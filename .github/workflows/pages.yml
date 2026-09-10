@@ -3,8 +3,8 @@
 # El sitio es la carpeta wiki/: HTML estático, sin build. Este flujo la sube
 # tal cual cada vez que se empuja a main.
 #
-# Requiere, una sola vez, dejar en Settings > Pages > Build and deployment
-# la fuente en «GitHub Actions».
+# La primera ejecución activa Pages ella misma (enablement: true), así que no
+# hay que tocar nada en Settings > Pages.
 
 name: Publicar la wiki
 
@@ -35,6 +35,10 @@ jobs:
 
       - name: Preparar Pages
         uses: actions/configure-pages@v5
+        with:
+          # Si Pages todavía no está activado en el repositorio, lo activa
+          # este paso: no hace falta tocar nada en Settings.
+          enablement: true
 
       - name: Empaquetar la carpeta wiki
         uses: actions/upload-pages-artifact@v3

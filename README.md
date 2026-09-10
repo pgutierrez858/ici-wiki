@@ -49,8 +49,8 @@ El sitio se publica en **GitHub Pages** desde este repositorio: cada empujón a
 `main` dispara `.github/workflows/pages.yml`, que sube la carpeta `wiki/` tal
 cual. No hay build ni dependencias.
 
-Una sola cosa hay que dejar puesta a mano, y sólo la primera vez:
-**Settings → Pages → Build and deployment → Source: GitHub Actions**.
+La primera ejecución activa Pages por su cuenta, así que no hay que tocar nada
+en los ajustes del repositorio.
 
 Queda en `https://pgutierrez858.github.io/ici-wiki/`.
 
