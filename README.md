@@ -49,8 +49,10 @@ El sitio se publica en **GitHub Pages** desde este repositorio: cada empujón a
 `main` dispara `.github/workflows/pages.yml`, que sube la carpeta `wiki/` tal
 cual. No hay build ni dependencias.
 
-La primera ejecución activa Pages por su cuenta, así que no hay que tocar nada
-en los ajustes del repositorio.
+Una sola cosa hay que dejar puesta a mano, y sólo la primera vez:
+**Settings → Pages → Build and deployment → Source: GitHub Actions**. El token
+del flujo no tiene permiso para crear el sitio, así que hasta que se marque eso
+el despliegue falla en el paso «Preparar Pages».
 
 Queda en `https://pgutierrez858.github.io/ici-wiki/`.
 

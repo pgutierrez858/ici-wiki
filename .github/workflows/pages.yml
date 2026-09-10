@@ -3,8 +3,9 @@
 # El sitio es la carpeta wiki/: HTML estático, sin build. Este flujo la sube
 # tal cual cada vez que se empuja a main.
 #
-# La primera ejecución activa Pages ella misma (enablement: true), así que no
-# hay que tocar nada en Settings > Pages.
+# Una vez, al crear el repositorio, hay que dejar en
+# Settings > Pages > Build and deployment la fuente en «GitHub Actions»:
+# el GITHUB_TOKEN no puede crear el sitio por su cuenta.
 
 name: Publicar la wiki
 
@@ -31,13 +32,13 @@ jobs:
       url: ${{ steps.despliegue.outputs.page_url }}
     steps:
       - name: Descargar el repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Preparar Pages
         uses: actions/configure-pages@v5
         with:
-          # Si Pages todavía no está activado en el repositorio, lo activa
-          # este paso: no hace falta tocar nada en Settings.
+          # Si Pages ya está activado, esto no hace nada; si se desactivara,
+          # lo intenta reactivar.
           enablement: true
 
       - name: Empaquetar la carpeta wiki
