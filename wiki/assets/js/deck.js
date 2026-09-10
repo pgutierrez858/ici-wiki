@@ -86,89 +86,6 @@
   var btnExit = bar.querySelector('[data-exit]');
   var count = bar.querySelector('.deck-count b');
 
-  /* ---------- notas de presentador ----------
-     Van cifradas y no hay nada en la interfaz que las mencione: la única
-     manera de abrirlas es añadir ?k=LA-CLAVE a la dirección. Se descifran en
-     el navegador con AES-GCM y la clave se borra de la barra de direcciones
-     en cuanto se lee. Sin clave, el archivo publicado es ruido. */
-  var URL_NOTAS = deck.getAttribute('data-aux');
-  var GUARDA = 'ici-notas:' + location.pathname;
-  var notas = null;
-  var notesOn = false;
-
-  var panel = document.createElement('aside');
-  panel.className = 'deck-notes';
-  panel.setAttribute('aria-live', 'polite');
-  deck.parentNode.insertBefore(panel, deck.nextSibling);
-
-  function aviso(txt) {
-    panel.classList.add('on');
-    panel.innerHTML = '<p class="s-notes"><span class="s-notes-label">Notas</span>' + txt + '</p>';
-  }
-
-  function fillNotes() {
-    if (!notas) return;
-    var html = notas[slides[i].id];
-    panel.innerHTML =
-      '<button class="deck-notes-x" type="button">ocultar</button>' +
-      '<div class="s-notes"><span class="s-notes-label">Notas · diapositiva ' +
-      (i + 1) + '</span>' + (html || '<p>Esta diapositiva no tiene notas.</p>') + '</div>';
-    var x = panel.querySelector('.deck-notes-x');
-    if (x) x.addEventListener('click', cerrarNotas);
-  }
-
-  function paintNotes() {
-    panel.classList.toggle('on', notesOn && !!notas);
-    if (notesOn && notas) fillNotes();
-  }
-
-  function cerrarNotas() {
-    notesOn = false;
-    notas = null;
-    try { sessionStorage.removeItem(GUARDA); } catch (e) {}
-    panel.classList.remove('on');
-    panel.innerHTML = '';
-  }
-
-  function b64(s) {
-    var bin = atob(s), a = new Uint8Array(bin.length);
-    for (var k = 0; k < bin.length; k++) a[k] = bin.charCodeAt(k);
-    return a;
-  }
-
-  async function descifrar(clave) {
-    if (!window.crypto || !crypto.subtle) {
-      throw new Error('Este navegador sólo descifra en una página servida por https.');
-    }
-    var r = await fetch(URL_NOTAS, { cache: 'no-store' });
-    if (!r.ok) throw new Error('No encuentro el archivo de notas.');
-    var caja = await r.json();
-    var material = await crypto.subtle.importKey('raw', new TextEncoder().encode(clave), 'PBKDF2', false, ['deriveKey']);
-    var key = await crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt: b64(caja.kdf.salt), iterations: caja.kdf.iter, hash: caja.kdf.hash },
-      material, { name: 'AES-GCM', length: 256 }, false, ['decrypt']
-    );
-    var claro = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(caja.iv) }, key, b64(caja.ct));
-    return JSON.parse(new TextDecoder().decode(claro));
-  }
-
-  async function abrir(clave, callado) {
-    if (!URL_NOTAS || !clave) return;
-    if (!callado) aviso('Descifrando…');
-    try {
-      notas = await descifrar(clave);
-      try { sessionStorage.setItem(GUARDA, clave); } catch (e) {}
-      notesOn = true;
-      paintNotes();
-    } catch (err) {
-      notas = null;
-      try { sessionStorage.removeItem(GUARDA); } catch (e) {}
-      aviso(/https/.test(err.message)
-        ? 'Las notas van cifradas y este navegador sólo puede descifrarlas en la versión publicada del sitio.'
-        : 'No he podido descifrar las notas: la clave no es correcta.');
-    }
-  }
-
   /* ---------- navegación ---------- */
   var i = 0;
 
@@ -182,7 +99,6 @@
     if (i !== antes) masca();
     btnPrev.disabled = i === 0;
     btnNext.disabled = i === slides.length - 1;
-    if (notesOn) fillNotes();
     if (!silent) {
       try { history.replaceState(null, '', '#' + slides[i].id); } catch (e) {}
     }
@@ -288,20 +204,4 @@
   show(start, true);
   colocaPac();
   paintFull();
-
-  var q = new URLSearchParams(location.search);
-  var claveURL = q.get('k');
-  if (claveURL) {
-    // la clave no se queda a la vista en el proyector
-    try {
-      q.delete('k');
-      var resto = q.toString();
-      history.replaceState(null, '', location.pathname + (resto ? '?' + resto : '') + location.hash);
-    } catch (e) {}
-    abrir(claveURL.trim());
-  } else {
-    var guardada = null;
-    try { guardada = sessionStorage.getItem(GUARDA); } catch (e) {}
-    if (guardada) abrir(guardada, true);
-  }
 })();

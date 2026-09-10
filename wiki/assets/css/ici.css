@@ -1171,7 +1171,7 @@ footer.page .credito { font-size: .82rem; }
    correcta del identificador: ni fondo, ni tamaño propio, ni color */
 h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
 .links .lm code, .rail a code, .chip code, .fact dt code, .slide-num code,
-.s-notes-label code, .cal-mname code {
+.cal-mname code {
   background: none;
   padding: 0;
   font-size: 1em;
@@ -1453,8 +1453,7 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
   .deck--js .img-stack > img + img, .deck--js .img-pair > img + img { margin-top: .6rem; }
   .deck--js .s-cover h2 { font-size: 1.6rem; }
   .deck--js .s-cover .pac { width: 2rem; height: 2rem; }
-  .deck-bar, .deck-pac, .deck-notes { display: none !important; }
-}
+  .deck-bar, .deck-pac, }
 
 /* ---------- barra de control ---------- */
 .deck-bar {
@@ -1594,42 +1593,6 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
   .deck-bar, .deck-pac { display: none !important; }
 }
 
-/* ---------- notas de presentador ---------- */
-.s-notes {
-  max-width: var(--measure);
-  margin: 0;
-  font-size: .98rem;
-  color: var(--ink-2);
-}
-.s-notes > :last-child { margin-bottom: 0; }
-.s-notes-label {
-  font-family: var(--f-mono);
-  font-size: .66rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  display: block;
-  margin-bottom: .4rem;
-}
-
-.deck-notes {
-  display: none;
-  margin: 1rem 0 0;
-  padding: 1rem 1.15rem;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--maze);
-  border-radius: 0 4px 4px 0;
-  max-width: none;
-}
-.deck-notes.on { display: block; }
-.deck-notes .s-notes { margin: 0; padding: 0; border: 0; font-size: 1rem; }
-.deck-notes .s-notes-label { color: var(--maze); }
-.deck-notes p { max-width: var(--measure); }
-
-@media print {
-  .deck-notes { display: none !important; }
-}
 
 /* ---------- enlaces a secciones todavía sin publicar ---------- */
 /* la etiqueta y la flecha sólo en lo que de verdad es un enlace apagado,
@@ -1665,23 +1628,6 @@ span.off[data-gate] [aria-hidden="true"],
 }
 .blk-links span.off, .legend .row { color: var(--ink-3); }
 
-.deck-notes { position: relative; }
-.deck-notes-x {
-  position: absolute;
-  top: .55rem;
-  right: .6rem;
-  font-family: var(--f-mono);
-  font-size: .62rem;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 3px;
-  padding: .25rem .45rem;
-  cursor: pointer;
-}
-.deck-notes-x:hover { color: var(--ink); border-color: var(--ink-3); }
 
 /* ---------- el calendario dentro de una diapositiva ----------
    Los tamaños del calendario de la wiki van en rem, que no escalan con el

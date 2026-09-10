@@ -1,18 +1,27 @@
-# Notas de presentador: el texto en claro y la clave con la que se cifran.
-# NO se publican nunca. Lo que va a la web es wiki/assets/aux/*.json, ya cifrado.
+# Este repositorio publica SÓLO la wiki. Todo lo demás del proyecto vive en
+# local: los generadores, la documentación de diseño y el material privado.
+#
+#   wiki/               el sitio, es lo único que se publica
+#   .github/workflows/  el despliegue en GitHub Pages
+#
+# Si algún día hace falta versionar las herramientas, que sea en un
+# repositorio privado aparte, no en este.
+
+# Documentación del proyecto y generadores
+/README.md
+/DESIGN.md
+/PRODUCT.md
+/tools/
+
+# Material privado: no puede acabar en un repositorio público
 notas/
-
-# Material de origen y trastos locales
-*.pdf
-ici-workspace/
-.DS_Store
-**/.DS_Store
-
-# Lo que se sube al Campus Virtual: los zips del motor y las soluciones de las
-# prácticas. NO se versiona aquí, porque este repositorio publica la wiki.
 recursos-campus-virtual/
+ici-workspace/
+*.pdf
 
 # Borradores sueltos anteriores a la wiki, ya integrados en wiki/
 /practica0.html
 /guia-eclipse-mspacman.html
-/game.pdf
+
+.DS_Store
+**/.DS_Store
