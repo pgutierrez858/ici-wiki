@@ -2,12 +2,169 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
 <title>Guías · ICI</title>
-<meta name="robots" content="noindex">
-<link rel="canonical" href="../guias/index.html">
-<meta http-equiv="refresh" content="0; url=../guias/index.html">
+<meta name="description" content="Guías de entorno y documentos de referencia de la asignatura: instalación de Eclipse y el simulador, y la clase Game.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
 </head>
-<body>
-  <p>Esta dirección lleva a <a href="../guias/index.html">Guías</a>.</p>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <span>Guías</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Guías
+      <span class="thin">Herramientas, entorno y documentos de referencia.</span>
+    </h1>
+    <p class="standfirst">
+      Aquí va lo que no es teoría ni enunciado: cómo montar el entorno, dónde está cada cosa del motor y
+      qué consultar cuando el código no compila. Se amplía conforme el curso lo pide.
+    </p>
+  </header>
+
+  <div class="cols solo" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="entorno">
+        <div class="sec-head">
+          <h2 class="sec">Entorno de desarrollo</h2>
+        </div>
+        <ul class="links">
+          <li>
+            <a href="eclipse.html">
+              <span class="lt">Ms. Pac-Man en Eclipse<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Guía · 7 pasos</span>
+              <span class="ld">
+                Instalar Eclipse desde eclipseide.org, importar el simulador, resolver las dependencias con
+                Maven y lanzar la primera partida. Incluye los diez errores típicos y cómo salir de ellos.
+              </span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="motor">
+        <div class="sec-head">
+          <h2 class="sec">El motor</h2>
+        </div>
+        <ul class="links">
+          <li>
+            <a href="clase-game.html">
+              <span class="lt">La clase <code>Game</code><span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Referencia</span>
+              <span class="ld">
+                Posiciones, píldoras, distancias, caminos, intersecciones y tiempos de comestible. Es lo
+                único que tu controlador puede preguntar, así que conviene tenerlo a mano.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="clase-game-slides.html">
+              <span class="lt">La clase <code>Game</code>, en diapositivas<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Presentación · 34 diapositivas</span>
+              <span class="ld">
+                Lo mismo que la referencia, con dibujos: el laberinto como grafo, cómo se numeran los nodos,
+                qué pasa en cada turno, las reglas del juego y los métodos que más se usan.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://gaia.fdi.ucm.es/research/mspacman/">
+              <span class="lt">GAIA · Ms. Pac-Man<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Externo</span>
+              <span class="ld">
+                El grupo de investigación que mantiene el entorno, y la competición internacional que se
+                organiza con él.
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div class="note trap">
+          <span class="note-label">Regla que no cambia</span>
+          <p>
+            El código del simulador no se modifica nunca. Si algo del motor te estorba, la solución está en
+            tu controlador o en preguntar en clase, no en tocar <code>pacman.*</code>.
+          </p>
+        </div>
+      </section>
+
+      <section id="proximas">
+        <div class="sec-head">
+          <h2 class="sec">En camino</h2>
+        </div>
+        <p>
+          Con cada bloque se publica aquí lo que haga falta: la guía de Jess para la Práctica&nbsp;3, la de
+          jFuzzyLogic para la Práctica&nbsp;4 y las herramientas del entorno de la Práctica&nbsp;5 cuando se
+          anuncie cuál es.
+        </p>
+      </section>
+
+    </main>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 10 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
 </body>
 </html>

@@ -2,12 +2,383 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
 <title>Prácticas · ICI</title>
-<meta name="robots" content="noindex">
-<link rel="canonical" href="../practicas/index.html">
-<meta http-equiv="refresh" content="0; url=../practicas/index.html">
+<meta name="description" content="Los bloques de prácticas del curso, qué pide cada uno y las reglas de entrega comunes a todas las entregas de la asignatura.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
 </head>
-<body>
-  <p>Esta dirección lleva a <a href="../practicas/index.html">Prácticas</a>.</p>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <span>Prácticas</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Prácticas
+      <span class="thin">Siete prácticas y un bloque extra al final, y de aquí sale toda la nota.</span>
+    </h1>
+    <p class="standfirst">
+      Cada bloque introduce una forma de representar conocimiento y te pide aplicarla a un entorno de
+      juego. El enunciado de cada práctica se publica al empezar su bloque; las reglas de entrega, en
+      cambio, son las mismas todo el curso y están al final de esta página.
+    </p>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Próxima entrega</dt>
+      <dd><span data-next-due>dom 20 septiembre</span><small><span data-next-due-rel>Quedan 12 días</span> · <span data-next-name>Práctica 0</span></small></dd>
+    </div>
+    <div class="fact">
+      <dt>Formato</dt>
+      <dd><code>practicaN.zip</code><small>Por el Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Paquete</dt>
+      <dd><code>…ici.c2627</code><small>Curso 2026&#8239;–&#8239;2027</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Entorno actual</dt>
+      <dd>Ms. Pac-Man<small>Hasta la Práctica 4</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="bloques">
+        <div class="sec-head">
+          <h2 class="sec">Los bloques</h2>
+        </div>
+        <!--ICI:BLOCKS-->
+        <ol class="blocks">
+          <li class="blk" data-b="p0" data-start="2026-09-07" data-due="2026-09-20" data-name="Práctica 0">
+            <span class="blk-num" aria-hidden="true">00</span>
+            <div class="blk-main">
+              <h3 class="blk-title"><a href="practica-0.html">Práctica 0 · Tutorial</a> <span class="chip now" data-state>En curso</span></h3>
+              <p class="blk-desc">El simulador, el ciclo de una partida y los primeros comportamientos, todavía a mano.</p>
+            </div>
+            <div class="blk-meta">
+              <span>Entrega <b>dom 20 septiembre</b></span>
+              <span class="env">Entorno: Ms. Pac-Man</span>
+              <span>Individual</span>
+            </div>
+            <ul class="blk-links">
+              <li><a href="practica-0.html">Enunciado <span aria-hidden="true">→</span></a></li>
+              <li><span class="off">Tema 1 · Ingeniería del conocimiento</span></li>
+            </ul>
+          </li>
+          <li class="blk" data-b="p1" data-start="2026-09-21" data-due="2026-10-04" data-name="Práctica 1">
+            <span class="blk-num" aria-hidden="true">01</span>
+            <div class="blk-main">
+              <h3 class="blk-title">Práctica 1 · Algorítmica <span class="chip soon" data-state>Por abrir</span></h3>
+              <p class="blk-desc">Movimiento y búsqueda de caminos en el laberinto: la solución directa, y por qué no escala.</p>
+            </div>
+            <div class="blk-meta">
+              <span>Entrega <b>dom 4 octubre</b></span>
+              <span class="env">Entorno: Ms. Pac-Man</span>
+              <span>Grupos</span>
+            </div>
+            <ul class="blk-links">
+              <li><span class="off">Enunciado por publicar</span></li>
+              <li><span class="off">Tema 2 · Búsqueda y movimiento</span></li>
+            </ul>
+          </li>
+          <li class="blk" data-b="p2" data-start="2026-10-05" data-due="2026-10-18" data-name="Práctica 2">
+            <span class="blk-num" aria-hidden="true">02</span>
+            <div class="blk-main">
+              <h3 class="blk-title">Práctica 2 · Máquinas de estados <span class="chip soon" data-state>Por abrir</span></h3>
+              <p class="blk-desc">Comportamientos como estados y transiciones: diseño, jerarquía y depuración de una FSM.</p>
+            </div>
+            <div class="blk-meta">
+              <span>Entrega <b>dom 18 octubre</b></span>
+              <span class="env">Entorno: Ms. Pac-Man</span>
+              <span>Grupos</span>
+            </div>
+            <ul class="blk-links">
+              <li><span class="off">Enunciado por publicar</span></li>
+              <li><span class="off">Tema 2 · Máquinas de estados</span></li>
+            </ul>
+          </li>
+          <li class="blk" data-b="p3" data-start="2026-10-19" data-due="2026-11-01" data-name="Práctica 3">
+            <span class="blk-num" aria-hidden="true">03</span>
+            <div class="blk-main">
+              <h3 class="blk-title">Práctica 3 · Sistemas de reglas <span class="chip soon" data-state>Por abrir</span></h3>
+              <p class="blk-desc">Conocimiento declarativo con Jess: hechos, reglas, motor de inferencia y encadenamiento.</p>
+            </div>
+            <div class="blk-meta">
+              <span>Entrega <b>dom 1 noviembre</b></span>
+              <span class="env">Entorno: Ms. Pac-Man</span>
+              <span>Grupos</span>
+            </div>
+            <ul class="blk-links">
+              <li><span class="off">Enunciado por publicar</span></li>
+              <li><span class="off">Tema 3 · Sistemas de reglas</span></li>
+            </ul>
+          </li>
+          <li class="blk" data-b="p4" data-start="2026-11-02" data-due="2026-11-15" data-name="Práctica 4">
+            <span class="blk-num" aria-hidden="true">04</span>
+            <div class="blk-main">
+              <h3 class="blk-title">Práctica 4 · Razonamiento borroso <span class="chip soon" data-state>Por abrir</span></h3>
+              <p class="blk-desc">Decisiones con magnitudes imprecisas: conjuntos borrosos, reglas lingüísticas e inferencia.</p>
+            </div>
+            <div class="blk-meta">
+              <span>Entrega <b>dom 15 noviembre</b></span>
+              <span class="env">Entorno: Ms. Pac-Man</span>
+              <span>Grupos</span>
+            </div>
+            <ul class="blk-links">
+              <li><span class="off">Enunciado por publicar</span></li>
+              <li><span class="off">Tema 4 · Razonamiento borroso</span></li>
+            </ul>
+          </li>
+          <li class="blk" data-b="mx" data-start="2026-11-16" data-due="2026-11-29" data-name="Práctica 5" data-due-txt="Por anunciar">
+            <span class="blk-num" aria-hidden="true">05</span>
+            <div class="blk-main">
+              <h3 class="blk-title">Práctica 5 · Juegos por turnos <span class="chip soon" data-state>Por abrir</span></h3>
+              <p class="blk-desc">Simular el futuro en vez de razonar sobre el presente: minimax, poda alfa-beta y Monte Carlo Tree Search.</p>
+            </div>
+            <div class="blk-meta">
+              <span>Entrega <b>Por anunciar</b></span>
+              <span class="env">Entorno: ???</span>
+              <span>Grupos</span>
+            </div>
+            <ul class="blk-links">
+              <li><span class="off">Enunciado por publicar</span></li>
+              <li><span class="off">Tema 5 · Juegos por turnos</span></li>
+            </ul>
+          </li>
+          <li class="blk" data-b="cb" data-start="2026-11-30" data-due="2026-12-13" data-name="Práctica 6" data-due-txt="Por anunciar">
+            <span class="blk-num" aria-hidden="true">06</span>
+            <div class="blk-main">
+              <h3 class="blk-title">Práctica 6 · Razonamiento basado en casos <span class="chip soon" data-state>Por abrir</span></h3>
+              <p class="blk-desc">En vez de escribir reglas, guardar partidas: recuperar el caso más parecido, adaptar su solución y aprender del resultado.</p>
+            </div>
+            <div class="blk-meta">
+              <span>Entrega <b>Por anunciar</b></span>
+              <span class="env">Entorno: Por anunciar</span>
+              <span>Grupos</span>
+            </div>
+            <ul class="blk-links">
+              <li><span class="off">Enunciado por publicar</span></li>
+              <li><span class="off">Tema 6 · Razonamiento basado en casos</span></li>
+            </ul>
+          </li>
+          <li class="blk" data-b="bn" data-start="2026-12-14" data-due="2026-12-20" data-name="Bonus" data-due-txt="Por anunciar">
+            <span class="blk-num" aria-hidden="true">B</span>
+            <div class="blk-main">
+              <h3 class="blk-title">Bonus · Juegos de lenguaje <span class="chip soon" data-state>Por abrir</span></h3>
+              <p class="blk-desc">Código Secreto como entorno, y por una vez técnicas que no son simbólicas: embeddings y modelos de lenguaje.</p>
+            </div>
+            <div class="blk-meta">
+              <span>Entrega <b>Por anunciar</b></span>
+              <span class="env">Entorno: Código Secreto</span>
+              <span>Grupos</span>
+            </div>
+            <ul class="blk-links">
+              <li><span class="off">Enunciado por publicar</span></li>
+              <li><span class="off">Bonus · Juegos de lenguaje</span></li>
+            </ul>
+          </li>
+        </ol>
+        <!--/ICI:BLOCKS-->
+        <p class="apunte sep">
+          Las fechas completas están en el <a href="../calendario.html">calendario</a>. Un bloque «por
+          abrir» todavía no tiene enunciado publicado; cada uno se publica al empezar su tramo.
+        </p>
+      </section>
+
+      <section id="reglas">
+        <div class="sec-head">
+          <h2 class="sec">Reglas de entrega</h2>
+        </div>
+        <p>
+          Como norma general, <strong>todas</strong> las entregas del curso siguen el mismo esquema. Cada
+          enunciado puede añadir requisitos, pero nunca quita estos.
+        </p>
+
+        <h3>El paquete</h3>
+        <p>
+          Todo el código de una entrega vive en el paquete
+          <code>es.ucm.fdi.ici.c2627.practicaX.grupoYY</code>, donde <code>X</code> es el número de la
+          práctica e <code>YY</code> el número de grupo asignado en clase. En las prácticas individuales,
+          el último tramo es <code>grupoIndividual</code>.
+        </p>
+        <pre><code>es/ucm/fdi/ici/c2627/practica2/grupo07/
+  <span class="c">├─</span> MsPacMan.java   <span class="c">// controlador de Ms. Pac-Man</span>
+  <span class="c">├─</span> Ghosts.java     <span class="c">// controlador de los cuatro fantasmas</span>
+  <span class="c">└─</span> …               <span class="c">// las clases auxiliares que necesites</span></code></pre>
+
+        <h3>Los controladores</h3>
+        <p>
+          Salvo que el enunciado diga otra cosa, cada entrega incluye los dos bandos: la clase
+          <code>MsPacMan</code> y la clase <code>Ghosts</code>. Si entregas varios controladores
+          alternativos, indica en la memoria cuál es el que debe evaluarse.
+        </p>
+
+        <h3>El zip</h3>
+        <div class="note trap">
+          <span class="note-label">Lo que más se falla</span>
+          <p>
+            La raíz del zip tiene que ser la carpeta <code>es</code>. Al abrir
+            <code>practica2.zip</code> lo primero que debe verse es <code>es/</code>, no <code>src/</code>
+            ni la carpeta del proyecto de Eclipse.
+          </p>
+        </div>
+        <ul class="check">
+          <li>El nombre del archivo es <code>practicaN.zip</code>, con el número de la práctica.</li>
+          <li>El paquete es <code>es.ucm.fdi.ici.c2627.practicaN.grupoYY</code>.</li>
+          <li>Al abrir el zip aparece <code>es/</code> en la raíz.</li>
+          <li>No hay ni un archivo del simulador dentro (paquete <code>pacman.*</code>).</li>
+          <li>El código compila tal cual, sin tocar nada del motor.</li>
+          <li>Se sube por el Campus Virtual antes del final del domingo de entrega.</li>
+        </ul>
+        <p class="apunte">
+          No se permite modificar el código del simulador, así que la entrega tampoco debe contenerlo:
+          se compila contra el motor tal y como se distribuye.
+        </p>
+      </section>
+
+      <section id="grupos">
+        <div class="sec-head">
+          <h2 class="sec">Grupos y defensa</h2>
+        </div>
+        <p>
+          La Práctica&nbsp;0 es individual. A partir de la Práctica&nbsp;1 se trabaja en grupo, y el
+          enunciado de cada bloque fija el tamaño, el reparto del trabajo y qué se puntúa. Algunas entregas
+          tienen componente competitiva, con un torneo entre los controladores de la clase, y otras se
+          evalúan sólo por implementación y defensa.
+        </p>
+        <p>
+          La defensa es en clase, sobre el código que habéis entregado, y puede pedírsele a cualquier
+          miembro del grupo. Conviene que todos sepáis explicar todo: es la mejor señal de que el trabajo
+          se ha repartido de verdad.
+        </p>
+        <p>
+          Los detalles de evaluación de la asignatura están en
+          <a href="../index.html#evaluacion">la página de la asignatura</a>.
+        </p>
+      </section>
+
+      <section id="antes">
+        <div class="sec-head">
+          <h2 class="sec">Antes de la primera práctica</h2>
+        </div>
+        <p>
+          El material sale del Campus Virtual en dos piezas: <code>ICI-MsPacManEngine.zip</code>, el
+          simulador de las prácticas 0 a 4, que se descarga una sola vez, y un
+          <code>ICI-PracticaN.zip</code> por práctica, con el proyecto de Eclipse ya referenciando al
+          simulador y con el paquete creado. Se importa primero el simulador. Del entorno de la segunda
+          mitad del curso se dará lo suyo cuando se anuncie.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../guias/eclipse.html">
+              <span class="lt">Ms. Pac-Man en Eclipse<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Guía</span>
+              <span class="ld">Instalar el IDE, importar el simulador y ver la primera partida.</span>
+            </a>
+          </li>
+          <li>
+            <a href="../guias/clase-game.html">
+              <span class="lt">La clase <code>Game</code><span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Referencia</span>
+              <span class="ld">Todo lo que tu controlador puede preguntarle al estado de la partida.</span>
+            </a>
+          </li>
+          <li>
+            <span class="off" data-gate="teoria" data-href="../teoria/index.html">
+              <span class="lt">Teoría<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Temario</span>
+              <span class="ld">Los conceptos de cada bloque, en una línea cada uno.</span>
+            </span>
+          </li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#bloques">Los bloques</a></li>
+            <li><a href="#reglas">Reglas de entrega</a></li>
+            <li><a href="#grupos">Grupos y defensa</a></li>
+            <li><a href="#antes">Antes de la primera práctica</a></li>
+          </ol>
+        </nav>
+        <p class="rail-note">
+          Empieza por la <a href="practica-0.html">Práctica&nbsp;0</a>: es individual, no puntúa y sirve
+          para tener el entorno listo.
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 10 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
 </body>
 </html>

@@ -2,12 +2,335 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- sección todavía sin publicar: fuera de los buscadores hasta que se abra -->
+<meta name="robots" content="noindex, nofollow">
+<!--/ICI:HEAD-->
 <title>Teoría · ICI</title>
-<meta name="robots" content="noindex">
-<link rel="canonical" href="../teoria/index.html">
-<meta http-equiv="refresh" content="0; url=../teoria/index.html">
+<meta name="description" content="Temario de Ingeniería de Comportamientos Inteligentes: los conceptos de cada tema, en una línea cada uno, y a qué práctica sirven.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
 </head>
-<body>
-  <p>Esta dirección lleva a <a href="../teoria/index.html">Teoría</a>.</p>
+<body data-page="teoria">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <span>Teoría</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Teoría
+      <span class="thin">Los temas del curso y el vocabulario de cada uno.</span>
+    </h1>
+    <p class="standfirst">
+      Esta página funciona como mapa: por cada tema, para qué sirve, a qué práctica va asociado y los
+      conceptos que hay que tener claros, definidos en una línea. El desarrollo completo de cada concepto se
+      publica en esta sección junto con la práctica que lo usa.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="tema-1">
+        <div class="sec-head">
+          <span class="num">Tema 1</span>
+          <h2 class="sec">Introducción: ingeniería del conocimiento</h2>
+        </div>
+        <p class="tema-when">
+          <a href="../practicas/practica-0.html">Práctica 0 · Tutorial</a> · 7&#8239;–&#8239;20 sep
+        </p>
+        <p>
+          El tema que sostiene todos los demás. Un sistema basado en conocimiento separa lo que el sistema
+          <em>sabe</em> de lo que el sistema <em>hace</em> con lo que sabe: la base de conocimiento por un
+          lado, el motor que razona sobre ella por otro. Toda la asignatura consiste en decidir qué va en la
+          base de conocimiento y en qué formato.
+        </p>
+        <dl class="gloss">
+          <div><dt>Sistema basado en conocimiento</dt><dd>Programa donde el conocimiento del dominio está representado explícitamente y separado del mecanismo que lo utiliza.</dd></div>
+          <div><dt>Base de conocimiento</dt><dd>El conjunto de hechos y relaciones que el sistema sabe sobre el dominio, en un formato que puede inspeccionarse y corregirse a mano.</dd></div>
+          <div><dt>Motor de inferencia</dt><dd>El mecanismo que aplica el conocimiento a una situación concreta para obtener conclusiones o decisiones.</dd></div>
+          <div><dt>Adquisición del conocimiento</dt><dd>Sacar el conocimiento de donde esté, sea un experto, tus propias partidas o los datos del motor, y hacerlo explícito. Es el cuello de botella real.</dd></div>
+          <div><dt>Modelos lógicos</dt><dd>Representaciones basadas en verdad y deducción: lógica de predicados, reglas de producción.</dd></div>
+          <div><dt>Modelos estructurados</dt><dd>Representaciones basadas en organización: marcos, redes semánticas, ontologías, máquinas de estados.</dd></div>
+          <div><dt>Modelos imprecisos</dt><dd>Representaciones que admiten grados en vez de sí o no: lógica borrosa, probabilidad, similitud entre casos.</dd></div>
+          <div><dt>Reusabilidad</dt><dd>Grado en que el conocimiento modelado sigue valiendo al cambiar de problema o de dominio. Es la razón de cambiar de entorno a mitad de curso.</dd></div>
+        </dl>
+      </section>
+
+      <section id="tema-2">
+        <div class="sec-head">
+          <span class="num">Tema 2</span>
+          <h2 class="sec">Repaso de IA para videojuegos</h2>
+        </div>
+        <p class="tema-when">
+          <a href="../practicas/index.html#bloques">Prácticas 1 y 2</a> · 21 sep&#8239;–&#8239;18 oct
+        </p>
+        <p>
+          El repertorio clásico de un personaje: cómo se mueve y cómo decide. Primero la solución directa
+          a base de condicionales anidados, para ver dónde se rompe; después la máquina de estados, que es
+          la primera representación de verdad del curso.
+        </p>
+        <figure class="wide">
+          <figcaption>La máquina de estados de cada personaje, corriendo junto a la partida</figcaption>
+          <img class="shot" src="../assets/img/maquina-estados.jpg" width="1500" height="838" loading="lazy"
+               alt="Tres ventanas a la vez: a la izquierda el diagrama de estados de Ms. Pac-Man, en el centro la partida en marcha, y a la derecha los diagramas de Sue, Inky, Pinky y Blinky, cada uno con los estados chase y runAway unidos por transiciones etiquetadas.">
+        </figure>
+        <dl class="gloss">
+          <div><dt>Búsqueda de caminos</dt><dd>Encontrar la ruta entre dos puntos del mapa. En el laberinto de Ms. Pac-Man el grafo es fijo y el motor ya ofrece distancias y caminos precalculados.</dd></div>
+          <div><dt>Distancia de camino vs. euclídea</dt><dd>La distancia en línea recta miente en un laberinto: dos nodos vecinos en el plano pueden estar a media pantalla por el pasillo.</dd></div>
+          <div><dt>Comportamiento de dirección</dt><dd>Regla local de movimiento (perseguir, huir, interceptar, patrullar) que se calcula cada tick a partir del estado.</dd></div>
+          <div><dt>Toma de decisiones</dt><dd>Elegir <em>qué</em> hacer, en un nivel por encima de <em>cómo</em> moverse: la decisión escoge el comportamiento, el comportamiento escoge la dirección.</dd></div>
+          <div><dt>Máquina de estados finita (FSM)</dt><dd>Conjunto de estados, uno activo cada vez, y transiciones etiquetadas con la condición que las dispara. Cada estado encapsula un comportamiento.</dd></div>
+          <div><dt>Transición</dt><dd>Condición sobre el estado del juego que hace pasar de un estado a otro: «fantasma cerca y no comestible», «se acabó el tiempo de píldora».</dd></div>
+          <div><dt>FSM jerárquica</dt><dd>Estados que contienen máquinas de estados. Evita la explosión de transiciones cuando el número de estados crece.</dd></div>
+          <div><dt>Histéresis</dt><dd>Margen deliberado entre la condición que entra a un estado y la que sale de él, para que el personaje no oscile entre dos estados en ticks consecutivos.</dd></div>
+          <div><dt>Coordinación</dt><dd>Los cuatro fantasmas son cuatro agentes con un objetivo común: repartirse cuadrantes, cortar escapatorias, no perseguir todos lo mismo.</dd></div>
+        </dl>
+      </section>
+
+      <section id="tema-3">
+        <div class="sec-head">
+          <span class="num">Tema 3</span>
+          <h2 class="sec">Sistemas de reglas</h2>
+        </div>
+        <p class="tema-when">
+          <a href="../practicas/index.html#bloques">Práctica 3</a> · 19 oct&#8239;–&#8239;1 nov
+        </p>
+        <p>
+          Conocimiento declarativo: en vez de escribir el orden en que se comprueban las cosas, escribes
+          las reglas y el motor decide cuáles se aplican. Se gana legibilidad y se pierde el control del
+          flujo, que es exactamente el intercambio que hay que entender.
+        </p>
+        <figure class="wide">
+          <figcaption>Jess disparando reglas mientras se juega la partida</figcaption>
+          <img class="shot" src="../assets/img/reglas-jess.jpg" width="1500" height="859" loading="lazy"
+               alt="A la izquierda la consola de Jess con los hechos de la memoria de trabajo y la regla BLINKYrunsAway disparándose una y otra vez; a la derecha la partida, con los cuatro fantasmas azules porque son comestibles.">
+        </figure>
+        <dl class="gloss">
+          <div><dt>Hecho</dt><dd>Afirmación sobre el estado actual del mundo, añadida a la memoria de trabajo: <code>(fantasma-cerca blinky 12)</code>.</dd></div>
+          <div><dt>Regla de producción</dt><dd>Par antecedente–consecuente: si se cumplen estos patrones sobre los hechos, ejecuta estas acciones.</dd></div>
+          <div><dt>Memoria de trabajo</dt><dd>El conjunto de hechos vigentes en un instante. Tu controlador la reconstruye o la actualiza en cada tick.</dd></div>
+          <div><dt>Emparejamiento</dt><dd>Proceso de encontrar qué reglas tienen su antecedente satisfecho por los hechos actuales.</dd></div>
+          <div><dt>Agenda y resolución de conflictos</dt><dd>Cuando varias reglas pueden dispararse a la vez, la estrategia de resolución decide el orden: prioridad explícita, especificidad, antigüedad del hecho.</dd></div>
+          <div><dt>Encadenamiento hacia delante</dt><dd>Se parte de los hechos y se deducen conclusiones. Es el modo natural para decidir la acción de un personaje.</dd></div>
+          <div><dt>Encadenamiento hacia atrás</dt><dd>Se parte de una hipótesis y se busca si los hechos la sostienen. Útil para diagnóstico más que para actuar.</dd></div>
+          <div><dt>Jess</dt><dd>Motor de reglas para Java que usaremos en la práctica. Las reglas se escriben en un fichero aparte del código Java, y eso es parte de la gracia.</dd></div>
+        </dl>
+      </section>
+
+      <section id="tema-4">
+        <div class="sec-head">
+          <span class="num">Tema 4</span>
+          <h2 class="sec">Razonamiento borroso</h2>
+        </div>
+        <p class="tema-when">
+          <a href="../practicas/index.html#bloques">Práctica 4</a> · 2&#8239;–&#8239;15 nov
+        </p>
+        <p>
+          «El fantasma está cerca» no es verdadero ni falso: es verdadero en cierto grado. La lógica
+          borrosa permite escribir reglas con el vocabulario con el que de verdad piensa un jugador y
+          obtener decisiones suaves en vez de saltos bruscos en un umbral.
+        </p>
+        <figure class="wide">
+          <figcaption>Las reglas borrosas y su grado de cumplimiento, tick a tick</figcaption>
+          <img class="shot" src="../assets/img/logica-borrosa.jpg" width="1500" height="846" loading="lazy"
+               alt="A la izquierda la salida del motor borroso: las distancias y confianzas de cada fantasma como entrada, el valor de runAway como salida, y doce reglas del tipo «si la distancia de Blinky es cerca y la confianza es alta, entonces runAway es emergency» con su grado de activación. A la derecha la partida en marcha.">
+        </figure>
+        <dl class="gloss">
+          <div><dt>Conjunto borroso</dt><dd>Conjunto en el que la pertenencia es un grado entre 0 y 1 en vez de un sí o un no.</dd></div>
+          <div><dt>Función de pertenencia</dt><dd>La curva que asigna ese grado a cada valor de la variable: triangular, trapezoidal, gaussiana.</dd></div>
+          <div><dt>Variable lingüística</dt><dd>Variable cuyos valores son palabras, como una distancia que puede ser <em>cerca</em>, <em>media</em> o <em>lejos</em>, cada una con su función de pertenencia.</dd></div>
+          <div><dt>Regla borrosa</dt><dd>Regla escrita sobre variables lingüísticas: «si la distancia es <em>cerca</em> y el fantasma es <em>no comestible</em>, la amenaza es <em>alta</em>».</dd></div>
+          <div><dt>Difuminación</dt><dd>Convertir las magnitudes numéricas del juego en grados de pertenencia. La entrada del sistema borroso.</dd></div>
+          <div><dt>Inferencia (Mamdani)</dt><dd>Combinar el grado de cumplimiento de cada regla para obtener un conjunto borroso de salida.</dd></div>
+          <div><dt>Desdifuminación</dt><dd>Reducir ese conjunto de salida a un número con el que actuar: centro de gravedad, media de máximos.</dd></div>
+          <div><dt>jFuzzyLogic</dt><dd>Biblioteca Java que usaremos; las reglas se escriben en FCL, un formato de texto independiente del código.</dd></div>
+        </dl>
+      </section>
+
+      <section id="tema-5">
+        <div class="sec-head">
+          <span class="num">Tema 5</span>
+          <h2 class="sec">Decisiones en juegos por turnos</h2>
+        </div>
+        <p class="tema-when">
+          <a href="../practicas/index.html#bloques">Práctica 5</a> · 16&#8239;–&#8239;29 nov
+        </p>
+        <p>
+          Cuando el juego va por turnos y hay un adversario, se puede <em>simular</em> el futuro en vez de
+          razonar sólo sobre el presente. El conocimiento del dominio no desaparece: se traslada a la
+          función que evalúa lo buena que es una posición y a cómo se poda el árbol.
+        </p>
+        <dl class="gloss">
+          <div><dt>Modelo <em>forward</em></dt><dd>Capacidad de preguntarle al juego «si hago esta jugada, ¿cómo queda el estado?» sin jugarla de verdad. Sin él no hay búsqueda.</dd></div>
+          <div><dt>Árbol de juego</dt><dd>Nodos que son estados y aristas que son jugadas, alternando el turno de cada jugador.</dd></div>
+          <div><dt>Minimax</dt><dd>Elegir la jugada que maximiza tu resultado suponiendo que el adversario elige siempre la que te lo minimiza.</dd></div>
+          <div><dt>Poda alfa-beta</dt><dd>Descartar ramas que no pueden cambiar la decisión final. Mismo resultado que minimax explorando mucho menos.</dd></div>
+          <div><dt>Función de evaluación</dt><dd>Estimación de lo buena que es una posición sin llegar al final de la partida. Aquí es donde va el conocimiento del dominio.</dd></div>
+          <div><dt>Monte Carlo Tree Search</dt><dd>Construir el árbol de forma incremental guiado por simulaciones aleatorias: seleccionar, expandir, simular, propagar el resultado.</dd></div>
+          <div><dt>UCT</dt><dd>La fórmula que equilibra explotar la jugada que va bien y explorar las poco visitadas durante la selección.</dd></div>
+          <div><dt>Presupuesto y <em>anytime</em></dt><dd>El controlador tiene un tiempo límite por jugada; MCTS puede pararse en cualquier momento y devolver la mejor jugada encontrada hasta entonces.</dd></div>
+        </dl>
+        <div class="note mine">
+          <span class="note-label">Sobre este tema</span>
+          <p>
+            El entorno de esta práctica sale de una encuesta a la clase, así que se anuncia cuando la
+            encuesta esté cerrada, y las páginas del tema se publican con ese anuncio. El contenido, en
+            cambio, ya está decidido: es lo que hay en la lista de arriba.
+          </p>
+        </div>
+      </section>
+
+      <section id="tema-6">
+        <div class="sec-head">
+          <span class="num">Tema 6</span>
+          <h2 class="sec">Razonamiento basado en casos</h2>
+        </div>
+        <p class="tema-when">
+          <a href="../practicas/index.html#bloques">Práctica 6</a> · 30 nov&#8239;–&#8239;13 dic
+        </p>
+        <p>
+          La última vuelta de tuerca: en vez de escribir reglas, guardar experiencias. Un sistema basado en
+          casos resuelve un problema nuevo recuperando el caso más parecido que ya resolvió y adaptando su
+          solución. Es la forma más directa de que un comportamiento aprenda sin entrenar un modelo.
+        </p>
+        <dl class="gloss">
+          <div><dt>Caso</dt><dd>Par problema–solución tomado de una experiencia concreta, con el resultado que obtuvo.</dd></div>
+          <div><dt>Base de casos</dt><dd>La memoria del sistema. Sustituye a la base de reglas: el conocimiento está en los ejemplos, no en las generalizaciones.</dd></div>
+          <div><dt>Ciclo de las cuatro R</dt><dd>Recuperar el caso similar, reutilizar su solución, revisar el resultado y retener el caso nuevo.</dd></div>
+          <div><dt>Medida de similitud</dt><dd>Función que decide qué caso guardado se parece más a la situación actual. Ahí va el conocimiento del dominio.</dd></div>
+          <div><dt>Adaptación</dt><dd>Ajustar la solución recuperada a las diferencias entre el caso viejo y el problema nuevo.</dd></div>
+          <div><dt>Retención y mantenimiento</dt><dd>Decidir qué casos merecen guardarse para que la base crezca en calidad y no sólo en tamaño.</dd></div>
+        </dl>
+      </section>
+
+      <section id="bonus">
+        <div class="sec-head">
+          <span class="num">Bonus</span>
+          <h2 class="sec">Agentes para juegos de lenguaje</h2>
+        </div>
+        <p class="tema-when">
+          Código Secreto · 14&#8239;–&#8239;20 dic
+        </p>
+        <p>
+          El bloque que rompe la regla del curso. Cuando el tablero son palabras, escribir el conocimiento a
+          mano no llega: hay que medir significado, y eso hoy sale de modelos entrenados sobre muchísimo
+          texto. Sirve para ver por dentro las técnicas del otro lado de la Inteligencia Artificial y para
+          entender qué se gana y qué se pierde al cambiar de lado.
+        </p>
+        <dl class="gloss">
+          <div><dt>Código Secreto</dt><dd>Veinticinco palabras en la mesa. El jefe de espías ve cuáles son de su equipo y sólo puede decir una palabra y un número para señalarlas.</dd></div>
+          <div><dt>Embedding</dt><dd>Vector que representa una palabra, colocado de forma que las palabras de significado parecido queden cerca unas de otras.</dd></div>
+          <div><dt>Similitud del coseno</dt><dd>La medida habitual de cercanía entre dos vectores: el ángulo que forman, no la distancia en línea recta.</dd></div>
+          <div><dt>Modelo de lenguaje</dt><dd>Modelo que, dado un contexto, reparte probabilidad entre las continuaciones posibles. No deduce la respuesta, la ordena.</dd></div>
+          <div><dt><em>Prompt</em></dt><dd>El contexto que se le da al modelo. Aquí es una decisión de diseño más, y se prueba y se mide como cualquier otra.</dd></div>
+          <div><dt>Decisión con riesgo</dt><dd>Acertar de más regala el turno y tocar la casilla negra pierde la partida, así que la mejor pista no siempre es la más ambiciosa.</dd></div>
+          <div><dt>Sesgo del corpus</dt><dd>Los vectores heredan lo que había en el texto de entrenamiento, con sus asociaciones útiles y sus prejuicios.</dd></div>
+        </dl>
+        <div class="note mine">
+          <span class="note-label">Por qué está aquí</span>
+          <p>
+            Después de cuatro meses escribiendo conocimiento a mano, este bloque enseña el contraste: lo que
+            se gana en cobertura, lo que se pierde en control y por qué la industria usa cada cosa donde la
+            usa.
+          </p>
+        </div>
+      </section>
+
+      <section id="bibliografia">
+        <div class="sec-head">
+          <h2 class="sec">Para leer más</h2>
+        </div>
+        <p>
+          La bibliografía completa, tema por tema, está en
+          <a href="../index.html#recursos">la página de la asignatura</a>. Si sólo vas a leer un libro en
+          todo el curso, que sea el de Millington y Funge: es el que más se parece a lo que hacemos aquí.
+        </p>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="temas">
+          <h2 id="temas">Temas</h2>
+          <ol>
+            <li><a href="#tema-1"><em>Tema 1</em>Ingeniería del conocimiento</a></li>
+            <li><a href="#tema-2"><em>Tema 2</em>IA para videojuegos</a></li>
+            <li><a href="#tema-3"><em>Tema 3</em>Sistemas de reglas</a></li>
+            <li><a href="#tema-4"><em>Tema 4</em>Razonamiento borroso</a></li>
+            <li><a href="#tema-5"><em>Tema 5</em>Juegos por turnos</a></li>
+            <li><a href="#tema-6"><em>Tema 6</em>Casos</a></li>
+            <li><a href="#bonus"><em>Bonus</em>Juegos de lenguaje</a></li>
+          </ol>
+        </nav>
+        <p class="rail-note">
+          Cada tema se explica en clase justo antes de la práctica que lo usa. Aquí queda el vocabulario
+          para volver a consultarlo.
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 10 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
 </body>
 </html>
