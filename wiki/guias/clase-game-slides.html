@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>La clase Game, en diapositivas · ICI</title>
+<meta name="description" content="Diapositivas sobre el simulador de Ms. Pac-Man: el laberinto como grafo, la numeración de los nodos, cómo avanza cada turno, las reglas del juego y los métodos de la clase Game.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>La clase Game en diapositivas</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      La clase <code>Game</code>, en diapositivas
+      <span class="thin">El simulador por dentro, para verlo en clase.</span>
+    </h1>
+    <p class="standfirst">
+      Lo mismo que cuenta <a href="clase-game.html">la página de la clase <code>Game</code></a>, con dibujos
+      y en el orden en el que se explica: el laberinto y sus nodos, qué pasa en cada turno, las reglas del
+      juego y los métodos que vas a usar. Se pasa con las flechas del teclado y el botón de abajo la pone a
+      pantalla completa.
+    </p>
+  </header>
+
+  <div id="contenido" tabindex="-1" style="padding-top:var(--gap)">
+  <div class="deck">
+    <div class="deck-stage">
+      <section class="slide s-cover" id="d1">
+        <span class="slide-num">La clase Game</span>
+        <svg class="pac" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+          <path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        </svg>
+        <h2>La clase <code>Game</code></h2>
+        <p class="sub">El simulador de Ms. Pac-Man por dentro: el laberinto, el turno, las reglas y los métodos.</p>
+        <p class="who">
+          <strong>Ingeniería de Comportamientos Inteligentes</strong> · Pablo Gutiérrez Sánchez · pabgut02@ucm.es
+        </p>
+      </section>
+      <section class="slide" id="d2">
+        <span class="slide-num">Ms. Pac-Man · 2</span>
+        <h2>Tu controlador sólo ve una cosa</h2>
+        <ul>
+          <li>En cada turno recibes un objeto <code>Game</code> con el estado de la partida.</li>
+          <li>Devuelves un <code>MOVE</code>. Eso es todo el contrato.</li>
+          <li>El objeto es una <strong>copia</strong>: puedes preguntarle lo que quieras sin romper nada.</li>
+          <li>Todo lo demás sale de preguntarle bien.</li>
+        </ul>
+        <p class="lede">Los métodos se llaman siempre sobre él: <code>game.metodo(parametros)</code>.</p>
+      </section>
+      <section class="slide s-part" id="d3">
+        <span class="slide-num">Parte 1 · 3</span>
+        <p class="part-num">Parte 1</p>
+        <h2>El laberinto</h2>
+      </section>
+      <section class="slide s-figure" id="d4">
+        <span class="slide-num">Parte 1 · 4</span>
+        <h2>El laberinto es un grafo</h2>
+        <figure>
+          <figcaption>El laberinto de verdad, y lo que ve tu código</figcaption>
+          <div class="img-pair">
+          <img class="lab pixel" src="../assets/img/laberinto-a.png" width="456" height="520" alt="El primer laberinto del simulador, con las píldoras y Ms. Pac-Man.">
+          <svg class="diag dgs1" viewBox="0 0 440 250" role="img" aria-label="A la izquierda, un trozo de laberinto dibujado con pasillos y paredes. A la derecha, el mismo trozo convertido en grafo: un punto por cada sitio donde se puede estar y una línea entre los que están pegados.">
+            <style>
+              .dgs1 .pas{fill:none;stroke:var(--surface-2);stroke-width:20;stroke-linecap:round}
+              .dgs1 .par{fill:var(--ink-3);opacity:.2}
+              .dgs1 .ar{stroke:var(--maze);stroke-width:2}
+              .dgs1 .nd{fill:var(--maze)}
+              .dgs1 .cr{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1.2}
+              .dgs1 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+            </style>
+            <path d="M30 60 H170 M100 60 V190 M30 190 H170" class="pas"/>
+            <rect x="42" y="88" width="46" height="74" class="par"/>
+            <rect x="118" y="88" width="40" height="74" class="par"/>
+            <text x="100" y="228" class="t">el laberinto</text>
+            <path d="M270 60 H410 M340 60 V190 M270 190 H410" class="ar"/>
+            <circle cx="270" cy="60" r="5" class="nd"/><circle cx="305" cy="60" r="5" class="nd"/><circle cx="375" cy="60" r="5" class="nd"/><circle cx="410" cy="60" r="5" class="nd"/>
+            <circle cx="340" cy="95" r="5" class="nd"/><circle cx="340" cy="130" r="5" class="nd"/><circle cx="340" cy="160" r="5" class="nd"/>
+            <circle cx="270" cy="190" r="5" class="nd"/><circle cx="305" cy="190" r="5" class="nd"/><circle cx="375" cy="190" r="5" class="nd"/><circle cx="410" cy="190" r="5" class="nd"/>
+            <circle cx="340" cy="60" r="7.5" class="cr"/><circle cx="340" cy="190" r="7.5" class="cr"/>
+            <text x="340" y="228" class="t">el grafo: nodos y vecinos</text>
+            <text x="340" y="244" class="t">en amarillo, los cruces</text>
+          </svg>
+          </div>
+        </figure>
+        <p class="foot">
+          Cada sitio donde se puede estar es un <strong>nodo</strong>, y cada nodo sabe qué nodo hay en cada
+          dirección. Un cruce es un nodo con tres vecinos o más.
+        </p>
+      </section>
+      <section class="slide s-figure" id="d5">
+        <span class="slide-num">Parte 1 · 5</span>
+        <h2>Cómo se numeran los nodos</h2>
+        <figure>
+          <figcaption>Esquina de arriba a la izquierda del primer laberinto</figcaption>
+          <svg class="diag dgn1" viewBox="0 0 470 246" role="img" aria-label="Fragmento del laberinto: la fila de arriba contiene los nodos 0, 1, 2, 3, 4 y sigue hasta el 20; después hay una pared y al otro lado están el 21 y el 22. Bajando desde el nodo 0 se llega al 79, luego al 85 y luego al 91.">
+            <style>
+              .dgn1 .pas{fill:none;stroke:var(--surface-2);stroke-width:30;stroke-linecap:round}
+              .dgn1 .cel{fill:var(--surface);stroke:var(--line);stroke-width:1.4}
+              .dgn1 .conp{stroke:var(--pill);stroke-width:2.2}
+              .dgn1 .nu{font-family:var(--f-mono);font-size:11.5px;text-anchor:middle;fill:var(--ink)}
+              .dgn1 .pared{fill:var(--ink-3);opacity:.22}
+              .dgn1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgn1 .tm{fill:var(--bad)}
+              .dgn1 .tp{fill:var(--pill-ink)}
+              .dgn1 .pu{font-family:var(--f-mono);font-size:14px;text-anchor:middle;fill:var(--ink-3)}
+              .dgn1 .fl{fill:none;stroke:var(--maze);stroke-width:1.8;marker-end:url(#n1a)}
+            </style>
+            <defs><marker id="n1a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker></defs>
+            <path d="M38 54 H250" class="pas"/>
+            <path d="M312 54 H358" class="pas"/>
+            <path d="M38 54 V156" class="pas"/>
+            <rect x="266" y="38" width="30" height="32" class="pared"/>
+            <text x="281" y="30" class="t" text-anchor="middle">pared</text>
+            <rect x="24" y="43" width="28" height="22" rx="4" class="cel conp"/><text x="38" y="58" class="nu">0</text>
+            <rect x="56" y="43" width="28" height="22" rx="4" class="cel"/><text x="70" y="58" class="nu">1</text>
+            <rect x="88" y="43" width="28" height="22" rx="4" class="cel"/><text x="102" y="58" class="nu">2</text>
+            <rect x="120" y="43" width="28" height="22" rx="4" class="cel"/><text x="134" y="58" class="nu">3</text>
+            <rect x="152" y="43" width="28" height="22" rx="4" class="cel conp"/><text x="166" y="58" class="nu">4</text>
+            <text x="194" y="59" class="pu">…</text>
+            <rect x="204" y="43" width="28" height="22" rx="4" class="cel"/><text x="218" y="58" class="nu">19</text>
+            <rect x="236" y="43" width="28" height="22" rx="4" class="cel"/><text x="250" y="58" class="nu">20</text>
+            <rect x="298" y="43" width="28" height="22" rx="4" class="cel"/><text x="312" y="58" class="nu">21</text>
+            <rect x="330" y="43" width="28" height="22" rx="4" class="cel"/><text x="344" y="58" class="nu">22</text>
+            <text x="372" y="59" class="pu">…</text>
+            <rect x="24" y="77" width="28" height="22" rx="4" class="cel"/><text x="38" y="92" class="nu">79</text>
+            <rect x="24" y="111" width="28" height="22" rx="4" class="cel"/><text x="38" y="126" class="nu">85</text>
+            <rect x="24" y="145" width="28" height="22" rx="4" class="cel"/><text x="38" y="160" class="nu">91</text>
+            <path d="M62 68 C88 76 84 86 66 90" class="fl"/>
+            <text x="72" y="102" class="t">getNeighbour(0, DOWN) = 79</text>
+            <text x="72" y="118" class="t">la fila de arriba son los nodos 0 a 78,</text>
+            <text x="72" y="132" class="t">así que debajo del 0 está el 79</text>
+            <text x="72" y="156" class="t tm">20 y 21 son números seguidos y</text>
+            <text x="72" y="170" class="t tm">no son vecinos: hay una pared</text>
+            <text x="24" y="206" class="t tp">Borde amarillo: nodo con píldora. Hay una cada 4 nodos.</text>
+            <text x="24" y="224" class="t">Coordenadas del nodo 0: x = 4, y = 4. Del 79: x = 4, y = 5.</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          El número de un nodo es su posición en el array del laberinto, del 0 al
+          <code>getNumberOfNodes() - 1</code>. La lista va por filas, así que en una fila los números van
+          seguidos y al bajar dan un salto.
+        </p>
+      </section>
+      <section class="slide s-figure" id="d6">
+        <span class="slide-num">Parte 1 · 6</span>
+        <h2>Y eso mismo, en el juego</h2>
+        <figure>
+          <img class="lab pixel" src="../assets/img/nodos-esquina.png" width="700" height="400" alt="Ampliación de la esquina de arriba a la izquierda del laberinto, con los nodos 0 a 6 de la primera fila y los nodos 79, 85 y 91 marcados en amarillo sobre los puntos de las píldoras.">
+          <figcaption class="tras">Los mismos nodos, sobre el laberinto de verdad</figcaption>
+        </figure>
+        <p class="foot">
+          Se ve que un nodo no es una casilla del dibujo: entre dos píldoras seguidas hay cuatro nodos, y en
+          cada turno se avanza un nodo.
+        </p>
+      </section>
+      <section class="slide" id="d7">
+        <span class="slide-num">Parte 1 · 7</span>
+        <h2>Un índice no es una coordenada</h2>
+        <ul>
+          <li>No hagas aritmética con los números de nodo.</li>
+          <li><code>nodo + 1</code> puede estar al otro lado de una pared.</li>
+          <li>Para moverte: <code>getNeighbour</code> y <code>getPossibleMoves</code>.</li>
+          <li>Para medir la distancia entre dos nodos: <code>getShortestPathDistance</code>.</li>
+          <li>Para saber en qué fila y columna del laberinto está un nodo: <code>getNodeXCood</code> y <code>getNodeYCood</code>.</li>
+        </ul>
+      </section>
+      <section class="slide" id="d8">
+        <span class="slide-num">Parte 1 · 8</span>
+        <h2>Todo se mide en nodos</h2>
+        <ul>
+          <li><code>getShortestPathDistance</code> y <code>getDistance</code> cuentan <strong>nodos</strong>, o sea pasos.</li>
+          <li>Las coordenadas <code>x</code> e <code>y</code> de un nodo van en esa unidad: un vecino está a 1 de distancia.</li>
+          <li>Para dibujar, el motor multiplica <code>x</code> e <code>y</code> por 2: un nodo son 2 píxeles.</li>
+          <li>Entre dos píldoras seguidas hay 4 nodos, y <code>EAT_DISTANCE</code> vale 2.</li>
+        </ul>
+      </section>
+      <section class="slide s-split wide-right" id="d9">
+        <span class="slide-num">Parte 1 · 9</span>
+        <div class="stack">
+          <h2>Cruces, túneles y cárcel</h2>
+          <ul>
+            <li>38 nodos de este laberinto son cruce, y los da <code>getJunctionIndices()</code>.</li>
+            <li>Uno o dos <strong>túneles</strong> unen el borde izquierdo con el derecho, en un paso.</li>
+            <li>La cárcel y su puerta son otros dos nodos fijos del mapa.</li>
+          </ul>
+        </div>
+        <figure>
+          <img class="lab pixel" src="../assets/img/laberinto-a-anotado.png" width="684" height="780" alt="El primer laberinto con los 38 cruces marcados en amarillo, los cuatro extremos de los dos túneles en azul, la cárcel en rosa y la puerta de la cárcel en verde.">
+          <figcaption class="tras">Cruces en amarillo, túneles en azul, cárcel en rosa y su puerta en verde</figcaption>
+        </figure>
+      </section>
+      <section class="slide s-figure" id="d10">
+        <span class="slide-num">Parte 1 · 10</span>
+        <h2>Cuatro laberintos</h2>
+        <figure>
+          <div class="img-cuatro">
+            <img class="lab pixel" src="../assets/img/laberinto-a.png" width="456" height="520" alt="Laberinto A.">
+            <img class="lab pixel" src="../assets/img/laberinto-b.png" width="456" height="520" alt="Laberinto B.">
+            <img class="lab pixel" src="../assets/img/laberinto-c.png" width="456" height="520" alt="Laberinto C.">
+            <img class="lab pixel" src="../assets/img/laberinto-d.png" width="456" height="520" alt="Laberinto D.">
+          </div>
+          <figcaption class="tras">A, 1293 nodos · B, 1319 · C, 1380 · D, 1309</figcaption>
+        </figure>
+        <p class="foot">
+          Se cambia de uno al siguiente en cada nivel, en ciclo. Cada laberinto numera sus nodos desde cero
+          por su cuenta: el nodo 400 está junto al borde derecho en A y junto al izquierdo en B. Por eso un
+          número de nodo escrito a mano en el código apunta a otro sitio en cuanto se pasa de nivel.
+        </p>
+      </section>
+      <section class="slide" id="d11">
+        <span class="slide-num">Parte 1 · 11</span>
+        <h2>Hay dos numeraciones y se parecen</h2>
+        <ul>
+          <li><code>getActivePillsIndices()</code> devuelve <strong>números de nodo</strong>.</li>
+          <li><code>isPillStillAvailable(i)</code> espera el <strong>número de píldora</strong>: del 0 al 219 en el primer laberinto.</li>
+          <li>El puente entre las dos es <code>getPillIndex(nodo)</code>, que da <code>-1</code> si ahí no hay píldora.</li>
+        </ul>
+        <p class="lede">
+          Mezclarlas no da error: te contesta por otra píldora cualquiera.
+        </p>
+      </section>
+      <section class="slide s-part" id="d12">
+        <span class="slide-num">Parte 2 · 12</span>
+        <p class="part-num">Parte 2</p>
+        <h2>El turno</h2>
+      </section>
+      <section class="slide s-figure" id="d13">
+        <span class="slide-num">Parte 2 · 13</span>
+        <h2>Qué pasa en cada turno</h2>
+        <figure>
+          <svg class="diag dgn2" viewBox="0 0 480 246" role="img" aria-label="Diagrama del turno: del estado del turno salen copias para el controlador de Ms. Pac-Man y el de los fantasmas, que deciden en paralelo con 40 milisegundos cada uno; el motor aplica los dos movimientos, resuelve píldoras, contactos y contadores, y de ahí sale el estado del turno siguiente.">
+            <style>
+              .dgn2 .bx{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+              .dgn2 .bxm{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.5}
+              .dgn2 .bxp{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.5}
+              .dgn2 .nm{font-family:var(--f-display);font-weight:700;font-size:11.5px;text-anchor:middle;fill:var(--ink)}
+              .dgn2 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgn2 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.8;marker-end:url(#n2a)}
+              .dgn2 .flv{fill:none;stroke:var(--maze);stroke-width:1.8;stroke-dasharray:4 3;marker-end:url(#n2b)}
+            </style>
+            <defs>
+              <marker id="n2a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker>
+              <marker id="n2b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+            </defs>
+            <rect x="170" y="12" width="140" height="30" rx="5" class="bxp"/>
+            <text x="240" y="31" class="nm">ESTADO DEL TURNO</text>
+            <path d="M200 44 C150 58 130 58 120 70" class="fl"/>
+            <path d="M280 44 C330 58 350 58 360 70" class="fl"/>
+            <rect x="22" y="72" width="196" height="42" rx="5" class="bxm"/>
+            <text x="120" y="90" class="nm">TU CONTROLADOR</text>
+            <text x="120" y="105" class="t">40 ms para devolver un MOVE</text>
+            <rect x="262" y="72" width="196" height="42" rx="5" class="bx"/>
+            <text x="360" y="90" class="nm">LOS FANTASMAS</text>
+            <text x="360" y="105" class="t">40 ms, cuatro MOVE</text>
+            <path d="M120 116 C130 132 150 136 170 142" class="fl"/>
+            <path d="M360 116 C350 132 330 136 310 142" class="fl"/>
+            <rect x="100" y="144" width="280" height="30" rx="5" class="bx"/>
+            <text x="240" y="163" class="nm">EL MOTOR APLICA LOS DOS MOVIMIENTOS</text>
+            <path d="M240 176 V190" class="fl"/>
+            <rect x="100" y="192" width="280" height="30" rx="5" class="bx"/>
+            <text x="240" y="211" class="nm">PÍLDORAS · CONTACTOS · CONTADORES</text>
+            <path d="M380 207 H464 V27 H312" class="flv"/>
+            <text x="456" y="19" class="t" style="text-anchor:end">turno siguiente</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          La partida avanza a saltos. Los dos controladores deciden sobre el mismo estado y sin verse, y
+          después el motor aplica los dos movimientos y resuelve el resto.
+        </p>
+      </section>
+      <section class="slide" id="d14">
+        <span class="slide-num">Parte 2 · 14</span>
+        <h2>Simultáneo, aunque se aplique por orden</h2>
+        <ul>
+          <li>Primero se mueve Ms. Pac-Man, luego los fantasmas.</li>
+          <li>Los contactos se comprueban al final, con todos ya colocados.</li>
+          <li>Ese orden no da ventaja a nadie.</li>
+          <li>La única consecuencia: la píldora de poder se come antes de que los fantasmas se muevan, y por eso se dan la vuelta en el mismo turno.</li>
+        </ul>
+      </section>
+      <section class="slide" id="d15">
+        <span class="slide-num">Parte 2 · 15</span>
+        <h2>Los 40 ms no los vigila nadie</h2>
+        <ul>
+          <li><code>runGame</code>, el modo de clase, y <code>runExperiment</code>, el de la evaluación, llaman a tu <code>getMove</code> y <strong>esperan</strong> a que devuelva.</li>
+          <li>Después piden el de los fantasmas y sólo entonces avanzan el turno: mientras piensas, no se mueve nada.</li>
+          <li>Ni excepción ni aviso: si tardas 300 ms, ese turno tarda 300 ms y ya está.</li>
+          <li>Que no te corten no quiere decir que da igual: evaluar una entrega son decenas de partidas de 4000 turnos.</li>
+        </ul>
+      </section>
+      <section class="slide s-figure" id="d16">
+        <span class="slide-num">Parte 2 · 16</span>
+        <h2>Y los modos que sí llevan reloj</h2>
+        <figure>
+          <svg class="diag dgs3" viewBox="0 0 470 200" role="img" aria-label="Línea de tiempo de cinco turnos de 40 milisegundos cada uno. Debajo, una barra que representa un getMove que tarda 200 milisegundos y ocupa los cinco turnos. El motor juega esos cinco turnos con el movimiento del turno anterior, y sólo al final del quinto recibe el movimiento nuevo.">
+            <style>
+              .dgs3 .cj{fill:var(--surface);stroke:var(--line);stroke-width:1.4}
+              .dgs3 .barra{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.6}
+              .dgs3 .et{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgs3 .etc{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgs3 .tit{font-family:var(--f-mono);font-size:10px;fill:var(--ink-3)}
+              .dgs3 .fl{fill:none;stroke:var(--maze);stroke-width:1.6;marker-end:url(#s3a)}
+              .dgs3 .lin{stroke:var(--maze);stroke-width:1.4;stroke-dasharray:4 3}
+            </style>
+            <defs><marker id="s3a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker></defs>
+            <text x="92" y="16" class="etc">turno 1</text><text x="158" y="16" class="etc">turno 2</text><text x="224" y="16" class="etc">turno 3</text><text x="290" y="16" class="etc">turno 4</text><text x="356" y="16" class="etc">turno 5</text>
+            <text x="4" y="42" class="tit">el motor</text>
+            <rect x="62" y="26" width="62" height="26" rx="3" class="cj"/><text x="93" y="43" class="etc">40 ms</text>
+            <rect x="128" y="26" width="62" height="26" rx="3" class="cj"/><text x="159" y="43" class="etc">40 ms</text>
+            <rect x="194" y="26" width="62" height="26" rx="3" class="cj"/><text x="225" y="43" class="etc">40 ms</text>
+            <rect x="260" y="26" width="62" height="26" rx="3" class="cj"/><text x="291" y="43" class="etc">40 ms</text>
+            <rect x="326" y="26" width="62" height="26" rx="3" class="cj"/><text x="357" y="43" class="etc">40 ms</text>
+            <text x="4" y="90" class="tit">tu hilo</text>
+            <rect x="62" y="74" width="326" height="26" rx="3" class="barra"/>
+            <text x="225" y="91" class="etc">un getMove que tarda 200 ms</text>
+            <path d="M388 74 V56" class="lin"/>
+            <path d="M388 122 V104" class="fl"/>
+            <text x="466" y="132" class="et" style="text-anchor:end">aquí acabas y devuelves</text>
+            <text x="4" y="164" class="et">El motor no espera. Durante esos cinco turnos juega con el movimiento que le</text>
+            <text x="4" y="180" class="et">diste antes, y no arranca un cálculo nuevo hasta que este termina.</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          En <code>runGameTimed</code> cada controlador tiene su propio hilo. El motor le entrega el estado,
+          espera 40 ms y coge el último movimiento que ese hilo haya dejado escrito. Si todavía no ha
+          terminado, repite el del turno anterior.
+        </p>
+      </section>
+      <section class="slide s-figure" id="d17">
+        <span class="slide-num">Parte 2 · 17</span>
+        <h2>Velocidades</h2>
+        <figure>
+          <figcaption>Ocho turnos seguidos: quién avanza y quién se queda</figcaption>
+          <svg class="diag dgn3" viewBox="0 0 470 158" role="img" aria-label="Comparación a lo largo de ocho turnos: Ms. Pac-Man avanza en los ocho, un fantasma persiguiendo también avanza en los ocho, y un fantasma comestible avanza en cuatro y se queda quieto en los otros cuatro.">
+            <style>
+              .dgn3 .et{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgn3 .tn{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-3)}
+              .dgn3 .av{fill:var(--maze)}
+              .dgn3 .qu{fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:2 2}
+              .dgn3 .ln{stroke:var(--line-soft);stroke-width:1}
+              .dgn3 .pie{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+            </style>
+            <text x="14" y="14" class="tn" style="text-anchor:start">turno</text>
+            <text x="176" y="14" class="tn">1</text><text x="212" y="14" class="tn">2</text><text x="248" y="14" class="tn">3</text><text x="284" y="14" class="tn">4</text><text x="320" y="14" class="tn">5</text><text x="356" y="14" class="tn">6</text><text x="392" y="14" class="tn">7</text><text x="428" y="14" class="tn">8</text>
+            <text x="0" y="42" class="et">Ms. Pac-Man</text>
+            <path d="M168 38 H436" class="ln"/>
+            <circle cx="176" cy="38" r="6" class="av"/><circle cx="212" cy="38" r="6" class="av"/><circle cx="248" cy="38" r="6" class="av"/><circle cx="284" cy="38" r="6" class="av"/><circle cx="320" cy="38" r="6" class="av"/><circle cx="356" cy="38" r="6" class="av"/><circle cx="392" cy="38" r="6" class="av"/><circle cx="428" cy="38" r="6" class="av"/>
+            <text x="0" y="76" class="et">fantasma normal</text>
+            <path d="M168 72 H436" class="ln"/>
+            <circle cx="176" cy="72" r="6" class="av"/><circle cx="212" cy="72" r="6" class="av"/><circle cx="248" cy="72" r="6" class="av"/><circle cx="284" cy="72" r="6" class="av"/><circle cx="320" cy="72" r="6" class="av"/><circle cx="356" cy="72" r="6" class="av"/><circle cx="392" cy="72" r="6" class="av"/><circle cx="428" cy="72" r="6" class="av"/>
+            <text x="0" y="110" class="et">fantasma comestible</text>
+            <path d="M168 106 H436" class="ln"/>
+            <circle cx="176" cy="106" r="6" class="av"/><circle cx="212" cy="106" r="5" class="qu"/><circle cx="248" cy="106" r="6" class="av"/><circle cx="284" cy="106" r="5" class="qu"/><circle cx="320" cy="106" r="6" class="av"/><circle cx="356" cy="106" r="5" class="qu"/><circle cx="392" cy="106" r="6" class="av"/><circle cx="428" cy="106" r="5" class="qu"/>
+            <circle cx="8" cy="136" r="6" class="av"/><text x="20" y="140" class="pie">avanza un nodo</text>
+            <circle cx="168" cy="136" r="5" class="qu"/><text x="180" y="140" class="pie">se queda donde está</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          Todos van a un nodo por turno. Las excepciones son de los fantasmas: en la cárcel no se mueven, y
+          siendo comestibles se quedan quietos uno de cada dos turnos.
+        </p>
+      </section>
+      <section class="slide" id="d18">
+        <span class="slide-num">Parte 2 · 18</span>
+        <h2>Qué implica esa diferencia</h2>
+        <ul>
+          <li>Persiguiendo, un fantasma <strong>no corre más que tú</strong>: no te alcanza por detrás, sólo te acorrala.</li>
+          <li>Siendo comestible <strong>no se te escapa</strong>: le ganas un nodo cada dos turnos.</li>
+          <li>Un fantasma comestible a diez nodos se caza en unos veinte turnos, si el camino es directo.</li>
+          <li>Los 200 turnos que dura una píldora de poder dan para cazar a varios.</li>
+        </ul>
+      </section>
+      <section class="slide s-figure" id="d19">
+        <span class="slide-num">Parte 2 · 19</span>
+        <h2>Cuándo decides de verdad</h2>
+        <figure>
+          <svg class="diag dgs2" viewBox="0 0 440 250" role="img" aria-label="Un cruce en forma de T: se llega por la izquierda, y desde ahí salen tres pasillos. El de vuelta a la izquierda está tachado porque no se puede retroceder, y quedan como legales seguir a la derecha y bajar.">
+            <style>
+              .dgs2 .pas{fill:none;stroke:var(--surface-2);stroke-width:26;stroke-linecap:round}
+              .dgs2 .ok{fill:none;stroke:var(--ok);stroke-width:3;marker-end:url(#s2a)}
+              .dgs2 .no{fill:none;stroke:var(--bad);stroke-width:2.4;stroke-dasharray:5 4}
+              .dgs2 .x{stroke:var(--bad);stroke-width:2.6}
+              .dgs2 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgs2 .tk{fill:var(--ok)}
+              .dgs2 .tn{fill:var(--bad)}
+              .dgs2 .nu{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink)}
+              .dgs2 .cel{fill:var(--surface);stroke:var(--line);stroke-width:1.3}
+            </style>
+            <defs><marker id="s2a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ok)"/></marker></defs>
+            <path d="M40 100 H400 M220 100 V220" class="pas"/>
+            <g transform="translate(202 82) scale(1.38)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" fill="var(--pill)"/></g>
+            <path d="M246 100 H330" class="ok"/>
+            <text x="252" y="78" class="t tk">RIGHT: legal</text>
+            <path d="M220 126 V200" class="ok"/>
+            <text x="232" y="176" class="t tk">DOWN: legal</text>
+            <path d="M194 100 H110" class="no"/>
+            <path d="M138 90 L158 110 M158 90 L138 110" class="x"/>
+            <text x="60" y="64" class="t tn">LEFT: es la vuelta</text>
+            <text x="60" y="78" class="t tn">atrás, no cuenta</text>
+            <rect x="26" y="228" width="388" height="0" fill="none"/>
+            <text x="26" y="244" class="t">getPossibleMoves(nodo, RIGHT) devuelve [RIGHT, DOWN]</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          El motor te llama en todos los turnos, pero en un pasillo no hay nada que elegir. La pregunta útil es
+          <code>getPossibleMoves(nodo, ultimoMovimiento).length &gt; 1</code>, que ya descuenta la vuelta atrás.
+        </p>
+      </section>
+      <section class="slide" id="d20">
+        <span class="slide-num">Parte 2 · 20</span>
+        <h2>El controlador, por dentro</h2>
+<pre><code><span class="c">// timeDue: hora en ms a la que deberías haber contestado</span>
+<span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+    <span class="k">int</span>  nodo   = game.getPacmanCurrentNodeIndex();
+    MOVE ultimo = game.getPacmanLastMoveMade();
+    MOVE[] opciones = game.getPossibleMoves(nodo, ultimo);
+    <span class="k">if</span> (opciones.length == <span class="n">1</span>)          <span class="c">// pasillo: nada que elegir</span>
+        <span class="k">return</span> opciones[<span class="n">0</span>];
+    <span class="k">return</span> decide(game, nodo, opciones);  <span class="c">// cruce: tu lógica</span>
+}</code></pre>
+        <p class="lede">
+          Se llama en todos los turnos. El <code>timeDue</code> lo comparas tú con
+          <code>System.currentTimeMillis()</code>: el motor no lo mira.
+        </p>
+      </section>
+      <section class="slide" id="d21">
+        <span class="slide-num">Parte 2 · 21</span>
+        <h2>¿Y si estoy en medio de un pasillo?</h2>
+        <ul>
+          <li><code>getPossibleMoves(nodo, ultimo)</code> devuelve <strong>un solo</strong> movimiento: seguir de frente.</li>
+          <li>Y ahí da igual lo que devuelvas: el motor lo corrige y Ms. Pac-Man sigue de frente.</li>
+          <li>O sea que ese <code>if</code> no arregla nada: está para no calcular en vano.</li>
+          <li>Y nunca se queda quieta: con <code>MOVE.NEUTRAL</code> o con <code>null</code>, hasta en el primer turno de una vida, la dirección la elige el motor.</li>
+        </ul>
+      </section>
+      <section class="slide" id="d22">
+        <span class="slide-num">Parte 2 · 22</span>
+        <h2>Si devuelves un movimiento imposible</h2>
+        <ol>
+          <li>Si en esa dirección hay pasillo y no es la contraria a la que llevabas, se usa tal cual.</li>
+          <li>Si no vale, se <strong>sigue recto</strong>.</li>
+          <li>Si tampoco se puede seguir recto, el primer movimiento legal que no sea volver.</li>
+        </ol>
+        <p class="lede">
+          La vuelta atrás, un movimiento contra una pared, <code>MOVE.NEUTRAL</code> y <code>null</code>
+          caen todos en la segunda regla: Ms. Pac-Man no se para nunca por decisión tuya.
+        </p>
+      </section>
+      <section class="slide s-part" id="d23">
+        <span class="slide-num">Parte 3 · 23</span>
+        <p class="part-num">Parte 3</p>
+        <h2>Las reglas</h2>
+      </section>
+      <section class="slide s-figure" id="d24">
+        <span class="slide-num">Parte 3 · 24</span>
+        <h2>El contacto es a distancia 2</h2>
+        <figure>
+          <svg class="diag dgn4" viewBox="0 0 460 104" role="img" aria-label="Un pasillo con sus nodos y las píldoras cada cuatro nodos. Ms. Pac-Man y un fantasma están separados por dos nodos, y una llave marca esa distancia como contacto.">
+            <style>
+              .dgn4 .pas{fill:none;stroke:var(--surface-2);stroke-width:26;stroke-linecap:round}
+              .dgn4 .nd{fill:var(--ink-3);opacity:.55}
+              .dgn4 .pl{fill:var(--pill);stroke:var(--pill-ink);stroke-width:.8}
+              .dgn4 .gh{fill:var(--blinky)}
+              .dgn4 .pc{fill:var(--pill)}
+              .dgn4 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgn4 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.6;marker-end:url(#n4a)}
+            </style>
+            <defs><marker id="n4a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker></defs>
+            <path d="M30 46 H430" class="pas"/>
+            <circle cx="30" cy="46" r="2.6" class="nd"/><circle cx="55" cy="46" r="2.6" class="nd"/><circle cx="80" cy="46" r="2.6" class="nd"/><circle cx="105" cy="46" r="2.6" class="nd"/><circle cx="155" cy="46" r="2.6" class="nd"/><circle cx="180" cy="46" r="2.6" class="nd"/><circle cx="205" cy="46" r="2.6" class="nd"/><circle cx="255" cy="46" r="2.6" class="nd"/><circle cx="280" cy="46" r="2.6" class="nd"/><circle cx="305" cy="46" r="2.6" class="nd"/><circle cx="355" cy="46" r="2.6" class="nd"/><circle cx="380" cy="46" r="2.6" class="nd"/><circle cx="405" cy="46" r="2.6" class="nd"/>
+            <circle cx="30" cy="46" r="4.5" class="pl"/><circle cx="130" cy="46" r="4.5" class="pl"/><circle cx="230" cy="46" r="4.5" class="pl"/><circle cx="330" cy="46" r="4.5" class="pl"/><circle cx="430" cy="46" r="4.5" class="pl"/>
+            <g transform="translate(146 37) scale(.692)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M196 46 a9 9 0 0 1 18 0 v9 h-18 z" class="gh"/>
+            <path d="M155 26 H205" class="fl"/>
+            <text x="152" y="20" class="t">2 nodos: contacto</text>
+            <text x="30" y="78" class="t">Puntos grises: nodos. Bolas amarillas: píldoras, una cada 4 nodos.</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          Cuando todos han terminado de moverse, el motor mide la distancia por los pasillos entre
+          Ms.&nbsp;Pac-Man y cada fantasma. Si es de 2 nodos o menos, se han tocado: no hace falta que caigan
+          en el mismo nodo.
+        </p>
+      </section>
+      <section class="slide" id="d25">
+        <span class="slide-num">Parte 3 · 25</span>
+        <h2>Qué pasa al tocarse</h2>
+        <p class="lede">Depende del estado del fantasma, y se comprueba con todos ya colocados.</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Estado</th><th scope="col">Qué pasa</th></tr></thead>
+            <tbody>
+              <tr><td>Comestible</td><td>Te lo comes y se va a la cárcel.</td></tr>
+              <tr><td>Normal</td><td>Pierdes una vida y se recoloca todo.</td></tr>
+              <tr><td>En la cárcel</td><td>Nada: su nodo no conecta con el mapa.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="slide" id="d26">
+        <span class="slide-num">Parte 3 · 26</span>
+        <h2>Perder una vida</h2>
+        <ul>
+          <li>Los cuatro fantasmas vuelven a la cárcel con sus tiempos iniciales.</li>
+          <li>Ms. Pac-Man aparece otra vez, en un nodo al azar.</li>
+          <li>El mapa <strong>no</strong> se repone: lo comido sigue comido.</li>
+          <li>En un mismo turno puedes comerte un fantasma comestible y que te coma otro que no lo era.</li>
+        </ul>
+      </section>
+      <section class="slide s-figure" id="d27">
+        <span class="slide-num">Parte 3 · 27</span>
+        <h2>La cárcel</h2>
+        <figure>
+          <svg class="diag dgn5" viewBox="0 0 470 216" role="img" aria-label="Ciclo de un fantasma: de la cárcel sale a la puerta cuando su contador llega a cero, de ahí pasa a perseguir a un nodo por turno; con una píldora de poder se vuelve comestible y va a media velocidad; si Ms. Pac-Man lo toca vuelve a la cárcel, y si se le acaba el tiempo vuelve a perseguir.">
+            <style>
+              .dgn5 .bx{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+              .dgn5 .bxr{fill:var(--surface);stroke:var(--blinky);stroke-width:1.6}
+              .dgn5 .bxp{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.6}
+              .dgn5 .nm{font-family:var(--f-display);font-weight:700;font-size:11.5px;text-anchor:middle;fill:var(--ink)}
+              .dgn5 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgn5 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.6;marker-end:url(#n5a)}
+              .dgn5 .flp{fill:none;stroke:var(--pill-ink);stroke-width:1.6;marker-end:url(#n5b)}
+            </style>
+            <defs>
+              <marker id="n5a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker>
+              <marker id="n5b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker>
+            </defs>
+            <rect x="14" y="96" width="116" height="46" rx="5" class="bx"/>
+            <text x="72" y="116" class="nm">CÁRCEL</text>
+            <text x="72" y="131" class="t">quieto, cuenta atrás</text>
+            <path d="M132 119 H166" class="fl"/>
+            <text x="149" y="88" class="t">llega a 0</text>
+            <rect x="170" y="96" width="116" height="46" rx="5" class="bx"/>
+            <text x="228" y="116" class="nm">EN LA PUERTA</text>
+            <text x="228" y="131" class="t">sale con NEUTRAL</text>
+            <path d="M288 119 H322" class="fl"/>
+            <rect x="326" y="96" width="130" height="46" rx="5" class="bxr"/>
+            <text x="391" y="116" class="nm">PERSIGUIENDO</text>
+            <text x="391" y="131" class="t">un nodo por turno</text>
+            <rect x="326" y="16" width="130" height="46" rx="5" class="bxp"/>
+            <text x="391" y="36" class="nm">COMESTIBLE</text>
+            <text x="391" y="51" class="t">media velocidad</text>
+            <path d="M366 96 V66" class="flp"/>
+            <text x="298" y="82" class="t">píldora de poder</text>
+            <path d="M416 66 V94" class="fl"/>
+            <text x="456" y="82" class="t" style="text-anchor:end">acaba el tiempo</text>
+            <path d="M326 39 H72 V94" class="flp"/>
+            <text x="196" y="34" class="t">Ms. Pac-Man lo toca: vuelve a la cárcel</text>
+            <text x="14" y="178" class="t" style="text-anchor:start">Contadores iniciales: Blinky 40 turnos, Pinky 60, Inky 80, Sue 100.</text>
+            <text x="14" y="194" class="t" style="text-anchor:start">Después de que te lo comas: 40 turnos. Todos bajan un 10&#37; por nivel.</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          Un fantasma encerrado está en un nodo sin vecinos, quieto, y su movimiento se ignora. Al llegar su
+          contador a cero aparece en la puerta con <code>MOVE.NEUTRAL</code>.
+          <code>getGhostLairTime(GHOST)</code> te dice cuántos turnos le quedan dentro.
+        </p>
+      </section>
+      <section class="slide" id="d28">
+        <span class="slide-num">Parte 3 · 28</span>
+        <h2>La píldora de poder</h2>
+        <ul>
+          <li>Los fantasmas que están fuera de la cárcel pasan a comestibles durante 200 turnos, algo menos en niveles avanzados. Los que están dentro salen normales.</li>
+          <li>En ese mismo turno todos <strong>se dan la vuelta</strong>, y su movimiento se ignora.</li>
+          <li>El primero que te comas vale 200 puntos, el segundo 400, el tercero 800 y el cuarto 1600.</li>
+          <li>Esa cuenta vuelve a empezar con cada píldora de poder.</li>
+        </ul>
+      </section>
+      <section class="slide" id="d29">
+        <span class="slide-num">Parte 3 · 29</span>
+        <h2>Niveles, vidas y puntos</h2>
+        <p class="lede">Todos estos valores están en <code>Constants</code>: léelos de ahí y no los copies a mano.</p>
+        <div class="table-scroll">
+          <table>
+            <tbody>
+              <tr><td>Píldora</td><td>10 puntos</td></tr>
+              <tr><td>Píldora de poder</td><td>50</td></tr>
+              <tr><td>Vidas</td><td>3, y una más a los 10&#8239;000 puntos</td></tr>
+              <tr><td>Fin del nivel</td><td>Cuando no queda ninguna píldora, ni normal ni de poder</td></tr>
+              <tr><td>Fin de la partida</td><td>Al quedarse sin vidas, o al llegar a 24&#8239;000 turnos</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="slide s-part" id="d30">
+        <span class="slide-num">Parte 4 · 30</span>
+        <p class="part-num">Parte 4</p>
+        <h2>Los métodos</h2>
+      </section>
+      <section class="slide" id="d31">
+        <span class="slide-num">Parte 4 · 31</span>
+        <h2>Dónde está todo el mundo</h2>
+        <p class="lede">
+          <code>GHOST</code> es el enumerado de los cuatro fantasmas. <code>MOVE</code>, el de las cuatro
+          direcciones más <code>NEUTRAL</code>.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <tbody>
+              <tr><td><code>getPacmanCurrentNodeIndex()</code></td><td>El nodo de Ms. Pac-Man</td></tr>
+              <tr><td><code>getPacmanLastMoveMade()</code></td><td>El último movimiento de Ms. Pac-Man</td></tr>
+              <tr><td><code>getGhostCurrentNodeIndex(GHOST)</code></td><td>El nodo de ese fantasma</td></tr>
+                <tr><td><code>getGhostLastMoveMade(GHOST)</code></td><td>El último movimiento de ese fantasma: dice por dónde puede salir</td></tr>
+              <tr><td><code>getGhostEdibleTime(GHOST)</code></td><td>Turnos que le quedan de comestible, 0 si no lo es</td></tr>
+              <tr><td><code>getGhostLairTime(GHOST)</code></td><td>Turnos que le quedan en la cárcel, 0 si ya ha salido</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="slide" id="d32">
+        <span class="slide-num">Parte 4 · 32</span>
+        <h2>Hacia dónde moverse</h2>
+        <p class="lede">
+          Les das dónde estás, dónde quieres ir, tu último movimiento y una métrica de distancia.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <tbody>
+              <tr><td><code>getNextMoveTowardsTarget(...)</code></td><td>El movimiento que te acerca</td></tr>
+              <tr><td><code>getNextMoveAwayFromTarget(...)</code></td><td>El que te aleja</td></tr>
+              <tr><td><code>getDistance(...)</code></td><td>La distancia entre dos nodos, en nodos</td></tr>
+              <tr><td><code>getClosestNodeIndexFromNodeIndex(...)</code></td><td>De una lista, el más cercano</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="slide s-figure" id="d33">
+        <span class="slide-num">Parte 4 · 33</span>
+        <h2>Para qué sirve la métrica</h2>
+        <figure>
+          <figcaption>Aquí EUCLID y PATH no eligen el mismo movimiento</figcaption>
+          <svg class="diag dgm1" viewBox="0 0 420 250" role="img" aria-label="Fragmento de laberinto: Ms. Pac-Man está en un cruce y el objetivo queda arriba a la derecha. Hacia arriba sale un pasillo que se corta, pero en línea recta parece el camino más corto, así que la métrica euclídea elige ese movimiento. El camino de verdad va hacia la derecha y sube por el otro pasillo.">
+            <style>
+              .dgm1 .pasillo{fill:none;stroke:var(--surface-2);stroke-width:17;stroke-linecap:round}
+              .dgm1 .mal{fill:none;stroke:var(--bad);stroke-width:2.2;stroke-dasharray:5 4;marker-end:url(#gm1)}
+              .dgm1 .bien{fill:none;stroke:var(--ok);stroke-width:2.6;marker-end:url(#gm2)}
+              .dgm1 .recta{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:3 3}
+              .dgm1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgm1 .tm{fill:var(--bad)}
+              .dgm1 .tb{fill:var(--ok)}
+              .dgm1 .corte{stroke:var(--ink-3);stroke-width:2}
+            </style>
+            <defs>
+              <marker id="gm1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker>
+              <marker id="gm2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ok)"/></marker>
+            </defs>
+            <g class="pasillo">
+              <path d="M60 200 H340"/>
+              <path d="M120 200 V112"/>
+              <path d="M280 200 V60"/>
+              <path d="M280 60 H170"/>
+            </g>
+            <path d="M108 104 L132 104" class="corte"/>
+            <text x="140" y="108" class="t">sin salida</text>
+            <path d="M120 200 L180 60" class="recta"/>
+            <circle cx="180" cy="60" r="7" fill="var(--pill)" stroke="var(--ink)" stroke-width="1.5"/>
+            <text x="192" y="64" class="t">objetivo</text>
+            <path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" fill="var(--pill)" transform="translate(107 187) scale(.98)"/>
+            <path d="M120 186 V146" class="mal"/>
+            <text x="128" y="160" class="t tm">EUCLID sube: la recta es más corta</text>
+            <path d="M138 200 H206" class="bien"/>
+            <text x="146" y="222" class="t tb">PATH va a la derecha: el pasillo llega</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          Es la regla con la que el motor compara los vecinos. <code>DM.PATH</code> cuenta los pasos por los
+          pasillos y está precalculada; <code>EUCLID</code> y <code>MANHATTAN</code> miden sobre las
+          coordenadas y atraviesan las paredes. Usa <code>PATH</code>.
+        </p>
+      </section>
+      <section class="slide" id="d34">
+        <span class="slide-num">Parte 4 · 34</span>
+        <h2>Alejarse no es escapar</h2>
+        <ul>
+          <li><code>getNextMoveAwayFromTarget</code> mira <strong>un solo paso</strong>: compara los vecinos y nada más.</li>
+          <li>Si dos alejan lo mismo, gana el primero en el orden del enumerado <code>MOVE</code>: <code>UP</code>, <code>RIGHT</code>, <code>DOWN</code>, <code>LEFT</code>.</li>
+          <li>No sabe si el pasillo que elige tiene una sola salida, ni si por ahí viene otro fantasma.</li>
+          <li>Para huir en serio, recorre tus movimientos legales y compara tú lo que te interese.</li>
+        </ul>
+      </section>
+      <section class="slide" id="d35">
+        <span class="slide-num">Parte 4 · 35</span>
+        <h2>Caminos, cruces y píldoras</h2>
+        <p class="lede">
+          <code>getShortestPath(a, b, m).length</code> es lo mismo que
+          <code>getShortestPathDistance(a, b, m)</code>: no pidas las dos cosas.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <tbody>
+              <tr><td><code>getShortestPath(...)</code></td><td>La secuencia de nodos</td></tr>
+              <tr><td><code>getShortestPathDistance(...)</code></td><td>La longitud de ese camino, en nodos</td></tr>
+              <tr><td><code>isJunction(nodo)</code></td><td>Si ese nodo tiene tres salidas o más</td></tr>
+              <tr><td><code>getActivePillsIndices()</code></td><td>Los nodos de las píldoras que quedan</td></tr>
+              <tr><td><code>getPillIndices()</code></td><td>Los nodos de todas las del mapa, comidas o no</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="slide s-part" id="d36">
+        <span class="slide-num">Parte 5 · 36</span>
+        <p class="part-num">Parte 5</p>
+        <h2>Lo que falla en silencio</h2>
+      </section>
+      <section class="slide" id="d37">
+        <span class="slide-num">Parte 5 · 37</span>
+        <h2>Cuando le pides algo imposible</h2>
+        <p class="lede">Casi nunca hay excepción: te devuelve un valor y la partida sigue.</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Si le pides…</th><th scope="col">Devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>getNeighbour</code> contra una pared</td><td><code>-1</code></td></tr>
+              <tr><td><code>getMoveToMake…</code> con un nodo que no es vecino</td><td><code>null</code></td></tr>
+              <tr><td><code>getNeighbouringNodes</code> con un nodo que no existe</td><td>Array vacío</td></tr>
+              <tr><td><code>getShortestPathDistance</code> a un nodo al que no se puede llegar, como la cárcel</td><td><code>-1</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="slide" id="d38">
+        <span class="slide-num">Parte 5 · 38</span>
+        <h2>El <code>-1</code> se contagia</h2>
+        <ul>
+          <li>Ese <code>-1</code> es un índice de nodo que no existe, y casi ningún método protesta.</li>
+          <li><code>getShortestPathDistance(algo, -1)</code> devuelve <strong>0</strong>: tu código lo lee como «ya estoy encima».</li>
+          <li><code>getNextMoveAwayFromTarget</code> con un <code>-1</code> devuelve <code>MOVE.NEUTRAL</code>.</li>
+          <li>Comprueba <code>!= -1</code> justo donde recibes el índice, no más adelante.</li>
+        </ul>
+      </section>
+      <section class="slide" id="d39">
+        <span class="slide-num">Parte 5 · 39</span>
+        <h2>Visibilidad parcial</h2>
+        <ul>
+          <li>Llega con la práctica de razonamiento borroso.</li>
+          <li>El <strong>mapa</strong> no se esconde: dónde están las píldoras y los cruces se puede pedir siempre.</li>
+          <li>Lo que se esconde es el <strong>estado</strong>: si esa píldora sigue ahí, o dónde anda un fantasma.</li>
+          <li>El nodo de un fantasma que no ves vale <code>-1</code>, y su último movimiento <code>null</code>: ahí comprobarlo deja de ser opcional.</li>
+        </ul>
+      </section>
+      <section class="slide s-cover" id="d40">
+        <span class="slide-num">Parte 5 · 40</span>
+        <svg class="pac" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+          <path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        </svg>
+        <h2>La referencia completa está en la wiki</h2>
+        <p class="sub">Con las tablas de todos los métodos, los detalles y los avisos: <em>Guías · La clase Game</em>.</p>
+        <p class="who">
+          <strong>Pablo Gutiérrez Sánchez</strong> · pabgut02@ucm.es · Despacho 409
+        </p>
+      </section>
+    </div>
+  </div>
+
+  <div class="note tip" style="margin-top:1.5rem">
+    <span class="note-label">Cómo se maneja</span>
+    <p>
+      Flechas izquierda y derecha, o barra espaciadora, para pasar de diapositiva. La tecla
+      <kbd>F</kbd> o el botón <em>Pantalla completa</em> la ponen a tamaño de proyector, y
+      <kbd>Esc</kbd> o <em>Volver a la página</em> devuelven aquí. También se puede tocar la mitad
+      derecha o izquierda de la diapositiva, o deslizar el dedo en el móvil.
+    </p>
+  </div>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 10 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+<script src="../assets/js/deck.js" defer></script>
+</body>
+</html>

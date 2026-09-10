@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Ms. Pac-Man en Eclipse · ICI</title>
+<meta name="description" content="Guía de instalación del entorno de la asignatura: Eclipse desde eclipseide.org, importar el simulador Ms. Pac-Man y lanzar la primera partida.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Ms. Pac-Man en Eclipse</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Ms. Pac-Man en Eclipse
+      <span class="thin">Instalar el entorno, importar el simulador y ver la primera partida en pantalla.</span>
+    </h1>
+    <p class="standfirst">
+      Los primeros bloques del curso se trabajan sobre el motor de la competición
+      <em>Ms. Pac-Man vs Ghosts</em>, adaptado en la Facultad. Esta guía te lleva desde un ordenador sin
+      nada instalado hasta una partida corriendo en tu pantalla. Reserva unos 30&nbsp;minutos la primera
+      vez, casi todos de descargas.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="antes">
+        <h2 class="sec">Lo que vas a instalar</h2>
+        <p>
+          Una sola cosa: <strong>Eclipse IDE for Java Developers</strong>, descargado de
+          <a href="https://eclipseide.org/">eclipseide.org</a>. Eclipse es
+          él mismo una aplicación Java y necesita una máquina virtual para arrancar, pero de eso se encarga
+          su propio instalador: si no encuentra un Java válido en tu ordenador, se ofrece a descargarlo.
+        </p>
+        <p>
+          A eso se suma el material de la asignatura, que está en el Campus Virtual en dos archivos:
+        </p>
+        <ul>
+          <li>
+            <code>ICI-MsPacManEngine.zip</code>: el simulador. Sirve para las prácticas de la primera
+            mitad del curso, de la 0 a la 4, así que se descarga una sola vez. Y
+            <strong>no se modifica nunca</strong>.
+          </li>
+          <li>
+            <code>ICI-Practica0.zip</code>: el proyecto donde escribirás tus controladores. Habrá uno igual
+            por cada práctica.
+          </li>
+        </ul>
+        <p>
+          Descárgate los dos antes de seguir. Todo lo que viene después da por hecho que los tienes en el
+          disco.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Antes de empezar</span>
+          <p>
+            Si tienes curiosidad por saber con qué partes, abre un terminal
+            (<span class="path">cmd</span> en Windows, <span class="path">Terminal</span> en macOS o Linux)
+            y ejecuta <code>java -version</code>. Si responde con una versión 21 o mayor, ya tienes un Java
+            aprovechable. Si en cambio dice <em>«command not found»</em> o
+            <em>«Unable to locate a Java Runtime»</em>, como en la captura, no hay que hacer nada especial:
+            el instalador de Eclipse lo resuelve en el paso&nbsp;2.
+          </p>
+        </div>
+        <figure class="wide">
+          <figcaption>Terminal de macOS · no hay ningún Java instalado</figcaption>
+          <img class="shot crop" src="../assets/img/java-not-found.png" width="889" height="190" loading="lazy"
+               alt="Ventana de Terminal en macOS: al ejecutar «java -v» responde «The operation couldn&#39;t be completed. Unable to locate a Java Runtime. Please visit http://www.java.com for information on installing Java.»">
+        </figure>
+      </section>
+
+      <section id="eclipse" class="step">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <h2 class="sec">Instalar Eclipse</h2>
+          <p>
+            Ve a <a href="https://eclipseide.org/">eclipseide.org</a>,
+            descarga el instalador y, en la lista de paquetes, elige
+            <strong>«Eclipse IDE for Java Developers»</strong>. Es el más pequeño de los que nos sirven e
+            incluye lo único que necesitamos además del editor de Java: el soporte de Maven
+            (<em>m2e</em>), con el que el simulador resuelve sus dependencias.
+          </p>
+          <p>
+            «Eclipse IDE for Enterprise Java and Web Developers» también funciona, pero descarga bastante
+            más de lo necesario. Cualquier versión de los últimos dos años vale; si te dan a elegir, coge
+            la más reciente.
+          </p>
+
+          <div class="note trap">
+            <span class="note-label">La arquitectura correcta</span>
+            <p>
+              En la página de descarga hay que elegir arquitectura, y equivocarse aquí es el error más
+              común. Si tu Mac es <strong>M1, M2, M3 o M4</strong>, necesitas <strong>aarch64</strong>,
+              no x64. En Windows y Linux de sobremesa, casi siempre <strong>x64</strong>. Con la
+              arquitectura equivocada, Eclipse o no se instala, o arranca con errores incomprensibles.
+            </p>
+          </div>
+
+          <h3>El workspace</h3>
+          <p>
+            Al final de la instalación te pedirá una carpeta de <strong>workspace</strong>. El workspace es
+            simplemente el directorio donde Eclipse guarda tus proyectos y su configuración; te propondrá
+            algo como <span class="path">~/eclipse-workspace</span> y así está bien.
+          </p>
+          <div class="note tip">
+            <span class="note-label">Si ya usas Eclipse</span>
+            <p>
+              Crea un workspace nuevo para la asignatura, en
+              <span class="path">File &gt; Switch Workspace &gt; Other…</span>. Mezclar estos proyectos con
+              los de otras asignaturas complica la vida cuando algo se rompe.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="jdk" class="step">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <h2 class="sec">El Java que usa Eclipse</h2>
+          <p>
+            Durante la instalación, Eclipse busca una máquina virtual de Java con la que arrancar. Si no
+            encuentra ninguna válida, <strong>se ofrece a descargarla él mismo</strong>: acepta y quédate
+            con <strong>Java 21 o superior</strong>. No hace falta que instales Java por tu cuenta ni que
+            elijas distribución.
+          </p>
+          <div class="note tip">
+            <span class="note-label">Si ya tenías Java</span>
+            <p>
+              El instalador te deja señalar la instalación que ya tienes. Si es la 21 o mayor, úsala; si es
+              anterior, deja que descargue una nueva. Varias versiones conviven sin problema en el mismo
+              ordenador: Eclipse usará la que le indiques y el resto del sistema seguirá con la suya.
+            </p>
+          </div>
+
+          <h3>¿Me sirve el Java que ya tengo?</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th scope="col">Lo que tienes</th><th scope="col">¿Sirve?</th><th scope="col">Comentario</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Nada, ningún Java instalado</td>
+                  <td class="pick yes">Sin problema</td>
+                  <td>El caso normal, y el más cómodo: el instalador de Eclipse se encarga.</td>
+                </tr>
+                <tr>
+                  <td>JDK 21 o 25 (LTS), cualquier proveedor</td>
+                  <td class="pick yes">Sirve</td>
+                  <td>Es sobre lo que está probado el material de la asignatura. Señálalo y sigue.</td>
+                </tr>
+                <tr>
+                  <td>Sólo un JRE, sin compilador</td>
+                  <td class="pick ok">Sirve para el IDE</td>
+                  <td>Eclipse trae su propio compilador, así que compila igual. Para compilar desde el terminal sí necesitarías un JDK.</td>
+                </tr>
+                <tr>
+                  <td>Java 8, 11 o 17</td>
+                  <td class="pick no">No</td>
+                  <td>Las versiones recientes de Eclipse ni arrancan con ellas. Deja que el instalador descargue una nueva.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>Comprobación</h4>
+          <p>
+            Con Eclipse ya instalado, ábrelo: si llega a la ventana del <em>Package Explorer</em>, el Java
+            está resuelto. El paso&nbsp;5 comprueba además cuál es el que usa para compilar.
+          </p>
+          <p>
+            Si además quieres trabajar desde el terminal, que no es necesario para el curso, un
+            <code>java -version</code> y un <code>javac -version</code> deben responder los dos, y con el
+            mismo número. Si <code>java</code> contesta pero <code>javac</code> no, lo que tienes es un JRE.
+          </p>
+        </div>
+      </section>
+
+      <section id="importar" class="step">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <h2 class="sec">Importar los dos proyectos</h2>
+          <p>
+            Descomprime los dos zips del Campus Virtual en la misma carpeta, en algún sitio estable.
+            Cada uno trae una carpeta de proyecto Eclipse completa: <code>MsPacManEngine</code> por un lado
+            y <code>Practica0</code> por otro. Importa primero el simulador, porque el proyecto de la
+            práctica lo referencia por su nombre.
+          </p>
+          <p>Con Eclipse abierto:</p>
+          <ol>
+            <li>
+              <span class="path">File &gt; Import…</span>
+            </li>
+            <li>
+              <span class="path">General &gt; Existing Projects into Workspace</span>, y
+              <kbd>Next</kbd>.
+            </li>
+            <li>
+              En <strong>Select root directory</strong>, pulsa <kbd>Browse…</kbd> y elige la carpeta donde
+              has descomprimido los dos zips. Eclipse encuentra los proyectos y los lista solo.
+            </li>
+            <li>
+              Marca los dos, <strong><code>MsPacManEngine</code> y <code>Practica0</code></strong>.
+            </li>
+            <li>
+              Marca también <strong>«Copy projects into workspace»</strong> y pulsa <kbd>Finish</kbd>.
+            </li>
+          </ol>
+          <div class="note tip">
+            <span class="note-label">Por qué copiar al workspace</span>
+            <p>
+              Con esa casilla marcada trabajas sobre tu copia, y siempre te queda el original intacto para
+              volver a empezar si algo se lía. Sin ella, Eclipse edita directamente los archivos
+              descomprimidos.
+            </p>
+          </div>
+          <p>
+            Al terminar verás los proyectos en el <em>Package Explorer</em>, probablemente con marcas
+            rojas de error. Es lo esperado: aún falta descargar las dependencias. Eso es el paso siguiente.
+          </p>
+        </div>
+      </section>
+
+      <section id="maven" class="step">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <h2 class="sec">Resolver las dependencias con Maven</h2>
+          <p>
+            <code>MsPacManEngine</code> es un proyecto Maven: su archivo <code>pom.xml</code> declara las
+            bibliotecas que necesita y Maven las descarga de Internet la primera vez. Son unas cuantas
+            (jCOLIBRI para el razonamiento basado en casos, GraphStream para grafos, slf4j para
+            <em>logging</em>) y las usarás en prácticas posteriores. Otras tres
+            (<code>jFuzzyLogic.jar</code>, <code>jess.jar</code>, <code>jsr94.jar</code>) vienen ya dentro
+            de la carpeta <code>lib/</code> del proyecto.
+          </p>
+          <p>Haz clic derecho sobre <strong>MsPacManEngine</strong> y elige:</p>
+          <ol>
+            <li><span class="path">Maven &gt; Update Project…</span> (o <kbd>Alt</kbd>+<kbd>F5</kbd>)</li>
+            <li>Marca <strong>«Force Update of Snapshots/Releases»</strong>.</li>
+            <li><kbd>OK</kbd>, y espera. La primera vez puede tardar varios minutos.</li>
+          </ol>
+          <div class="note trap">
+            <span class="note-label">Necesitas conexión</span>
+            <p>
+              Este paso descarga de repositorios públicos. Hazlo con una conexión estable y, si estás en
+              una red con proxy o cortafuegos restrictivo, mejor desde casa o con los datos del móvil. Un
+              <em>«Missing artifact&nbsp;…»</em> casi siempre significa que la descarga no llegó a
+              completarse: repite el <em>Update Project</em>.
+            </p>
+          </div>
+
+          <h3>La versión de Java del proyecto</h3>
+          <p>
+            El <code>pom.xml</code> del motor está escrito para Java&nbsp;8, así que verás avisos del tipo
+            <em>«source value 8 is obsolete»</em>. Son <strong>avisos, no errores</strong>: el proyecto
+            compila y funciona igual, y puedes ignorarlos mientras trabajemos con este motor.
+          </p>
+          <p>
+            Solo si tu JDK se niega a compilar con ese nivel, cosa que puede pasar con las versiones más
+            nuevas, haz clic derecho en el proyecto,
+            <span class="path">Properties &gt; Java Compiler</span>, desmarca
+            <strong>«Use compliance from execution environment»</strong> y pon
+            <strong>21</strong> en <em>Compiler compliance level</em>.
+          </p>
+        </div>
+      </section>
+
+      <section id="jre" class="step">
+        <div class="step-num">05</div>
+        <div class="step-body">
+          <h2 class="sec">Comprobar que Eclipse ve tu JDK</h2>
+          <p>
+            Aunque Eclipse arranque, conviene confirmar cuál es el Java que usa para <em>compilar</em>.
+            Ve a
+            <span class="path">Window &gt; Preferences &gt; Java &gt; Installed JREs</span>
+            (en macOS, <span class="path">Eclipse &gt; Settings…</span>).
+          </p>
+          <p>
+            Debe aparecer un Java 21 o superior marcado como <strong>predeterminado</strong> (en
+            negrita). Si Eclipse descargó el suyo en el paso&nbsp;2, ya estará ahí. Si no aparece ninguno,
+            pulsa <kbd>Add…</kbd>, elige <strong>Standard VM</strong> y apunta el <em>JRE home</em> a la
+            carpeta de instalación del JDK:
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th scope="col">Sistema</th><th scope="col">Ruta habitual del JDK</th></tr></thead>
+              <tbody>
+                <tr><td>Windows</td><td><code>C:\Program Files\Java\jdk-21…</code></td></tr>
+                <tr><td>macOS</td><td><code>/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home</code></td></tr>
+                <tr><td>Linux</td><td><code>/usr/lib/jvm/java-21-openjdk-amd64</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Si tienes varias versiones instaladas, marca la casilla de la 21 o superior para hacerla
+            predeterminada. Después, un <span class="path">Project &gt; Clean…</span> sobre todos los
+            proyectos deja el estado limpio.
+          </p>
+        </div>
+      </section>
+
+      <section id="tuproyecto" class="step">
+        <div class="step-num">06</div>
+        <div class="step-body">
+          <h2 class="sec">Tu proyecto y el enlace con el motor</h2>
+          <p>
+            Tu código nunca vive dentro de <code>MsPacManEngine</code>: vive en un proyecto aparte que
+            <em>referencia</em> al motor. El <code>Practica0</code> que te descargas ya viene con esa
+            referencia hecha, pero merece la pena saber dónde está, porque es la causa número uno de
+            errores de compilación misteriosos.
+          </p>
+          <p>
+            Clic derecho en <code>Practica0</code>,
+            <span class="path">Properties &gt; Java Build Path &gt; Projects</span>. Ahí debe figurar
+            <strong>MsPacManEngine</strong>. Si no está, <kbd>Add…</kbd> y añádelo. Eso es lo que permite
+            que tus clases hagan <code>import pacman.Executor;</code>.
+          </p>
+
+          <h3 class="label">Si necesitas crear el proyecto desde cero</h3>
+          <ol>
+            <li><span class="path">File &gt; New &gt; Java Project</span>, nombre <code>Practica0</code>.</li>
+            <li>En <em>JRE</em>, deja <strong>«Use default JRE»</strong> (tu JDK 21).</li>
+            <li>Desmarca <em>«Create module-info.java file»</em> si te lo ofrece: este proyecto no usa módulos.</li>
+            <li>Una vez creado, añade <code>MsPacManEngine</code> en <em>Java Build Path &gt; Projects</em>.</li>
+          </ol>
+
+          <h3 class="label">Paquetes</h3>
+          <p>
+            Todo tu código va en un paquete con esta forma exacta, donde <code>X</code> es el número de la
+            práctica e <code>YY</code> el número de grupo que se te asigne en clase:
+          </p>
+<pre><code>es.ucm.fdi.ici.c2627.practicaX.grupoYY</code></pre>
+          <p>
+            La <strong>Práctica&nbsp;0 es individual</strong>, así que en ella el último tramo no es un
+            número de grupo:
+          </p>
+<pre><code>es.ucm.fdi.ici.c2627.practica0.grupoIndividual</code></pre>
+          <p>
+            La entrega se corrige de forma automática y el nombre del paquete forma parte del contrato.
+            Míralo con calma en el enunciado de cada práctica.
+          </p>
+        </div>
+      </section>
+
+      <section id="ejecutar" class="step">
+        <div class="step-num">07</div>
+        <div class="step-body">
+          <h2 class="sec">Lanzar la primera partida</h2>
+          <p>
+            El punto de entrada es una clase con <code>main</code> que configura un
+            <code>Executor</code> y le pasa dos controladores: uno para Ms.&nbsp;Pac-Man y otro para los
+            fantasmas. El proyecto <code>Practica0</code> ya trae uno hecho, <code>ExecutorTest</code>,
+            junto a los dos controladores aleatorios que usa:
+          </p>
+<pre><code><span class="k">public class</span> ExecutorTest {
+
+    <span class="k">public static void</span> main(String[] args) {
+        Executor executor = <span class="k">new</span> Executor.Builder()
+                .setTickLimit(<span class="n">4000</span>)
+                .setVisual(<span class="k">true</span>)
+                .setScaleFactor(<span class="n">2.5</span>)
+                .build();
+
+        PacmanController pacMan = <span class="k">new</span> MsPacManRandom();
+        GhostController  ghosts = <span class="k">new</span> GhostsRandom();
+
+        System.out.println(
+            executor.runGame(pacMan, ghosts, <span class="n">30</span>) <span class="c">// el último parámetro es la velocidad</span>
+        );
+    }
+}</code></pre>
+          <p>
+            Ábrela, clic derecho sobre el editor y
+            <span class="path">Run As &gt; Java Application</span> (o <kbd>Ctrl</kbd>+<kbd>F11</kbd>;
+            <kbd>⌘</kbd>+<kbd>F11</kbd> en macOS).
+          </p>
+          <figure class="narrow">
+            <figcaption>Esto es lo que tiene que aparecer</figcaption>
+            <img class="shot" src="../assets/img/simulador.jpg" width="707" height="900" loading="lazy"
+                 alt="Ventana del simulador: el laberinto con sus píldoras, los cuatro fantasmas encerrados en la casilla central, Ms. Pac-Man abajo, y la puntuación, el nivel y el tiempo en el borde inferior.">
+          </figure>
+          <p>Si todo está bien, ocurren tres cosas:</p>
+          <ul>
+            <li>Se abre una ventana con el laberinto y las cinco entidades moviéndose.</li>
+            <li>La partida termina por sí sola al agotar los 4000 <em>ticks</em> o al perder las vidas.</li>
+            <li>La consola de Eclipse imprime un número: la puntuación final.</li>
+          </ul>
+          <p>
+            Con controladores aleatorios esa puntuación será baja y errática, de unos pocos cientos de
+            puntos. Es lo correcto: nadie está jugando todavía.
+          </p>
+          <div class="note tip">
+            <span class="note-label">Dos ajustes que usarás mucho</span>
+            <p>
+              El tercer parámetro de <code>runGame</code> es el retardo entre <em>ticks</em> en
+              milisegundos: súbelo a <code>60</code> para seguir la partida con la vista, bájalo a
+              <code>0</code> para que vuele. Y <code>setVisual(false)</code> quita la ventana, que es lo que
+              querrás cuando midas resultados sobre muchas partidas.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="problemas">
+        <h2 class="sec">Cuando algo no funciona</h2>
+        <p>
+          Estos son los tropiezos que se repiten cada curso, con lo que suele arreglarlos.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th scope="col">Lo que ves</th><th scope="col">Qué pasa y cómo se arregla</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><em>«Unable to locate a Java Runtime»</em>, o Eclipse no arranca</td>
+                <td>La arquitectura de Eclipse no es la de tu máquina, o no llegó a configurar ningún Java. Repasa el paso 1 vigilando x64 frente a aarch64, y el paso 2.</td>
+              </tr>
+              <tr>
+                <td><code>ClassNotFoundException: pacman.Executor</code>, o <code>import pacman.*</code> en rojo</td>
+                <td>Tu proyecto no referencia al motor. Paso 6: <span class="path">Java Build Path &gt; Projects</span> debe incluir <code>MsPacManEngine</code>.</td>
+              </tr>
+              <tr>
+                <td><em>«Missing artifact es.ucm.fdi.gaia:jCOLIBRI:jar:3.2»</em> u otro artefacto</td>
+                <td>Descarga de Maven incompleta. <span class="path">Maven &gt; Update Project</span> con <em>Force Update</em> y conexión estable.</td>
+              </tr>
+              <tr>
+                <td>Marca roja en el proyecto, pero ningún error en los archivos</td>
+                <td>Estado de compilación desactualizado. <span class="path">Project &gt; Clean…</span> y, si persiste, <em>Update Project</em> de Maven.</td>
+              </tr>
+              <tr>
+                <td><em>«source value 8 is obsolete»</em> y avisos parecidos</td>
+                <td>Nada que arreglar: son avisos del nivel de compilación del motor. Si te molestan, el final del paso 4 explica cómo subirlo a 21.</td>
+              </tr>
+              <tr>
+                <td>El programa acaba al instante, sin ventana</td>
+                <td>Falta <code>.setVisual(true)</code> en el <em>Builder</em>, o el <code>main</code> que ejecutaste no es el que crees. Mira la pestaña de la consola.</td>
+              </tr>
+              <tr>
+                <td>Ms.&nbsp;Pac-Man se queda quieta o va a tirones</td>
+                <td>Tu <code>getMove</code> devuelve <code>null</code>, o tarda más de los 40&nbsp;ms del <em>tick</em>. Devuelve siempre un <code>MOVE</code> válido, y <code>MOVE.NEUTRAL</code> si no hay nada mejor, evitando cálculos largos.</td>
+              </tr>
+              <tr>
+                <td>La ventana es enorme o minúscula</td>
+                <td><code>setScaleFactor(…)</code>. Prueba entre <code>1.5</code> y <code>3.0</code> según tu pantalla.</td>
+              </tr>
+              <tr>
+                <td>Todo iba bien y de pronto nada compila</td>
+                <td>Cierra Eclipse, bórralo todo del workspace y reimporta desde el zip original. Cuesta cinco minutos y resuelve más de lo que parece.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Si te quedas atascado</span>
+          <p>
+            Escríbeme a <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> con tres cosas: tu sistema
+            operativo, la salida de <code>java -version</code> y el texto completo del error, copiado y
+            pegado. Con eso se resuelve en un correo; con «no me funciona Eclipse», en cinco.
+          </p>
+        </div>
+      </section>
+
+      <section id="checklist">
+        <h2 class="sec">Antes de dar el entorno por listo</h2>
+        <ul class="check">
+          <li>Eclipse abre hasta el <em>Package Explorer</em> sin quejarse del Java.</li>
+          <li>En <em>Installed JREs</em> hay un Java 21 o superior en negrita.</li>
+          <li><code>MsPacManEngine</code> y <code>Practica0</code> están en el <em>Package Explorer</em> sin marcas rojas.</li>
+          <li><code>Practica0</code> referencia a <code>MsPacManEngine</code> en el <em>Java Build Path</em>.</li>
+          <li><code>ExecutorTest</code> abre la ventana del juego e imprime una puntuación al terminar.</li>
+          <li>Sabes cambiar la velocidad de la partida y apagar la interfaz gráfica.</li>
+          <li>Te has guardado los dos zips originales del Campus Virtual, por si hay que reimportar.</li>
+        </ul>
+        <p style="margin-top:1.25rem">
+          Con esas casillas marcadas ya puedes empezar la
+          <a href="../practicas/practica-0.html"><strong>Práctica&nbsp;0</strong></a>, que es donde se
+          aprende a jugar de verdad.
+        </p>
+      </section>
+
+      <section id="siguiente">
+        <h2 class="sec">A dónde ir ahora</h2>
+        <ul class="links">
+          <li>
+            <a href="../practicas/practica-0.html">
+              <span class="lt">Práctica 0<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Enunciado</span>
+              <span class="ld">
+                El primer ejemplo ya funcionando, dos controladores que escribes tú y la entrega
+                individual del domingo 20 de septiembre.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="clase-game.html">
+              <span class="lt">La clase <code>Game</code><span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Referencia</span>
+              <span class="ld">
+                Lo único que tu controlador puede preguntarle a la partida: posiciones, distancias,
+                caminos y tiempos. Se consulta desde el ejercicio 2 en adelante.
+              </span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-guia">
+          <h2 id="en-esta-guia">En esta guía</h2>
+          <ol>
+            <li><a href="#antes"><span>·</span>Lo que vas a instalar</a></li>
+            <li><a href="#eclipse"><span>01</span>Instalar Eclipse</a></li>
+            <li><a href="#jdk"><span>02</span>El Java que usa Eclipse</a></li>
+            <li><a href="#importar"><span>03</span>Importar los proyectos</a></li>
+            <li><a href="#maven"><span>04</span>Dependencias con Maven</a></li>
+            <li><a href="#jre"><span>05</span>Comprobar el JDK</a></li>
+            <li><a href="#tuproyecto"><span>06</span>Tu proyecto y el motor</a></li>
+            <li><a href="#ejecutar"><span>07</span>La primera partida</a></li>
+            <li><a href="#problemas"><span>·</span>Cuando algo no funciona</a></li>
+            <li><a href="#checklist"><span>·</span>Checklist final</a></li>
+            <li><a href="#siguiente"><span>·</span>A dónde ir ahora</a></li>
+          </ol>
+        </nav>
+        <div class="note tip rail-nota">
+          <span class="note-label">Resumen en una línea</span>
+          <p style="margin:0">
+            Eclipse for Java Developers desde <em>eclipseide.org</em> → que descargue Java 21 → los dos
+            zips del Campus Virtual → importar → <em>Maven Update</em> → ejecutar
+            <code>ExecutorTest</code>.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 10 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

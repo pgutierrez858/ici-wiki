@@ -1,0 +1,1363 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>La clase Game · ICI</title>
+<meta name="description" content="Los métodos de la clase Game del simulador de Ms. Pac-Man: posiciones, movimientos, píldoras, caminos, intersecciones, visibilidad parcial y la clase Constants.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>La clase Game</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      La clase <code>Game</code>
+      <span class="thin">Todo lo que tu controlador puede preguntarle a la partida.</span>
+    </h1>
+    <p class="standfirst">
+      Tu controlador recibe en cada decisión un objeto <code>Game</code> con el estado completo de la
+      partida, y esa es su única ventana al mundo. Aquí están los métodos que vas a usar de verdad,
+      agrupados por para qué sirven. Todos se llaman sobre ese objeto, o sea
+      <code>game.metodo(parametros)</code>. Lo mismo, con dibujos y en formato de clase, está en
+      <a href="clase-game-slides.html">las diapositivas</a>.
+    </p>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Paquete</dt>
+      <dd><code>pacman.game</code><small>No se modifica nunca</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Nodos</dt>
+      <dd>Índices <code>int</code><small>El laberinto es un grafo</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Decisiones</dt>
+      <dd>En las intersecciones<small>Una acción por cruce</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Visibilidad parcial</dt>
+      <dd>Práctica 4<small>Ahí cambian las reglas</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="reglas">
+        <div class="sec-head">
+          <h2 class="sec">Dos cambios respecto al juego original</h2>
+        </div>
+        <p>
+          El simulador no es exactamente el arcade original. Hay dos diferencias que condicionan cómo se
+          escribe un controlador:
+        </p>
+        <ol>
+          <li>
+            Tu controlador se llama en todos los turnos, pero la decisión sólo cuenta
+            <strong>al llegar a una intersección</strong>. En medio de un pasillo no hay alternativa: el
+            único movimiento legal es seguir.
+          </li>
+          <li>
+            No se puede hacer el <strong>movimiento contrario</strong> al que te trajo a esa intersección.
+            No se vuelve atrás.
+          </li>
+        </ol>
+        <div class="note tip">
+          <span class="note-label">Por dónde empezar</span>
+          <p>
+            Para no perderte, mira primero <a href="#metodos">Métodos</a> y
+            <a href="#constants">Constants</a>. La <a href="#parcial">visibilidad parcial</a> no hace falta
+            hasta la práctica de lógica borrosa, y leerla antes de tiempo sólo despista.
+          </p>
+        </div>
+      </section>
+
+      <section id="nodos">
+        <div class="sec-head">
+          <h2 class="sec">Cómo se numeran los nodos</h2>
+        </div>
+        <p>
+          El laberinto es un grafo, y todos los métodos de <code>Game</code> hablan de <strong>nodos</strong>
+          con un <code>int</code>. Ese entero es la posición del nodo dentro del array del laberinto, del
+          <code>0</code> al <code>getNumberOfNodes() - 1</code>. El primer laberinto tiene 1293 nodos, o sea
+          del 0 al 1292: 220 con píldora, 4 con píldora de poder y 38 que son cruces.
+        </p>
+        <p>
+          Un nodo no es una casilla del dibujo, es un paso: a velocidad normal cada personaje cambia de nodo
+          una vez por turno, y las píldoras están cada cuatro nodos. La numeración sale del archivo del
+          laberinto, que lista los nodos <strong>por filas</strong>, de arriba abajo, y dentro de cada fila de
+          izquierda a derecha. De ahí las dos cosas que hay que saber: en una misma fila los números van
+          seguidos, y al bajar una fila el número da un salto.
+        </p>
+        <figure class="lab-uno">
+          <figcaption>El primer laberinto al empezar el nivel</figcaption>
+          <img loading="lazy" class="lab pixel" src="../assets/img/laberinto-a.png" width="456" height="520"
+               alt="El primer laberinto del simulador: pasillos rosas sobre fondo negro, las píldoras como puntos blancos repartidos por todos los pasillos, cuatro píldoras de poder más grandes en las esquinas, la caja de la cárcel en el centro y Ms. Pac-Man abajo, en el centro.">
+        </figure>
+        <p>
+          Esa imagen sale del propio simulador: es el laberinto con sus 220 píldoras, las cuatro de poder en
+          las esquinas y Ms.&nbsp;Pac-Man colocada en el nodo de salida del juego original.
+        </p>
+        <figure class="wide">
+          <figcaption>Esquina de arriba a la izquierda del primer laberinto, con el número de cada nodo</figcaption>
+          <svg class="explica dgn1" viewBox="0 0 470 246" role="img" aria-label="Fragmento del laberinto: la fila de arriba contiene los nodos 0, 1, 2, 3, 4 y sigue hasta el 20; después hay una pared y al otro lado están el 21 y el 22. Bajando desde el nodo 0 se llega al 79, luego al 85 y luego al 91.">
+            <style>
+              .dgn1 .pas{fill:none;stroke:var(--surface-2);stroke-width:30;stroke-linecap:round}
+              .dgn1 .cel{fill:var(--surface);stroke:var(--line);stroke-width:1.4}
+              .dgn1 .conp{stroke:var(--pill);stroke-width:2.2}
+              .dgn1 .nu{font-family:var(--f-mono);font-size:11.5px;text-anchor:middle;fill:var(--ink)}
+              .dgn1 .pared{fill:var(--ink-3);opacity:.22}
+              .dgn1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgn1 .tm{fill:var(--bad)}
+              .dgn1 .tp{fill:var(--pill-ink)}
+              .dgn1 .pu{font-family:var(--f-mono);font-size:14px;text-anchor:middle;fill:var(--ink-3)}
+              .dgn1 .fl{fill:none;stroke:var(--maze);stroke-width:1.8;marker-end:url(#n1a)}
+            </style>
+            <defs><marker id="n1a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker></defs>
+            <path d="M38 54 H250" class="pas"/>
+            <path d="M312 54 H358" class="pas"/>
+            <path d="M38 54 V156" class="pas"/>
+            <rect x="266" y="38" width="30" height="32" class="pared"/>
+            <text x="281" y="30" class="t" text-anchor="middle">pared</text>
+            <rect x="24" y="43" width="28" height="22" rx="4" class="cel conp"/><text x="38" y="58" class="nu">0</text>
+            <rect x="56" y="43" width="28" height="22" rx="4" class="cel"/><text x="70" y="58" class="nu">1</text>
+            <rect x="88" y="43" width="28" height="22" rx="4" class="cel"/><text x="102" y="58" class="nu">2</text>
+            <rect x="120" y="43" width="28" height="22" rx="4" class="cel"/><text x="134" y="58" class="nu">3</text>
+            <rect x="152" y="43" width="28" height="22" rx="4" class="cel conp"/><text x="166" y="58" class="nu">4</text>
+            <text x="194" y="59" class="pu">…</text>
+            <rect x="204" y="43" width="28" height="22" rx="4" class="cel"/><text x="218" y="58" class="nu">19</text>
+            <rect x="236" y="43" width="28" height="22" rx="4" class="cel"/><text x="250" y="58" class="nu">20</text>
+            <rect x="298" y="43" width="28" height="22" rx="4" class="cel"/><text x="312" y="58" class="nu">21</text>
+            <rect x="330" y="43" width="28" height="22" rx="4" class="cel"/><text x="344" y="58" class="nu">22</text>
+            <text x="372" y="59" class="pu">…</text>
+            <rect x="24" y="77" width="28" height="22" rx="4" class="cel"/><text x="38" y="92" class="nu">79</text>
+            <rect x="24" y="111" width="28" height="22" rx="4" class="cel"/><text x="38" y="126" class="nu">85</text>
+            <rect x="24" y="145" width="28" height="22" rx="4" class="cel"/><text x="38" y="160" class="nu">91</text>
+            <path d="M62 68 C88 76 84 86 66 90" class="fl"/>
+            <text x="72" y="102" class="t">getNeighbour(0, DOWN) = 79</text>
+            <text x="72" y="118" class="t">la fila de arriba son los nodos 0 a 78,</text>
+            <text x="72" y="132" class="t">así que debajo del 0 está el 79</text>
+            <text x="72" y="156" class="t tm">20 y 21 son números seguidos y</text>
+            <text x="72" y="170" class="t tm">no son vecinos: hay una pared</text>
+            <text x="24" y="206" class="t tp">Borde amarillo: nodo con píldora. Hay una cada 4 nodos.</text>
+            <text x="24" y="224" class="t">Coordenadas del nodo 0: x = 4, y = 4. Del 79: x = 4, y = 5.</text>
+          </svg>
+        </figure>
+        <figure class="wide">
+          <figcaption>Y ese mismo trozo en el juego, ampliado</figcaption>
+          <img loading="lazy" class="lab pixel" src="../assets/img/nodos-esquina.png" width="700" height="400"
+               alt="Ampliación de la esquina de arriba a la izquierda del laberinto: sobre los puntos de las píldoras se han marcado en amarillo los nodos 0 a 6 de la primera fila y los nodos 79, 85 y 91 bajando por el pasillo de la izquierda.">
+        </figure>
+        <p>
+          Los nodos marcados en amarillo son los mismos del dibujo anterior. Se ve bien que en un pasillo hay
+          cuatro nodos entre píldora y píldora, y que los nodos son pasos, no casillas del dibujo.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>int getNumberOfNodes()</code></td><td>Cuántos nodos tiene el laberinto actual. Los índices válidos van de 0 a ese número menos uno.</td></tr>
+              <tr><td><code>int getNodeXCood(int)</code></td><td>La columna del nodo. En el primer laberinto va de 0 a 108.</td></tr>
+              <tr><td><code>int getNodeYCood(int)</code></td><td>La fila del nodo. En el primer laberinto, de 4 a 116.</td></tr>
+              <tr><td><code>int getMazeIndex()</code></td><td>Cuál de los cuatro laberintos se está jugando, de 0 a 3.</td></tr>
+              <tr><td><code>Maze getCurrentMaze()</code></td><td>El laberinto entero, con la lista de nodos y los datos fijos del mapa.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">En qué unidades está todo esto</span>
+          <p>
+            Las coordenadas <strong>no son píxeles</strong>: están en la misma unidad que los nodos, o sea
+            que dos casillas contiguas del grafo se llevan exactamente 1. Para dibujar, el motor las
+            multiplica por 2, así que un nodo son dos píxeles de la ventana del juego y el laberinto entero
+            ocupa 224 por 248.
+          </p>
+          <p>
+            Por eso todas las distancias que devuelve el <code>game</code> están en nodos:
+            <code>getShortestPathDistance</code> cuenta los pasos que hay que dar, y
+            <code>getDistance</code> también, con cualquiera de las tres métricas. Para hacerte una idea:
+            entre dos píldoras seguidas hay 4 nodos, y la coordenada x del primer laberinto va de 0 a 108.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Un índice no es una coordenada</span>
+          <p>
+            No hagas aritmética con los números de nodo. <code>nodo + 1</code> suele ser el de la derecha
+            dentro de la misma fila, pero al final de un tramo es un nodo que está al otro lado de una pared,
+            como el 20 y el 21 del dibujo. Para moverte por el grafo están
+            <code>getNeighbour</code> y <code>getPossibleMoves</code>, y para saber a qué distancia queda
+            algo, <code>getShortestPathDistance</code>.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Los túneles rompen la intuición de la distancia</span>
+          <p>
+            Cada laberinto tiene uno o dos <strong>túneles</strong> que conectan el borde izquierdo con el
+            derecho, a la misma altura: dos en el primero, el segundo y el cuarto, y uno en el tercero. Son
+            las únicas aristas del grafo que unen dos nodos que en la pantalla están lejísimos.
+          </p>
+          <p>
+            La consecuencia para tu controlador es directa: un fantasma que está al otro lado de la
+            pantalla puede estar a <strong>un solo paso</strong>. Con <code>DM.PATH</code> te sale 1 y
+            aciertas; con <code>EUCLID</code> o <code>MANHATTAN</code> te sale 108 y te confías.
+          </p>
+        </div>
+        <figure class="lab-uno">
+          <figcaption>Los 38 cruces, los dos túneles, la cárcel y su puerta</figcaption>
+          <img loading="lazy" class="lab pixel" src="../assets/img/laberinto-a-anotado.png" width="684" height="780"
+               alt="El primer laberinto con marcas encima: círculos amarillos en los 38 nodos que son cruce, círculos azules en los cuatro extremos de los dos túneles laterales, un cuadrado rosa en el nodo de la cárcel y un círculo verde en la puerta por la que salen los fantasmas.">
+        </figure>
+        <p>
+          En amarillo, los 38 nodos que <code>getJunctionIndices()</code> devuelve como cruces. En azul, los
+          extremos de los dos túneles: los dos de la izquierda están pegados a los dos de la derecha. El
+          cuadrado rosa es la cárcel, y el círculo verde la puerta por la que salen los fantasmas.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Cada laberinto tiene su propia numeración</span>
+          <p>
+            Hay cuatro laberintos y se cambia de uno al siguiente en cada nivel, en ciclo. Cada uno numera
+            sus nodos desde cero por su cuenta, y no hay ninguna relación entre una numeración y otra: el
+            nodo 400 está junto al borde derecho del primer laberinto y junto al borde izquierdo del
+            segundo. Tampoco hay el mismo número de nodos: 1293, 1319, 1380 y 1309.
+          </p>
+          <p>
+            La consecuencia práctica es que un número de nodo escrito a mano en el código apunta a otro sitio
+            en cuanto se pasa de nivel. Los nodos que necesites, pídeselos al <code>game</code>:
+            <code>getPillIndices()</code>, <code>getJunctionIndices()</code>,
+            <code>getPacmanCurrentNodeIndex()</code>.
+          </p>
+          <p>
+            Y en esta versión del motor Ms. Pac-Man <strong>no siempre empieza en el mismo sitio</strong>:
+            al arrancar un nivel y cada vez que pierde una vida aparece en un nodo elegido al azar. Todo lo
+            que decida tu controlador tiene que salir de lo que le pregunta al <code>game</code>.
+          </p>
+        </div>
+        <div class="galeria">
+          <figure>
+            <img loading="lazy" class="lab pixel" src="../assets/img/laberinto-a.png" width="456" height="520" alt="Laberinto A del simulador.">
+            <figcaption>A · 1293 nodos</figcaption>
+          </figure>
+          <figure>
+            <img loading="lazy" class="lab pixel" src="../assets/img/laberinto-b.png" width="456" height="520" alt="Laberinto B del simulador, con otra disposición de pasillos.">
+            <figcaption>B · 1319 nodos</figcaption>
+          </figure>
+          <figure>
+            <img loading="lazy" class="lab pixel" src="../assets/img/laberinto-c.png" width="456" height="520" alt="Laberinto C del simulador, de trazado más abierto.">
+            <figcaption>C · 1380 nodos</figcaption>
+          </figure>
+          <figure>
+            <img loading="lazy" class="lab pixel" src="../assets/img/laberinto-d.png" width="456" height="520" alt="Laberinto D del simulador.">
+            <figcaption>D · 1309 nodos</figcaption>
+          </figure>
+        </div>
+        <p>
+          Los cuatro laberintos, tal como los trae el motor. Se juegan en este orden y se vuelve al primero
+          después del cuarto.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Hay dos numeraciones, y se parecen mucho</span>
+          <p>
+            Los métodos que devuelven listas de píldoras, como
+            <code>getActivePillsIndices()</code>, dan <strong>números de nodo</strong>: son sitios del
+            laberinto y se usan como cualquier otro nodo. Pero las píldoras tienen además su propia
+            numeración, del 0 al 219, que es la que espera <code>isPillStillAvailable(int)</code>. Para pasar
+            de una a la otra está <code>getPillIndex(nodoConPildora)</code>, que devuelve <code>-1</code> si
+            en ese nodo no hay píldora.
+          </p>
+          <p>
+            Si le pasas un número de nodo a <code>isPillStillAvailable</code> te contesta por otra píldora
+            cualquiera, o se sale del array. Lo mismo con
+            <code>isPowerPillStillAvailable(int)</code>, donde la numeración va del 0 al 3.
+          </p>
+        </div>
+      </section>
+
+      <section id="turnos">
+        <div class="sec-head">
+          <h2 class="sec">Cómo avanza la partida, turno a turno</h2>
+        </div>
+        <p>
+          La partida no es continua: avanza a saltos, en <strong>turnos</strong> (el código los llama
+          <em>ticks</em>). En cada turno pasa siempre lo mismo y en el mismo orden:
+        </p>
+        <ol>
+          <li>
+            El motor entrega a cada controlador una <strong>copia</strong> del estado de ese turno, junto con
+            el instante en el que debería estar la respuesta, que es el <code>timeDue</code> de tu
+            <code>getMove</code>.
+          </li>
+          <li>
+            Los dos controladores deciden <strong>a la vez</strong>. Ninguno ve el movimiento que ha elegido
+            el otro, sólo el estado que acaban de recibir.
+          </li>
+          <li>El motor mueve a Ms. Pac-Man y se come la píldora del nodo en el que cae, si la hay.</li>
+          <li>Mueve a los fantasmas a los que les toque moverse.</li>
+          <li>
+            Con todos ya colocados, comprueba los contactos, descuenta los contadores de comestible y de
+            cárcel, y mira si el nivel o la partida se han acabado.
+          </li>
+        </ol>
+        <figure class="wide">
+          <figcaption>El turno, de principio a fin</figcaption>
+          <svg class="explica dgn2" viewBox="0 0 480 246" role="img" aria-label="Diagrama del turno: del estado del turno salen copias para el controlador de Ms. Pac-Man y el de los fantasmas, que deciden en paralelo con 40 milisegundos cada uno; el motor aplica los dos movimientos, resuelve píldoras, contactos y contadores, y de ahí sale el estado del turno siguiente.">
+            <style>
+              .dgn2 .bx{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+              .dgn2 .bxm{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.5}
+              .dgn2 .bxp{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.5}
+              .dgn2 .nm{font-family:var(--f-display);font-weight:700;font-size:11.5px;text-anchor:middle;fill:var(--ink)}
+              .dgn2 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgn2 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.8;marker-end:url(#n2a)}
+              .dgn2 .flv{fill:none;stroke:var(--maze);stroke-width:1.8;stroke-dasharray:4 3;marker-end:url(#n2b)}
+            </style>
+            <defs>
+              <marker id="n2a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker>
+              <marker id="n2b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+            </defs>
+            <rect x="170" y="12" width="140" height="30" rx="5" class="bxp"/>
+            <text x="240" y="31" class="nm">ESTADO DEL TURNO</text>
+            <path d="M200 44 C150 58 130 58 120 70" class="fl"/>
+            <path d="M280 44 C330 58 350 58 360 70" class="fl"/>
+            <rect x="22" y="72" width="196" height="42" rx="5" class="bxm"/>
+            <text x="120" y="90" class="nm">TU CONTROLADOR</text>
+            <text x="120" y="105" class="t">40 ms para devolver un MOVE</text>
+            <rect x="262" y="72" width="196" height="42" rx="5" class="bx"/>
+            <text x="360" y="90" class="nm">LOS FANTASMAS</text>
+            <text x="360" y="105" class="t">40 ms, cuatro MOVE</text>
+            <path d="M120 116 C130 132 150 136 170 142" class="fl"/>
+            <path d="M360 116 C350 132 330 136 310 142" class="fl"/>
+            <rect x="100" y="144" width="280" height="30" rx="5" class="bx"/>
+            <text x="240" y="163" class="nm">EL MOTOR APLICA LOS DOS MOVIMIENTOS</text>
+            <path d="M240 176 V190" class="fl"/>
+            <rect x="100" y="192" width="280" height="30" rx="5" class="bx"/>
+            <text x="240" y="211" class="nm">PÍLDORAS · CONTACTOS · CONTADORES</text>
+            <path d="M380 207 H464 V27 H312" class="flv"/>
+            <text x="456" y="19" class="t" style="text-anchor:end">turno siguiente</text>
+          </svg>
+        </figure>
+        <div class="note tip">
+          <span class="note-label">Simultáneo, aunque se aplique por orden</span>
+          <p>
+            El motor mueve primero a Ms. Pac-Man y después a los fantasmas, pero eso no da ventaja a nadie:
+            los dos han decidido sobre el mismo estado y los contactos se comprueban al final, cuando todos
+            han terminado de moverse. La única consecuencia visible de ese orden es la píldora de poder, que
+            se come antes de que los fantasmas se muevan, y por eso se dan la vuelta en ese mismo turno.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Los 40 ms no los vigila nadie, y depende del modo</span>
+          <p>
+            El <code>Executor</code> tiene dos familias de modos y se portan de forma distinta:
+          </p>
+          <ul>
+            <li>
+              <code>runGame</code> y <code>runExperiment</code>, que son los que usamos en clase y en la
+              evaluación, llaman a tu <code>getMove</code> y <strong>esperan</strong> a que devuelvas. Si
+              tardas 300&nbsp;ms, la partida va lenta y nada más. El <code>timeDue</code> es sólo
+              información para que te controles tú.
+            </li>
+            <li>
+              <code>runGameTimed</code> y <code>runGameTimedSpeedOptimised</code> le dan a cada controlador
+              su propio hilo. Cada turno el motor le entrega el estado, espera 40&nbsp;ms y coge el último
+              movimiento que ese hilo haya dejado escrito; si todavía no ha terminado, repite el del turno
+              anterior. Y no arranca un cálculo nuevo mientras el anterior sigue vivo, así que un
+              <code>getMove</code> de 200&nbsp;ms son cinco turnos de 40 en los que el juego avanza con
+              información vieja.
+            </li>
+          </ul>
+          <p>
+            En ninguno de los dos casos se aborta tu método ni salta una excepción: nadie interrumpe un
+            <code>getMove</code> a medias. Que no te corten tampoco significa que el tiempo dé igual, porque
+            evaluar una entrega son decenas de partidas de 4000 turnos y eso se paga en horas de cálculo.
+            <code>getShortestPath</code> sobre listas grandes se cobra en cada llamada.
+          </p>
+        </div>
+
+        <h3>Velocidades</h3>
+        <p>
+          Todos los personajes se mueven un nodo por turno, con dos excepciones, y las dos son de los
+          fantasmas:
+        </p>
+        <ul>
+          <li>Un fantasma <strong>en la cárcel</strong> no se mueve, y su movimiento se ignora.</li>
+          <li>
+            Un fantasma <strong>comestible</strong> se queda quieto uno de cada dos turnos, o sea que va a
+            media velocidad.
+          </li>
+        </ul>
+        <figure class="wide">
+          <figcaption>Ocho turnos seguidos: quién avanza y quién se queda</figcaption>
+          <svg class="explica dgn3" viewBox="0 0 470 158" role="img" aria-label="Comparación a lo largo de ocho turnos: Ms. Pac-Man avanza en los ocho, un fantasma persiguiendo también avanza en los ocho, y un fantasma comestible avanza en cuatro y se queda quieto en los otros cuatro.">
+            <style>
+              .dgn3 .et{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgn3 .tn{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-3)}
+              .dgn3 .av{fill:var(--maze)}
+              .dgn3 .qu{fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:2 2}
+              .dgn3 .ln{stroke:var(--line-soft);stroke-width:1}
+              .dgn3 .pie{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+            </style>
+            <text x="14" y="14" class="tn" style="text-anchor:start">turno</text>
+            <text x="176" y="14" class="tn">1</text><text x="212" y="14" class="tn">2</text><text x="248" y="14" class="tn">3</text><text x="284" y="14" class="tn">4</text><text x="320" y="14" class="tn">5</text><text x="356" y="14" class="tn">6</text><text x="392" y="14" class="tn">7</text><text x="428" y="14" class="tn">8</text>
+            <text x="0" y="42" class="et">Ms. Pac-Man</text>
+            <path d="M168 38 H436" class="ln"/>
+            <circle cx="176" cy="38" r="6" class="av"/><circle cx="212" cy="38" r="6" class="av"/><circle cx="248" cy="38" r="6" class="av"/><circle cx="284" cy="38" r="6" class="av"/><circle cx="320" cy="38" r="6" class="av"/><circle cx="356" cy="38" r="6" class="av"/><circle cx="392" cy="38" r="6" class="av"/><circle cx="428" cy="38" r="6" class="av"/>
+            <text x="0" y="76" class="et">fantasma normal</text>
+            <path d="M168 72 H436" class="ln"/>
+            <circle cx="176" cy="72" r="6" class="av"/><circle cx="212" cy="72" r="6" class="av"/><circle cx="248" cy="72" r="6" class="av"/><circle cx="284" cy="72" r="6" class="av"/><circle cx="320" cy="72" r="6" class="av"/><circle cx="356" cy="72" r="6" class="av"/><circle cx="392" cy="72" r="6" class="av"/><circle cx="428" cy="72" r="6" class="av"/>
+            <text x="0" y="110" class="et">fantasma comestible</text>
+            <path d="M168 106 H436" class="ln"/>
+            <circle cx="176" cy="106" r="6" class="av"/><circle cx="212" cy="106" r="5" class="qu"/><circle cx="248" cy="106" r="6" class="av"/><circle cx="284" cy="106" r="5" class="qu"/><circle cx="320" cy="106" r="6" class="av"/><circle cx="356" cy="106" r="5" class="qu"/><circle cx="392" cy="106" r="6" class="av"/><circle cx="428" cy="106" r="5" class="qu"/>
+            <circle cx="8" cy="136" r="6" class="av"/><text x="20" y="140" class="pie">avanza un nodo</text>
+            <circle cx="168" cy="136" r="5" class="qu"/><text x="180" y="140" class="pie">se queda donde está</text>
+          </svg>
+        </figure>
+        <p>
+          Eso tiene dos consecuencias que conviene tener presentes al escribir cualquier controlador:
+        </p>
+        <ul>
+          <li>
+            Mientras persiguen, los fantasmas <strong>no corren más que tú</strong>. No te pueden alcanzar
+            desde atrás, sólo acorralarte entre varios.
+          </li>
+          <li>
+            Mientras son comestibles no se te pueden escapar: le ganas un nodo cada dos turnos, así que uno
+            que esté a diez nodos se caza en unos veinte turnos si el camino es directo. Con 200 turnos de
+            tiempo comestible al principio de la partida, da para varios.
+          </li>
+        </ul>
+
+        <h3>Cuándo decides de verdad</h3>
+        <p>
+          Tu controlador se llama en <strong>todos</strong> los turnos, no sólo en los cruces. Lo que pasa es
+          que en medio de un pasillo no hay nada que elegir: el único movimiento legal es seguir, y si
+          devuelves otra cosa el motor la sustituye. Por eso la decisión sólo cuenta cuando hay más de una
+          opción, y la forma directa de preguntarlo es ésta:
+        </p>
+<pre><code><span class="c">// timeDue: hora en ms a la que deberías haber contestado</span>
+<span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+    <span class="k">int</span>  nodo   = game.getPacmanCurrentNodeIndex();
+    MOVE ultimo = game.getPacmanLastMoveMade();
+    MOVE[] opciones = game.getPossibleMoves(nodo, ultimo);
+
+    <span class="k">if</span> (opciones.length == <span class="n">1</span>)          <span class="c">// pasillo: nada que elegir</span>
+        <span class="k">return</span> opciones[<span class="n">0</span>];
+
+    <span class="k">return</span> decide(game, nodo, opciones);  <span class="c">// cruce: tu lógica</span>
+}</code></pre>
+        <p>
+          En un pasillo, <code>getPossibleMoves(nodo, ultimo)</code> devuelve un array de <strong>un solo
+          elemento</strong>, seguir de frente, porque la vuelta atrás ya viene descontada. Y ahí da igual lo
+          que devuelvas: ese movimiento, <code>MOVE.NEUTRAL</code>, uno contra la pared o la vuelta atrás
+          acaban todos en lo mismo, porque el motor los corrige. Ese <code>if</code> no arregla nada, está
+          para no gastar tiempo calculando algo que no puede cambiar el resultado.
+        </p>
+        <p>
+          El caso en el que el array trae más de un elemento es el cruce, y es el único turno en el que tu
+          decisión se aplica tal cual.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Si no devuelves nada aprovechable, decide el motor</span>
+          <p>
+            No existe el turno en el que Ms.&nbsp;Pac-Man se queda quieta. Devolver
+            <code>MOVE.NEUTRAL</code> o <code>null</code> es dejar que el motor elija con las reglas de
+            corrección de arriba, y eso incluye el primer turno de cada vida.
+          </p>
+          <p>
+            Ese primer turno tiene además una particularidad: al aparecer, el motor le pone un último
+            movimiento artificial, el contrario a su primera salida legal, así que desde el turno uno ya hay
+            una opción descontada. Si aparece en un pasillo, la dirección con la que arranca está decidida
+            antes de que tú digas nada.
+          </p>
+          <p>
+            Los fantasmas sí pasan por el caso limpio: salen de la cárcel con <code>MOVE.NEUTRAL</code> como
+            último movimiento, y entonces <code>getPossibleMoves</code> les devuelve todas las salidas del
+            nodo.
+          </p>
+        </div>
+        <p>
+          Para los fantasmas el motor ya trae la pregunta hecha, en
+          <code>doesGhostRequireAction(GHOST)</code>: es cierto en los cruces, y también en el turno en el que
+          el fantasma acaba de salir de la cárcel, cuando su último movimiento es <code>MOVE.NEUTRAL</code> y
+          hay que elegir hacia dónde tirar. Además descarta los turnos en los que un fantasma comestible no se
+          mueve, que son turnos en los que no hay nada que decidir.
+        </p>
+      </section>
+
+      <section id="reglas-juego">
+        <div class="sec-head">
+          <h2 class="sec">Las reglas, una por una</h2>
+        </div>
+
+        <h3>El contacto: por qué se come a distancia 2</h3>
+        <p>
+          Cuando todo el mundo ha terminado de moverse, el motor mide la distancia por los pasillos entre
+          Ms.&nbsp;Pac-Man y cada fantasma. Si esa distancia es de <strong>2 nodos o menos</strong>, se toman
+          por tocados. No hace falta caer en el mismo nodo, y hay dos razones:
+        </p>
+        <ul>
+          <li>
+            Los dos avanzan un nodo por turno en el mismo instante, así que pueden
+            <strong>cruzarse</strong> sin llegar a pisar nunca la misma casilla.
+          </li>
+          <li>
+            Un nodo es un paso muy pequeño: entre dos píldoras hay cuatro. Dos nodos es medio hueco entre
+            píldoras, o sea que en la pantalla los dibujos ya están encima uno del otro.
+          </li>
+        </ul>
+        <figure class="wide">
+          <figcaption>Arriba, la distancia a la que se produce el contacto. Abajo, el cruce que obliga a que sea así.</figcaption>
+          <svg class="explica dgn4" viewBox="0 0 460 190" role="img" aria-label="Un pasillo con sus nodos y las píldoras cada cuatro nodos: Ms. Pac-Man y un fantasma separados por dos nodos, marcados como contacto. Debajo, los dos intercambian su posición en el mismo turno y se cruzan sin coincidir en ningún nodo.">
+            <style>
+              .dgn4 .pas{fill:none;stroke:var(--surface-2);stroke-width:26;stroke-linecap:round}
+              .dgn4 .nd{fill:var(--ink-3);opacity:.55}
+              .dgn4 .pl{fill:var(--pill);stroke:var(--pill-ink);stroke-width:.8}
+              .dgn4 .gh{fill:var(--blinky)}
+              .dgn4 .pc{fill:var(--pill)}
+              .dgn4 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgn4 .tb{fill:var(--bad)}
+              .dgn4 .cor{fill:none;stroke:var(--bad);stroke-width:1.4}
+              .dgn4 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.6;marker-end:url(#n4a)}
+            </style>
+            <defs><marker id="n4a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker></defs>
+            <path d="M30 46 H430" class="pas"/>
+            <circle cx="30" cy="46" r="2.6" class="nd"/><circle cx="55" cy="46" r="2.6" class="nd"/><circle cx="80" cy="46" r="2.6" class="nd"/><circle cx="105" cy="46" r="2.6" class="nd"/><circle cx="155" cy="46" r="2.6" class="nd"/><circle cx="180" cy="46" r="2.6" class="nd"/><circle cx="205" cy="46" r="2.6" class="nd"/><circle cx="255" cy="46" r="2.6" class="nd"/><circle cx="280" cy="46" r="2.6" class="nd"/><circle cx="305" cy="46" r="2.6" class="nd"/><circle cx="355" cy="46" r="2.6" class="nd"/><circle cx="380" cy="46" r="2.6" class="nd"/><circle cx="405" cy="46" r="2.6" class="nd"/>
+            <circle cx="30" cy="46" r="4.5" class="pl"/><circle cx="130" cy="46" r="4.5" class="pl"/><circle cx="230" cy="46" r="4.5" class="pl"/><circle cx="330" cy="46" r="4.5" class="pl"/><circle cx="430" cy="46" r="4.5" class="pl"/>
+            <g transform="translate(146 37) scale(.692)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M196 46 a9 9 0 0 1 18 0 v9 h-18 z" class="gh"/>
+            <path d="M155 26 H205" class="fl"/>
+            <text x="152" y="20" class="t">2 nodos: contacto</text>
+            <text x="30" y="78" class="t">Puntos grises: nodos. Bolas amarillas: píldoras, una cada 4 nodos.</text>
+            <path d="M30 130 H430" class="pas"/>
+            <g transform="translate(171 121) scale(.692)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M198 130 a9 9 0 0 1 18 0 v9 h-18 z" class="gh"/>
+            <path d="M180 118 C190 104 200 104 208 116" class="cor"/>
+            <path d="M205 142 C196 154 186 154 178 144" class="cor"/>
+            <text x="228" y="126" class="t tb">se intercambian el sitio en un</text>
+            <text x="228" y="142" class="t tb">turno, sin pisar el mismo nodo</text>
+            <text x="30" y="172" class="t">La medida es la distancia por los pasillos, no en línea</text>
+            <text x="30" y="186" class="t">recta: una pared entre los dos no cuenta como cerca.</text>
+          </svg>
+        </figure>
+        <p>Lo que ocurre en ese contacto depende de en qué estado esté el fantasma:</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Estado del fantasma</th><th scope="col">Qué pasa</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Comestible</td>
+                <td>
+                  Te lo comes: puntos, y se va derecho a la cárcel con el contador puesto. Sale de nuevo
+                  cuando ese contador llegue a cero.
+                </td>
+              </tr>
+              <tr>
+                <td>Normal</td>
+                <td>
+                  Pierdes una vida. Si te quedan, se recoloca todo: los cuatro fantasmas vuelven a la cárcel
+                  con sus tiempos iniciales y Ms.&nbsp;Pac-Man aparece otra vez, en un nodo al azar. El mapa
+                  no se repone: las píldoras que ya te habías comido siguen comidas.
+                </td>
+              </tr>
+              <tr>
+                <td>En la cárcel</td>
+                <td>Nada. Su nodo no conecta con el resto del laberinto, así que no puede tocarte.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">En un mismo turno puedes comer y morir</span>
+          <p>
+            El motor recorre los cuatro fantasmas. Si uno comestible está a tiro te lo apunta, y si además hay
+            otro normal igual de cerca, pierdes la vida de todas formas. Estar rodeado con la píldora de poder
+            a medias no es seguro.
+          </p>
+        </div>
+
+        <h3>La cárcel</h3>
+        <p>
+          La cárcel es un nodo aparte, el último del laberinto, que no tiene vecinos. Un fantasma encerrado
+          está ahí quieto, su movimiento se ignora, y lo único que pasa es que su contador baja un turno cada
+          turno. Cuando llega a cero, el fantasma aparece en la puerta de la cárcel, siempre el mismo nodo del
+          mapa, y con <code>MOVE.NEUTRAL</code> como último movimiento.
+        </p>
+        <figure class="wide">
+          <figcaption>El ciclo de un fantasma</figcaption>
+          <svg class="explica dgn5" viewBox="0 0 470 216" role="img" aria-label="Ciclo de un fantasma: de la cárcel sale a la puerta cuando su contador llega a cero, de ahí pasa a perseguir a un nodo por turno; con una píldora de poder se vuelve comestible y va a media velocidad; si Ms. Pac-Man lo toca vuelve a la cárcel, y si se le acaba el tiempo vuelve a perseguir.">
+            <style>
+              .dgn5 .bx{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+              .dgn5 .bxr{fill:var(--surface);stroke:var(--blinky);stroke-width:1.6}
+              .dgn5 .bxp{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.6}
+              .dgn5 .nm{font-family:var(--f-display);font-weight:700;font-size:11.5px;text-anchor:middle;fill:var(--ink)}
+              .dgn5 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgn5 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.6;marker-end:url(#n5a)}
+              .dgn5 .flp{fill:none;stroke:var(--pill-ink);stroke-width:1.6;marker-end:url(#n5b)}
+            </style>
+            <defs>
+              <marker id="n5a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker>
+              <marker id="n5b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker>
+            </defs>
+            <rect x="14" y="96" width="116" height="46" rx="5" class="bx"/>
+            <text x="72" y="116" class="nm">CÁRCEL</text>
+            <text x="72" y="131" class="t">quieto, cuenta atrás</text>
+            <path d="M132 119 H166" class="fl"/>
+            <text x="149" y="88" class="t">llega a 0</text>
+            <rect x="170" y="96" width="116" height="46" rx="5" class="bx"/>
+            <text x="228" y="116" class="nm">EN LA PUERTA</text>
+            <text x="228" y="131" class="t">sale con NEUTRAL</text>
+            <path d="M288 119 H322" class="fl"/>
+            <rect x="326" y="96" width="130" height="46" rx="5" class="bxr"/>
+            <text x="391" y="116" class="nm">PERSIGUIENDO</text>
+            <text x="391" y="131" class="t">un nodo por turno</text>
+            <rect x="326" y="16" width="130" height="46" rx="5" class="bxp"/>
+            <text x="391" y="36" class="nm">COMESTIBLE</text>
+            <text x="391" y="51" class="t">media velocidad</text>
+            <path d="M366 96 V66" class="flp"/>
+            <text x="298" y="82" class="t">píldora de poder</text>
+            <path d="M416 66 V94" class="fl"/>
+            <text x="456" y="82" class="t" style="text-anchor:end">acaba el tiempo</text>
+            <path d="M326 39 H72 V94" class="flp"/>
+            <text x="196" y="34" class="t">Ms. Pac-Man lo toca: vuelve a la cárcel</text>
+            <text x="14" y="178" class="t" style="text-anchor:start">Contadores iniciales: Blinky 40 turnos, Pinky 60, Inky 80, Sue 100.</text>
+            <text x="14" y="194" class="t" style="text-anchor:start">Después de que te lo comas: 40 turnos. Todos bajan un 10&#37; por nivel.</text>
+          </svg>
+        </figure>
+        <p>
+          De ahí sale una consecuencia táctica: los fantasmas no aparecen todos a la vez. Al empezar un nivel
+          hay un rato en el que sólo está Blinky fuera, y ese margen se puede aprovechar.
+          <code>getGhostLairTime(GHOST)</code> te dice cuántos turnos le quedan a cada uno, así que puedes
+          saber cuándo va a salir el siguiente.
+        </p>
+
+        <h3>La píldora de poder</h3>
+        <ul>
+          <li>
+            Todos los fantasmas que estén <strong>fuera</strong> de la cárcel pasan a comestibles durante 200
+            turnos. Los que estén dentro no se enteran, y salen normales.
+          </li>
+          <li>
+            En ese mismo turno todos <strong>se dan la vuelta</strong>. El movimiento que había decidido su
+            controlador se ignora y retroceden un nodo.
+          </li>
+          <li>
+            El primer fantasma que te comas vale 200 puntos, el segundo 400, el tercero 800 y el cuarto 1600.
+            La cuenta se reinicia con cada píldora de poder.
+          </li>
+          <li>
+            Los 200 turnos de tiempo comestible bajan un 10&#37; en cada nivel, y se recuperan cada seis
+            niveles.
+          </li>
+        </ul>
+
+        <h3>Niveles, vidas y puntos</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Regla</th><th scope="col">Detalle</th></tr></thead>
+            <tbody>
+              <tr><td>Píldora</td><td>10 puntos. Píldora de poder, 50.</td></tr>
+              <tr><td>Fantasmas</td><td>200, 400, 800 y 1600 dentro de la misma píldora de poder.</td></tr>
+              <tr><td>Vidas</td><td>Empiezas con 3. A los 10&#8239;000 puntos te dan una más, una sola vez en toda la partida.</td></tr>
+              <tr><td>Fin del nivel</td><td>Cuando no queda ninguna píldora, ni normal ni de poder. Se pasa al laberinto siguiente de los cuatro, en ciclo, y se reponen todas las píldoras.</td></tr>
+              <tr><td>Fin de la partida</td><td>Al quedarte sin vidas, o al llegar a 24&#8239;000 turnos en total. Si se acaba el tiempo, cada vida que te sobre suma 800 puntos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Estos números están en la clase <a href="#constants"><code>Constants</code></a>, y merece la pena
+          leerlos de ahí en lugar de escribirlos a mano en tu controlador.
+        </p>
+      </section>
+
+      <section id="metodos">
+        <div class="sec-head">
+          <h2 class="sec">Métodos</h2>
+        </div>
+        <p>
+          Estos sirven en las cuatro prácticas de Ms. Pac-Man. <code>GHOST</code> es el enumerado con los cuatro fantasmas
+          (<code>BLINKY</code>, <code>PINKY</code>, <code>INKY</code>, <code>SUE</code>) y
+          <code>MOVE</code> el de las cuatro direcciones más <code>NEUTRAL</code>.
+        </p>
+
+        <h3>Dónde está Ms. Pac-Man</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>int getPacmanCurrentNodeIndex()</code></td><td>El nodo del laberinto en el que está.</td></tr>
+              <tr><td><code>MOVE getPacmanLastMoveMade()</code></td><td>El último movimiento que hizo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Dónde están los fantasmas</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>int getGhostCurrentNodeIndex(GHOST)</code></td><td>El nodo de ese fantasma.</td></tr>
+              <tr><td><code>MOVE getGhostLastMoveMade(GHOST)</code></td><td>El último movimiento de ese fantasma. Con él puedes preguntar por sus movimientos posibles y por las distancias que él sí puede recorrer.</td></tr>
+              <tr><td><code>int getGhostEdibleTime(GHOST)</code></td><td>Turnos que le quedan de comestible, 0 si no lo es.</td></tr>
+              <tr><td><code>int getGhostLairTime(GHOST)</code></td><td>Turnos que le quedan en la cárcel, 0 si ya ha salido.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Los fantasmas también tienen último movimiento</span>
+          <p>
+            Sirve para lo mismo que el de Ms.&nbsp;Pac-Man: con
+            <code>getPossibleMoves(nodoDelFantasma, getGhostLastMoveMade(fantasma))</code> sabes por dónde
+            puede salir de verdad, sin contar la vuelta atrás, y con
+            <code>getNextMoveTowardsTarget</code> puedes calcular hacia dónde tirará si va a por ti. Es la
+            forma de anticipar a un fantasma en lugar de mirar sólo dónde está.
+          </p>
+          <p>
+            Con visibilidad parcial devuelve <code>null</code> si no lo ves, y ahí es fácil llevarse un
+            <code>NullPointerException</code>.
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Comestible sin preguntar por un booleano</span>
+          <p>
+            Existe un <code>isGhostEdible(GHOST)</code>, pero lo que se usa es
+            <code>getGhostEdibleTime(GHOST)&nbsp;&gt;&nbsp;0</code>: contesta a lo mismo y además te dice
+            cuántos turnos te quedan, que es el dato con el que decides si merece la pena ir a por él.
+          </p>
+        </div>
+
+        <h3>Hacia dónde moverse</h3>
+        <p>
+          Estos dos son los que más se usan en las primeras prácticas. Les das el nodo en el que estás, el
+          nodo al que quieres ir, el último movimiento que hiciste y una <strong>métrica de
+          distancia</strong>, y te devuelven la dirección que hay que tomar.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>MOVE getNextMoveTowardsTarget(int, int, MOVE, DM)</code></td>
+                <td>El movimiento que te acerca al destino.</td>
+              </tr>
+              <tr>
+                <td><code>MOVE getNextMoveAwayFromTarget(int, int, MOVE, DM)</code></td>
+                <td>El movimiento con el que huyes del destino.</td>
+              </tr>
+              <tr>
+                <td><code>double getDistance(int, int, MOVE, DM)</code></td>
+                <td>La distancia entre dos nodos, medida con esa métrica.</td>
+              </tr>
+              <tr>
+                <td><code>int getClosestNodeIndexFromNodeIndex(int, int[], DM)</code></td>
+                <td>De una lista de nodos, el más cercano. Sirve para «la píldora más próxima».</td>
+              </tr>
+              <tr>
+                <td><code>int getFarthestNodeIndexFromNodeIndex(int, int[], DM)</code></td>
+                <td>El más lejano de la lista.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Para qué sirve la métrica de distancia</h3>
+        <p>
+          Es la regla con la que el motor <strong>compara los vecinos</strong> de tu nodo. Por dentro,
+          <code>getNextMoveTowardsTarget</code> no hace nada más que esto: mira los nodos a los que puedes
+          llegar con un movimiento, mide con la métrica que le has pasado cuánto dista cada uno del
+          destino, y te devuelve el movimiento que lleva al vecino con la medida más pequeña. Cambiar la
+          métrica cambia la respuesta.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Métrica</th><th scope="col">Qué mide</th><th scope="col">Unidades</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>DM.PATH</code></td>
+                <td>La distancia recorriendo los pasillos, la que de verdad hay que andar. Está precalculada en una tabla del laberinto, así que consultarla es inmediata.</td>
+                <td>Nodos</td>
+              </tr>
+              <tr>
+                <td><code>DM.EUCLID</code></td>
+                <td>La línea recta entre las coordenadas de los dos nodos. Atraviesa las paredes.</td>
+                <td>Nodos</td>
+              </tr>
+              <tr>
+                <td><code>DM.MANHATTAN</code></td>
+                <td>La suma de las diferencias en horizontal y en vertical. También atraviesa las paredes.</td>
+                <td>Nodos</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="narrow">
+          <figcaption>Por qué importa: aquí las dos métricas no dicen lo mismo</figcaption>
+          <svg class="explica dgm1" viewBox="0 0 420 250" role="img" aria-label="Fragmento de laberinto: Ms. Pac-Man está en un cruce y el objetivo queda arriba a la derecha. Hacia arriba sale un pasillo que se corta, pero en línea recta parece el camino más corto, así que la métrica euclídea elige ese movimiento. El camino de verdad va hacia la derecha y sube por el otro pasillo.">
+            <style>
+              .dgm1 .pasillo{fill:none;stroke:var(--surface-2);stroke-width:17;stroke-linecap:round}
+              .dgm1 .mal{fill:none;stroke:var(--bad);stroke-width:2.2;stroke-dasharray:5 4;marker-end:url(#gm1)}
+              .dgm1 .bien{fill:none;stroke:var(--ok);stroke-width:2.6;marker-end:url(#gm2)}
+              .dgm1 .recta{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:3 3}
+              .dgm1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgm1 .tm{fill:var(--bad)}
+              .dgm1 .tb{fill:var(--ok)}
+              .dgm1 .corte{stroke:var(--ink-3);stroke-width:2}
+            </style>
+            <defs>
+              <marker id="gm1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker>
+              <marker id="gm2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ok)"/></marker>
+            </defs>
+            <g class="pasillo">
+              <path d="M60 200 H340"/>
+              <path d="M120 200 V112"/>
+              <path d="M280 200 V60"/>
+              <path d="M280 60 H170"/>
+            </g>
+            <path d="M108 104 L132 104" class="corte"/>
+            <text x="140" y="108" class="t">sin salida</text>
+            <path d="M120 200 L180 60" class="recta"/>
+            <circle cx="180" cy="60" r="7" fill="var(--pill)" stroke="var(--ink)" stroke-width="1.5"/>
+            <text x="192" y="64" class="t">objetivo</text>
+            <path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" fill="var(--pill)" transform="translate(107 187) scale(.98)"/>
+            <path d="M120 186 V146" class="mal"/>
+            <text x="128" y="160" class="t tm">EUCLID sube: la recta es más corta</text>
+            <path d="M138 200 H206" class="bien"/>
+            <text x="146" y="222" class="t tb">PATH va a la derecha: el pasillo llega</text>
+          </svg>
+        </figure>
+        <div class="note trap">
+          <span class="note-label">La métrica por defecto que quieres es <code>DM.PATH</code></span>
+          <p>
+            En un laberinto la línea recta miente: dos nodos que están pegados en la pantalla pueden estar
+            a media vuelta por el pasillo. Si usas <code>EUCLID</code> o <code>MANHATTAN</code> para
+            decidir movimientos, tu personaje se queda pegado a las paredes y entra en callejones. No las
+            uses para eso por ahorrar tiempo, porque <code>PATH</code> es una consulta a una tabla ya
+            calculada y no cuesta más.
+          </p>
+          <p>
+            Las tres devuelven la misma unidad, el nodo, porque las coordenadas del laberinto están
+            justamente a un nodo de distancia entre casillas contiguas. Lo que no miden es lo mismo:
+            <code>EUCLID</code> y <code>MANHATTAN</code> se saltan las paredes, así que salen
+            <strong>siempre cortas</strong>. Sirven como cota inferior, que es lo que las hace válidas como
+            heurística en una búsqueda, pero un umbral ajustado con una no vale para la otra.
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">El parámetro <code>MOVE</code> no es decorativo</span>
+          <p>
+            Las dos versiones de cada método, con y sin <code>MOVE</code>, no hacen lo mismo. La que lleva
+            el último movimiento sólo considera los vecinos a los que se puede ir <strong>sin darse la
+            vuelta</strong>, que es la regla del motor; la que no lo lleva considera los cuatro, así que
+            puede devolverte justo el movimiento que el juego no te va a dejar hacer. Pásalo siempre.
+          </p>
+          <p>
+            En <code>getDistance</code> el parámetro hace otra cosa: con <code>MOVE</code> la distancia se
+            mide respetando la regla de no volver atrás, y sin él se lee de la tabla simétrica del
+            laberinto. Para saber a qué distancia está algo, da igual; para elegir un movimiento, no.
+          </p>
+        </div>
+
+        <h3 class="label">Qué hace el motor con un movimiento que no puede aplicar</h3>
+        <p>
+          Devolver un movimiento imposible no rompe nada: no hay excepción, no hay aviso y no pierdes el
+          turno. El motor no rechaza lo que le das, lo <strong>sustituye</strong>. Antes de mover a
+          Ms.&nbsp;Pac-Man aplica estas tres reglas, en este orden:
+        </p>
+        <ol>
+          <li>Si en esa dirección hay pasillo y no es la contraria a la que llevabas, se usa tal cual.</li>
+          <li>
+            Si no vale, se <strong>sigue en la dirección que llevabas</strong>, siempre que ahí haya
+            pasillo.
+          </li>
+          <li>
+            Y si tampoco se puede seguir recto, porque el pasillo gira, se toma el primer movimiento legal
+            que no sea volver.
+          </li>
+        </ol>
+        <p>Caso por caso, esto es lo que acaba ocurriendo:</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Lo que devuelves</th><th scope="col">Lo que hace el juego</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>La vuelta atrás, con pasillo por delante</td>
+                <td>Sigue recto</td>
+              </tr>
+              <tr>
+                <td>Un movimiento contra la pared</td>
+                <td>Sigue recto</td>
+              </tr>
+              <tr>
+                <td><code>MOVE.NEUTRAL</code> o <code>null</code></td>
+                <td>Sigue recto</td>
+              </tr>
+              <tr>
+                <td>Cualquiera de los tres anteriores en un punto donde tampoco puede seguir recto, porque el pasillo gira</td>
+                <td>El primer movimiento legal que no sea volver</td>
+              </tr>
+              <tr>
+                <td>Algo que hace fallar la propia corrección, con el personaje en un estado raro</td>
+                <td><code>MOVE.NEUTRAL</code>, y ahí sí una línea de error en el <em>log</em></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Lo importante de esa tabla es que la salida por defecto es «seguir recto», no «pararse»:
+          Ms.&nbsp;Pac-Man no se queda quieta por una decisión tuya, ni siquiera devolviendo
+          <code>MOVE.NEUTRAL</code>.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Por qué esto cuesta de ver</span>
+          <p>
+            Tu código cree que ha cambiado de dirección y el juego va por otro lado, sin una línea en la
+            consola. Cuando el agente hace algo que no encaja con lo que has programado, compara en el
+            tick siguiente lo que devolviste con <code>game.getPacmanLastMoveMade()</code>: si no
+            coinciden, el motor te ha corregido y el fallo está en la decisión, no en el resto de la
+            lógica.
+          </p>
+          <p>
+            Para no llegar a eso, decide siempre entre los movimientos de
+            <code>getPossibleMoves(nodo, ultimoMovimiento)</code>, que ya vienen sin la vuelta atrás.
+          </p>
+        </div>
+        <p>
+          Los fantasmas funcionan con la misma corrección, con dos diferencias: cuando llegan a la tercera
+          regla eligen al azar entre los movimientos legales, y sí pueden darse la vuelta, pero sólo
+          cuando el motor se lo impone al comerse Ms.&nbsp;Pac-Man una píldora de poder. Pedirlo no sirve.
+        </p>
+
+        <h3 class="label">Cómo elige <code>getNextMoveAwayFromTarget</code></h3>
+        <p>
+          Desde un cruce suele haber más de una salida que aleja del objetivo, así que el empate es
+          frecuente. Lo que hace el método es mirar <strong>un solo movimiento</strong>, medir con la
+          métrica la distancia de cada vecino al objetivo y quedarse con la mayor. Como la comparación es
+          estricta, en un empate gana el primero que mira, y el orden en el que mira los vecinos es el de
+          la enumeración <code>MOVE</code>: <code>UP</code>, <code>RIGHT</code>, <code>DOWN</code>,
+          <code>LEFT</code>. Así que la elección es siempre la misma para una misma situación, pero el
+          criterio para deshacer el empate no tiene nada que ver con el juego.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Alejarse no es escapar</span>
+          <p>
+            El método no simula nada más allá de ese paso: no sabe que dentro de dos casillas el pasillo
+            tiene una sola salida, ni que por ahí viene otro fantasma que no es el objetivo, ni que estás
+            dejando atrás la píldora de poder. Sólo maximiza una distancia ahora.
+          </p>
+          <p>
+            Si huir es importante en tu agente, hazlo tú: recorre
+            <code>getPossibleMoves(nodo, ultimoMovimiento)</code>, descarta los movimientos que acercan a
+            <em>cualquier</em> fantasma peligroso, y entre los que quedan compara lo que de verdad te
+            interesa. Este método vale como línea base y para el fantasma concreto que te está
+            persiguiendo, no como estrategia de escape.
+          </p>
+        </div>
+
+        <h3>Vecinos y movimientos posibles</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>MOVE[] getPossibleMoves(int, MOVE)</code></td><td>Los movimientos legales desde ese nodo, sin contar la vuelta atrás.</td></tr>
+              <tr><td><code>int[] getNeighbouringNodes(int, MOVE)</code></td><td>Los nodos vecinos, quitando el que queda a tus espaldas.</td></tr>
+              <tr><td><code>int getNeighbour(int, MOVE)</code></td><td>El nodo al que llegas tomando ese movimiento concreto.</td></tr>
+              <tr><td><code>MOVE getMoveToMakeToReachDirectNeighbour(int, int)</code></td><td>El movimiento que lleva de un nodo a un vecino suyo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <code>getPossibleMoves</code> y <code>getNeighbouringNodes</code> tienen sobrecarga sin
+          <code>MOVE</code>, y entonces incluyen también el movimiento de retroceso. Ojo con el nombre:
+          el que devuelve <strong>un</strong> nodo es <code>getNeighbour</code>, en singular;
+          <code>getNeighbouringNodes</code> devuelve el array.
+        </p>
+
+        <h3 class="label">Qué pasa cuando le pides algo imposible</h3>
+        <p>
+          Esto conviene saberlo de memoria, porque el motor no lanza una excepción que te pare: te
+          devuelve un valor y sigue. Y cada método falla de una manera distinta.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Si le pides…</th><th scope="col">Devuelve</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>getNeighbour(nodo, MOVE)</code> con un movimiento que ahí no existe, por ejemplo <code>UP</code> contra una pared</td>
+                <td><code>-1</code></td>
+              </tr>
+              <tr>
+                <td><code>getMoveToMakeToReachDirectNeighbour(a, b)</code> con un <code>b</code> que no es vecino directo de <code>a</code></td>
+                <td><code>null</code></td>
+              </tr>
+              <tr>
+                <td><code>getNeighbouringNodes(nodo, MOVE)</code> con un nodo que no existe</td>
+                <td>Un array <strong>vacío</strong>, y una línea de error en el <em>log</em></td>
+              </tr>
+              <tr>
+                <td><code>getPossibleMoves(nodo, MOVE)</code> con un movimiento con el que no se puede haber llegado a ese nodo, o sea que su contrario no es vecino</td>
+                <td>Un array <strong>vacío</strong>, sin más aviso</td>
+              </tr>
+              <tr>
+                <td><code>getShortestPathDistance(a, b)</code> con un <code>b</code> al que no se puede llegar, como el nodo de la cárcel</td>
+                <td><code>-1</code>, que es menor que cualquier distancia de verdad</td>
+              </tr>
+              <tr>
+                <td><code>getNeighbour</code> o <code>getMoveToMake…</code> con un índice de nodo fuera del laberinto</td>
+                <td>Excepción, esta vez sí</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">El <code>-1</code> se contagia, y en silencio</span>
+          <p>
+            Ese <code>-1</code> es un índice de nodo que no existe, pero si lo pasas a otro método casi
+            ninguno protesta. <code>getShortestPathDistance(algo, -1)</code> devuelve <strong>0</strong>,
+            que en tu código se lee como «ya estoy encima del objetivo», y
+            <code>getNextMoveAwayFromTarget</code> con un <code>-1</code> devuelve
+            <code>MOVE.NEUTRAL</code>. El resultado típico es un personaje que se queda quieto o que
+            persigue algo que no está donde crees, sin un solo error en la consola. Y no es coherente entre
+            versiones del mismo método: <code>getShortestPathDistance(algo, -1, movimiento)</code>, con el
+            <code>MOVE</code>, sí lanza una excepción.
+          </p>
+          <p>
+            El <code>null</code> es algo más agradecido: si lo usas para cualquier cosa salta un
+            <code>NullPointerException</code> y lo ves enseguida. Lo único que no avisa es devolverlo
+            como movimiento, porque entonces el motor lo descarta y sigue recto, igual que con la vuelta
+            atrás.
+          </p>
+          <p>
+            La costumbre que ahorra horas: comprueba <code>!= -1</code> y <code>!= null</code> justo
+            donde lo recibes, y nunca uses el resultado de un método del <code>game</code> como índice sin
+            mirarlo. Con visibilidad parcial esto pasa de recomendación a obligación, porque ahí lo que no
+            se ve vale <code>-1</code> continuamente.
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Recorrer los vecinos sin sorpresas</span>
+          <p>
+            Si lo que quieres es «prueba todos los movimientos que puedo hacer», recorre
+            <code>getPossibleMoves(nodo, ultimoMovimiento)</code> y saca el vecino de cada uno con
+            <code>getNeighbour</code>: así los movimientos vienen ya filtrados y ninguna llamada te puede
+            devolver <code>-1</code>.
+          </p>
+        </div>
+
+        <h3>Píldoras</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>int[] getActivePillsIndices()</code></td><td>Los nodos de las píldoras que siguen sin comer.</td></tr>
+              <tr><td><code>int[] getActivePowerPillsIndices()</code></td><td>Lo mismo para las píldoras de poder.</td></tr>
+              <tr><td><code>int[] getPillIndices()</code></td><td>Todas las del mapa, comidas o no.</td></tr>
+              <tr><td><code>int[] getPowerPillIndices()</code></td><td>Todas las de poder del mapa.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Confundir activas con iniciales</span>
+          <p>
+            Los métodos sin <code>Active</code> devuelven la configuración inicial del mapa, no lo que queda
+            por comer. Si tu Ms.&nbsp;Pac-Man va a por píldoras que ya se comió, es esto.
+          </p>
+        </div>
+
+        <h3>Caminos y distancias</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>int[] getShortestPath(int, int, MOVE)</code></td><td>La secuencia de nodos del camino óptimo entre origen y destino, siguiendo <code>DM.PATH</code>.</td></tr>
+              <tr><td><code>int getShortestPathDistance(int, int, MOVE)</code></td><td>La longitud de ese camino.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Si necesitas las dos cosas, con una tienes la otra:
+          <code>getShortestPath(a, b, m).length</code> equivale a
+          <code>getShortestPathDistance(a, b, m)</code>. Pedir las dos por separado es pagar el cálculo dos
+          veces, y el <em>tick</em> dura 40&nbsp;ms.
+        </p>
+
+        <h3>Intersecciones</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>boolean isJunction(int)</code></td><td>Si ese nodo es un cruce del laberinto.</td></tr>
+              <tr><td><code>int[] getJunctionIndices()</code></td><td>Todos los cruces del mapa.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">«Es un cruce» y «tengo que elegir» no son lo mismo</span>
+          <p>
+            El patrón habitual es decidir sólo cuando hay algo que decidir, y repetir el movimiento el resto
+            del tiempo. Si ese filtro lo escribes con <code>isJunction(nodo)</code>, te estás fiando de un
+            método que sólo mira el mapa: dice si ese nodo tiene tres salidas o más, y no sabe por dónde has
+            llegado. La pregunta que de verdad quieres hacer es cuántas opciones legales te quedan
+            <em>ahora</em>, y ésa la contesta esto:
+          </p>
+<pre><code>game.getPossibleMoves(nodo, ultimoMovimiento).length &gt; 1</code></pre>
+          <p>
+            En un pasillo da 1, porque la vuelta atrás ya viene descontada, y en un cruce da 2 o 3. La
+            diferencia se nota con los fantasmas, que salen de la cárcel con
+            <code>MOVE.NEUTRAL</code> en un nodo que no es un cruce y ahí tienen que elegir hacia dónde
+            tirar: para ellos el motor trae la pregunta ya montada en
+            <code>doesGhostRequireAction(GHOST)</code>. Para Ms.&nbsp;Pac-Man no hay equivalente, así que el
+            filtro lo escribes tú.
+          </p>
+        </div>
+      </section>
+
+      <section id="parcial">
+        <div class="sec-head">
+          <h2 class="sec">Métodos para visibilidad parcial</h2>
+        </div>
+        <p>
+          En la práctica de lógica borrosa el controlador deja de ver todo el laberinto, y con eso cambia la
+          forma de preguntar. Los métodos de arriba siguen existiendo, pero pueden devolverte datos
+          inesperados, y no siempre del mismo tipo: la posición de un fantasma que no ves vale
+          <code>-1</code>, pero su último movimiento vale <code>null</code>, y lo mismo
+          <code>isGhostEdible</code>, que devuelve <code>Boolean</code> justamente para poder decir «no lo
+          sé». Antes de usar un valor, comprueba que el objeto por el que preguntas es observable.
+        </p>
+        <p>
+          Ojo también con <code>getPacmanCurrentNodeIndex()</code>: en un controlador de fantasmas con
+          visibilidad parcial devuelve <code>-1</code> mientras no la vean.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>boolean isNodeObservable(int)</code></td><td>Si ese nodo se ve desde el punto de vista actual.</td></tr>
+              <tr><td><code>boolean wasPowerPillEaten()</code></td><td>Si se acaba de comer una píldora de poder.</td></tr>
+              <tr><td><code>Boolean isPillStillAvailable(int)</code></td><td>Si esa píldora sigue ahí. Ojo: el parámetro es el <strong>número de píldora</strong>, no el del nodo. Devuelve <code>null</code> si su nodo no se ve.</td></tr>
+              <tr><td><code>Boolean isPowerPillStillAvailable(int)</code></td><td>Lo mismo con las de poder, numeradas del 0 al 3.</td></tr>
+              <tr><td><code>int getPillIndex(int)</code></td><td>El número de píldora que le corresponde a un nodo, o <code>-1</code> si ahí no hay píldora. Es el puente entre las dos numeraciones.</td></tr>
+              <tr><td><code>Maze getCurrentMaze()</code></td><td>El laberinto en el que se está jugando.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label"><code>wasPowerPillEaten</code> dura un tick</span>
+          <p>
+            Devuelve <code>true</code> sólo en el <em>tick</em> exacto en el que se comió la píldora. Si lo
+            consultas después, por ejemplo al llegar a la siguiente intersección, ya será <code>false</code>
+            salvo que ambas cosas coincidan en el mismo <em>tick</em>. Si te interesa el dato, guárdatelo
+            cuando pase.
+          </p>
+        </div>
+        <p>
+          Es un método útil justamente porque no depende de ver a Ms.&nbsp;Pac-Man: los fantasmas pueden
+          deducir que anda cerca de una píldora de poder sin tenerla a la vista.
+        </p>
+        <h3>El mapa no se esconde, el estado sí</h3>
+        <p>
+          Esta distinción evita bastante confusión. El <strong>mapa</strong> es fijo y lo puedes pedir
+          completo también con visibilidad parcial: qué nodos hay, dónde están las píldoras, dónde están los
+          cruces. Lo que se esconde es el <strong>estado</strong> de la partida: si esa píldora sigue ahí, o
+          por dónde anda ahora un fantasma.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Con visibilidad parcial</th></tr></thead>
+            <tbody>
+              <tr><td><code>getPowerPillIndices()</code></td><td>Los cuatro nodos con píldora de poder del mapa, se vean o no, y estén comidas o no.</td></tr>
+              <tr><td><code>getPillIndices()</code></td><td>Igual, con las 220 normales.</td></tr>
+              <tr><td><code>getJunctionIndices()</code></td><td>Todos los cruces del mapa.</td></tr>
+              <tr><td><code>getActivePowerPillsIndices()</code></td><td>Sólo las que además <em>ves</em> y siguen sin comer. Puede venir vacío sin que quede ninguna cerca.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Y aquí está la respuesta a la pregunta obvia: un número de nodo <strong>ya es</strong> una posición.
+          Con ese índice tienes todo lo que necesitas sin haber visto nada:
+          <code>getShortestPathDistance(miNodo, nodoDeLaPildora)</code> te dice a qué distancia queda,
+          <code>getNextMoveTowardsTarget</code> te lleva hasta ahí, y
+          <code>getNodeXCood</code>/<code>getNodeYCood</code> te dan sus coordenadas si las necesitas para
+          dibujar o para comparar.
+        </p>
+        <p>
+          El uso típico es reconstruir a mano lo que el motor ya no te cuenta: te guardas los cuatro nodos con
+          píldora de poder al empezar, tachas las que compruebes comidas con
+          <code>isPowerPillStillAvailable</code> cuando su nodo sea observable, y te apoyas en
+          <code>wasPowerPillEaten()</code> para saber que ha caído alguna aunque no la veas. Un controlador de
+          fantasmas puede así vigilar las que quedan sin haber visto a Ms.&nbsp;Pac-Man en ningún momento.
+        </p>
+        <p>
+          Si prefieres el laberinto en crudo, <code>getCurrentMaze()</code> devuelve un objeto con los mismos
+          datos en campos públicos:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Campo de <code>Maze</code></th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><code>int[] pillIndices</code></td><td>Nodos de las píldoras del mapa.</td></tr>
+              <tr><td><code>int[] powerPillIndices</code></td><td>Nodos de las píldoras de poder.</td></tr>
+              <tr><td><code>int[] junctionIndices</code></td><td>Nodos que son cruce.</td></tr>
+              <tr><td><code>int initialGhostNodeIndex</code></td><td>La puerta de la cárcel: el nodo en el que aparecen los fantasmas al salir.</td></tr>
+              <tr><td><code>int lairNodeIndex</code></td><td>La cárcel. Es el último nodo del laberinto y no tiene vecinos.</td></tr>
+              <tr><td><code>int initialPacManNodeIndex</code></td><td>Donde arrancaba Ms. Pac-Man en el juego original. En esta versión aparece en un nodo al azar, así que este campo no dice dónde está.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="constants">
+        <div class="sec-head">
+          <h2 class="sec">La clase <code>Constants</code></h2>
+        </div>
+        <p>
+          Aparte de <code>Game</code>, en <code>Constants</code> están los parámetros que rigen la partida.
+          Merece la pena mirarla porque varios afectan a decisiones de diseño del controlador:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Constante</th><th scope="col">Valor</th><th scope="col">Qué controla</th></tr></thead>
+            <tbody>
+              <tr><td><code>EDIBLE_TIME</code></td><td>200</td><td>Turnos que son comestibles los fantasmas con una píldora de poder.</td></tr>
+              <tr><td><code>EDIBLE_TIME_REDUCTION</code></td><td>0,9</td><td>Cuánto se acorta ese tiempo en cada nivel.</td></tr>
+              <tr><td><code>GHOST_SPEED_REDUCTION</code></td><td>2</td><td>Un fantasma comestible se queda quieto uno de cada dos turnos.</td></tr>
+              <tr><td><code>COMMON_LAIR_TIME</code></td><td>40</td><td>Turnos de cárcel de un fantasma después de que te lo comas.</td></tr>
+              <tr><td><code>LAIR_REDUCTION</code></td><td>0,9</td><td>Cuánto se acortan los tiempos de cárcel en cada nivel.</td></tr>
+              <tr><td><code>EAT_DISTANCE</code></td><td>2</td><td>Nodos a los que se considera que ya se han tocado.</td></tr>
+              <tr><td><code>NUM_LIVES</code></td><td>3</td><td>Vidas con las que empieza Ms. Pac-Man.</td></tr>
+              <tr><td><code>EXTRA_LIFE_SCORE</code></td><td>10&#8239;000</td><td>Puntos a los que se regala una vida, una sola vez.</td></tr>
+              <tr><td><code>MAX_TIME</code></td><td>24&#8239;000</td><td>Turnos que puede durar una partida como máximo.</td></tr>
+              <tr><td><code>DELAY</code></td><td>40</td><td>Milisegundos que tiene tu controlador para contestar en cada turno.</td></tr>
+              <tr><td><code>NUM_MAZES</code></td><td>4</td><td>Laberintos distintos, que se van alternando por nivel.</td></tr>
+              <tr><td><code>PILL</code> · <code>POWER_PILL</code> · <code>GHOST_EAT_SCORE</code></td><td>10 · 50 · 200</td><td>Los puntos de cada cosa. El de los fantasmas se dobla con cada uno.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          En la clase hay alguna más, y vale la pena abrirla una vez. Lo importante es leer los valores de
+          ahí y no copiarlos a mano en tu controlador.
+        </p>
+      </section>
+
+      <section id="siguiente">
+        <div class="sec-head">
+          <h2 class="sec">A dónde ir ahora</h2>
+        </div>
+        <ul class="links">
+          <li>
+            <a href="clase-game-slides.html">
+              <span class="lt">La clase <code>Game</code>, en diapositivas<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Presentación</span>
+              <span class="ld">Lo de esta página con dibujos, para verlo en clase.</span>
+            </a>
+          </li>
+          <li>
+            <a href="../practicas/practica-0.html">
+              <span class="lt">Práctica 0<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Enunciado</span>
+              <span class="ld">Los primeros controladores, donde se usan estos métodos por primera vez.</span>
+            </a>
+          </li>
+          <li>
+            <a href="eclipse.html">
+              <span class="lt">Ms. Pac-Man en Eclipse<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lm">Guía</span>
+              <span class="ld">Montar el entorno antes de escribir nada.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#reglas">Dos cambios respecto al original</a></li>
+            <li><a href="#nodos">Cómo se numeran los nodos</a></li>
+            <li><a href="#turnos">Turno a turno</a></li>
+            <li><a href="#reglas-juego">Las reglas</a></li>
+            <li><a href="#metodos">Métodos</a></li>
+            <li><a href="#parcial">Visibilidad parcial</a></li>
+            <li><a href="#constants">La clase <code>Constants</code></a></li>
+          </ol>
+        </nav>
+        <p class="rail-note">
+          Este documento sale del material de apoyo de la asignatura. Si echas en falta un método, dímelo y
+          se añade.
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 10 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

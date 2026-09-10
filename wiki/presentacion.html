@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Presentación de la asignatura · ICI</title>
+<meta name="description" content="Diapositivas de la primera clase de Ingeniería de Comportamientos Inteligentes: IA simbólica, temario, entornos, calendario y evaluación.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/ici.css">
+<script src="assets/js/tema.js"></script>
+</head>
+<body data-page="presentacion">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="presentacion.html" aria-current="page">Presentación</a></li>
+        <li><a href="calendario.html">Calendario</a></li>
+        <li><a href="practicas/index.html">Prácticas</a></li>
+        <li><a href="guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <span>Presentación</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Presentación de la asignatura
+      <span class="thin">Las diapositivas de la primera clase.</span>
+    </h1>
+    <p class="standfirst">
+      Lo mismo que cuenta la <a href="index.html">página de la asignatura</a>, en el orden en el que se
+      explica en clase. Se pasa con las flechas del teclado y el botón de abajo la pone a pantalla completa.
+      Si prefieres leerlo de un tirón, la página de la asignatura lo tiene todo en texto.
+    </p>
+  </header>
+
+  <div id="contenido" tabindex="-1" style="padding-top:var(--gap)">
+  <div class="deck" data-aux="assets/aux/presentacion.json">
+    <div class="deck-stage">
+
+      <section class="slide s-cover" id="d1">
+        <span class="slide-num">Curso 2026&#8239;–&#8239;2027</span>
+        <svg class="pac" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+          <path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        </svg>
+        <h2>Ingeniería de Comportamientos Inteligentes</h2>
+        <p class="sub">Técnicas simbólicas de Inteligencia Artificial aplicadas a personajes de videojuego.</p>
+        <p class="who">
+          <strong>Pablo Gutiérrez Sánchez</strong> · pabgut02@ucm.es · Despacho 409<br>
+          Facultad de Informática, Universidad Complutense de Madrid
+        </p>
+      </section>
+      <section class="slide s-part" id="d2">
+        <span class="slide-num">Parte 1 · 2</span>
+        <p class="part-num">Parte 1</p>
+        <h2>La IA en el mundo de los videojuegos</h2>
+      </section>
+      <section class="slide s-figure" id="d3">
+        <span class="slide-num">Parte 1 · 3</span>
+        <h2>IA simbólica y IA subsimbólica</h2>
+        <figure>
+          <figcaption>Una red neuronal y un árbol de decisión</figcaption>
+          <div class="img-pair">
+            <img src="assets/img/red-neuronal.jpg" width="1200" height="679"
+                 alt="Diagrama titulado «how a deep neural network sees»: la foto de un coche entra en una red de varias capas y se muestran los mapas de activación intermedios hasta la salida.">
+            <img src="assets/img/arbol-decision.jpg" width="1100" height="1100"
+                 alt="Árbol de decisión dibujado a mano: ¿llueve? y si no, ¿hace viento?, ¿hay tormenta?, con las hojas «no llevar nada», «llevar paraguas», «llevar chubasquero» y «quedarse en casa».">
+          </div>
+        </figure>
+        <p class="foot">
+          La <strong>subsimbólica</strong> aprende de los datos y es la que ha crecido en los últimos años.
+          La <strong>simbólica</strong> escribe el conocimiento de forma explícita y razona sobre él, y es
+          la familia a la que pertenecen todas las técnicas del curso.
+        </p>
+      </section>
+      <section class="slide" id="d4">
+        <span class="slide-num">Parte 1 · 4</span>
+        <h2>¿Sabe razonar un modelo de lenguaje?</h2>
+        <ul>
+          <li>Acierta muchas veces, y no puede explicar ninguna de sus respuestas.</li>
+          <li>Para corregir una decisión concreta hay que tocar todo lo demás.</li>
+          <li>Cuesta demasiado para ejecutarlo sesenta veces por segundo.</li>
+        </ul>
+        <p class="lede">
+          Debate abierto y con literatura reciente: <em>Large Language Models Need Symbolic AI</em>, de
+          Kristian Hammond y David Leake.
+        </p>
+      </section>
+      <section class="slide" id="d5">
+        <span class="slide-num">Parte 1 · 5</span>
+        <h2>Qué se gana escribiendo las reglas uno mismo</h2>
+        <ul>
+          <li>Se puede <strong>explicar</strong>: cada decisión sale de una regla que alguien escribió.</li>
+          <li>Se puede <strong>corregir</strong> esa regla sin tocar el resto.</li>
+          <li>Cabe en el <strong>presupuesto de tiempo</strong>: microsegundos por decisión, sin servidores.</li>
+          <li>La <strong>entiende el diseñador</strong>, y no necesita datos de entrenamiento.</li>
+        </ul>
+      </section>
+      <section class="slide s-figure" id="d6">
+        <span class="slide-num">Parte 1 · 6</span>
+        <h2>Técnicas clásicas en juegos comerciales</h2>
+        <figure>
+          <figcaption>Halo: Combat Evolved (Bungie / Microsoft), vía Wikipedia · a la derecha, un árbol de comportamiento</figcaption>
+          <div class="img-pair">
+            <img src="assets/img/halo.jpg" width="368" height="276"
+                 alt="Captura de Halo: Combat Evolved, con el jugador apuntando a varios enemigos en un pasillo.">
+            <svg class="diag dg1" viewBox="0 0 620 270" role="img" aria-label="Árbol de comportamiento: un nodo selector arriba con tres hijos. El primero es una secuencia con la condición «¿ve al jugador?» y la acción «Disparar»; el segundo, una secuencia con «¿oye algo?» e «Investigar»; y el tercero, la acción «Patrullar», que es la que queda si no se cumple nada.">
+          <style>
+            
+            .dg1 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dg1 .tx{font-family:var(--f-mono);font-size:12px;text-anchor:middle;fill:var(--ink)}
+
+            .dg1 .lin{fill:none;stroke:var(--line);stroke-width:1.5}
+            .dg1 .sel{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.5}
+            .dg1 .seq{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+            .dg1 .cond{fill:var(--surface);stroke:var(--line);stroke-width:1.5;stroke-dasharray:4 3}
+            .dg1 .act{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.5}
+            .dg1 .op{font-family:var(--f-mono);font-size:17px;text-anchor:middle;fill:var(--maze)}</style>
+          <g class="lin">
+            <path d="M310 62 L130 106"/><path d="M310 62 V106"/><path d="M310 62 L530 106"/>
+            <path d="M130 142 L70 196"/><path d="M130 142 L200 196"/>
+            <path d="M310 142 L340 196"/><path d="M310 142 L465 196"/>
+          </g>
+          <rect x="286" y="27" width="48" height="34" rx="4" class="sel"/><text x="310" y="48" class="tx" style="font-size:12px"></text><text x="310" y="51" class="op">?</text>
+          <rect x="108" y="107" width="44" height="34" rx="4" class="seq"/><text x="130" y="128" class="tx" style="font-size:12px"></text><text x="130" y="131" class="op">→</text>
+          <rect x="288" y="107" width="44" height="34" rx="4" class="seq"/><text x="310" y="128" class="tx" style="font-size:12px"></text><text x="310" y="131" class="op">→</text>
+          <rect x="475" y="107" width="110" height="34" rx="4" class="act"/><text x="530" y="128" class="tx" style="font-size:12px">Patrullar</text>
+          <rect x="8" y="198" width="124" height="32" rx="16" class="cond"/><text x="70" y="218" class="tx" style="font-size:11px">¿ve al jugador?</text>
+          <rect x="150" y="198" width="100" height="32" rx="4" class="act"/><text x="200" y="218" class="tx" style="font-size:12px">Disparar</text>
+          <rect x="287" y="198" width="106" height="32" rx="16" class="cond"/><text x="340" y="218" class="tx" style="font-size:11px">¿oye algo?</text>
+          <rect x="410" y="198" width="110" height="32" rx="4" class="act"/><text x="465" y="218" class="tx" style="font-size:12px">Investigar</text>
+          <text x="348" y="48" class="lb" style="font-size:11px">el primero que funcione</text>
+          <text x="14" y="256" class="lb">condición</text>
+          <text x="200" y="256" class="lb" text-anchor="middle">acción</text>
+        </svg>
+          </div>
+        </figure>
+        <p class="foot">Máquinas de estados, árboles de comportamiento, planificadores, utilidad y coordinación. Los enemigos de <em>Halo</em> corren un árbol como el de la derecha; los de <em>F.E.A.R.</em>, un planificador.</p>
+      </section>
+      <section class="slide s-split wide-right" id="d7">
+        <span class="slide-num">Parte 1 · 7</span>
+        <div class="stack">
+          <h2>Sistemas de utilidad</h2>
+          <ul>
+            <li>Se puntúa cada acción posible y se ejecuta la mejor.</li>
+            <li><em>Los Sims</em>: cada personaje puntúa según sus necesidades.</li>
+            <li><em>Fire Emblem</em>: a quién atacar, desde dónde y qué daño recibiría.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>Fire Emblem: Three Houses (Intelligent Systems / Nintendo), vía Wikipedia</figcaption>
+          <img src="assets/img/fire-emblem.jpg" width="390" height="219"
+               alt="Captura de un combate táctico de Fire Emblem: Three Houses, con las unidades sobre una rejilla y el panel de previsión de daño antes de atacar.">
+        </figure>
+      </section>
+      <section class="slide s-figure" id="d8">
+        <span class="slide-num">Parte 1 · 8</span>
+        <h2>Dónde usa la industria el aprendizaje profundo</h2>
+        <figure>
+          <div class="img-pair">
+            <svg class="diag dg3" viewBox="0 0 480 230" role="img" aria-label="Bucle de aprendizaje por refuerzo: el agente envía una acción al juego y el juego devuelve el estado siguiente y una recompensa, repetido millones de veces.">
+          <style>
+            
+            .dg3 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dg3 .tx{font-family:var(--f-mono);font-size:12px;text-anchor:middle;fill:var(--ink)}
+
+            .dg3 .bx{fill:var(--surface);stroke:var(--maze);stroke-width:1.8}
+            .dg3 .bx2{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.8}
+            .dg3 .fl{fill:none;stroke:var(--ink-2);stroke-width:2;marker-end:url(#p1)}
+            .dg3 .nm{font-family:var(--f-display);font-weight:700;font-size:15px;text-anchor:middle;fill:var(--ink)}</style>
+          <defs><marker id="p1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker></defs>
+          <rect x="34" y="72" width="150" height="80" rx="6" class="bx2"/>
+          <text x="109" y="118" class="nm">AGENTE</text>
+          <rect x="296" y="72" width="150" height="80" rx="6" class="bx"/>
+          <text x="371" y="118" class="nm">JUEGO</text>
+          <path d="M184 92 C230 62 250 62 296 92" class="fl"/>
+          <path d="M296 132 C250 162 230 162 184 132" class="fl"/>
+          <text x="240" y="56" class="lb" text-anchor="middle">acción</text>
+          <text x="240" y="184" class="lb" text-anchor="middle">estado + recompensa</text>
+          <text x="240" y="212" class="lb" text-anchor="middle">× millones de partidas</text>
+        </svg>
+            <svg class="diag dg4" viewBox="0 0 400 250" role="img" aria-label="Plano de un nivel visto desde arriba con seis salas, el recorrido que ha hecho un bot de pruebas atravesándolas, y tres marcas donde ha encontrado fallos.">
+          <style>
+            
+            .dg4 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dg4 .tx{font-family:var(--f-mono);font-size:12px;text-anchor:middle;fill:var(--ink)}
+
+            .dg4 .sala{fill:var(--surface-2);stroke:var(--line);stroke-width:1.2}
+            .dg4 .cam{fill:none;stroke:var(--maze);stroke-width:2;stroke-linejoin:round;opacity:.85}
+            .dg4 .bug{fill:var(--bad);stroke:var(--surface);stroke-width:1.5}
+            .dg4 .bt{font-family:var(--f-mono);font-size:10px;font-weight:700;text-anchor:middle;fill:#fff}</style>
+          <rect x="30" y="40" width="110" height="70" rx="3" class="sala"/><rect x="170" y="30" width="90" height="60" rx="3" class="sala"/><rect x="290" y="50" width="70" height="90" rx="3" class="sala"/><rect x="40" y="140" width="80" height="80" rx="3" class="sala"/><rect x="150" y="120" width="120" height="60" rx="3" class="sala"/><rect x="300" y="170" width="80" height="60" rx="3" class="sala"/>
+          <path d="M60 70 L120 60 L200 55 L215 70 L250 50 L320 80 L330 120 L300 130 L240 140 L190 150 L150 175 L90 170 L70 200 L120 205 L200 190 L280 195 L340 200" class="cam"/>
+          <circle cx="215" cy="70" r="9" class="bug"/><text x="215" y="74" class="bt">!</text>
+          <circle cx="70" cy="200" r="9" class="bug"/><text x="70" y="204" class="bt">!</text>
+          <circle cx="330" cy="120" r="9" class="bug"/><text x="330" y="124" class="bt">!</text>
+          <text x="14" y="240" class="lb" style="font-size:9.5px">un bot recorre el nivel y marca dónde se rompe</text>
+        </svg>
+          </div>
+        </figure>
+        <p class="foot">Se usa sobre todo en <strong>control de calidad</strong>: bots que recorren el nivel buscando fallos, midiendo dificultad y probando el equilibrio. Los personajes contra los que peleas siguen siendo simbólicos.</p>
+      </section>
+      <section class="slide s-part" id="d9">
+        <span class="slide-num">Parte 2 · 9</span>
+        <p class="part-num">Parte 2</p>
+        <h2>La asignatura</h2>
+      </section>
+      <section class="slide" id="d10">
+        <span class="slide-num">Parte 2 · 10</span>
+        <h2>Objetivo de la asignatura</h2>
+        <p class="big">
+          «Dotar a los estudiantes de la capacidad para aplicar técnicas simbólicas de Inteligencia
+          Artificial a la creación de comportamientos inteligentes en el dominio de los videojuegos.»
+        </p>
+        <p class="lede">
+          Y para eso hay que entender el proceso de <strong>adquisición, representación y uso</strong>
+          del conocimiento, que es la parte que cuesta. Programarlo viene después.
+        </p>
+      </section>
+      <section class="slide s-figure" id="d11">
+        <span class="slide-num">Parte 2 · 11</span>
+        <h2>El ciclo del controlador</h2>
+        <figure>
+          <svg class="diag dgc1" viewBox="0 0 700 300" role="img" aria-label="Esquema del ciclo del controlador: el estado de la partida en el instante t entra en un bloque que contiene máquinas de estados, reglas, lógica borrosa y razonamiento basado en casos, de ahí sale una acción, y el juego avanza al instante t más uno.">
+          <style>
+            .dgc1 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dgc1 .cj{fill:var(--surface);stroke:var(--maze);stroke-width:1.8}
+            .dgc1 .tec{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.4}
+            .dgc1 .tt{font-family:var(--f-display);font-weight:600;font-size:14px;text-anchor:middle;fill:var(--ink)}
+            .dgc1 .nm{font-family:var(--f-display);font-weight:700;font-size:15px;text-anchor:middle;fill:var(--ink)}
+            .dgc1 .ar{fill:none;stroke:var(--ink-2);stroke-width:2;marker-end:url(#pc1)}
+            .dgc1 .ciclo{fill:none;stroke:var(--pill-ink);stroke-width:1.8;stroke-dasharray:6 4;marker-end:url(#pc2)}
+            .dgc1 .marco{fill:none;stroke:var(--line);stroke-width:1.4;stroke-dasharray:5 4}
+          </style>
+          <defs>
+            <marker id="pc1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker>
+            <marker id="pc2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker>
+          </defs>
+
+          <rect x="24" y="98" width="132" height="76" rx="5" class="cj"/>
+          <text x="90" y="130" class="nm">Estado</text>
+          <text x="90" y="152" class="lb" text-anchor="middle">EN t</text>
+          <path d="M162 136 H236" class="ar"/>
+
+          <rect x="256" y="44" width="182" height="200" rx="6" class="marco"/>
+          <text x="347" y="34" class="lb" text-anchor="middle">TU CONTROLADOR</text>
+          <rect x="272" y="64" width="150" height="36" rx="4" class="tec"/><text x="347" y="87" class="tt">Estados</text><rect x="272" y="110" width="150" height="36" rx="4" class="tec"/><text x="347" y="133" class="tt">Reglas</text><rect x="272" y="156" width="150" height="36" rx="4" class="tec"/><text x="347" y="179" class="tt">Borroso</text><rect x="272" y="202" width="150" height="36" rx="4" class="tec"/><text x="347" y="225" class="tt">Casos</text>
+          <path d="M444 136 H518" class="ar"/>
+
+          <rect x="538" y="98" width="132" height="76" rx="5" class="cj"/>
+          <text x="604" y="136" class="nm">Acción</text>
+          <text x="604" y="158" class="lb" text-anchor="middle">UN MOVIMIENTO</text>
+
+          <path d="M604 182 V262 H90 V182" class="ciclo"/>
+          <text x="347" y="284" class="lb" text-anchor="middle">el juego avanza a t+1 y vuelve a preguntar, con 40 ms de presupuesto</text>
+        </svg>
+        </figure>
+        <p class="foot">Entra el estado de la partida y sale una acción. Lo que va en el bloque del medio es el temario de la asignatura, y cada práctica cambia la técnica que hay dentro.</p>
+      </section>
+      <section class="slide" id="d12">
+        <span class="slide-num">Parte 2 · 12</span>
+        <h2>Temario</h2>
+        <div class="table-scroll">
+          <table>
+            <tbody>
+              <tr><th scope="row">Tema 1</th><td>Ingeniería del conocimiento: modelos lógicos, estructurados e imprecisos.</td></tr>
+              <tr><th scope="row">Tema 2</th><td>Repaso de IA para videojuegos: caminos, movimiento y máquinas de estados.</td></tr>
+              <tr><th scope="row">Tema 3</th><td>Sistemas de reglas: inferencia y encadenamiento, con Jess.</td></tr>
+              <tr><th scope="row">Tema 4</th><td>Razonamiento borroso: conjuntos, variables lingüísticas e inferencia.</td></tr>
+              <tr><th scope="row">Tema 5</th><td>Juegos por turnos: minimax, poda alfa-beta y Monte Carlo Tree Search.</td></tr>
+              <tr><th scope="row">Tema 6</th><td>Razonamiento basado en casos: memoria, similitud y adaptación.</td></tr>
+              <tr><th scope="row">Bonus</th><td>Agentes para juegos de lenguaje: <em>embeddings</em> y modelos de lenguaje.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede">Cada tema se explica justo antes de la práctica que lo usa.</p>
+      </section>
+      <section class="slide" id="d13">
+        <span class="slide-num">Parte 2 · 13</span>
+        <h2>El ciclo de ingeniería del conocimiento</h2>
+        <div class="table-scroll">
+          <table>
+            <tbody>
+              <tr><th scope="row">Adquisición</th><td>¿Qué sabe un buen jugador que el programa no sabe?</td></tr>
+              <tr><th scope="row">Conceptualización</th><td>¿Cuáles son las entidades, las situaciones y las decisiones?</td></tr>
+              <tr><th scope="row">Formalización</th><td>¿En qué modelo cabe ese conocimiento?</td></tr>
+              <tr><th scope="row">Implementación</th><td>¿Cómo se ejecuta dentro del presupuesto de tiempo?</td></tr>
+              <tr><th scope="row">Evaluación</th><td>¿Es mejor que la alternativa, y por qué?</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="slide" id="d14">
+        <span class="slide-num">Parte 2 · 14</span>
+        <h2>Cómo son las clases</h2>
+        <ul>
+          <li><strong>Miércoles y jueves, de 14:00 a 16:00.</strong> Teoría y laboratorio en la misma sesión.</li>
+          <li>Se explica lo justo y se trabaja en clase, con los grupos ya montados.</li>
+          <li>Se revisa el avance de cada grupo, se resuelven dudas y ahí mismo se defienden las prácticas.</li>
+          <li>Las tutorías no tienen horario fijo: por correo o preguntándome en clase, y online si hace falta.</li>
+        </ul>
+      </section>
+      <section class="slide s-part" id="d15">
+        <span class="slide-num">Parte 3 · 15</span>
+        <p class="part-num">Parte 3</p>
+        <h2>El entorno</h2>
+      </section>
+      <section class="slide s-split wide-right" id="d16">
+        <span class="slide-num">Parte 3 · 16</span>
+        <div class="stack">
+          <h2>Ms. Pac-Man</h2>
+          <ul>
+            <li>Motor de la competición de la Universidad de Essex, adaptado aquí.</li>
+            <li>Tiempo real, información completa, una decisión en cada cruce.</li>
+            <li>Java, con construcciones básicas del lenguaje.</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="assets/img/simulador.jpg" width="707" height="900"
+               alt="Ventana del simulador: el laberinto con sus píldoras, los cuatro fantasmas en la casilla central y Ms. Pac-Man abajo.">
+        </figure>
+      </section>
+      <section class="slide" id="d17">
+        <span class="slide-num">Parte 3 · 17</span>
+        <h2>Se programan los dos bandos</h2>
+        <ul>
+          <li><strong>Ms. Pac-Man</strong> es un problema de un agente: comer, huir y decidir cuándo merece la pena arriesgar.</li>
+          <li><strong>Los cuatro fantasmas</strong> son otro problema distinto: cuatro agentes que tienen que coordinarse sin hablar entre ellos.</li>
+          <li>Dos reglas del motor que cambian todo: la decisión sólo cuenta <strong>al llegar a una intersección</strong>, y <strong>no se puede volver atrás</strong>.</li>
+        </ul>
+      </section>
+      <section class="slide s-split wide-right" id="d18">
+        <span class="slide-num">Parte 3 · 18</span>
+        <div class="stack">
+          <h2>Práctica 2 · Máquinas de estados</h2>
+          <ul>
+            <li>Un estado por comportamiento, una condición por transición.</li>
+            <li>Se ve en qué estado está cada personaje mientras juega, y por eso se puede
+              depurar delante del profesor.</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="assets/img/maquina-estados.jpg" width="1500" height="838"
+               alt="Tres ventanas: el diagrama de estados de Ms. Pac-Man, la partida en marcha, y los diagramas de los cuatro fantasmas con los estados chase y runAway unidos por transiciones etiquetadas.">
+        </figure>
+      </section>
+      <section class="slide s-split wide-right" id="d19">
+        <span class="slide-num">Parte 3 · 19</span>
+        <div class="stack">
+          <h2>Práctica 3 · Sistemas de reglas</h2>
+          <ul>
+            <li>Los hechos entran en la memoria de trabajo.</li>
+            <li>El motor decide qué reglas se disparan y en qué orden.</li>
+            <li>Ganas legibilidad y pierdes el control del orden en que pasan las cosas, y a eso
+              hay que acostumbrarse.</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="assets/img/reglas-jess.jpg" width="1500" height="859"
+               alt="A la izquierda la consola de Jess con los hechos de la memoria de trabajo y la regla BLINKYrunsAway disparándose; a la derecha la partida con los fantasmas azules porque son comestibles.">
+        </figure>
+      </section>
+      <section class="slide s-split wide-right" id="d20">
+        <span class="slide-num">Parte 3 · 20</span>
+        <div class="stack">
+          <h2>Práctica 4 · Razonamiento borroso</h2>
+          <ul>
+            <li>«El fantasma está cerca» tiene un grado de verdad entre 0 y 1.</li>
+            <li>Las reglas se escriben con palabras y el motor razona con los grados.</li>
+            <li>Aquí el controlador además deja de ver todo el laberinto.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>Las funciones de pertenencia de la distancia al fantasma</figcaption>
+          <svg class="diag dg2" viewBox="0 0 460 240" role="img" aria-label="Tres funciones de pertenencia sobre el eje de la distancia. «Cerca» vale uno hasta veinte y baja hasta cero en cincuenta; «media» sube de veinte a cincuenta y baja de cincuenta a ochenta; «lejos» sube de cincuenta a ochenta y se queda en uno. A distancia cuarenta, «cerca» vale cero coma treinta y tres y «media» cero coma sesenta y siete.">
+          <style>
+            .dg2 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dg2 .ax{fill:none;stroke:var(--line);stroke-width:1.2}
+            .dg2 .f1{fill:var(--inky);fill-opacity:.16;stroke:var(--inky);stroke-width:2}
+            .dg2 .f2{fill:var(--maze);fill-opacity:.14;stroke:var(--maze);stroke-width:2}
+            .dg2 .f3{fill:var(--clyde);fill-opacity:.16;stroke:var(--clyde);stroke-width:2}
+            .dg2 .corte{stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:4 4}
+            .dg2 .g{font-family:var(--f-mono);font-size:11px;fill:var(--ink-3);paint-order:stroke fill;stroke:var(--surface);stroke-width:3.5px;stroke-linejoin:round}</style>
+          <g class="ax"><path d="M40 190 H430"/><path d="M40 190 V44"/></g>
+          <path d="M40.0 190 L40.0 50 L116.0 50 L230.0 190 Z" class="f1"/>
+          <path d="M116.0 190 L230.0 50 L344.0 190 Z" class="f2"/>
+          <path d="M230.0 190 L344.0 50 L420.0 50 L420.0 190 Z" class="f3"/>
+          <path d="M192.0 190 V46" class="corte"/>
+          <circle cx="192.0" cy="96.66666666666667" r="3.5" fill="var(--maze)"/>
+          <circle cx="192.0" cy="143.33333333333334" r="3.5" fill="var(--inky)"/>
+          <text x="62.8" y="42" class="lb">CERCA</text>
+          <text x="207.2" y="42" class="lb">MEDIA</text>
+          <text x="366.8" y="42" class="lb">LEJOS</text>
+          <text x="20" y="54" class="g">1</text>
+          <text x="20" y="194" class="g">0</text>
+          <text x="192.0" y="208" class="g" text-anchor="middle">40</text>
+          <text x="430" y="208" class="g" text-anchor="end">distancia al fantasma</text>
+          <text x="202.0" y="100.66666666666667" class="g">0,67 media</text>
+          <text x="202.0" y="147.33333333333334" class="g">0,33 cerca</text>
+        </svg>
+        </figure>
+      </section>
+      <section class="slide" id="d21">
+        <span class="slide-num">Parte 3 · 21</span>
+        <h2>El 16 de noviembre cambiamos de entorno</h2>
+        <ul>
+          <li>El entorno lo decidimos entre todos: paso una <strong>encuesta</strong> para ver a qué jugáis.</li>
+          <li>El contenido ya está fijado: juegos por turnos, minimax con poda y MCTS.</li>
+          <li>Si sólo funciona en este laberinto, no sabemos si habéis aprendido a representar
+            conocimiento o a explotar este laberinto.</li>
+        </ul>
+      </section>
+      <section class="slide s-figure" id="d22">
+        <span class="slide-num">Parte 3 · 22</span>
+        <h2>Juegos por turnos</h2>
+        <figure>
+          <div class="img-pair">
+            <svg class="diag dg5" viewBox="-2 -2 324 324" role="img" aria-label="Tablero de ajedrez con una posición de mitad de partida: rey y torre blancos en el flanco de rey, peones blancos en el centro, un caballo blanco, y rey, torre, caballo y dos peones negros.">
+          <style>.dg5 .pz{font-family:"Apple Symbols","Segoe UI Symbol","DejaVu Sans",serif;font-size:30px;text-anchor:middle;fill:#14192B}
+          .dg5 .pz-b{fill:#FFFFFF;stroke:#14192B;stroke-width:1;paint-order:stroke fill}</style>
+          <rect x="0" y="0" width="40" height="40" fill="#EAEEF7"/><rect x="40" y="0" width="40" height="40" fill="#A9B4D4"/><rect x="80" y="0" width="40" height="40" fill="#EAEEF7"/><rect x="120" y="0" width="40" height="40" fill="#A9B4D4"/><rect x="160" y="0" width="40" height="40" fill="#EAEEF7"/><rect x="200" y="0" width="40" height="40" fill="#A9B4D4"/><rect x="240" y="0" width="40" height="40" fill="#EAEEF7"/><rect x="280" y="0" width="40" height="40" fill="#A9B4D4"/><rect x="0" y="40" width="40" height="40" fill="#A9B4D4"/><rect x="40" y="40" width="40" height="40" fill="#EAEEF7"/><rect x="80" y="40" width="40" height="40" fill="#A9B4D4"/><rect x="120" y="40" width="40" height="40" fill="#EAEEF7"/><rect x="160" y="40" width="40" height="40" fill="#A9B4D4"/><rect x="200" y="40" width="40" height="40" fill="#EAEEF7"/><rect x="240" y="40" width="40" height="40" fill="#A9B4D4"/><rect x="280" y="40" width="40" height="40" fill="#EAEEF7"/><rect x="0" y="80" width="40" height="40" fill="#EAEEF7"/><rect x="40" y="80" width="40" height="40" fill="#A9B4D4"/><rect x="80" y="80" width="40" height="40" fill="#EAEEF7"/><rect x="120" y="80" width="40" height="40" fill="#A9B4D4"/><rect x="160" y="80" width="40" height="40" fill="#EAEEF7"/><rect x="200" y="80" width="40" height="40" fill="#A9B4D4"/><rect x="240" y="80" width="40" height="40" fill="#EAEEF7"/><rect x="280" y="80" width="40" height="40" fill="#A9B4D4"/><rect x="0" y="120" width="40" height="40" fill="#A9B4D4"/><rect x="40" y="120" width="40" height="40" fill="#EAEEF7"/><rect x="80" y="120" width="40" height="40" fill="#A9B4D4"/><rect x="120" y="120" width="40" height="40" fill="#EAEEF7"/><rect x="160" y="120" width="40" height="40" fill="#A9B4D4"/><rect x="200" y="120" width="40" height="40" fill="#EAEEF7"/><rect x="240" y="120" width="40" height="40" fill="#A9B4D4"/><rect x="280" y="120" width="40" height="40" fill="#EAEEF7"/><rect x="0" y="160" width="40" height="40" fill="#EAEEF7"/><rect x="40" y="160" width="40" height="40" fill="#A9B4D4"/><rect x="80" y="160" width="40" height="40" fill="#EAEEF7"/><rect x="120" y="160" width="40" height="40" fill="#A9B4D4"/><rect x="160" y="160" width="40" height="40" fill="#EAEEF7"/><rect x="200" y="160" width="40" height="40" fill="#A9B4D4"/><rect x="240" y="160" width="40" height="40" fill="#EAEEF7"/><rect x="280" y="160" width="40" height="40" fill="#A9B4D4"/><rect x="0" y="200" width="40" height="40" fill="#A9B4D4"/><rect x="40" y="200" width="40" height="40" fill="#EAEEF7"/><rect x="80" y="200" width="40" height="40" fill="#A9B4D4"/><rect x="120" y="200" width="40" height="40" fill="#EAEEF7"/><rect x="160" y="200" width="40" height="40" fill="#A9B4D4"/><rect x="200" y="200" width="40" height="40" fill="#EAEEF7"/><rect x="240" y="200" width="40" height="40" fill="#A9B4D4"/><rect x="280" y="200" width="40" height="40" fill="#EAEEF7"/><rect x="0" y="240" width="40" height="40" fill="#EAEEF7"/><rect x="40" y="240" width="40" height="40" fill="#A9B4D4"/><rect x="80" y="240" width="40" height="40" fill="#EAEEF7"/><rect x="120" y="240" width="40" height="40" fill="#A9B4D4"/><rect x="160" y="240" width="40" height="40" fill="#EAEEF7"/><rect x="200" y="240" width="40" height="40" fill="#A9B4D4"/><rect x="240" y="240" width="40" height="40" fill="#EAEEF7"/><rect x="280" y="240" width="40" height="40" fill="#A9B4D4"/><rect x="0" y="280" width="40" height="40" fill="#A9B4D4"/><rect x="40" y="280" width="40" height="40" fill="#EAEEF7"/><rect x="80" y="280" width="40" height="40" fill="#A9B4D4"/><rect x="120" y="280" width="40" height="40" fill="#EAEEF7"/><rect x="160" y="280" width="40" height="40" fill="#A9B4D4"/><rect x="200" y="280" width="40" height="40" fill="#EAEEF7"/><rect x="240" y="280" width="40" height="40" fill="#A9B4D4"/><rect x="280" y="280" width="40" height="40" fill="#EAEEF7"/>
+          <rect x="0" y="0" width="320" height="320" fill="none" stroke="#14192B" stroke-width="1.5"/>
+          <text x="260" y="29" class="pz">♚</text><text x="220" y="29" class="pz">♜</text><text x="220" y="109" class="pz">♞</text><text x="180" y="149" class="pz">♟</text><text x="140" y="109" class="pz">♟</text><text x="260" y="309" class="pz pz-b">♔</text><text x="220" y="309" class="pz pz-b">♖</text><text x="180" y="189" class="pz pz-b">♙</text><text x="140" y="189" class="pz pz-b">♙</text><text x="100" y="229" class="pz pz-b">♘</text>
+        </svg>
+            <img src="assets/img/terraforming-mars.jpg" width="1200" height="900"
+                 alt="Una partida de Terraforming Mars al final, con el tablero de hexágonos cubierto de fichas de océano, vegetación y ciudad, y las cartas de los jugadores alrededor.">
+          </div>
+        </figure>
+        <figcaption class="tras">Terraforming Mars · foto: BiblioteKarin, CC BY-SA 4.0, Wikimedia Commons</figcaption>
+        <p class="foot">En el ajedrez, en el Go o en un juego de mesa como <em>Terraforming Mars</em> hay turnos y hay un adversario, y eso permite probar una jugada por dentro antes de hacerla.</p>
+      </section>
+      <section class="slide s-figure" id="d23">
+        <span class="slide-num">Parte 3 · 23</span>
+        <h2>Minimax y poda alfa-beta</h2>
+        <figure>
+          <svg class="diag dg7" viewBox="0 0 720 300" role="img" aria-label="Árbol de minimax de tres niveles. La raíz, que maximiza, tiene tres hijos que minimizan, y cada uno tres hojas con valores 3, 12 y 8; 2, 4 y 6; 14, 5 y 2. Los hijos que minimizan devuelven 3, 2 y 2, y la raíz elige 3. Dos hojas de la rama central aparecen tachadas porque la poda alfa-beta las descarta sin evaluarlas.">
+          <style>
+            .dg7 .nodo{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.5}
+            .dg7 .hoja{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+            .dg7 .poda-caja{fill:none;stroke:var(--ink-3);stroke-dasharray:3 3}
+            .dg7 .lin{fill:none;stroke:var(--line);stroke-width:1.5}
+            .dg7 .poda{stroke:var(--ink-3);stroke-dasharray:4 4}
+            .dg7 .v{font-family:var(--f-mono);font-size:15px;text-anchor:middle;fill:var(--ink)}
+            .dg7 .poda-t{fill:var(--ink-3)}
+            .dg7 .r{font-family:var(--f-mono);font-size:16px;font-weight:700;text-anchor:middle;fill:var(--pill-ink)}
+            .dg7 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;fill:var(--ink-3)}
+            .dg7 .x{font-family:var(--f-mono);font-size:17px;text-anchor:middle;fill:var(--bad)}</style>
+          <g class="lin"><path d="M360 64 L140 116"/><path d="M360 64 L360 116"/><path d="M360 64 L580 116"/><path d="M140 152 L70 222"/><path d="M140 152 L140 222"/><path d="M140 152 L210 222"/><path d="M360 152 L290 222"/><path d="M360 152 L360 222" class="poda"/><path d="M360 152 L430 222" class="poda"/><path d="M580 152 L510 222"/><path d="M580 152 L580 222"/><path d="M580 152 L650 222"/></g>
+          <path d="M360 32 L382 64 L338 64 Z" class="nodo"/><path d="M118 116 L162 116 L140 152 Z" class="nodo"/><path d="M338 116 L382 116 L360 152 Z" class="nodo"/><path d="M558 116 L602 116 L580 152 Z" class="nodo"/><rect x="54" y="222" width="32" height="32" rx="3" class="hoja"/><text x="70" y="244" class="v">3</text><rect x="124" y="222" width="32" height="32" rx="3" class="hoja"/><text x="140" y="244" class="v">12</text><rect x="194" y="222" width="32" height="32" rx="3" class="hoja"/><text x="210" y="244" class="v">8</text><rect x="274" y="222" width="32" height="32" rx="3" class="hoja"/><text x="290" y="244" class="v">2</text><rect x="344" y="222" width="32" height="32" rx="3" class="hoja poda-caja"/><text x="360" y="244" class="v poda-t">4</text><rect x="414" y="222" width="32" height="32" rx="3" class="hoja poda-caja"/><text x="430" y="244" class="v poda-t">6</text><rect x="494" y="222" width="32" height="32" rx="3" class="hoja"/><text x="510" y="244" class="v">14</text><rect x="564" y="222" width="32" height="32" rx="3" class="hoja"/><text x="580" y="244" class="v">5</text><rect x="634" y="222" width="32" height="32" rx="3" class="hoja"/><text x="650" y="244" class="v">2</text><text x="360" y="196" class="x">×</text><text x="430" y="196" class="x">×</text>
+          <text x="360" y="22" class="r">3</text>
+          <text x="140" y="108" class="r">3</text><text x="360" y="108" class="r">2</text><text x="580" y="108" class="r">2</text>
+          <text x="8" y="52" class="lb">MAX</text><text x="8" y="140" class="lb">MIN</text>
+          <text x="8" y="244" class="lb">HOJAS</text>
+        </svg>
+        </figure>
+        <p class="foot">Yo maximizo, el adversario minimiza y el valor sube desde las hojas. La poda alfa-beta se salta las ramas tachadas, que ya no pueden cambiar la decisión.</p>
+      </section>
+      <section class="slide s-figure" id="d24">
+        <span class="slide-num">Parte 3 · 24</span>
+        <h2>Monte Carlo Tree Search</h2>
+        <figure>
+          <svg class="diag dg8" viewBox="0 0 960 280" role="img" aria-label="Las cuatro fases de la búsqueda de Monte Carlo en árbol, una detrás de otra: selección, en la que se baja por el árbol eligiendo la rama más prometedora; expansión, en la que se añade un nodo nuevo; simulación, en la que se juega una partida al azar desde ese nodo; y retropropagación, en la que el resultado sube por el camino recorrido.">
+          <style>
+            .dg8 .nodo{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+            .dg8 .nuevo{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.5;stroke-dasharray:4 3}
+            .dg8 .nuevo-l{stroke:var(--pill);stroke-dasharray:4 3}
+            .dg8 .lin{fill:none;stroke:var(--line);stroke-width:1.5}
+            .dg8 .cam{fill:none;stroke:var(--maze);stroke-width:3.5;stroke-linecap:round}
+            .dg8 .sim-l{fill:none;stroke:var(--ink-3);stroke-width:1.5;stroke-dasharray:2 4}
+            .dg8 .back-l{fill:none;stroke:var(--ok);stroke-width:2.5;stroke-linecap:round}
+            .dg8 .v{font-family:var(--f-mono);font-size:16px;text-anchor:middle;fill:var(--ink-3)}
+            .dg8 .r{font-family:var(--f-mono);font-size:14px;font-weight:700;fill:var(--ok)}
+            .dg8 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}</style>
+          <text x="8" y="18" class="lb">1 · Selección</text><g class="lin"><path d="M120 58 L64 108"/><path d="M120 58 L176 108"/><path d="M64 122 L34 172"/><path d="M64 122 L94 172"/></g><g class="cam"><path d="M120 58 L64 108"/><path d="M64 122 L34 172"/></g><circle cx="120" cy="44" r="14" class="nodo"/><circle cx="64" cy="115" r="14" class="nodo"/><circle cx="176" cy="115" r="14" class="nodo"/><circle cx="34" cy="179" r="14" class="nodo"/><circle cx="94" cy="179" r="14" class="nodo"/>
+          <text x="248" y="18" class="lb">2 · Expansión</text><g class="lin"><path d="M360 58 L304 108"/><path d="M360 58 L416 108"/><path d="M304 122 L274 172"/><path d="M304 122 L334 172"/></g><g class="cam"><path d="M360 58 L304 108"/><path d="M304 122 L274 172"/></g><circle cx="360" cy="44" r="14" class="nodo"/><circle cx="304" cy="115" r="14" class="nodo"/><circle cx="416" cy="115" r="14" class="nodo"/><circle cx="274" cy="179" r="14" class="nodo"/><circle cx="334" cy="179" r="14" class="nodo"/><g class="lin"><path d="M274 193 L274 234" class="nuevo-l"/></g><circle cx="274" cy="248" r="14" class="nuevo"/>
+          <text x="488" y="18" class="lb">3 · Simulación</text><g class="lin"><path d="M600 58 L544 108"/><path d="M600 58 L656 108"/><path d="M544 122 L514 172"/><path d="M544 122 L574 172"/></g><g class="cam"><path d="M600 58 L544 108"/><path d="M544 122 L514 172"/></g><circle cx="600" cy="44" r="14" class="nodo"/><circle cx="544" cy="115" r="14" class="nodo"/><circle cx="656" cy="115" r="14" class="nodo"/><circle cx="514" cy="179" r="14" class="nodo"/><circle cx="574" cy="179" r="14" class="nodo"/><g class="lin"><path d="M514 193 L514 234" class="nuevo-l"/></g><circle cx="514" cy="248" r="14" class="nuevo"/><path d="M528 252 C570 258 590 240 630 250" class="sim-l"/><text x="676" y="256" class="v">?</text>
+          <text x="728" y="18" class="lb">4 · Retropropagación</text><g class="lin"><path d="M840 58 L784 108"/><path d="M840 58 L896 108"/><path d="M784 122 L754 172"/><path d="M784 122 L814 172"/></g><g class="cam"><path d="M840 58 L784 108"/><path d="M784 122 L754 172"/></g><circle cx="840" cy="44" r="14" class="nodo"/><circle cx="784" cy="115" r="14" class="nodo"/><circle cx="896" cy="115" r="14" class="nodo"/><circle cx="754" cy="179" r="14" class="nodo"/><circle cx="814" cy="179" r="14" class="nodo"/><g class="lin"><path d="M754 193 L754 234" class="nuevo-l"/></g><circle cx="754" cy="248" r="14" class="nuevo"/><g class="back-l"><path d="M754 234 L754 196"/><path d="M754 165 L778 128"/><path d="M790 102 L834 64"/></g><text x="772" y="216" class="r">+1</text>
+          <g stroke="var(--line-soft)" stroke-width="1"><path d="M236 30 L236 260"/><path d="M476 30 L476 260"/><path d="M716 30 L716 260"/></g>
+        </svg>
+        </figure>
+        <p class="foot">Cuando el árbol no cabe entero se construye a trozos. Se le puede cortar el tiempo cuando haga falta, porque siempre tiene una jugada preparada.</p>
+      </section>
+      <section class="slide s-split wide-right" id="d25">
+        <span class="slide-num">Parte 3 · 25</span>
+        <div class="stack">
+          <h2>Práctica 6 · Casos</h2>
+          <ul>
+            <li>En vez de reglas se guardan partidas: cada caso es un problema con su solución.</li>
+            <li>Ante una situación nueva se recupera el caso más parecido y se adapta.</li>
+            <li>El conocimiento se concentra en la medida de similitud.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>El ciclo de las cuatro R</figcaption>
+          <svg class="diag dgc2" viewBox="0 0 640 400" role="img" aria-label="El ciclo del razonamiento basado en casos: un problema nuevo entra en la fase de recuperar, sigue por reutilizar, revisar y retener, y vuelve al principio. En el centro está la base de casos, que las cuatro fases consultan y actualizan.">
+          <style>
+            .dgc2 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3);paint-order:stroke fill;stroke:var(--surface);stroke-width:3.5px;stroke-linejoin:round}
+            .dgc2 .etapa{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.6}
+            .dgc2 .et{font-family:var(--f-display);font-weight:700;font-size:14px;text-anchor:middle;fill:var(--ink)}
+            .dgc2 .arco{fill:none;stroke:var(--maze);stroke-width:2;marker-end:url(#pb1)}
+            .dgc2 .base{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.6}
+            .dgc2 .caso{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1}
+            .dgc2 .radio{fill:none;stroke:var(--line);stroke-width:1.2;stroke-dasharray:3 3}
+            .dgc2 .ent{fill:none;stroke:var(--pill-ink);stroke-width:2.2;marker-end:url(#pb2)}
+            .dgc2 .nm{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;fill:var(--pill-ink)}
+          </style>
+          <defs>
+            <marker id="pb1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+            <marker id="pb2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker>
+          </defs>
+          <g class="radio"><path d="M250 200 L311 94"/><path d="M250 200 L356 261"/><path d="M250 200 L189 306"/><path d="M250 200 L144 139"/></g>
+          <path d="M359 94 A 152 152 0 0 1 397 237" class="arco"/><path d="M356 309 A 152 152 0 0 1 213 347" class="arco"/><path d="M141 306 A 152 152 0 0 1 103 163" class="arco"/><path d="M144 91 A 152 152 0 0 1 287 53" class="arco"/>
+          <rect x="198" y="168" width="104" height="52" rx="5" class="base"/>
+          <rect x="210" y="178" width="80" height="9" rx="2" class="caso"/>
+          <rect x="210" y="191" width="80" height="9" rx="2" class="caso"/>
+          <rect x="210" y="204" width="80" height="9" rx="2" class="caso"/>
+          <text x="250" y="238" class="lb" text-anchor="middle">BASE DE CASOS</text>
+          <rect x="258" y="77" width="106" height="34" rx="17" class="etapa"/><text x="311" y="99" class="et">REcuperar</text><rect x="303" y="244" width="106" height="34" rx="17" class="etapa"/><text x="356" y="266" class="et">REutilizar</text><rect x="136" y="289" width="106" height="34" rx="17" class="etapa"/><text x="189" y="311" class="et">REvisar</text><rect x="91" y="122" width="106" height="34" rx="17" class="etapa"/><text x="144" y="144" class="et">REtener</text>
+          <path d="M104 46 L249 74" class="ent"/>
+          <text x="26" y="38" class="nm">problema nuevo</text>
+          <path d="M414 269 L468 299" class="ent"/>
+          <text x="422" y="319" class="nm">solución propuesta</text>
+          <text x="26" y="386" class="lb">lo que sale bien se guarda, y la base crece con cada partida</text>
+        </svg>
+        </figure>
+      </section>
+      <section class="slide s-part" id="d26">
+        <span class="slide-num">Parte 4 · 26</span>
+        <p class="part-num">Parte 4</p>
+        <h2>Juegos de lenguaje</h2>
+      </section>
+      <section class="slide s-figure" id="d27">
+        <span class="slide-num">Parte 4 · 27</span>
+        <h2>Código Secreto</h2>
+        <figure>
+          <figcaption>A la izquierda, una partida real · foto: JIP, CC BY-SA 3.0, Wikimedia Commons</figcaption>
+          <div class="img-pair">
+            <img src="assets/img/codenames-partida.jpg" width="1200" height="900"
+                 alt="Una partida de Código Secreto en una mesa, con la cuadrícula de cartas y varias ya tapadas por cartas de agente rojas y azules.">
+            <svg class="diag dgg1" viewBox="0 0 400 290" role="img" aria-label="Cuadrícula de cinco por cinco con veinticinco palabras en castellano. Cuatro casillas ya están tapadas por cartas de agente: dos rojas, una azul y una neutral.">
+          <style>
+            .dgg1 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dgg1 .w{font-family:var(--f-mono);font-size:11px;text-anchor:middle;fill:var(--ink)}</style>
+          <rect x="10" y="10" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="45" y="39" class="w" style="font-size:10px">PLAYA</text><rect x="86" y="10" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="121" y="39" class="w" style="font-size:10px">CORONA</text><rect x="162" y="10" width="70" height="48" rx="3" fill="#B03A2E" stroke="#14192B" stroke-width="1"/><circle cx="197" cy="34" r="11" fill="#ffffff44" stroke="#ffffff88" stroke-width="1"/><rect x="238" y="10" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="273" y="39" class="w" style="font-size:10px">HIELO</text><rect x="314" y="10" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="349" y="39" class="w" style="font-size:10px">BANCO</text><rect x="10" y="64" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="45" y="93" class="w" style="font-size:10px">LUNA</text><rect x="86" y="64" width="70" height="48" rx="3" fill="#28527A" stroke="#14192B" stroke-width="1"/><circle cx="121" cy="88" r="11" fill="#ffffff44" stroke="#ffffff88" stroke-width="1"/><rect x="162" y="64" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="197" y="93" class="w" style="font-size:10px">CARTA</text><rect x="238" y="64" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="273" y="93" class="w" style="font-size:10px">NUBE</text><rect x="314" y="64" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="349" y="93" class="w" style="font-size:10px">VELA</text><rect x="10" y="118" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="45" y="147" class="w" style="font-size:10px">TABLA</text><rect x="86" y="118" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="121" y="147" class="w" style="font-size:10px">CAMPO</text><rect x="162" y="118" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="197" y="147" class="w" style="font-size:8.5px">ESTRELLA</text><rect x="238" y="118" width="70" height="48" rx="3" fill="#B03A2E" stroke="#14192B" stroke-width="1"/><circle cx="273" cy="142" r="11" fill="#ffffff44" stroke="#ffffff88" stroke-width="1"/><rect x="314" y="118" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="349" y="147" class="w" style="font-size:10px">GATO</text><rect x="10" y="172" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="45" y="201" class="w" style="font-size:10px">ANILLO</text><rect x="86" y="172" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="121" y="201" class="w" style="font-size:10px">TORRE</text><rect x="162" y="172" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="197" y="201" class="w" style="font-size:10px">PLATO</text><rect x="238" y="172" width="70" height="48" rx="3" fill="#C9B79C" stroke="#14192B" stroke-width="1"/><circle cx="273" cy="196" r="11" fill="#ffffff44" stroke="#ffffff88" stroke-width="1"/><rect x="314" y="172" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="349" y="201" class="w" style="font-size:10px">SOMBRA</text><rect x="10" y="226" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="45" y="255" class="w" style="font-size:10px">MIEL</text><rect x="86" y="226" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="121" y="255" class="w" style="font-size:10px">CLAVE</text><rect x="162" y="226" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="197" y="255" class="w" style="font-size:10px">NIEBLA</text><rect x="238" y="226" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="273" y="255" class="w" style="font-size:10px">ROBOT</text><rect x="314" y="226" width="70" height="48" rx="3" fill="#F5EFE3" stroke="#14192B" stroke-width="1"/><text x="349" y="255" class="w" style="font-size:10px">SIRENA</text>
+        </svg>
+          </div>
+        </figure>
+        <p class="foot">Veinticinco palabras sobre la mesa. Cada equipo tiene las suyas, sólo su jefe de espías sabe cuáles, y para señalarlas puede decir una palabra y un número.</p>
+      </section>
+      <section class="slide s-split wide-right" id="d28">
+        <span class="slide-num">Parte 4 · 28</span>
+        <div class="stack">
+          <h2>El problema del jefe de espías</h2>
+          <ul>
+            <li>Su tarjeta dice de quién es cada palabra, incluida la que hace perder la partida.</li>
+            <li>«Océano, 2» debe llevar a <em>playa</em> y <em>ola</em>, y no a <em>barco</em>, que es del rival.</li>
+            <li>Dar la pista y adivinarla son dos problemas distintos.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>La tarjeta del jefe de espías: 9 rojas, 8 azules, 7 neutras y una que pierde la partida</figcaption>
+          <svg class="diag dgg2" viewBox="0 0 320 290" role="img" aria-label="Tarjeta del jefe de espías: una cuadrícula de cinco por cinco donde nueve casillas son rojas, ocho azules, siete neutras y una negra, la del asesino.">
+          <style>
+            .dgg2 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dgg2 .w{font-family:var(--f-mono);font-size:11px;text-anchor:middle;fill:var(--ink)}</style>
+          <rect x="12" y="12" width="296" height="212" rx="5" fill="#F5EFE3" stroke="#14192B" stroke-width="1.5"/>
+          <rect x="16" y="16" width="288" height="204" rx="3" fill="none" stroke="#B03A2E" stroke-width="3"/>
+          <rect x="26" y="24" width="47" height="33" rx="2" fill="#28527A" stroke="#14192B" stroke-width=".8"/><rect x="79" y="24" width="47" height="33" rx="2" fill="#C9B79C" stroke="#14192B" stroke-width=".8"/><rect x="132" y="24" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="185" y="24" width="47" height="33" rx="2" fill="#C9B79C" stroke="#14192B" stroke-width=".8"/><rect x="238" y="24" width="47" height="33" rx="2" fill="#C9B79C" stroke="#14192B" stroke-width=".8"/><rect x="26" y="63" width="47" height="33" rx="2" fill="#28527A" stroke="#14192B" stroke-width=".8"/><rect x="79" y="63" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="132" y="63" width="47" height="33" rx="2" fill="#14192B" stroke="#14192B" stroke-width=".8"/><path d="M148 74 l14 11 M162 74 l-14 11" stroke="#fff" stroke-width="2" fill="none"/><rect x="185" y="63" width="47" height="33" rx="2" fill="#28527A" stroke="#14192B" stroke-width=".8"/><rect x="238" y="63" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="26" y="102" width="47" height="33" rx="2" fill="#28527A" stroke="#14192B" stroke-width=".8"/><rect x="79" y="102" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="132" y="102" width="47" height="33" rx="2" fill="#C9B79C" stroke="#14192B" stroke-width=".8"/><rect x="185" y="102" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="238" y="102" width="47" height="33" rx="2" fill="#28527A" stroke="#14192B" stroke-width=".8"/><rect x="26" y="141" width="47" height="33" rx="2" fill="#C9B79C" stroke="#14192B" stroke-width=".8"/><rect x="79" y="141" width="47" height="33" rx="2" fill="#28527A" stroke="#14192B" stroke-width=".8"/><rect x="132" y="141" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="185" y="141" width="47" height="33" rx="2" fill="#C9B79C" stroke="#14192B" stroke-width=".8"/><rect x="238" y="141" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="26" y="180" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="79" y="180" width="47" height="33" rx="2" fill="#C9B79C" stroke="#14192B" stroke-width=".8"/><rect x="132" y="180" width="47" height="33" rx="2" fill="#28527A" stroke="#14192B" stroke-width=".8"/><rect x="185" y="180" width="47" height="33" rx="2" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><rect x="238" y="180" width="47" height="33" rx="2" fill="#28527A" stroke="#14192B" stroke-width=".8"/>
+          <g class="lb">
+            <rect x="26" y="238" width="12" height="12" fill="#B03A2E" stroke="#14192B" stroke-width=".8"/><text x="44" y="248">9 rojas</text>
+            <rect x="170" y="238" width="12" height="12" fill="#28527A" stroke="#14192B" stroke-width=".8"/><text x="188" y="248">8 azules</text>
+            <rect x="26" y="260" width="12" height="12" fill="#C9B79C" stroke="#14192B" stroke-width=".8"/><text x="44" y="270">7 neutras</text>
+            <rect x="170" y="260" width="12" height="12" fill="#14192B"/><text x="188" y="270">1 asesino</text>
+          </g>
+        </svg>
+        </figure>
+      </section>
+      <section class="slide s-split wide-right" id="d29">
+        <span class="slide-num">Parte 4 · 29</span>
+        <div class="stack">
+          <h2>Embeddings</h2>
+          <ul>
+            <li>Cada palabra es un vector, y las de significado parecido caen cerca.</li>
+            <li>Con eso se puede medir si <em>océano</em> está más cerca de <em>playa</em> que de <em>corona</em>.</li>
+            <li>No entiende nada de lo que dice: sólo mide distancias.</li>
+          </ul>
+        </div>
+        <figure>
+          <svg class="diag dg12" viewBox="0 0 470 330" role="img" aria-label="Nube de palabras colocadas en un plano según su significado: los animales gato, perro y ratón juntos abajo a la izquierda; playa, ola y barco abajo a la derecha; y arriba hombre, mujer, rey y reina, con dos flechas paralelas que van de hombre a rey y de mujer a reina.">
+          <style>
+            
+            .dg12 .lb{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dg12 .w{font-family:var(--f-mono);font-size:11px;text-anchor:middle;fill:var(--ink)}
+
+            .dg12 .pt{fill:var(--maze);stroke:var(--surface);stroke-width:1.5}
+            .dg12 .ej{stroke:var(--line);stroke-width:1}
+            .dg12 .vec{fill:none;stroke:var(--pill-ink);stroke-width:2;stroke-dasharray:5 4;marker-end:url(#fl)}
+            .dg12 .nube{fill:var(--maze-soft);opacity:.5}
+            .dg12 .fx{font-family:var(--f-mono);font-size:12.5px;fill:var(--pill-ink)}</style>
+          <defs><marker id="fl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker></defs>
+          <g class="ej"><path d="M26 312 H452"/><path d="M26 312 V30"/></g>
+          <ellipse cx="100" cy="268" rx="60" ry="44" class="nube"/>
+          <ellipse cx="376" cy="276" rx="62" ry="42" class="nube"/>
+          <ellipse cx="272" cy="164" rx="94" ry="62" class="nube"/>
+          <path d="M220 190 L250 124" class="vec"/>
+          <path d="M288 206 L324 140" class="vec"/>
+          <circle cx="86" cy="250" r="4.5" class="pt"/><text x="86" y="265" class="w">gato</text><circle cx="132" cy="272" r="4.5" class="pt"/><text x="132" y="287" class="w">perro</text><circle cx="70" cy="296" r="4.5" class="pt"/><text x="70" y="311" class="w">ratón</text><circle cx="352" cy="254" r="4.5" class="pt"/><text x="352" y="269" class="w">playa</text><circle cx="404" cy="274" r="4.5" class="pt"/><text x="404" y="289" class="w">ola</text><circle cx="372" cy="300" r="4.5" class="pt"/><text x="372" y="315" class="w">barco</text><circle cx="214" cy="196" r="4.5" class="pt"/><text x="214" y="211" class="w">hombre</text><circle cx="282" cy="212" r="4.5" class="pt"/><text x="282" y="227" class="w">mujer</text><circle cx="256" cy="116" r="4.5" class="pt"/><text x="256" y="106" class="w">rey</text><circle cx="330" cy="132" r="4.5" class="pt"/><text x="330" y="122" class="w">reina</text>
+          <text x="40" y="52" class="fx">rey − hombre + mujer ≈ reina</text>
+          <text x="40" y="74" class="lb">significado parecido, sitios cercanos</text>
+        </svg>
+        </figure>
+      </section>
+      <section class="slide s-split wide-right" id="d30">
+        <span class="slide-num">Parte 4 · 30</span>
+        <div class="stack">
+          <h2>Cómo se busca una pista con embeddings</h2>
+          <ul>
+            <li>No vale la palabra más cercana a una de las mías.</li>
+            <li>Busco una zona con <strong>dos o tres mías</strong> y ninguna del rival.</li>
+            <li>El problema pasa a ser geométrico: medir y descartar.</li>
+          </ul>
+        </div>
+        <figure>
+          <svg class="diag dgz1" viewBox="0 0 520 362" role="img" aria-label="Las veinticinco palabras del tablero colocadas en el espacio de significados, cada una con el color de su equipo. Una circunferencia alrededor de la pista «océano» encierra playa y ola, que son del equipo propio, y deja fuera barco, que es del rival, y corona, que es la casilla negra.">
+          <style>
+            .dgz1 .w{font-family:var(--f-mono);font-size:11.5px;fill:var(--ink);paint-order:stroke fill;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+            .dgz1 .lb{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;fill:var(--ink-3)}
+            .dgz1 .zona{fill:var(--pill);fill-opacity:.13;stroke:var(--pill-ink);stroke-width:2;stroke-dasharray:6 4}
+            .dgz1 .pista{fill:var(--pill);stroke:var(--surface);stroke-width:2.5;paint-order:stroke fill}
+            .dgz1 .pt{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink);paint-order:stroke fill;stroke:var(--surface);stroke-width:3.5px;stroke-linejoin:round}
+          </style>
+          <circle cx="172" cy="112" r="64" class="zona"/>
+          <circle cx="152" cy="124" r="6" fill="#B03A2E" stroke="var(--surface)" stroke-width="1.8"/><text x="139" y="128" class="w" text-anchor="end">playa</text><circle cx="198" cy="98" r="6" fill="#B03A2E" stroke="var(--surface)" stroke-width="1.8"/><text x="209" y="102" class="w">ola</text><circle cx="404" cy="252" r="6" fill="#B03A2E" stroke="var(--surface)" stroke-width="1.8"/><text x="415" y="256" class="w">miel</text><circle cx="118" cy="292" r="6" fill="#B03A2E" stroke="var(--surface)" stroke-width="1.8"/><text x="129" y="296" class="w">torre</text><circle cx="252" cy="152" r="6" fill="#28527A" stroke="var(--surface)" stroke-width="1.8"/><text x="263" y="156" class="w">barco</text><circle cx="432" cy="120" r="6" fill="#28527A" stroke="var(--surface)" stroke-width="1.8"/><text x="443" y="124" class="w">banco</text><circle cx="330" cy="300" r="6" fill="#28527A" stroke="var(--surface)" stroke-width="1.8"/><text x="341" y="304" class="w">luna</text><circle cx="300" cy="222" r="6" fill="#C9B79C" stroke="var(--surface)" stroke-width="1.8"/><text x="311" y="226" class="w">carta</text><circle cx="200" cy="246" r="6" fill="#C9B79C" stroke="var(--surface)" stroke-width="1.8"/><text x="211" y="250" class="w">nube</text><circle cx="86" cy="192" r="6" fill="#C9B79C" stroke="var(--surface)" stroke-width="1.8"/><text x="97" y="196" class="w">gato</text><circle cx="432" cy="62" r="6" fill="#14192B" stroke="var(--surface)" stroke-width="1.8"/><text x="443" y="66" class="w">corona</text>
+          <path d="M172 100 l11 12 -11 12 -11 -12 z" class="pista"/>
+          <text x="172" y="34" class="pt" text-anchor="middle">«océano, 2»</text>
+          <path d="M14 328 H506" stroke="var(--line)" stroke-width="1"/><g class="lb">
+            <circle cx="20" cy="348" r="5" fill="#B03A2E"/><text x="32" y="352">mías</text>
+            <circle cx="106" cy="348" r="5" fill="#28527A"/><text x="118" y="352">del rival</text>
+            <circle cx="216" cy="348" r="5" fill="#C9B79C"/><text x="228" y="352">neutras</text>
+            <circle cx="316" cy="348" r="5" fill="#14192B" stroke="var(--surface)" stroke-width="1.5"/><text x="328" y="352">la negra</text>
+          </g>
+        </svg>
+        </figure>
+      </section>
+      <section class="slide s-part" id="d31">
+        <span class="slide-num">Parte 5 · 31</span>
+        <p class="part-num">Parte 5</p>
+        <h2>Calendario y evaluación</h2>
+      </section>
+      <section class="slide s-cal" id="d32">
+        <span class="slide-num">Parte 5 · 32</span>
+        <h2>Calendario de prácticas</h2>
+        <!--ICI:CAL-->
+        <div class="cal">
+          <div class="cal-head" aria-hidden="true">
+            <span class="cal-corner"></span><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+          </div>
+          <div class="cal-month">
+            <h3 class="cal-mname">Septiembre</h3>
+            <div class="cal-weeks">
+              <div class="cal-week" data-b="p0" role="group" aria-label="Semana del 7 de septiembre al 13 de septiembre · Práctica 0 · Tutorial">
+                <div class="d" data-day="2026-09-07" title="lunes 7 de septiembre" aria-label="lunes 7 de septiembre">7</div>
+                <div class="d" data-day="2026-09-08" title="martes 8 de septiembre" aria-label="martes 8 de septiembre">8</div>
+                <div class="d" data-day="2026-09-09" title="miércoles 9 de septiembre" aria-label="miércoles 9 de septiembre">9</div>
+                <div class="d" data-day="2026-09-10" title="jueves 10 de septiembre" aria-label="jueves 10 de septiembre">10</div>
+                <div class="d" data-day="2026-09-11" title="viernes 11 de septiembre" aria-label="viernes 11 de septiembre">11</div>
+                <div class="d" data-day="2026-09-12" title="sábado 12 de septiembre" aria-label="sábado 12 de septiembre">12</div>
+                <div class="d" data-day="2026-09-13" title="domingo 13 de septiembre" aria-label="domingo 13 de septiembre">13</div>
+              </div>
+              <div class="cal-week" data-b="p0" role="group" aria-label="Semana del 14 de septiembre al 20 de septiembre · Práctica 0 · Tutorial">
+                <div class="d" data-day="2026-09-14" title="lunes 14 de septiembre" aria-label="lunes 14 de septiembre">14</div>
+                <div class="d" data-day="2026-09-15" title="martes 15 de septiembre" aria-label="martes 15 de septiembre">15</div>
+                <div class="d" data-day="2026-09-16" title="miércoles 16 de septiembre" aria-label="miércoles 16 de septiembre">16</div>
+                <div class="d" data-day="2026-09-17" title="jueves 17 de septiembre" aria-label="jueves 17 de septiembre">17</div>
+                <div class="d" data-day="2026-09-18" title="viernes 18 de septiembre" aria-label="viernes 18 de septiembre">18</div>
+                <div class="d" data-day="2026-09-19" title="sábado 19 de septiembre" aria-label="sábado 19 de septiembre">19</div>
+                <div class="d due" data-day="2026-09-20" title="domingo 20 de septiembre · entrega de Práctica 0" aria-label="domingo 20 de septiembre · entrega de Práctica 0">20</div>
+              </div>
+              <div class="cal-week" data-b="p1" role="group" aria-label="Semana del 21 de septiembre al 27 de septiembre · Práctica 1 · Algorítmica">
+                <div class="d" data-day="2026-09-21" title="lunes 21 de septiembre" aria-label="lunes 21 de septiembre">21</div>
+                <div class="d" data-day="2026-09-22" title="martes 22 de septiembre" aria-label="martes 22 de septiembre">22</div>
+                <div class="d" data-day="2026-09-23" title="miércoles 23 de septiembre" aria-label="miércoles 23 de septiembre">23</div>
+                <div class="d" data-day="2026-09-24" title="jueves 24 de septiembre" aria-label="jueves 24 de septiembre">24</div>
+                <div class="d" data-day="2026-09-25" title="viernes 25 de septiembre" aria-label="viernes 25 de septiembre">25</div>
+                <div class="d" data-day="2026-09-26" title="sábado 26 de septiembre" aria-label="sábado 26 de septiembre">26</div>
+                <div class="d" data-day="2026-09-27" title="domingo 27 de septiembre" aria-label="domingo 27 de septiembre">27</div>
+              </div>
+              <div class="cal-week" data-b="p1" role="group" aria-label="Semana del 28 de septiembre al 4 de octubre · Práctica 1 · Algorítmica">
+                <div class="d" data-day="2026-09-28" title="lunes 28 de septiembre" aria-label="lunes 28 de septiembre">28</div>
+                <div class="d" data-day="2026-09-29" title="martes 29 de septiembre" aria-label="martes 29 de septiembre">29</div>
+                <div class="d" data-day="2026-09-30" title="miércoles 30 de septiembre" aria-label="miércoles 30 de septiembre">30</div>
+                <div class="d other" data-day="2026-10-01" title="jueves 1 de octubre" aria-label="jueves 1 de octubre">1</div>
+                <div class="d other" data-day="2026-10-02" title="viernes 2 de octubre" aria-label="viernes 2 de octubre">2</div>
+                <div class="d other" data-day="2026-10-03" title="sábado 3 de octubre" aria-label="sábado 3 de octubre">3</div>
+                <div class="d other due" data-day="2026-10-04" title="domingo 4 de octubre · entrega de Práctica 1" aria-label="domingo 4 de octubre · entrega de Práctica 1">4</div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-month">
+            <h3 class="cal-mname">Octubre</h3>
+            <div class="cal-weeks">
+              <div class="cal-week" data-b="p2" role="group" aria-label="Semana del 5 de octubre al 11 de octubre · Práctica 2 · Máquinas de estados">
+                <div class="d" data-day="2026-10-05" title="lunes 5 de octubre" aria-label="lunes 5 de octubre">5</div>
+                <div class="d" data-day="2026-10-06" title="martes 6 de octubre" aria-label="martes 6 de octubre">6</div>
+                <div class="d" data-day="2026-10-07" title="miércoles 7 de octubre" aria-label="miércoles 7 de octubre">7</div>
+                <div class="d" data-day="2026-10-08" title="jueves 8 de octubre" aria-label="jueves 8 de octubre">8</div>
+                <div class="d" data-day="2026-10-09" title="viernes 9 de octubre" aria-label="viernes 9 de octubre">9</div>
+                <div class="d" data-day="2026-10-10" title="sábado 10 de octubre" aria-label="sábado 10 de octubre">10</div>
+                <div class="d" data-day="2026-10-11" title="domingo 11 de octubre" aria-label="domingo 11 de octubre">11</div>
+              </div>
+              <div class="cal-week" data-b="p2" role="group" aria-label="Semana del 12 de octubre al 18 de octubre · Práctica 2 · Máquinas de estados">
+                <div class="d holi" data-day="2026-10-12" title="lunes 12 de octubre · Fiesta Nacional, no lectivo" aria-label="lunes 12 de octubre · Fiesta Nacional, no lectivo">12</div>
+                <div class="d" data-day="2026-10-13" title="martes 13 de octubre" aria-label="martes 13 de octubre">13</div>
+                <div class="d" data-day="2026-10-14" title="miércoles 14 de octubre" aria-label="miércoles 14 de octubre">14</div>
+                <div class="d" data-day="2026-10-15" title="jueves 15 de octubre" aria-label="jueves 15 de octubre">15</div>
+                <div class="d" data-day="2026-10-16" title="viernes 16 de octubre" aria-label="viernes 16 de octubre">16</div>
+                <div class="d" data-day="2026-10-17" title="sábado 17 de octubre" aria-label="sábado 17 de octubre">17</div>
+                <div class="d due" data-day="2026-10-18" title="domingo 18 de octubre · entrega de Práctica 2" aria-label="domingo 18 de octubre · entrega de Práctica 2">18</div>
+              </div>
+              <div class="cal-week" data-b="p3" role="group" aria-label="Semana del 19 de octubre al 25 de octubre · Práctica 3 · Sistemas de reglas">
+                <div class="d" data-day="2026-10-19" title="lunes 19 de octubre" aria-label="lunes 19 de octubre">19</div>
+                <div class="d" data-day="2026-10-20" title="martes 20 de octubre" aria-label="martes 20 de octubre">20</div>
+                <div class="d" data-day="2026-10-21" title="miércoles 21 de octubre" aria-label="miércoles 21 de octubre">21</div>
+                <div class="d" data-day="2026-10-22" title="jueves 22 de octubre" aria-label="jueves 22 de octubre">22</div>
+                <div class="d" data-day="2026-10-23" title="viernes 23 de octubre" aria-label="viernes 23 de octubre">23</div>
+                <div class="d" data-day="2026-10-24" title="sábado 24 de octubre" aria-label="sábado 24 de octubre">24</div>
+                <div class="d" data-day="2026-10-25" title="domingo 25 de octubre" aria-label="domingo 25 de octubre">25</div>
+              </div>
+              <div class="cal-week" data-b="p3" role="group" aria-label="Semana del 26 de octubre al 1 de noviembre · Práctica 3 · Sistemas de reglas">
+                <div class="d" data-day="2026-10-26" title="lunes 26 de octubre" aria-label="lunes 26 de octubre">26</div>
+                <div class="d" data-day="2026-10-27" title="martes 27 de octubre" aria-label="martes 27 de octubre">27</div>
+                <div class="d" data-day="2026-10-28" title="miércoles 28 de octubre" aria-label="miércoles 28 de octubre">28</div>
+                <div class="d" data-day="2026-10-29" title="jueves 29 de octubre" aria-label="jueves 29 de octubre">29</div>
+                <div class="d" data-day="2026-10-30" title="viernes 30 de octubre" aria-label="viernes 30 de octubre">30</div>
+                <div class="d" data-day="2026-10-31" title="sábado 31 de octubre" aria-label="sábado 31 de octubre">31</div>
+                <div class="d other due" data-day="2026-11-01" title="domingo 1 de noviembre · entrega de Práctica 3" aria-label="domingo 1 de noviembre · entrega de Práctica 3">1</div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-month">
+            <h3 class="cal-mname">Noviembre</h3>
+            <div class="cal-weeks">
+              <div class="cal-week" data-b="p4" role="group" aria-label="Semana del 2 de noviembre al 8 de noviembre · Práctica 4 · Razonamiento borroso">
+                <div class="d" data-day="2026-11-02" title="lunes 2 de noviembre" aria-label="lunes 2 de noviembre">2</div>
+                <div class="d" data-day="2026-11-03" title="martes 3 de noviembre" aria-label="martes 3 de noviembre">3</div>
+                <div class="d" data-day="2026-11-04" title="miércoles 4 de noviembre" aria-label="miércoles 4 de noviembre">4</div>
+                <div class="d" data-day="2026-11-05" title="jueves 5 de noviembre" aria-label="jueves 5 de noviembre">5</div>
+                <div class="d" data-day="2026-11-06" title="viernes 6 de noviembre" aria-label="viernes 6 de noviembre">6</div>
+                <div class="d" data-day="2026-11-07" title="sábado 7 de noviembre" aria-label="sábado 7 de noviembre">7</div>
+                <div class="d" data-day="2026-11-08" title="domingo 8 de noviembre" aria-label="domingo 8 de noviembre">8</div>
+              </div>
+              <div class="cal-week" data-b="p4" role="group" aria-label="Semana del 9 de noviembre al 15 de noviembre · Práctica 4 · Razonamiento borroso">
+                <div class="d holi" data-day="2026-11-09" title="lunes 9 de noviembre · La Almudena, no lectivo" aria-label="lunes 9 de noviembre · La Almudena, no lectivo">9</div>
+                <div class="d" data-day="2026-11-10" title="martes 10 de noviembre" aria-label="martes 10 de noviembre">10</div>
+                <div class="d" data-day="2026-11-11" title="miércoles 11 de noviembre" aria-label="miércoles 11 de noviembre">11</div>
+                <div class="d" data-day="2026-11-12" title="jueves 12 de noviembre" aria-label="jueves 12 de noviembre">12</div>
+                <div class="d" data-day="2026-11-13" title="viernes 13 de noviembre" aria-label="viernes 13 de noviembre">13</div>
+                <div class="d" data-day="2026-11-14" title="sábado 14 de noviembre" aria-label="sábado 14 de noviembre">14</div>
+                <div class="d due" data-day="2026-11-15" title="domingo 15 de noviembre · entrega de Práctica 4" aria-label="domingo 15 de noviembre · entrega de Práctica 4">15</div>
+              </div>
+              <div class="cal-week mx" data-b="mx" role="group" aria-label="Semana del 16 de noviembre al 22 de noviembre · Práctica 5 · Juegos por turnos">
+                <div class="mx-wave" aria-hidden="true"></div>
+                <div class="d" data-day="2026-11-16" title="lunes 16 de noviembre" aria-label="lunes 16 de noviembre">16</div>
+                <div class="d" data-day="2026-11-17" title="martes 17 de noviembre" aria-label="martes 17 de noviembre">17</div>
+                <div class="d" data-day="2026-11-18" title="miércoles 18 de noviembre" aria-label="miércoles 18 de noviembre">18</div>
+                <div class="d" data-day="2026-11-19" title="jueves 19 de noviembre" aria-label="jueves 19 de noviembre">19</div>
+                <div class="d" data-day="2026-11-20" title="viernes 20 de noviembre" aria-label="viernes 20 de noviembre">20</div>
+                <div class="d" data-day="2026-11-21" title="sábado 21 de noviembre" aria-label="sábado 21 de noviembre">21</div>
+                <div class="d" data-day="2026-11-22" title="domingo 22 de noviembre" aria-label="domingo 22 de noviembre">22</div>
+              </div>
+              <div class="cal-week mx" data-b="mx" role="group" aria-label="Semana del 23 de noviembre al 29 de noviembre · Práctica 5 · Juegos por turnos">
+                <div class="mx-wave" aria-hidden="true"></div>
+                <div class="d" data-day="2026-11-23" title="lunes 23 de noviembre" aria-label="lunes 23 de noviembre">23</div>
+                <div class="d" data-day="2026-11-24" title="martes 24 de noviembre" aria-label="martes 24 de noviembre">24</div>
+                <div class="d" data-day="2026-11-25" title="miércoles 25 de noviembre" aria-label="miércoles 25 de noviembre">25</div>
+                <div class="d" data-day="2026-11-26" title="jueves 26 de noviembre" aria-label="jueves 26 de noviembre">26</div>
+                <div class="d" data-day="2026-11-27" title="viernes 27 de noviembre" aria-label="viernes 27 de noviembre">27</div>
+                <div class="d" data-day="2026-11-28" title="sábado 28 de noviembre" aria-label="sábado 28 de noviembre">28</div>
+                <div class="d due" data-day="2026-11-29" title="domingo 29 de noviembre · entrega de Práctica 5 (fecha por confirmar)" aria-label="domingo 29 de noviembre · entrega de Práctica 5 (fecha por confirmar)">29</div>
+              </div>
+              <div class="cal-week" data-b="cb" role="group" aria-label="Semana del 30 de noviembre al 6 de diciembre · Práctica 6 · Razonamiento basado en casos">
+                <div class="d" data-day="2026-11-30" title="lunes 30 de noviembre" aria-label="lunes 30 de noviembre">30</div>
+                <div class="d other" data-day="2026-12-01" title="martes 1 de diciembre" aria-label="martes 1 de diciembre">1</div>
+                <div class="d other" data-day="2026-12-02" title="miércoles 2 de diciembre" aria-label="miércoles 2 de diciembre">2</div>
+                <div class="d other" data-day="2026-12-03" title="jueves 3 de diciembre" aria-label="jueves 3 de diciembre">3</div>
+                <div class="d other" data-day="2026-12-04" title="viernes 4 de diciembre" aria-label="viernes 4 de diciembre">4</div>
+                <div class="d other" data-day="2026-12-05" title="sábado 5 de diciembre" aria-label="sábado 5 de diciembre">5</div>
+                <div class="d other" data-day="2026-12-06" title="domingo 6 de diciembre" aria-label="domingo 6 de diciembre">6</div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-month">
+            <h3 class="cal-mname">Diciembre</h3>
+            <div class="cal-weeks">
+              <div class="cal-week" data-b="cb" role="group" aria-label="Semana del 7 de diciembre al 13 de diciembre · Práctica 6 · Razonamiento basado en casos">
+                <div class="d" data-day="2026-12-07" title="lunes 7 de diciembre" aria-label="lunes 7 de diciembre">7</div>
+                <div class="d holi" data-day="2026-12-08" title="martes 8 de diciembre · La Inmaculada, no lectivo" aria-label="martes 8 de diciembre · La Inmaculada, no lectivo">8</div>
+                <div class="d" data-day="2026-12-09" title="miércoles 9 de diciembre" aria-label="miércoles 9 de diciembre">9</div>
+                <div class="d" data-day="2026-12-10" title="jueves 10 de diciembre" aria-label="jueves 10 de diciembre">10</div>
+                <div class="d" data-day="2026-12-11" title="viernes 11 de diciembre" aria-label="viernes 11 de diciembre">11</div>
+                <div class="d" data-day="2026-12-12" title="sábado 12 de diciembre" aria-label="sábado 12 de diciembre">12</div>
+                <div class="d due" data-day="2026-12-13" title="domingo 13 de diciembre · entrega de Práctica 6 (fecha por confirmar)" aria-label="domingo 13 de diciembre · entrega de Práctica 6 (fecha por confirmar)">13</div>
+              </div>
+              <div class="cal-week" data-b="bn" role="group" aria-label="Semana del 14 de diciembre al 20 de diciembre · Bonus · Juegos de lenguaje">
+                <div class="d" data-day="2026-12-14" title="lunes 14 de diciembre" aria-label="lunes 14 de diciembre">14</div>
+                <div class="d" data-day="2026-12-15" title="martes 15 de diciembre" aria-label="martes 15 de diciembre">15</div>
+                <div class="d" data-day="2026-12-16" title="miércoles 16 de diciembre" aria-label="miércoles 16 de diciembre">16</div>
+                <div class="d" data-day="2026-12-17" title="jueves 17 de diciembre" aria-label="jueves 17 de diciembre">17</div>
+                <div class="d" data-day="2026-12-18" title="viernes 18 de diciembre" aria-label="viernes 18 de diciembre">18</div>
+                <div class="d" data-day="2026-12-19" title="sábado 19 de diciembre" aria-label="sábado 19 de diciembre">19</div>
+                <div class="d due" data-day="2026-12-20" title="domingo 20 de diciembre · entrega de Bonus (fecha por confirmar)" aria-label="domingo 20 de diciembre · entrega de Bonus (fecha por confirmar)">20</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--/ICI:CAL-->
+        <p class="marcas">Recuadro azul, hoy · punto amarillo, entrega · franja oscura, entorno por anunciar</p>
+        <!--ICI:LEGENDMINI-->
+        <ul class="legend-mini">
+          <li data-b="p0"><span class="sw" aria-hidden="true"></span><b>P0</b> Tutorial</li>
+          <li data-b="p1"><span class="sw" aria-hidden="true"></span><b>P1</b> Algorítmica</li>
+          <li data-b="p2"><span class="sw" aria-hidden="true"></span><b>P2</b> Máquinas de estados</li>
+          <li data-b="p3"><span class="sw" aria-hidden="true"></span><b>P3</b> Sistemas de reglas</li>
+          <li data-b="p4"><span class="sw" aria-hidden="true"></span><b>P4</b> Razonamiento borroso</li>
+          <li data-b="mx"><span class="sw" aria-hidden="true"></span><b>P5</b> Juegos por turnos</li>
+          <li data-b="cb"><span class="sw" aria-hidden="true"></span><b>P6</b> Razonamiento basado en casos</li>
+          <li data-b="bn"><span class="sw" aria-hidden="true"></span><b>Bonus</b> Juegos de lenguaje</li>
+        </ul>
+        <!--/ICI:LEGENDMINI-->
+      </section>
+      <section class="slide" id="d33">
+        <span class="slide-num">Parte 5 · 33</span>
+        <h2>Cómo se evalúa</h2>
+        <ul>
+          <li><strong>100&#8239;% prácticas</strong>, realización y defensa. Sin examen para quien sigue el curso.</li>
+          <li>La nota final es la media, y es <strong>individual</strong>: cuenta lo que aporta cada uno.</li>
+          <li>La <strong>Práctica 0</strong> es individual y no puntúa. El resto, en grupo.</li>
+          <li>Cada enunciado fija el tamaño del grupo, qué se entrega y cómo se puntúa.</li>
+          <li>La defensa completa se le puede pedir a cualquiera del grupo.</li>
+        </ul>
+      </section>
+      <section class="slide s-split wide-right" id="d34">
+        <span class="slide-num">Parte 5 · 34</span>
+        <div class="stack">
+          <h2>La competición</h2>
+          <ul>
+            <li>Todos los controladores juegan contra todos, en los dos bandos.</li>
+            <li>De ahí sale un ranking por entrega.</li>
+            <li>Una buena implementación bien defendida basta para aprobar.</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="assets/img/competicion.jpg" width="1400" height="787"
+               alt="Ventana de la herramienta de competición: la tabla de cada Ms. Pac-Man contra cada equipo de fantasmas y, debajo, los rankings de cada bando y el general.">
+        </figure>
+      </section>
+      <section class="slide" id="d35">
+        <span class="slide-num">Parte 5 · 35</span>
+        <h2>Plagio</h2>
+        <ul>
+          <li>Se controla el plagio del código, entre grupos y contra cursos anteriores.</li>
+          <li>En caso de plagio se aplica la normativa de la UCM.</li>
+          <li>Preguntar, comparar ideas y discutir estrategias es parte del curso.</li>
+          <li>Lo que no vale es entregar código que no habéis escrito vosotros, venga de donde venga.</li>
+        </ul>
+      </section>
+      <section class="slide" id="d36">
+        <span class="slide-num">Parte 5 · 36</span>
+        <h2>Uso de modelos de lenguaje en las prácticas</h2>
+        <ul>
+          <li>
+            <strong>Con un documento en cada entrega</strong> que diga qué modelo has usado, para qué lo
+            has usado y con qué <em>prompts</em>.
+          </li>
+          <li>
+            <strong>Entendiendo todo lo que entregas.</strong> Si en la defensa no puedes explicar una
+            línea, esa línea no debería estar ahí.
+          </li>
+        </ul>
+        <p class="lede">
+          Los vais a usar toda la carrera, así que más vale aprender a usarlos bien, y en eso echo una
+          mano encantado. Tened en cuenta que me interesa bastante más el diseño del sistema que el código
+          en sí.
+        </p>
+      </section>
+      <section class="slide" id="d37">
+        <span class="slide-num">Parte 5 · 37</span>
+        <h2>Herramientas que hay que instalar</h2>
+        <div class="table-scroll">
+          <table>
+            <tbody>
+              <tr><th scope="row">Eclipse IDE</th><td>for Java Developers, desde <code>eclipseide.org</code>. El instalador se encarga del Java.</td></tr>
+              <tr><th scope="row">Java</th><td>21 o superior. No hace falta instalarlo aparte.</td></tr>
+              <tr><th scope="row"><code>Jess</code></th><td>Motor de reglas, en la Práctica 3.</td></tr>
+              <tr><th scope="row"><code>jFuzzyLogic</code></th><td>Lógica borrosa, en la Práctica 4.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede">
+          La guía de instalación, con los errores típicos, está en la wiki. Reserva media hora la primera vez.
+        </p>
+      </section>
+      <section class="slide s-split" id="d38">
+        <span class="slide-num">Parte 5 · 38</span>
+        <div class="stack">
+          <h2>Dónde está cada cosa</h2>
+          <ul>
+            <li><strong>La wiki de la asignatura.</strong> Enunciados, teoría, guías y calendario.</li>
+            <li><strong>El Campus Virtual.</strong> Entregas, notas y todo comunicado oficial.</li>
+            <li><strong>gaia.fdi.ucm.es</strong>, el grupo que mantiene el entorno.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>El Campus Virtual de la asignatura</figcaption>
+          <img src="assets/img/campus-virtual.jpg" width="1400" height="857"
+               alt="Página del Campus Virtual de la asignatura, con las secciones de la clase y los apartados de apuntes y entregas.">
+        </figure>
+      </section>
+      <section class="slide s-split" id="d39">
+        <span class="slide-num">Parte 5 · 39</span>
+        <div class="stack">
+          <h2>Más allá de la asignatura</h2>
+          <p class="lede">
+            Con los mismos controladores se organiza un <strong>concurso internacional</strong> de
+            comportamientos para Ms.&nbsp;Pac-Man.
+          </p>
+          <p class="lede">
+            Y hay una versión física, <strong>RoboPacMan</strong>, en la que el controlador conduce un coche
+            por un laberinto impreso en el suelo.
+          </p>
+        </div>
+        <figure>
+          <img src="assets/img/robopacman.jpg" width="1024" height="768"
+                 alt="Coche de cuatro ruedas amarillas con una cabeza de Pac-Man impresa en 3D, delante de un portátil que muestra el laberinto del simulador.">
+        </figure>
+      </section>
+      <section class="slide s-cover" id="d40">
+        <span class="slide-num">Parte 5 · 40</span>
+        <svg class="pac" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+          <path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        </svg>
+        <h2>¿Preguntas?</h2>
+        <p class="sub">Las que surjan después, por correo o en clase.</p>
+
+        <p class="who">
+          <strong>Pablo Gutiérrez Sánchez</strong> · pabgut02@ucm.es · Despacho 409
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="note tip" style="margin-top:1.5rem">
+    <span class="note-label">Cómo se maneja</span>
+    <p>
+      Flechas izquierda y derecha, o barra espaciadora, para pasar de diapositiva. La tecla
+      <kbd>F</kbd> o el botón <em>Pantalla completa</em> la ponen a tamaño de proyector, y
+      <kbd>Esc</kbd> o <em>Volver a la página</em> devuelven aquí. También se puede tocar la mitad
+      derecha o izquierda de la diapositiva, o deslizar el dedo en el móvil.
+    </p>
+  </div>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 10 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="assets/js/ici.js" defer></script>
+<script src="assets/js/deck.js" defer></script>
+</body>
+</html>

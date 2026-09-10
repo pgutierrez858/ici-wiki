@@ -1,0 +1,1107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 0 · Introducción a Ms. Pac-Man · ICI</title>
+<meta name="description" content="Práctica 0 de Ingeniería de Comportamientos Inteligentes: conocer el simulador de Ms. Pac-Man y escribir los primeros comportamientos para Ms. Pac-Man y los fantasmas.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <span>Práctica 0</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Introducción a Ms. Pac-Man
+      <span class="thin">Conocer el simulador de la primera mitad del curso y aprender a jugar.</span>
+    </h1>
+    <p class="standfirst">
+      El objetivo de esta práctica es conocer el entorno de simulación que utilizaremos durante la primera
+      mitad del curso y escribir los primeros comportamientos, todavía muy simples, para Ms.&nbsp;Pac-Man y
+      para los fantasmas. Consta de tres ejercicios que se realizan de forma individual: los dos primeros son para
+      trastear y no se entregan; el tercero sí.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Fecha de entrega</dt>
+      <dd>20 de septiembre<small>Domingo, a través del Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Peso en la nota</dt>
+      <dd>Ninguno<small>No se evalúa para la nota final</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Modalidad</dt>
+      <dd>Individual<small>Los tres ejercicios</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Se entrega</dt>
+      <dd>Ejercicio 3<small><code>practica0.zip</code></small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="requisitos">
+        <div class="sec-head">
+          <span class="num">00</span>
+          <h2 class="sec">Antes de empezar</h2>
+        </div>
+        <p>Del Campus Virtual te descargas dos archivos:</p>
+        <ul>
+          <li>
+            <code>ICI-MsPacManEngine.zip</code>, el simulador. Es el mismo para las prácticas de la
+            primera mitad del curso, de la 0 a la 4, así que se descarga una sola vez. Y
+            <strong>no se modifica nunca</strong>.
+          </li>
+          <li>
+            <code>ICI-Practica0.zip</code>, el proyecto de esta práctica, que ya trae un ejemplo
+            funcionando. En cada práctica nueva se publicará otro zip como este.
+          </li>
+        </ul>
+        <p>
+          Los dos se descomprimen y se importan en Eclipse, el simulador primero, porque el proyecto de la
+          práctica lo referencia por su nombre. El cómo, paso a paso y con los errores típicos, está en la
+          guía <a href="../guias/eclipse.html"><strong>Ms. Pac-Man en Eclipse</strong></a>. Cuando
+          <code>ExecutorTest</code> te abra una ventana con el laberinto, estás listo para empezar.
+        </p>
+        <p>
+          Ten a mano también la referencia de la clase
+          <a href="../guias/clase-game.html"><code>Game</code></a>, que es donde vive toda la información
+          del estado de la partida.
+        </p>
+      </section>
+
+      <section id="juego">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Ms. Pac-Man</h2>
+        </div>
+        <p>
+          Ms.&nbsp;Pac-Man es un arcade de principios de los ochenta. La señora Pac-Man tiene que conseguir
+          el máximo número de puntos huyendo de cuatro fantasmas, y las reglas son sencillas: comerse todas
+          las píldoras de la pantalla, las normales y las de poder, momento en el que se pasa al siguiente
+          nivel. Mientras tanto, los cuatro fantasmas recorren el laberinto intentando capturarla.
+        </p>
+        <figure class="lab-uno">
+          <figcaption>El primer laberinto, tal como empieza el nivel</figcaption>
+          <img class="lab pixel" src="../assets/img/laberinto-a.png" width="456" height="520" loading="lazy"
+               alt="El primer laberinto del simulador: pasillos rosas sobre fondo negro, 220 píldoras como puntos blancos, cuatro píldoras de poder más grandes en las esquinas, la caja de la cárcel en el centro y Ms. Pac-Man abajo.">
+        </figure>
+        <p>
+          Esa imagen sale del propio simulador. Las 220 píldoras pequeñas son los puntos que hay que
+          comerse para acabar el nivel; las cuatro grandes de las esquinas son las de poder, y la caja del
+          centro es la cárcel de los fantasmas.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th scope="col">Fantasma</th><th scope="col">Color</th><th scope="col">Turnos de cárcel al empezar</th><th scope="col">En el juego original</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="ghost-name"><span class="swatch g-blinky"></span>Blinky</span></td>
+                <td>Rojo</td>
+                <td class="num-col">40</td>
+                <td>Muy rápido, y con la habilidad de encontrar a Pac-Man en el escenario.</td>
+              </tr>
+              <tr>
+                <td><span class="ghost-name"><span class="swatch g-pinky"></span>Pinky</span></td>
+                <td>Rosa</td>
+                <td class="num-col">60</td>
+                <td>Intenta anticiparse y cortar el paso.</td>
+              </tr>
+              <tr>
+                <td><span class="ghost-name"><span class="swatch g-inky"></span>Inky</span></td>
+                <td>Cian</td>
+                <td class="num-col">80</td>
+                <td>Muy lento; muchas veces evita el encuentro con Pac-Man.</td>
+              </tr>
+              <tr>
+                <td><span class="ghost-name"><span class="swatch g-clyde"></span>Sue</span></td>
+                <td>Naranja</td>
+                <td class="num-col">100</td>
+                <td>Errático, alterna persecución y merodeo.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">En el simulador, los cuatro fantasmas son iguales</span>
+          <p>
+            Los comportamientos de la última columna son los del arcade y no están programados aquí: en el
+            simulador los cuatro los decide tu controlador. La única diferencia que trae el motor entre
+            ellos es el tiempo que pasan en la cárcel al empezar el nivel, y el nombre del cuarto, que en
+            el enumerado <code>GHOST</code> es <code>SUE</code> y no Clyde.
+          </p>
+        </div>
+        <h3 class="label">El laberinto por dentro</h3>
+        <p>
+          Tres cosas del mapa condicionan cualquier estrategia que escribas, y se ven mejor marcadas encima
+          del laberinto:
+        </p>
+        <figure class="lab-uno">
+          <figcaption>Cruces en amarillo, túneles en azul, cárcel en rosa y su puerta en verde</figcaption>
+          <img class="lab pixel" src="../assets/img/laberinto-a-anotado.png" width="684" height="780" loading="lazy"
+               alt="El primer laberinto con marcas encima: círculos amarillos en los 38 nodos que son cruce, círculos azules en los cuatro extremos de los dos túneles laterales, un cuadrado rosa en el nodo de la cárcel y un círculo verde en la puerta por la que salen los fantasmas.">
+        </figure>
+        <ul>
+          <li>
+            <strong>Los cruces</strong>, en amarillo. En este laberinto hay 38, y son los únicos sitios
+            donde una decisión cambia algo: en un pasillo sólo se puede seguir.
+          </li>
+          <li>
+            <strong>Los túneles</strong>, en azul. Uno o dos por laberinto, unen el borde izquierdo con el
+            derecho a la misma altura. Cruzarlos cuesta un solo paso, así que un fantasma que en la pantalla
+            está al otro lado del mapa puede estar pegado a ti.
+          </li>
+          <li>
+            <strong>La cárcel</strong>, en rosa, y su <strong>puerta</strong>, en verde. Los fantasmas
+            empiezan encerrados y aparecen siempre por ese nodo.
+          </li>
+        </ul>
+        <p>
+          Cerca de las esquinas hay cuatro puntos más grandes de lo normal, las
+          <strong><em>power pills</em></strong> (píldoras de poder). Proporcionan a Pac-Man, durante un
+          tiempo limitado, la habilidad de comerse ella a los fantasmas, que se vuelven todos azules
+          mientras dura, y después todo vuelve a ser como al principio. Una vez comidos, los
+          fantasmas se regeneran en <strong>casa</strong>, la caja situada en el centro del laberinto.
+        </p>
+        <p>
+          Con lo cual un fantasma pasa la partida dando vueltas por estos cuatro estados, y en cada uno se
+          comporta de forma distinta:
+        </p>
+        <figure class="wide">
+          <figcaption>El ciclo de un fantasma</figcaption>
+          <svg class="explica dgn5" viewBox="0 0 470 216" role="img" aria-label="Ciclo de un fantasma: de la cárcel sale a la puerta cuando su contador llega a cero, de ahí pasa a perseguir a un nodo por turno; con una píldora de poder se vuelve comestible y va a media velocidad; si Ms. Pac-Man lo toca vuelve a la cárcel, y si se le acaba el tiempo vuelve a perseguir.">
+            <style>
+              .dgn5 .bx{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+              .dgn5 .bxr{fill:var(--surface);stroke:var(--blinky);stroke-width:1.6}
+              .dgn5 .bxp{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.6}
+              .dgn5 .nm{font-family:var(--f-display);font-weight:700;font-size:11.5px;text-anchor:middle;fill:var(--ink)}
+              .dgn5 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgn5 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.6;marker-end:url(#n5a)}
+              .dgn5 .flp{fill:none;stroke:var(--pill-ink);stroke-width:1.6;marker-end:url(#n5b)}
+            </style>
+            <defs>
+              <marker id="n5a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker>
+              <marker id="n5b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker>
+            </defs>
+            <rect x="14" y="96" width="116" height="46" rx="5" class="bx"/>
+            <text x="72" y="116" class="nm">CÁRCEL</text>
+            <text x="72" y="131" class="t">quieto, cuenta atrás</text>
+            <path d="M132 119 H166" class="fl"/>
+            <text x="149" y="88" class="t">llega a 0</text>
+            <rect x="170" y="96" width="116" height="46" rx="5" class="bx"/>
+            <text x="228" y="116" class="nm">EN LA PUERTA</text>
+            <text x="228" y="131" class="t">sale con NEUTRAL</text>
+            <path d="M288 119 H322" class="fl"/>
+            <rect x="326" y="96" width="130" height="46" rx="5" class="bxr"/>
+            <text x="391" y="116" class="nm">PERSIGUIENDO</text>
+            <text x="391" y="131" class="t">un nodo por turno</text>
+            <rect x="326" y="16" width="130" height="46" rx="5" class="bxp"/>
+            <text x="391" y="36" class="nm">COMESTIBLE</text>
+            <text x="391" y="51" class="t">media velocidad</text>
+            <path d="M366 96 V66" class="flp"/>
+            <text x="298" y="82" class="t">píldora de poder</text>
+            <path d="M416 66 V94" class="fl"/>
+            <text x="456" y="82" class="t" style="text-anchor:end">acaba el tiempo</text>
+            <path d="M326 39 H72 V94" class="flp"/>
+            <text x="196" y="34" class="t">Ms. Pac-Man lo toca: vuelve a la cárcel</text>
+            <text x="14" y="178" class="t" style="text-anchor:start">Contadores iniciales: Blinky 40 turnos, Pinky 60, Inky 80, Sue 100.</text>
+            <text x="14" y="194" class="t" style="text-anchor:start">Después de que te lo comas: 40 turnos. Todos bajan un 10&#37; por nivel.</text>
+          </svg>
+        </figure>
+        <ul>
+          <li>
+            Los 200 turnos de comestible bajan un 10&#37; en cada nivel, y el multiplicador de puntos
+            vuelve a empezar con cada píldora de poder que te comas.
+          </li>
+          <li>
+            Un fantasma comestible <strong>se da la vuelta</strong> en el turno en el que te comes la
+            píldora, y va a media velocidad mientras dura.
+          </li>
+          <li>
+            Los que están dentro de la cárcel no se enteran de la píldora: salen normales.
+            <code>getGhostLairTime</code> te dice cuántos turnos le quedan a cada uno, así que puedes saber
+            cuándo va a salir el siguiente.
+          </li>
+        </ul>
+
+        <h3 class="label">Cuándo te comen y cuándo comes tú</h3>
+        <p>
+          El contacto no es caer en la misma casilla. Cuando todos han terminado de moverse, el motor mide
+          la distancia por los pasillos entre Ms.&nbsp;Pac-Man y cada fantasma: si es de <strong>2 nodos o
+          menos</strong>, se han tocado.
+        </p>
+        <figure class="wide">
+          <figcaption>Un pasillo visto de cerca: nodos, píldoras y la distancia de contacto</figcaption>
+          <svg class="explica dgn4" viewBox="0 0 460 104" role="img" aria-label="Un pasillo con sus nodos y las píldoras cada cuatro nodos. Ms. Pac-Man y un fantasma están separados por dos nodos, y una llave marca esa distancia como contacto.">
+            <style>
+              .dgn4 .pas{fill:none;stroke:var(--surface-2);stroke-width:26;stroke-linecap:round}
+              .dgn4 .nd{fill:var(--ink-3);opacity:.55}
+              .dgn4 .pl{fill:var(--pill);stroke:var(--pill-ink);stroke-width:.8}
+              .dgn4 .gh{fill:var(--blinky)}
+              .dgn4 .pc{fill:var(--pill)}
+              .dgn4 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgn4 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.6;marker-end:url(#n4a)}
+            </style>
+            <defs><marker id="n4a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker></defs>
+            <path d="M30 46 H430" class="pas"/>
+            <circle cx="30" cy="46" r="2.6" class="nd"/><circle cx="55" cy="46" r="2.6" class="nd"/><circle cx="80" cy="46" r="2.6" class="nd"/><circle cx="105" cy="46" r="2.6" class="nd"/><circle cx="155" cy="46" r="2.6" class="nd"/><circle cx="180" cy="46" r="2.6" class="nd"/><circle cx="205" cy="46" r="2.6" class="nd"/><circle cx="255" cy="46" r="2.6" class="nd"/><circle cx="280" cy="46" r="2.6" class="nd"/><circle cx="305" cy="46" r="2.6" class="nd"/><circle cx="355" cy="46" r="2.6" class="nd"/><circle cx="380" cy="46" r="2.6" class="nd"/><circle cx="405" cy="46" r="2.6" class="nd"/>
+            <circle cx="30" cy="46" r="4.5" class="pl"/><circle cx="130" cy="46" r="4.5" class="pl"/><circle cx="230" cy="46" r="4.5" class="pl"/><circle cx="330" cy="46" r="4.5" class="pl"/><circle cx="430" cy="46" r="4.5" class="pl"/>
+            <g transform="translate(146 37) scale(.692)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M196 46 a9 9 0 0 1 18 0 v9 h-18 z" class="gh"/>
+            <path d="M155 26 H205" class="fl"/>
+            <text x="152" y="20" class="t">2 nodos: contacto</text>
+            <text x="30" y="78" class="t">Puntos grises: nodos. Bolas amarillas: píldoras, una cada 4 nodos.</text>
+          </svg>
+        </figure>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Estado del fantasma</th><th scope="col">Qué pasa al tocarse</th></tr></thead>
+            <tbody>
+              <tr><td>Comestible</td><td>Te lo comes: puntos, y se va derecho a la cárcel con su contador puesto.</td></tr>
+              <tr><td>Normal</td><td>Pierdes una vida. Los cuatro fantasmas vuelven a la cárcel, Ms.&nbsp;Pac-Man reaparece y el mapa conserva las píldoras que ya te habías comido.</td></tr>
+              <tr><td>En la cárcel</td><td>Nada: su nodo no está conectado con el resto del laberinto.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">En un mismo turno puedes comer y morir</span>
+          <p>
+            El motor recorre los cuatro fantasmas. Si uno comestible está a tiro te lo apunta, y si además
+            hay otro normal igual de cerca, pierdes la vida de todas formas. Estar rodeado con la píldora de
+            poder a medias no es seguro.
+          </p>
+        </div>
+
+        <h3 class="label">Niveles y vidas</h3>
+        <p>
+          El nivel se acaba cuando no queda ninguna píldora, ni normal ni de poder. Entonces se pasa al
+          siguiente de los cuatro laberintos, en ciclo, y se reponen todas las píldoras. Los niveles no se
+          terminan: se repiten los cuatro mapas hasta que se acaba el tiempo o las vidas.
+        </p>
+        <div class="galeria">
+          <figure>
+            <img class="lab pixel" src="../assets/img/laberinto-a.png" width="456" height="520" loading="lazy" alt="Laberinto A del simulador.">
+            <figcaption>A · nivel 1</figcaption>
+          </figure>
+          <figure>
+            <img class="lab pixel" src="../assets/img/laberinto-b.png" width="456" height="520" loading="lazy" alt="Laberinto B del simulador, con otra disposición de pasillos.">
+            <figcaption>B · nivel 2</figcaption>
+          </figure>
+          <figure>
+            <img class="lab pixel" src="../assets/img/laberinto-c.png" width="456" height="520" loading="lazy" alt="Laberinto C del simulador, de trazado más abierto.">
+            <figcaption>C · nivel 3</figcaption>
+          </figure>
+          <figure>
+            <img class="lab pixel" src="../assets/img/laberinto-d.png" width="456" height="520" loading="lazy" alt="Laberinto D del simulador.">
+            <figcaption>D · nivel 4</figcaption>
+          </figure>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Regla</th><th scope="col">Detalle</th></tr></thead>
+            <tbody>
+              <tr><td>Vidas</td><td>Empiezas con 3. A los 10&#8239;000 puntos te dan una más, una sola vez en toda la partida.</td></tr>
+              <tr><td>Perder una vida</td><td>Se recolocan los cinco personajes y sigue el mismo nivel, con las píldoras que quedaran.</td></tr>
+              <tr><td>Fin del nivel</td><td>Cuando no queda ninguna píldora. Se cambia de laberinto y se reponen.</td></tr>
+              <tr><td>Fin de la partida</td><td>Al quedarte sin vidas, o al llegar al límite de turnos. Si se acaba el tiempo, cada vida que te sobre suma 800 puntos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">En las prácticas la partida se corta antes</span>
+          <p>
+            El <code>Executor</code> se configura con un límite de turnos, y en clase y en la corrección son
+            4000: unos dos minutos y medio de juego. Casi nunca vas a ver el cuarto laberinto, así que
+            optimiza para los primeros niveles.
+          </p>
+        </div>
+      </section>
+
+      <section id="simulador">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">El simulador</h2>
+        </div>
+        <p>
+          En la primera mitad del curso utilizaremos una adaptación del simulador creado para la competición
+          <em>Ms. Pac-Man vs Ghosts</em>, que se celebra anualmente en la
+          <em>Conference on Computational Intelligence and Games</em>. Debes usar el que viene en
+          <code>ICI-MsPacManEngine.zip</code>, importado como explica la
+          <a href="../guias/eclipse.html">guía de instalación</a>: es el que se usa para corregir.
+        </p>
+        <p>Sus características:</p>
+        <ul>
+          <li>Ejecución con o sin interfaz gráfica.</li>
+          <li>Ejecución esperando al controlador, o con reloj de 40&nbsp;ms por <em>tick</em>.</li>
+          <li>Posibilidad de crear comportamiento tanto global como individual para los fantasmas.</li>
+          <li>Visibilidad parcial.</li>
+          <li>Repetición de partidas y generación de <em>logs</em> y estadísticas.</li>
+          <li>Cuatro laberintos distintos, que se alternan al pasar de nivel.</li>
+        </ul>
+        <div class="note tip">
+          <span class="note-label">Una diferencia importante con el original</span>
+          <p>
+            En el simulador, <strong>Ms.&nbsp;Pac-Man y los fantasmas se mueven a la misma velocidad</strong>:
+            un nodo por turno. Las estrategias que dependen de correr más que el otro no funcionan aquí, hay
+            que jugar con la topología del laberinto. La única excepción es un fantasma comestible, que se
+            queda quieto uno de cada dos turnos y por eso no se te puede escapar.
+          </p>
+        </div>
+
+        <h3>Cómo avanza la partida</h3>
+        <p>
+          La partida no es continua: avanza a saltos, en <strong>turnos</strong>, y en cada uno pasa siempre
+          lo mismo. Tu controlador se llama una vez por turno.
+        </p>
+        <figure class="wide">
+          <figcaption>El turno, de principio a fin</figcaption>
+          <svg class="explica dgn2" viewBox="0 0 480 246" role="img" aria-label="Diagrama del turno: del estado del turno salen copias para el controlador de Ms. Pac-Man y el de los fantasmas, que deciden en paralelo con 40 milisegundos cada uno; el motor aplica los dos movimientos, resuelve píldoras, contactos y contadores, y de ahí sale el estado del turno siguiente.">
+            <style>
+              .dgn2 .bx{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+              .dgn2 .bxm{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.5}
+              .dgn2 .bxp{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.5}
+              .dgn2 .nm{font-family:var(--f-display);font-weight:700;font-size:11.5px;text-anchor:middle;fill:var(--ink)}
+              .dgn2 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgn2 .fl{fill:none;stroke:var(--ink-2);stroke-width:1.8;marker-end:url(#n2a)}
+              .dgn2 .flv{fill:none;stroke:var(--maze);stroke-width:1.8;stroke-dasharray:4 3;marker-end:url(#n2b)}
+            </style>
+            <defs>
+              <marker id="n2a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker>
+              <marker id="n2b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+            </defs>
+            <rect x="170" y="12" width="140" height="30" rx="5" class="bxp"/>
+            <text x="240" y="31" class="nm">ESTADO DEL TURNO</text>
+            <path d="M200 44 C150 58 130 58 120 70" class="fl"/>
+            <path d="M280 44 C330 58 350 58 360 70" class="fl"/>
+            <rect x="22" y="72" width="196" height="42" rx="5" class="bxm"/>
+            <text x="120" y="90" class="nm">TU CONTROLADOR</text>
+            <text x="120" y="105" class="t">40 ms para devolver un MOVE</text>
+            <rect x="262" y="72" width="196" height="42" rx="5" class="bx"/>
+            <text x="360" y="90" class="nm">LOS FANTASMAS</text>
+            <text x="360" y="105" class="t">40 ms, cuatro MOVE</text>
+            <path d="M120 116 C130 132 150 136 170 142" class="fl"/>
+            <path d="M360 116 C350 132 330 136 310 142" class="fl"/>
+            <rect x="100" y="144" width="280" height="30" rx="5" class="bx"/>
+            <text x="240" y="163" class="nm">EL MOTOR APLICA LOS DOS MOVIMIENTOS</text>
+            <path d="M240 176 V190" class="fl"/>
+            <rect x="100" y="192" width="280" height="30" rx="5" class="bx"/>
+            <text x="240" y="211" class="nm">PÍLDORAS · CONTACTOS · CONTADORES</text>
+            <path d="M380 207 H464 V27 H312" class="flv"/>
+            <text x="456" y="19" class="t" style="text-anchor:end">turno siguiente</text>
+          </svg>
+        </figure>
+        <ol>
+          <li>El motor entrega a cada controlador una copia del estado de ese turno.</li>
+          <li>Los dos deciden a la vez, sin ver el movimiento del otro.</li>
+          <li>Mueve a Ms.&nbsp;Pac-Man, que se come la píldora del nodo en el que cae.</li>
+          <li>Mueve a los fantasmas a los que toque mover.</li>
+          <li>
+            Con todos colocados, comprueba los contactos, descuenta los contadores de comestible y de
+            cárcel, y mira si el nivel o la partida se han acabado.
+          </li>
+        </ol>
+        <p>
+          Sobre las velocidades: todos se mueven un nodo por turno, salvo los fantasmas en la cárcel, que no
+          se mueven, y los comestibles, que se quedan quietos uno de cada dos turnos.
+        </p>
+        <figure class="wide">
+          <figcaption>Ocho turnos seguidos: quién avanza y quién se queda</figcaption>
+          <svg class="explica dgn3" viewBox="0 0 470 158" role="img" aria-label="Comparación a lo largo de ocho turnos: Ms. Pac-Man avanza en los ocho, un fantasma persiguiendo también avanza en los ocho, y un fantasma comestible avanza en cuatro y se queda quieto en los otros cuatro.">
+            <style>
+              .dgn3 .et{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgn3 .tn{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-3)}
+              .dgn3 .av{fill:var(--maze)}
+              .dgn3 .qu{fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-dasharray:2 2}
+              .dgn3 .ln{stroke:var(--line-soft);stroke-width:1}
+              .dgn3 .pie{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+            </style>
+            <text x="14" y="14" class="tn" style="text-anchor:start">turno</text>
+            <text x="176" y="14" class="tn">1</text><text x="212" y="14" class="tn">2</text><text x="248" y="14" class="tn">3</text><text x="284" y="14" class="tn">4</text><text x="320" y="14" class="tn">5</text><text x="356" y="14" class="tn">6</text><text x="392" y="14" class="tn">7</text><text x="428" y="14" class="tn">8</text>
+            <text x="0" y="42" class="et">Ms. Pac-Man</text>
+            <path d="M168 38 H436" class="ln"/>
+            <circle cx="176" cy="38" r="6" class="av"/><circle cx="212" cy="38" r="6" class="av"/><circle cx="248" cy="38" r="6" class="av"/><circle cx="284" cy="38" r="6" class="av"/><circle cx="320" cy="38" r="6" class="av"/><circle cx="356" cy="38" r="6" class="av"/><circle cx="392" cy="38" r="6" class="av"/><circle cx="428" cy="38" r="6" class="av"/>
+            <text x="0" y="76" class="et">fantasma normal</text>
+            <path d="M168 72 H436" class="ln"/>
+            <circle cx="176" cy="72" r="6" class="av"/><circle cx="212" cy="72" r="6" class="av"/><circle cx="248" cy="72" r="6" class="av"/><circle cx="284" cy="72" r="6" class="av"/><circle cx="320" cy="72" r="6" class="av"/><circle cx="356" cy="72" r="6" class="av"/><circle cx="392" cy="72" r="6" class="av"/><circle cx="428" cy="72" r="6" class="av"/>
+            <text x="0" y="110" class="et">fantasma comestible</text>
+            <path d="M168 106 H436" class="ln"/>
+            <circle cx="176" cy="106" r="6" class="av"/><circle cx="212" cy="106" r="5" class="qu"/><circle cx="248" cy="106" r="6" class="av"/><circle cx="284" cy="106" r="5" class="qu"/><circle cx="320" cy="106" r="6" class="av"/><circle cx="356" cy="106" r="5" class="qu"/><circle cx="392" cy="106" r="6" class="av"/><circle cx="428" cy="106" r="5" class="qu"/>
+            <circle cx="8" cy="136" r="6" class="av"/><text x="20" y="140" class="pie">avanza un nodo</text>
+            <circle cx="168" cy="136" r="5" class="qu"/><text x="180" y="140" class="pie">se queda donde está</text>
+          </svg>
+        </figure>
+        <ul>
+          <li>
+            Persiguiendo, un fantasma no corre más que tú: no te alcanza por detrás, sólo te acorrala entre
+            varios.
+          </li>
+          <li>
+            Comestible, no se te escapa: le ganas un nodo cada dos turnos, así que uno que esté a diez nodos
+            se caza en unos veinte turnos si el camino es directo.
+          </li>
+        </ul>
+        <p>
+          El detalle de todo esto, con los métodos que devuelven cada dato, está en la
+          <a href="../guias/clase-game.html">referencia de la clase <code>Game</code></a>.
+        </p>
+
+        <h3>Puntuación</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Acción</th><th scope="col" class="num-col">Puntos</th></tr></thead>
+            <tbody>
+              <tr><td>Cada <em>pill</em> comida</td><td class="num-col">10</td></tr>
+              <tr><td>Cada <em>power pill</em></td><td class="num-col">50</td></tr>
+              <tr><td>Primer fantasma comido</td><td class="num-col">200</td></tr>
+              <tr><td>Segundo fantasma (la puntuación se dobla)</td><td class="num-col">400</td></tr>
+              <tr><td>Tercer fantasma</td><td class="num-col">800</td></tr>
+              <tr><td>Cuarto fantasma</td><td class="num-col">1&#8239;600</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Dado un tablero con <em>n</em> <em>pills</em>, la máxima puntuación alcanzable es:</p>
+        <div class="formula">
+          10<em>n</em> + 4 &times; 50 + 4 &times; (200 + 400 + 800 + 1600) &nbsp;=&nbsp; 10<em>n</em> + 12&#8239;200
+        </div>
+        <p>
+          El multiplicador se reinicia con cada <em>power pill</em>, y hay cuatro por tablero: de ahí el
+          factor 4. Comerse los cuatro fantasmas con cada píldora vale tanto como 1&#8239;200
+          <em>pills</em>, lo que dice bastante sobre dónde está el margen de mejora de un controlador.
+        </p>
+        <p>
+          A eso se le suman dos cosas que no dependen del tablero: una vida extra al llegar a
+          10&#8239;000&nbsp;puntos, y 800&nbsp;puntos por cada vida que te sobre si la partida termina por
+          agotarse el tiempo.
+        </p>
+      </section>
+
+      <section id="executor">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">La clase <code>Executor</code></h2>
+        </div>
+        <p>
+          Es la clase encargada de ejecutar la simulación. Contiene métodos para lanzar el juego de
+          distintas formas:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Qué hace</th></tr></thead>
+            <tbody>
+              <tr><td><code>runGame(pacman, ghosts, delay)</code></td><td>El que vas a usar. Llama a tu controlador y <strong>espera</strong> a que devuelva; <code>delay</code> son los milisegundos de pausa entre turnos, para poder verlo. Devuelve la puntuación.</td></tr>
+              <tr><td><code>runExperiment(…)</code></td><td>Varias partidas seguidas, también esperando a los controladores. Es el modo con el que se evalúan las prácticas. Devuelve <code>Stats[]</code>.</td></tr>
+              <tr><td><code>runGameTimed(…)</code></td><td>Aquí sí hay reloj: cada controlador corre en su propio hilo y el juego avanza cada 40&nbsp;ms con lo que haya.</td></tr>
+              <tr><td><code>runGameTimedSpeedOptimised(…)</code></td><td>Igual, pero no espera los 40&nbsp;ms si los dos controladores han terminado antes.</td></tr>
+              <tr><td><code>runGameTimedRecorded(…)</code></td><td>Como el anterior, grabando la partida a un fichero.</td></tr>
+              <tr><td><code>replayGame(…)</code></td><td>Repetición de una partida grabada.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Según el método, obtendrás la puntuación de una partida o una serie de estadísticas. Las
+          estadísticas se guardan en objetos <code>Stats</code>, que ofrecen media, máximo, mínimo y
+          demás. <strong>Para la evaluación de las prácticas se realizarán varias simulaciones y se
+          utilizará la puntuación media obtenida</strong>, así que acostúmbrate a mirar la media y no una
+          partida suelta.
+        </p>
+
+        <h3>Creación del <code>Executor</code></h3>
+        <p>El ejecutor se construye con <code>Executor.Builder</code>, que permite configurar:</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Opción</th><th scope="col">Para qué sirve</th></tr></thead>
+            <tbody>
+              <tr><td><code>setPacmanPO</code> / <code>setGhostPO</code></td><td>Visibilidad parcial para Ms.&nbsp;Pac-Man y para los fantasmas.</td></tr>
+              <tr><td><code>setSightLimit</code> / <code>setPOType</code></td><td>Límite de visibilidad y su tipo (línea recta, radial…).</td></tr>
+              <tr><td><code>setGhostsMessage</code> / <code>setMessenger</code></td><td>Habilitan los mensajes entre fantasmas.</td></tr>
+              <tr><td><code>setVisual</code></td><td>Activa la interfaz gráfica.</td></tr>
+              <tr><td><code>setScaleFactor</code></td><td>Factor de escala de la interfaz gráfica.</td></tr>
+              <tr><td><code>setTickLimit</code></td><td>Tiempo total de juego, en <em>ticks</em>.</td></tr>
+              <tr><td><code>setTimeLimit</code></td><td>El plazo que se le anuncia al controlador, o sea el <code>timeDue</code> que recibe tu <code>getMove</code>. Por defecto, 40&nbsp;ms.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>Ejemplo</h4>
+<pre><code>Executor executor = <span class="k">new</span> Executor.Builder()
+        .setTickLimit(<span class="n">4000</span>)
+        .setGhostPO(<span class="k">false</span>)
+        .setPacmanPO(<span class="k">false</span>)
+        .setGhostsMessage(<span class="k">false</span>)
+        .setVisual(<span class="k">true</span>)
+        .setScaleFactor(<span class="n">3.0</span>)
+        .build();</code></pre>
+      </section>
+
+      <section id="controladores">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Controladores</h2>
+        </div>
+        <p>
+          El comportamiento de Ms.&nbsp;Pac-Man se define extendiendo
+          <code>pacman.controllers.PacmanController</code>, que obliga a implementar
+        </p>
+<pre><code><span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue)</code></pre>
+        <p>
+          Este método se llama en cada ciclo de la simulación. Recibe información sobre el juego y el
+          tiempo límite para devolver el movimiento. Los movimientos posibles son <code>UP</code>,
+          <code>RIGHT</code>, <code>DOWN</code>, <code>LEFT</code> y <code>NEUTRAL</code>.
+        </p>
+        <p>Una Ms.&nbsp;Pac-Man con movimientos aleatorios se implementaría así:</p>
+<pre><code><span class="k">public final class</span> MsPacManRandom <span class="k">extends</span> PacmanController {
+
+    <span class="k">private</span> Random rnd = <span class="k">new</span> Random();
+    <span class="k">private</span> MOVE[] allMoves = MOVE.values();
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+        <span class="k">return</span> allMoves[rnd.nextInt(allMoves.length)];
+    }
+}</code></pre>
+        <p>
+          El comportamiento de los fantasmas se implementa extendiendo la clase abstracta
+          <code>pacman.controllers.GhostController</code>. Esta es la interfaz a implementar si queremos
+          utilizar <strong>un único controlador para los cuatro fantasmas</strong>, y devuelve un mapa
+          donde se define el movimiento de cada uno (<code>EnumMap&lt;GHOST, MOVE&gt;</code>):
+        </p>
+<pre><code><span class="k">public final class</span> GhostsRandom <span class="k">extends</span> GhostController {
+
+    <span class="k">private</span> EnumMap&lt;GHOST, MOVE&gt; moves = <span class="k">new</span> EnumMap&lt;GHOST, MOVE&gt;(GHOST.class);
+    <span class="k">private</span> MOVE[] allMoves = MOVE.values();
+    <span class="k">private</span> Random rnd = <span class="k">new</span> Random();
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> EnumMap&lt;GHOST, MOVE&gt; getMove(Game game, <span class="k">long</span> timeDue) {
+        moves.clear();
+        <span class="k">for</span> (GHOST ghostType : GHOST.values()) {
+            <span class="k">if</span> (game.doesGhostRequireAction(ghostType)) {
+                moves.put(ghostType, allMoves[rnd.nextInt(allMoves.length)]);
+            }
+        }
+        <span class="k">return</span> moves;
+    }
+}</code></pre>
+        <div class="note trap">
+          <span class="note-label">Los 40 milisegundos, con precisión</span>
+          <p>
+            En <code>runGame</code> y en <code>runExperiment</code>, que son el modo de clase y el de
+            evaluación, el motor llama a tu <code>getMove</code> y <strong>espera</strong>. Nadie corta tu
+            método ni descarta tu movimiento: si tardas 300&nbsp;ms, la partida va lenta y nada más. El
+            <code>timeDue</code> que recibes es sólo el plazo que te anuncian para que te controles tú.
+          </p>
+          <p>
+            Los modos <code>runGameTimed…</code> sí llevan reloj: ahí cada controlador corre en su propia
+            hebra y el juego avanza cada 40&nbsp;ms con el <strong>último movimiento que devolviste</strong>,
+            no con el que estabas calculando. Y mientras esa hebra sigue trabajando no se lanza otra, así que
+            un cálculo de 200&nbsp;ms son cinco turnos decididos por inercia.
+          </p>
+          <p>
+            El presupuesto importa igual, porque la evaluación son muchas partidas de 4000 turnos cada una.
+            Y devuelve siempre un <code>MOVE</code>, aunque sea <code>MOVE.NEUTRAL</code>: un
+            <code>null</code> el motor lo descarta y sigue recto.
+          </p>
+        </div>
+        <p>
+          Conviene además sobrescribir <code>getName()</code> devolviendo el nombre de tu controlador: es
+          lo que aparece en los <em>logs</em> y las estadísticas, y ahorra mucho tiempo cuando comparas
+          varias versiones.
+        </p>
+      </section>
+
+      <section id="visualizacion">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Visualización</h2>
+        </div>
+        <p>
+          El simulador ofrece métodos para pintar información sobre el laberinto, y son la mejor
+          herramienta de depuración que tienes: <code>GameView.addLines()</code> dibuja una línea entre dos
+          puntos y <code>GameView.addPoints()</code> dibuja los puntos de un camino dado. Ambos son
+          estáticos, se llaman desde dentro de <code>getMove</code> y, si la ventana no está abierta, no
+          hacen nada, así que puedes dejarlos puestos sin que lastren la evaluación:
+        </p>
+<pre><code><span class="c">// campos de la clase, con java.awt.Color importado</span>
+<span class="k">private</span> Random rnd = <span class="k">new</span> Random();
+<span class="k">private</span> MOVE[] allMoves = MOVE.values();
+<span class="k">private</span> Color[] colours = { Color.RED, Color.PINK, Color.CYAN, Color.ORANGE };
+
+<span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+    <span class="c">// Líneas hacia las power pills</span>
+    <span class="k">int</span>[] activePowerPills = game.getActivePowerPillsIndices();
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; activePowerPills.length; i++)
+        GameView.addLines(game, Color.CYAN,
+                game.getPacmanCurrentNodeIndex(), activePowerPills[i]);
+
+    <span class="c">// Camino hacia cada fantasma</span>
+    <span class="k">for</span> (GHOST g : GHOST.values()) {
+        <span class="k">int</span> ghost    = game.getGhostCurrentNodeIndex(g);
+        <span class="k">int</span> mspacman = game.getPacmanCurrentNodeIndex();
+        <span class="c">// GHOST es un enum: ordinal() da su posición en la declaración</span>
+        <span class="c">// (BLINKY 0, PINKY 1, INKY 2, SUE 3), y por eso vale de índice</span>
+        <span class="k">if</span> (game.getGhostLairTime(g) &lt;= <span class="n">0</span>)
+            GameView.addPoints(game, colours[g.ordinal()],
+                    game.getShortestPath(ghost, mspacman));
+    }
+
+    <span class="k">return</span> allMoves[rnd.nextInt(allMoves.length)];
+}</code></pre>
+        <p>
+          Lo que dibujes se borra en cada <em>tick</em>, así que las llamadas van dentro del método, no en
+          el constructor.
+        </p>
+      </section>
+
+      <section id="game">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">La clase <code>Game</code></h2>
+        </div>
+        <p>
+          <code>Game</code> contiene toda la información sobre el estado del juego, quizás demasiada y mal
+          documentada, además de distintas funciones auxiliares. Por eso hay en esta wiki una
+          <a href="../guias/clase-game.html">referencia dedicada solo a esta clase</a>:
+          <strong>léela antes del ejercicio 2</strong>.
+        </p>
+        <p>
+          El método que hace avanzar la partida es <code>advanceGame(movimiento, movimientosDeFantasmas)</code>:
+          mueve a todo el mundo, resuelve las píldoras y los contactos y actualiza los contadores. No lo
+          llamas tú, lo llama el <code>Executor</code> una vez por <em>tick</em>. Como lo que recibes es una
+          copia del juego, sí puedes llamarlo sobre ella para simular, y eso será útil más adelante en el
+          curso.
+        </p>
+        <p>
+          El laberinto se representa como un grafo de nodos. Un nodo no es una casilla del dibujo, es un
+          paso: a velocidad normal cada personaje cambia de nodo una vez por turno, y entre dos píldoras
+          seguidas hay cuatro nodos. El número de un nodo es su posición en la lista del laberinto, que va
+          por filas.
+        </p>
+        <figure class="wide">
+          <figcaption>La esquina de arriba a la izquierda del primer laberinto, ampliada</figcaption>
+          <img class="lab pixel" src="../assets/img/nodos-esquina.png" width="700" height="400" loading="lazy"
+               alt="Ampliación de la esquina de arriba a la izquierda del laberinto: sobre los puntos de las píldoras se han marcado en amarillo los nodos 0 a 6 de la primera fila y los nodos 79, 85 y 91 bajando por el pasillo de la izquierda.">
+        </figure>
+        <p>
+          Casi toda la API habla de <strong>índices de nodo</strong> (<code>int</code>). Las distancias se piden con una métrica de
+          <code>Constants.DM</code>: <code>PATH</code> cuenta los pasos por los pasillos y es la que
+          quieres, mientras que <code>EUCLID</code> y <code>MANHATTAN</code> miden sobre las coordenadas y
+          atraviesan las paredes. Las distancias y los caminos con <code>PATH</code> están
+          <strong>precalculados</strong> al cargar el laberinto, así que consultarlos es barato.
+        </p>
+
+        <h3 class="label">Los métodos que usarás en esta práctica</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>getPacmanCurrentNodeIndex()</code></td><td>Índice del nodo donde está Ms.&nbsp;Pac-Man.</td></tr>
+              <tr><td><code>getGhostCurrentNodeIndex(GHOST)</code></td><td>Índice del nodo de un fantasma.</td></tr>
+              <tr><td><code>isGhostEdible(GHOST)</code></td><td>Si ese fantasma es comestible ahora mismo.</td></tr>
+              <tr><td><code>getGhostEdibleTime(GHOST)</code></td><td><em>Ticks</em> que le quedan de comestible.</td></tr>
+              <tr><td><code>getGhostLairTime(GHOST)</code></td><td><em>Ticks</em> que le quedan encerrado en casa. Si es &gt;&nbsp;0, no está en el laberinto.</td></tr>
+              <tr><td><code>doesGhostRequireAction(GHOST)</code></td><td>Si ese fantasma necesita una decisión en este <em>tick</em>.</td></tr>
+              <tr><td><code>getActivePillsIndices()</code></td><td><em>Pills</em> que quedan por comer.</td></tr>
+              <tr><td><code>getActivePowerPillsIndices()</code></td><td><em>Power pills</em> que quedan.</td></tr>
+              <tr><td><code>getDistance(desde, hasta, DM)</code></td><td>Distancia entre dos nodos con la métrica elegida.</td></tr>
+              <tr><td><code>getShortestPathDistance(desde, hasta)</code></td><td>Distancia real por el laberinto.</td></tr>
+              <tr><td><code>getClosestNodeIndexFromNodeIndex(desde, int[], DM)</code></td><td>El más cercano de un conjunto de nodos. Ideal para «la <em>pill</em> más próxima».</td></tr>
+              <tr><td><code>getApproximateNextMoveTowardsTarget(desde, hasta, últimoMov, DM)</code></td><td>Movimiento aproximado para acercarse a un nodo.</td></tr>
+              <tr><td><code>getApproximateNextMoveAwayFromTarget(desde, hasta, últimoMov, DM)</code></td><td>Movimiento aproximado para alejarse de un nodo.</td></tr>
+              <tr><td><code>getShortestPath(desde, hasta)</code></td><td>El camino como <code>int[]</code>, útil para dibujarlo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Las dos familias de métodos de movimiento</span>
+          <p>
+            Las dos miran sólo los movimientos legales, y se diferencian en cómo miden lo que le queda a
+            cada vecino hasta el objetivo. Los <code>getApproximate…</code>, que son los que pide el
+            enunciado, leen la tabla de distancias del laberinto, que no sabe por dónde has llegado. Los
+            <code>getNextMove…</code> usan la distancia que <strong>respeta la regla de no volver
+            atrás</strong>, que es la que de verdad vas a recorrer, y cuestan algo más.
+          </p>
+          <p>
+            Casi siempre coinciden. Se separan cuando el camino más corto desde el vecino pasaría por el
+            nodo del que vienes, que es justo el que el juego no te va a dejar tomar. El nombre engaña un
+            poco: hoy ninguna de las dos calcula nada aproximado, viene de versiones viejas del motor.
+          </p>
+        </div>
+      </section>
+
+      <section id="entrega-reglas">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Reglas de entrega</h2>
+        </div>
+        <p>Como norma general, <strong>todas</strong> las entregas del curso siguen el mismo esquema:</p>
+        <ul>
+          <li>
+            Se utilizará el paquete
+            <code>es.ucm.fdi.ici.c2627.practicaX.grupoYY</code>, que contendrá todo el código de los
+            controladores, tanto de Ms.&nbsp;Pac-Man como de los fantasmas.
+          </li>
+          <li>
+            Por defecto, el controlador de Ms.&nbsp;Pac-Man se denominará <code>MsPacMan</code> y el de los
+            fantasmas <code>Ghosts</code>. En caso de entregar varios controladores, se indicará el nombre
+            de cada uno.
+          </li>
+        </ul>
+        <p>
+          Para esta práctica, siendo individual, el paquete es
+          <code>es.ucm.fdi.ici.c2627.practica0.grupoIndividual</code>, y viene ya creado en el proyecto que
+          te descargas: las clases nuevas van ahí, junto a los dos controladores de ejemplo.
+        </p>
+      </section>
+
+      <section id="ej1">
+        <div class="sec-head">
+          <span class="num">Ejercicio 1</span>
+          <h2 class="sec">Arrancar lo que ya viene hecho</h2>
+          <span class="chip free">No se entrega</span>
+        </div>
+        <div class="ex">
+          <p>
+            <code>ICI-Practica0.zip</code> trae el ejemplo montado, para que lo primero que veas sea el
+            juego en marcha. Son tres archivos: <code>ExecutorTest.java</code> en la raíz de
+            <code>src</code>, y los dos controladores dentro del paquete
+            <code>es.ucm.fdi.ici.c2627.practica0.grupoIndividual</code>.
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th scope="col">Clase</th><th scope="col">Qué es</th></tr></thead>
+              <tbody>
+                <tr><td><code>ExecutorTest</code></td><td>El <code>main</code>: configura el <code>Executor</code> y lanza la partida.</td></tr>
+                <tr><td><code>MsPacManRandom</code></td><td>Ms. Pac-Man eligiendo un movimiento al azar en cada turno.</td></tr>
+                <tr><td><code>GhostsRandom</code></td><td>Lo mismo con los cuatro fantasmas.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>El <code>main</code> que viene es este:</p>
+<pre><code><span class="k">public class</span> ExecutorTest {
+
+    <span class="k">public static void</span> main(String[] args) {
+        Executor executor = <span class="k">new</span> Executor.Builder()
+                .setTickLimit(<span class="n">4000</span>)
+                .setVisual(<span class="k">true</span>)
+                .setScaleFactor(<span class="n">2.5</span>)
+                .build();
+
+        PacmanController pacMan = <span class="k">new</span> MsPacManRandom();
+        GhostController  ghosts = <span class="k">new</span> GhostsRandom();
+
+        System.out.println(
+            executor.runGame(pacMan, ghosts, <span class="n">30</span>) <span class="c">// pausa entre turnos, en ms</span>
+        );
+    }
+}</code></pre>
+          <p>
+            Ejecútalo con <span class="path">Run As &gt; Java Application</span>: se abre la ventana del
+            laberinto y la partida se termina sola al llegar a los 4000 turnos.
+          </p>
+          <p>
+            El <code>println</code> del ejemplo imprime lo que devuelve <code>runGame</code>, que es un
+            <code>int</code> con la <strong>puntuación final</strong> de esa partida: los 10 puntos de cada
+            píldora, los 50 de cada una de poder y los 200, 400, 800 y 1600 de los fantasmas que se haya
+            comido. Nada más, ni tiempo, ni nivel, ni vidas. Con controladores al azar saldrán unos pocos
+            cientos de puntos, y distintos en cada ejecución.
+          </p>
+          <div class="note trap">
+            <span class="note-label">Verás el número dos veces</span>
+            <p>
+              No es un fallo tuyo: <code>runGame</code> imprime la puntuación por su cuenta antes de
+              devolverla, así que el <code>println</code> de <code>ExecutorTest</code> la repite. Si te
+              molesta, quita el <code>println</code> y quédate con el valor:
+            </p>
+<pre><code><span class="k">int</span> puntos = executor.runGame(pacMan, ghosts, <span class="n">30</span>);</code></pre>
+          </div>
+          <h3 class="label">Y ahora toca cosas</h3>
+          <ul>
+            <li>
+              El último parámetro de <code>runGame</code> son los milisegundos de pausa entre turnos. Con 5
+              la partida vuela; con 100 se ve cada decisión.
+            </li>
+            <li>
+              <code>setScaleFactor</code> es el tamaño de la ventana, y
+              <code>setVisual(false)</code> la quita: prueba cuánto tarda una partida sin dibujar nada.
+            </li>
+            <li>
+              Sustituye <code>MsPacManRandom</code> por el controlador de teclado y juega tú. El resto del
+              <code>main</code> no cambia:
+            </li>
+          </ul>
+<pre><code>PacmanController pacMan = <span class="k">new</span> HumanController(<span class="k">new</span> KeyBoardInput());</code></pre>
+          <div class="note mine">
+            <span class="note-label">Juega un rato de verdad</span>
+            <p>
+              Esta parte parece un trámite y no lo es. Juega varias partidas con el teclado y fíjate en qué
+              decisiones tomas tú: cuándo das la vuelta, a qué distancia dejas de huir, qué haces cuando dos
+              fantasmas vienen por pasillos distintos. Esas son exactamente las reglas que tendrás que
+              escribir en código durante el resto del curso.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="ej2">
+        <div class="sec-head">
+          <span class="num">Ejercicio 2</span>
+          <h2 class="sec">Perseguir y huir</h2>
+          <span class="chip free">No se entrega</span>
+        </div>
+        <div class="ex">
+          <p>
+            Lee la <a href="../guias/clase-game.html">referencia de la clase <code>Game</code></a> e
+            investiga a fondo la funcionalidad que ofrece. Después, escribe dos controladores:
+          </p>
+          <h3 class="label"><code>GhostsAggressive</code></h3>
+          <p>
+            Utiliza el método <code>game.getApproximateNextMoveTowardsTarget</code> para dirigirse
+            <strong>siempre</strong> hacia Ms.&nbsp;Pac-Man, cuya posición encontrarás con
+            <code>getPacmanCurrentNodeIndex</code>.
+          </p>
+          <h3 class="label"><code>MsPacManRunAway</code></h3>
+          <p>
+            Utiliza <code>game.getApproximateNextMoveAwayFromTarget</code> para
+            <strong>huir del fantasma más cercano</strong>. Para obtener las posiciones de los fantasmas usa
+            <code>getGhostCurrentNodeIndex</code> y calcula las distancias con cualquiera de las métricas
+            disponibles.
+          </p>
+          <div class="note tip">
+            <span class="note-label">Enfréntalos entre sí</span>
+            <p>
+              Pon <code>MsPacManRunAway</code> contra <code>GhostsAggressive</code> y mira qué pasa. Huir del
+              más cercano, sin más, mete a Ms.&nbsp;Pac-Man en callejones sin salida una y otra vez: el
+              fantasma más próximo no siempre es el más peligroso. Entender por qué falla este
+              comportamiento es el punto de partida del ejercicio 3.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="ej3">
+        <div class="sec-head">
+          <span class="num">Ejercicio 3</span>
+          <h2 class="sec">Los controladores de la entrega</h2>
+          <span class="chip hand">Se entrega</span>
+        </div>
+        <div class="ex deliverable">
+          <p>
+            Crea las clases <code>MsPacMan</code> y <code>Ghosts</code>, que serán la entrega de esta
+            práctica, e implementa en ellas los comportamientos siguientes.
+          </p>
+
+          <h3><code>MsPacMan</code></h3>
+          <p>
+            El comportamiento de Ms.&nbsp;Pac-Man consiste en <strong>evitar fantasmas que están
+            demasiado cerca</strong> o <strong>perseguirles si son comestibles</strong>. En otro caso,
+            moverse a la <em>pill</em> o <em>power pill</em> más cercana.
+          </p>
+          <p>
+            Para el primer caso, o sea fantasma demasiado cerca o fantasma comestible, deberás
+            <strong>visualizar una línea</strong> indicando el fantasma del que Ms.&nbsp;Pac-Man huye o
+            intenta comer.
+          </p>
+          <figure>
+            <figcaption>Pseudocódigo · <code>MsPacMan</code></figcaption>
+            <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>()
+    <span class="var">limit</span> ← 20
+    <span class="var">nearestGhost</span> ← <span class="fn">getNearestChasingGhost</span>(<span class="var">limit</span>)
+    <b>if</b> <span class="var">nearestGhost</span> ≠ NULL <b>then</b>
+        <b>return</b> <span class="fn">nextMoveAwayFrom</span>(<span class="var">nearestGhost</span>)
+    <b>end if</b>
+    <span class="var">nearestGhost</span> ← <span class="fn">getNearestEdibleGhost</span>(<span class="var">limit</span>)
+    <b>if</b> <span class="var">nearestGhost</span> ≠ NULL <b>then</b>
+        <b>return</b> <span class="fn">nextMoveTowards</span>(<span class="var">nearestGhost</span>)
+    <b>end if</b>
+    <span class="var">nearestPill</span> ← <span class="fn">getNearestPill</span>()
+    <b>return</b> <span class="fn">nextMoveTowards</span>(<span class="var">nearestPill</span>)
+<b>end function</b></pre>
+          </figure>
+          <p>
+            <code>limit</code> es el umbral de distancia por debajo del cual se considera que un fantasma
+            está «demasiado cerca». El pseudocódigo propone 20; pruébalo y ajústalo.
+          </p>
+
+          <h3><code>Ghosts</code></h3>
+          <p>
+            El comportamiento de los fantasmas también es bastante sencillo. Huirán de Ms.&nbsp;Pac-Man si
+            esta puede comerles o si está cerca de una <em>power pill</em>. En caso contrario se moverán
+            hacia ella o aleatoriamente, con probabilidad <strong>90&nbsp;%</strong> y
+            <strong>10&nbsp;%</strong> respectivamente. Fija también un límite para estimar que
+            Ms.&nbsp;Pac-Man está cerca de una <em>power pill</em> (p.&nbsp;ej. 15).
+          </p>
+          <figure>
+            <figcaption>Pseudocódigo · <code>Ghosts</code>, para cada fantasma</figcaption>
+            <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>()
+    <b>if</b> <span class="fn">game.doesGhostRequireAction</span>(<span class="var">ghost</span>) = False <b>then</b> <b>continue</b> <b>end if</b>
+    <span class="var">pacman</span> ← <span class="fn">getPacmanIndex</span>()
+    <b>if</b> <span class="fn">isEdible</span>(<span class="var">ghost</span>) OR <span class="fn">pacManCloseToPPill</span>() <b>then</b>
+        <b>return</b> <span class="fn">nextMoveAwayFrom</span>(<span class="var">pacman</span>)
+    <b>end if</b>
+    <b>if</b> <span class="fn">nextFloat</span> &lt; 0.9 <b>then</b>
+        <b>return</b> <span class="fn">nextMoveTowards</span>(<span class="var">pacman</span>)
+    <b>else</b>
+        <b>return</b> <span class="fn">nextRandomMove</span>()
+    <b>end if</b>
+<b>end function</b></pre>
+          </figure>
+          <p>
+            Recuerda que <code>Ghosts</code> devuelve un <code>EnumMap&lt;GHOST, MOVE&gt;</code>: este
+            pseudocódigo describe lo que se decide <strong>para cada fantasma</strong>, dentro del bucle
+            sobre <code>GHOST.values()</code>. Los fantasmas que no requieren acción simplemente no se
+            añaden al mapa.
+          </p>
+        </div>
+      </section>
+
+      <section id="entrega">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Cómo se entrega</h2>
+        </div>
+        <p>
+          Debes entregar a través del Campus Virtual el código que implementa los dos comportamientos del
+          ejercicio 3, en un archivo zip denominado <code>practica0.zip</code>.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Importante: la raíz del zip</span>
+          <p>
+            El archivo debe realizarse <strong>en la raíz del código fuente</strong>. Es decir,
+            comprimiendo la carpeta <code>es</code>, que es la que hace de raíz del paquete. Al abrir el
+            zip, lo primero que debe verse es <code>es/</code>, no <code>src/</code> ni la carpeta del
+            proyecto.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">No se modifica el simulador</span>
+          <p>
+            Obviamente no se permite modificar el código del simulador. Por lo tanto, la entrega
+            <strong>no debe contener el código del simulador</strong> (paquete <code>pacman.*</code>).
+          </p>
+        </div>
+        <p>
+          Todas las prácticas serán comprobadas para la detección de plagios.
+        </p>
+        <h3 class="label">Antes de subir el zip</h3>
+        <ul>
+          <li>El paquete es <code>es.ucm.fdi.ici.c2627.practica0.grupoIndividual</code>.</li>
+          <li>Las clases se llaman exactamente <code>MsPacMan</code> y <code>Ghosts</code>.</li>
+          <li>Ambas compilan en un proyecto limpio que solo referencia a <code>MsPacManEngine</code>.</li>
+          <li>Al abrir el zip aparece <code>es/</code> en la raíz.</li>
+          <li>No hay ni un archivo del paquete <code>pacman.*</code> dentro.</li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#requisitos">Antes de empezar</a></li>
+            <li><a href="#juego">Ms. Pac-Man</a></li>
+            <li><a href="#simulador">El simulador</a></li>
+            <li><a href="#executor">La clase Executor</a></li>
+            <li><a href="#controladores">Controladores</a></li>
+            <li><a href="#visualizacion">Visualización</a></li>
+            <li><a href="#game">La clase Game</a></li>
+            <li><a href="#entrega-reglas">Reglas de entrega</a></li>
+            <li><a href="#ej1"><em>Ejercicio 1</em>Arrancar el ejemplo</a></li>
+            <li><a href="#ej2"><em>Ejercicio 2</em>Perseguir y huir</a></li>
+            <li><a href="#ej3"><em>Ejercicio 3</em>Los controladores de la entrega</a></li>
+            <li><a href="#entrega">Cómo se entrega</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">Dudas</span>
+          <p style="margin:0">
+            <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a>. Mejor preguntar en la primera semana que
+            en la víspera de la entrega.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 10 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

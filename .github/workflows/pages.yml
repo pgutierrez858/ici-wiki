@@ -1,0 +1,46 @@
+# Publica la wiki en GitHub Pages.
+#
+# El sitio es la carpeta wiki/: HTML estático, sin build. Este flujo la sube
+# tal cual cada vez que se empuja a main.
+#
+# Requiere, una sola vez, dejar en Settings > Pages > Build and deployment
+# la fuente en «GitHub Actions».
+
+name: Publicar la wiki
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un despliegue a la vez; si llega otro empujón, se cancela el anterior.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Empaquetar la carpeta wiki
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: wiki
+
+      - name: Desplegar
+        id: despliegue
+        uses: actions/deploy-pages@v4
