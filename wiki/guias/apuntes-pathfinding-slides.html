@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Pathfinding, en diapositivas · ICI</title>
+<meta name="description" content="Diapositivas del tema 1: representación del espacio, búsqueda en espacios de estados, búsquedas ciegas, heurísticas, A*, y cómo está resuelto todo eso en el simulador de Ms. Pac-Man.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Pathfinding en diapositivas</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Pathfinding, en diapositivas
+      <span class="thin">El tema 1, en el orden en el que se explica en clase.</span>
+    </h1>
+    <p class="standfirst">
+      Lo mismo que cuentan
+      <a href="apuntes-pathfinding.html">los apuntes de pathfinding y estrategias algorítmicas</a>, con los
+      dibujos y el pseudocódigo delante: representar el mapa, buscar en él, A*, y qué de todo eso viene ya
+      hecho en el simulador. Se pasa con las flechas del teclado y el botón de abajo la pone a pantalla
+      completa.
+    </p>
+  </header>
+
+  <div id="contenido" tabindex="-1" style="padding-top:var(--gap)">
+  <div class="deck">
+    <div class="deck-stage">
+
+      <section class="slide s-cover" id="d1">
+        <span class="slide-num">Tema 1</span>
+        <svg class="pac" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+          <path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        </svg>
+        <h2>Pathfinding y estrategias algorítmicas</h2>
+        <p class="sub">Cómo se representa un mapa, cómo se busca un camino en él, y qué hacer después con el camino.</p>
+        <p class="who">
+          <strong>Ingeniería de Comportamientos Inteligentes</strong> · Pablo Gutiérrez Sánchez · pabgut02@ucm.es
+        </p>
+      </section>
+
+      <section class="slide" id="d2">
+        <span class="slide-num">Tema 1 · 2</span>
+        <h2>El plan</h2>
+        <ol>
+          <li><strong>Representar el espacio.</strong> Waypoints, rejillas, mallas de navegación.</li>
+          <li><strong>Buscar.</strong> Espacios de estados, anchura, profundidad, coste uniforme.</li>
+          <li><strong>Heurísticas y A*.</strong> Qué las hace válidas y qué las hace buenas.</li>
+          <li><strong>En Ms. Pac-Man.</strong> Qué viene ya hecho, y con qué trampas.</li>
+          <li><strong>Estrategias.</strong> Lo que sí es vuestro, y es la Práctica 1.</li>
+        </ol>
+        <p class="lede">Las cuatro primeras partes son el repaso. La quinta es el trabajo.</p>
+      </section>
+
+      <section class="slide s-part" id="d3">
+        <span class="slide-num">Parte 1 · 3</span>
+        <p class="part-num">Parte 1</p>
+        <h2>Representar el espacio</h2>
+      </section>
+
+      <section class="slide s-figure" id="d4">
+        <span class="slide-num">Parte 1 · 4</span>
+        <h2>El problema</h2>
+        <figure>
+          <figcaption>Encontrar una ruta en un entorno 3D realista</figcaption>
+          <img src="../assets/img/pf-escena.jpg" width="1020" height="742"
+               alt="Interior de una nave espacial en un videojuego en 3D, con pasillos, puertas, cajas y tuberías.">
+        </figure>
+        <p class="foot">
+          Cientos de miles de triángulos, y ninguno le sirve al personaje para decidir por dónde ir.
+        </p>
+      </section>
+
+      <section class="slide" id="d5">
+        <span class="slide-num">Parte 1 · 5</span>
+        <h2>Son dos problemas, no uno</h2>
+        <ol>
+          <li><strong>Representar el espacio:</strong> convertir el mundo continuo en un <strong>grafo</strong> finito: dónde se puede estar y qué está conectado con qué.</li>
+          <li><strong>Buscar en el grafo:</strong> encontrar una secuencia de pasos de la salida al destino.</li>
+        </ol>
+        <p class="lede">
+          Se separan porque el algoritmo no depende de la representación. Cambiar de rejilla a malla no
+          obliga a reescribir A*.
+        </p>
+      </section>
+
+      <section class="slide s-split wide-right" id="d6">
+        <span class="slide-num">Parte 1 · 6</span>
+        <h2>Puntos de ruta</h2>
+        <div class="stack">
+          <ul>
+            <li>Puntos interconectados, a mano o sacados de las esquinas <strong>convexas</strong>: las que sobresalen al suelo libre, por donde una ruta dobla.</li>
+            <li>Una arista significa: «de aquí se llega hasta ahí».</li>
+            <li>El NPC va al punto más cercano a su origen y busca hasta el más cercano al destino.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>WayPoints</figcaption>
+          <img src="../assets/img/pf-waypoints.jpg" width="1020" height="742"
+               alt="La escena de la nave con esferas blancas en los sitios de paso, unidas por líneas que forman un grafo.">
+        </figure>
+      </section>
+
+      <section class="slide" id="d7">
+        <span class="slide-num">Parte 1 · 7</span>
+        <h2>Waypoints: el balance</h2>
+        <ul>
+          <li>Sistema <strong>muy sencillo</strong>: no almacena información del terreno ni delimita zonas transitables.</li>
+          <li>Muy usado para <strong>rutas prefijadas</strong>, como las patrullas.</li>
+          <li>Se adapta bien a interiores con pasillos, funciona en 3D y soporta cualquier movimiento.</li>
+          <li>Y el defecto: rutas <strong>poco naturales</strong>… como por raíles.</li>
+        </ul>
+      </section>
+
+      <section class="slide s-split wide-right" id="d8">
+        <span class="slide-num">Parte 1 · 8</span>
+        <h2>Rejillas</h2>
+        <div class="stack">
+          <ul>
+            <li>El mapa es un <em>array</em> bidimensional; la posición, dos enteros.</li>
+            <li>Cada casilla lleva <strong>tipo</strong> de terreno y <strong>transitabilidad</strong>.</li>
+            <li>El NPC tiene posición real con decimales, que se trunca.</li>
+            <li>Necesita homogeneidad: no ve nada más fino que la casilla.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>Rejilla sobre el terreno</figcaption>
+          <img src="../assets/img/pf-rejilla-terreno.jpg" width="928" height="704"
+               alt="Vista aérea de un mapa de estrategia con una rejilla blanca encima y zonas de agua, hierba, bosque y roca.">
+        </figure>
+      </section>
+
+      <section class="slide s-figure" id="d9">
+        <span class="slide-num">Parte 1 · 9</span>
+        <h2>La misma idea, en 3D</h2>
+        <figure>
+          <figcaption>Se samplea el mapa y sale la cuadrícula</figcaption>
+          <img src="../assets/img/pf-rejilla.jpg" width="1020" height="742"
+               alt="La escena de la nave con una cuadrícula regular proyectada sobre el suelo.">
+        </figure>
+        <p class="foot">También las hay hexagonales. La idea es la misma: casillas iguales, coordenadas enteras.</p>
+      </section>
+
+      <section class="slide s-split wide-right" id="d10">
+        <span class="slide-num">Parte 1 · 10</span>
+        <h2>Malla de navegación</h2>
+        <div class="stack">
+          <ul>
+            <li>El suelo, cubierto de polígonos llamados <strong>sectores</strong>.</li>
+            <li>Se construyen solos desde la geometría, con una triangulación de Delaunay restringida.</li>
+            <li>Los sectores son <strong>convexos</strong>: dentro de uno puedo ir en línea recta.</li>
+            <li>Se conectan por sus aristas, los <strong>portales</strong>.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>Navigation Mesh</figcaption>
+          <img src="../assets/img/pf-navmesh.jpg" width="1020" height="742"
+               alt="La escena de la nave con el suelo dividido en polígonos irregulares grandes adaptados a la zona transitable.">
+        </figure>
+      </section>
+
+      <section class="slide" id="d11">
+        <span class="slide-num">Parte 1 · 11</span>
+        <h2>Malla de navegación: el balance</h2>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">A favor</th><th scope="col">En contra</th></tr></thead>
+            <tbody>
+              <tr><td>Se ajusta muy bien a la zona transitable.</td><td>Cuesta memoria: muchos sectores en un mapa grande.</td></tr>
+              <tr><td>Rutas de calidad, no de raíles.</td><td>Sufre con saltos y movimiento libre: asume al NPC pegado al suelo.</td></tr>
+              <tr><td>Se genera automáticamente.</td><td><em>Quake III</em> y <em>Doom III</em> usan volúmenes (AAS) por eso mismo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="slide s-split" id="d12">
+        <span class="slide-num">Parte 1 · 12</span>
+        <h2>Y en Ms. Pac-Man: ya está</h2>
+        <div class="stack">
+          <ul>
+            <li>El laberinto <strong>ya es un grafo</strong>: 1293 nodos, grado máximo 4.</li>
+            <li>Un <strong>cruce</strong> es un nodo con tres vecinos o más. En el primer laberinto hay 38.</li>
+            <li>La representación no estorba, así que se ve clarísimo lo que hace el algoritmo.</li>
+          </ul>
+          <p class="lede">Por eso, aquí el mérito no está en encontrar el camino: está en decidir hacia dónde.</p>
+        </div>
+        <figure>
+          <figcaption>Los 38 cruces, en amarillo</figcaption>
+          <img class="lab pixel" src="../assets/img/laberinto-a-anotado.png" width="684" height="780"
+               alt="El primer laberinto con círculos amarillos sobre los cruces, azules en los túneles y marcas en la cárcel.">
+        </figure>
+      </section>
+
+      <section class="slide s-part" id="d13">
+        <span class="slide-num">Parte 2 · 13</span>
+        <p class="part-num">Parte 2</p>
+        <h2>Buscar</h2>
+      </section>
+
+      <section class="slide" id="d14">
+        <span class="slide-num">Parte 2 · 14</span>
+        <h2>Exploración de espacios de estados</h2>
+        <ul>
+          <li><strong>Estado:</strong> cada configuración posible del problema.</li>
+          <li><strong>Transición:</strong> los estados a los que se llega en un paso. También, sucesores.</li>
+          <li><strong>Coste:</strong> lo que cuesta una transición. Aquí, siempre 1.</li>
+          <li><strong>Camino solución:</strong> del estado inicial al objetivo. <strong>Camino parcial:</strong> hasta donde vas.</li>
+        </ul>
+        <p class="lede">Buscar un camino en un laberinto y resolver un puzle son el mismo problema.</p>
+      </section>
+
+      <section class="slide s-figure" id="d15">
+        <span class="slide-num">Parte 2 · 15</span>
+        <h2>Un camino solución</h2>
+        <figure>
+          <figcaption>8-puzle: cuatro transiciones del estado inicial al objetivo</figcaption>
+          <img src="../assets/img/pf-8puzzle.png" width="1500" height="246"
+               alt="Cinco tableros de 3 por 3 en fila, del inicial al objetivo, con el movimiento de cada transición escrito entre ellos.">
+        </figure>
+        <p class="foot">
+          Eso no es el espacio de estados: es <strong>un camino dentro de él</strong>. El espacio entero son
+          181 440 configuraciones. En el laberinto, 1293 nodos.
+        </p>
+      </section>
+
+      <section class="slide s-figure" id="d16">
+        <span class="slide-num">Parte 2 · 16</span>
+        <h2>El mapa, reducido a grafo</h2>
+        <figure>
+          <figcaption>El mismo mapa como rejilla y como grafo con costes en las aristas</figcaption>
+          <img src="../assets/img/pf-grafo-costes.png" width="468" height="233"
+               alt="A la izquierda una rejilla con muros y las casillas S y G; a la derecha el mismo mapa como grafo de puntos unidos por aristas con su coste.">
+        </figure>
+        <p class="foot">Las aristas pueden tener coste. En Ms. Pac-Man todas cuestan lo mismo: un turno.</p>
+      </section>
+
+      <section class="slide s-code" id="d17">
+        <span class="slide-num">Parte 2 · 17</span>
+        <h2>Todos los algoritmos son el mismo bucle</h2>
+        <pre class="pseudo"><b>function</b> <span class="fn">buscar</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">frontera</span> ← {<span class="var">inicio</span>};   <span class="var">visitados</span> ← ∅   <i>// abiertos y cerrados</i>
+    <b>while</b> <span class="var">frontera</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← <span class="fn">sacar</span>(<span class="var">frontera</span>)               <i>// ← AQUÍ está la diferencia</i>
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        añadir <span class="var">n</span> a <span class="var">visitados</span>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> AND <span class="var">v</span> ∉ <span class="var">frontera</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>;  añadir <span class="var">v</span> a <span class="var">frontera</span>
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+<b>end function</b></pre>
+        <p class="lede">Cola FIFO → anchura. Pila → profundidad. Prioridad → A*.</p>
+      </section>
+
+      <section class="slide" id="d18">
+        <span class="slide-num">Parte 2 · 18</span>
+        <h2>Abiertos y cerrados</h2>
+        <ul>
+          <li><strong>Nodos abiertos:</strong> el último nodo, de momento, de un posible camino. Cada uno guarda un puntero a su padre, y por eso se puede reconstruir el camino entero.</li>
+          <li><strong>Nodos cerrados:</strong> los ya expandidos; los nodos intermedios de algún camino.</li>
+        </ul>
+        <p class="lede">
+          Las dos listas están para gestionar la repetición de estados. ¿Y si llego al mismo estado por otro
+          camino? <strong>Quedarse con el mejor.</strong>
+        </p>
+      </section>
+
+      <section class="slide" id="d19">
+        <span class="slide-num">Parte 2 · 19</span>
+        <h2>El repertorio</h2>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">No informados o ciegos</th><th scope="col">Informados o heurísticos</th></tr></thead>
+            <tbody>
+              <tr><td>Primero en anchura</td><td>Primero el mejor</td></tr>
+              <tr><td>Coste uniforme</td><td>Voraz (<span lang="en">greedy</span>)</td></tr>
+              <tr><td>Primero en profundidad</td><td><strong>Óptima: A*</strong></td></tr>
+              <tr><td>Profundidad limitada · iterativa</td><td>Búsqueda local: escalada, genéticos</td></tr>
+              <tr><td>Bidireccional</td><td>Con adversario: minimax, poda alfa-beta</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede">La única diferencia: si hay o no <strong>heurística</strong>, una pista sobre hacia dónde está la solución.</p>
+      </section>
+
+      <section class="slide s-figure" id="d20">
+        <span class="slide-num">Parte 2 · 20</span>
+        <h2>Primero en anchura</h2>
+        <figure>
+          <figcaption>Cola FIFO: capa a capa, en todas direcciones a la vez</figcaption>
+          <svg class="diag dgs20" viewBox="0 0 470 200" role="img" aria-label="Un grafo con la salida a la izquierda y el objetivo a la derecha. Los nodos se agrupan en capas por su distancia al inicio; la búsqueda completa una capa antes de pasar a la siguiente.">
+            <style>
+              .dgs20 .ar{stroke:var(--line);stroke-width:1.4;fill:none}
+              .dgs20 .nd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.4}
+              .dgs20 .n0{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.8}
+              .dgs20 .ng{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.8}
+              .dgs20 .cap{fill:var(--surface-2)}
+              .dgs20 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-3)}
+              .dgs20 .tb{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+            </style>
+            <rect x="72" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="180" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="288" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="396" y="16" width="62" height="146" rx="4" class="cap"/>
+            <path d="M40 89 L107 55 M40 89 L107 123 M107 55 L215 40 M107 55 L215 89 M107 123 L215 89 M107 123 L215 138 M215 40 L323 40 M215 89 L323 76 M215 89 L323 112 M215 138 L323 148 M323 40 L427 89 M323 76 L427 89 M323 112 L427 89" class="ar"/>
+            <circle cx="40" cy="89" r="10" class="n0"/>
+            <circle cx="107" cy="55" r="9" class="nd"/><circle cx="107" cy="123" r="9" class="nd"/>
+            <circle cx="215" cy="40" r="9" class="nd"/><circle cx="215" cy="89" r="9" class="nd"/><circle cx="215" cy="138" r="9" class="nd"/>
+            <circle cx="323" cy="40" r="9" class="nd"/><circle cx="323" cy="76" r="9" class="nd"/><circle cx="323" cy="112" r="9" class="nd"/><circle cx="323" cy="148" r="9" class="nd"/>
+            <circle cx="427" cy="89" r="10" class="ng"/>
+            <text x="40" y="180" class="tb">salida</text>
+            <text x="107" y="180" class="t">capa 1</text>
+            <text x="215" y="180" class="t">capa 2</text>
+            <text x="323" y="180" class="t">capa 3</text>
+            <text x="427" y="180" class="tb">objetivo</text>
+          </svg>
+        </figure>
+        <p class="foot">Con todos los costes iguales, el primer camino que encuentra es <strong>el más corto</strong>.</p>
+      </section>
+
+      <section class="slide s-code" id="d21">
+        <span class="slide-num">Parte 2 · 21</span>
+        <h2>Anchura, en pseudocódigo</h2>
+        <pre class="pseudo"><b>function</b> <span class="fn">anchura</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">cola</span> ← cola FIFO con {<span class="var">inicio</span>}
+    <span class="var">visitados</span> ← {<span class="var">inicio</span>}
+    <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← <span class="fn">desencolar</span>(<span class="var">cola</span>)
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>;  añadir <span class="var">v</span> a <span class="var">visitados</span>;  <span class="fn">encolar</span>(<span class="var">cola</span>, <span class="var">v</span>)
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+<b>end function</b></pre>
+        <p class="lede">Una pasada: <strong>cuál me pilla más cerca, y por dónde se va</strong>.</p>
+      </section>
+
+      <section class="slide s-figure" id="d22">
+        <span class="slide-num">Parte 2 · 22</span>
+        <h2>Primero en profundidad</h2>
+        <figure>
+          <figcaption>Pila LIFO: se agota una rama entera, y el objetivo aparece por el camino de 5 habiendo uno de 3</figcaption>
+          <svg class="diag dgs22" viewBox="0 0 470 200" role="img" aria-label="Un grafo con dos ramas entre la salida y el objetivo: una por arriba de cinco pasos y otra por abajo de tres. La búsqueda en profundidad se lanza por la de arriba, la agota entera y llega al objetivo por ella, sin haber mirado nunca la corta.">
+            <style>
+              .dgs22 .ar{stroke:var(--line);stroke-width:1.4;fill:none}
+              .dgs22 .arc{stroke:var(--ok);stroke-width:1.8;fill:none}
+              .dgs22 .arv{stroke:var(--maze);stroke-width:2.6;fill:none}
+              .dgs22 .nd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.4}
+              .dgs22 .nv{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.7}
+              .dgs22 .ng{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.9}
+              .dgs22 .o{font-family:var(--f-mono);font-size:9px;text-anchor:middle;fill:var(--maze);dominant-baseline:middle}
+              .dgs22 .tb{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgs22 .tm{font-family:var(--f-mono);font-size:10px;fill:var(--maze)}
+              .dgs22 .tk{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+            </style>
+            <path d="M30 96 L112 140 M112 140 L258 144 M258 144 L424 96" class="arc"/>
+            <path d="M30 96 L96 44 M96 44 L168 30 M168 30 L244 34 M244 34 L322 60 M322 60 L424 96" class="arv"/>
+            <circle cx="112" cy="140" r="9" class="nd"/><circle cx="258" cy="144" r="9" class="nd"/>
+            <circle cx="30" cy="96" r="10" class="nv"/><text x="30" y="96" class="o">1</text>
+            <circle cx="96" cy="44" r="9" class="nv"/><text x="96" y="44" class="o">2</text>
+            <circle cx="168" cy="30" r="9" class="nv"/><text x="168" y="30" class="o">3</text>
+            <circle cx="244" cy="34" r="9" class="nv"/><text x="244" y="34" class="o">4</text>
+            <circle cx="322" cy="60" r="9" class="nv"/><text x="322" y="60" class="o">5</text>
+            <circle cx="424" cy="96" r="10" class="ng"/><text x="424" y="96" class="o">6</text>
+            <text x="110" y="14" class="tm">se lanza por aquí y la agota: 5 pasos</text>
+            <text x="110" y="180" class="tk">y había un camino de 3 pasos</text>
+            <text x="30" y="122" class="tb">salida</text>
+            <text x="424" y="122" class="tb">objetivo</text>
+          </svg>
+        </figure>
+        <p class="foot">Poquísima memoria y soluciones rápidas, pero <strong>no las más cortas</strong>. Sin control de visitados, además, se pierde en los ciclos.</p>
+      </section>
+
+      <section class="slide" id="d23">
+        <span class="slide-num">Parte 2 · 23</span>
+        <h2>Coste uniforme, o Dijkstra</h2>
+        <ul>
+          <li>Cola de prioridad ordenada por <strong><em>g</em>(n)</strong>, el coste real acumulado. Es Dijkstra.</li>
+          <li>Cambiar el contenedor no basta: se marca <strong>al sacar</strong>, y un nodo de la frontera <strong>puede mejorar</strong>.</li>
+          <li>Con costes a 1, la cola de prioridad es una FIFO y sale <strong>la anchura</strong>.</li>
+        </ul>
+        <p class="lede">
+          A* con <em>h</em> = 0 es Dijkstra. Dijkstra con costes iguales es la anchura. Los tres son el
+          mismo bucle con otra cosa dentro de la frontera.
+        </p>
+      </section>
+
+      <section class="slide s-part" id="d24">
+        <span class="slide-num">Parte 3 · 24</span>
+        <p class="part-num">Parte 3</p>
+        <h2>Heurísticas y A*</h2>
+      </section>
+
+      <section class="slide s-split wide-right" id="d25">
+        <span class="slide-num">Parte 3 · 25</span>
+        <h2>Heurística</h2>
+        <div class="stack">
+          <p class="big">Una función que devuelve un valor <strong>menor</strong> cuanto más cerca está un estado del objetivo.</p>
+          <ul>
+            <li>Los tres caminos escalonados miden <strong>lo mismo</strong>: distancia <strong>Manhattan</strong>.</li>
+            <li>La diagonal verde es la <strong>euclídea</strong>: siempre menor o igual.</li>
+            <li>Y ninguna es el camino que se recorre si hay paredes.</li>
+          </ul>
+        </div>
+        <figure>
+          <figcaption>Taxicab geometry · Wikimedia Commons, dominio público</figcaption>
+          <img src="../assets/img/pf-metricas.png" width="900" height="900"
+               alt="Una cuadrícula con dos puntos en esquinas opuestas, tres caminos escalonados de la misma longitud en rojo, azul y amarillo, y una diagonal verde más corta.">
+        </figure>
+      </section>
+
+      <section class="slide" id="d26">
+        <span class="slide-num">Parte 3 · 26</span>
+        <h2>Admisible y consistente</h2>
+        <ul>
+          <li>
+            <strong>Admisible:</strong> nunca sobreestima. <em>h</em>(n) ≤ <em>h*</em>(n). Una heurística
+            optimista no descarta el camino bueno; una pesimista sí.
+          </li>
+          <li>
+            <strong>Consistente</strong> o monótona: <em>h</em>(n) ≤ <em>c</em>(n, n′) + <em>h</em>(n′). La
+            desigualdad triangular. Garantiza que un nodo cerrado ya tiene su mejor camino.
+          </li>
+        </ul>
+        <p class="lede">
+          Con paredes por medio, Manhattan y euclídea siguen siendo admisibles, porque el camino real sólo
+          puede ser más largo, pero se vuelven <strong>malas</strong>, y la búsqueda explora de más.
+        </p>
+      </section>
+
+      <section class="slide s-code" id="d27">
+        <span class="slide-num">Parte 3 · 27</span>
+        <h2>Las tres métricas del motor</h2>
+<pre><code><span class="c">/**
+ * DM stands for Distance Metric [...]
+ * PATH: the actual path distance (i.e., number of step required to reach target)
+ * EUCLID: Euclidean distance using the nodes' x and y coordinates
+ * MANHATTAN: Manhattan distance (absolute distance between x and y coordinates)
+ */</span>
+<span class="k">public enum</span> DM {
+    PATH, EUCLID, MANHATTAN
+}</code></pre>
+        <p class="lede">
+          <code>EUCLID</code> y <code>MANHATTAN</code> <strong>atraviesan las paredes</strong>. Usa
+          siempre <code>DM.PATH</code>: cuenta pasos de verdad y está precalculada.
+        </p>
+      </section>
+
+      <section class="slide" id="d28">
+        <span class="slide-num">Parte 3 · 28</span>
+        <h2>A*: <em>f</em>(n) = <em>g</em>(n) + <em>h′</em>(n)</h2>
+        <ul>
+          <li><strong><em>g</em>(n):</strong> coste real del camino recorrido hasta ese nodo.</li>
+          <li><strong><em>h′</em>(n):</strong> estimación de lo que queda hasta el final.</li>
+        </ul>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Si…</th><th scope="col">A* es</th><th scope="col">Y entonces</th></tr></thead>
+            <tbody>
+              <tr><td><em>h</em> = 0</td><td>Coste uniforme</td><td>Óptimo, pero explora muchísimo más.</td></tr>
+              <tr><td><em>g</em> = 0</td><td>Voraz</td><td>Rápido y ya no óptimo.</td></tr>
+              <tr><td><em>h</em> = coste real</td><td>El camino, directo</td><td>Ni un nodo de más. El límite teórico.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede"><em>g</em> tiende a anchura, <em>h′</em> tiende a profundidad. Sumados, una búsqueda que <strong>cambia de camino</strong> cuando aparece algo mejor.</p>
+      </section>
+
+      <section class="slide s-code" id="d29">
+        <span class="slide-num">Parte 3 · 29</span>
+        <h2>A*, en pseudocódigo</h2>
+        <pre class="pseudo"><b>function</b> <span class="fn">aEstrella</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">abiertos</span> ← cola de prioridad por <span class="var">f</span>;   <span class="var">cerrados</span> ← ∅;   <span class="var">g</span>[<span class="var">inicio</span>] ← 0
+    <b>while</b> <span class="var">abiertos</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← el de <span class="var">f</span> menor
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        mover <span class="var">n</span> de <span class="var">abiertos</span> a <span class="var">cerrados</span>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∈ <span class="var">cerrados</span> <b>then continue end if</b>
+            <span class="var">gNuevo</span> ← <span class="var">g</span>[<span class="var">n</span>] + <span class="fn">coste</span>(<span class="var">n</span>, <span class="var">v</span>)
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">abiertos</span> OR <span class="var">gNuevo</span> &lt; <span class="var">g</span>[<span class="var">v</span>] <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>;  <span class="var">g</span>[<span class="var">v</span>] ← <span class="var">gNuevo</span>;  <span class="var">f</span>[<span class="var">v</span>] ← <span class="var">gNuevo</span> + <span class="fn">h</span>(<span class="var">v</span>, <span class="var">objetivo</span>)
+                insertar o reordenar <span class="var">v</span> en <span class="var">abiertos</span>
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+<b>end function</b></pre>
+      </section>
+
+      <section class="slide s-figure" id="d30">
+        <span class="slide-num">Parte 3 · 30</span>
+        <h2>A* terminado</h2>
+        <figure>
+          <figcaption>En azul los cerrados, en verde los que quedaron abiertos, en amarillo el camino</figcaption>
+          <img src="../assets/img/pf-astar-listas.png" width="700" height="437"
+               alt="Una rejilla con un muro en forma de U. Desde la salida verde se extiende una mancha azul de nodos cerrados, bordeada de verde por los abiertos, y una línea amarilla rodea el muro hasta el destino rojo.">
+        </figure>
+        <p class="foot">
+          La mancha no es un círculo, que sería lo del coste uniforme: es un óvalo estirado hacia el destino. Y se
+          abre en abanico al chocar con el muro, porque ahí la heurística deja de acertar.
+        </p>
+      </section>
+
+      <section class="slide s-part" id="d31">
+        <span class="slide-num">Parte 4 · 31</span>
+        <p class="part-num">Parte 4</p>
+        <h2>En Ms. Pac-Man, ya está hecho</h2>
+      </section>
+
+      <section class="slide s-code" id="d32">
+        <span class="slide-num">Parte 4 · 32</span>
+        <h2>A* está precalculado</h2>
+        <p class="lede">El laberinto no cambia: al cargarlo se computan todas las distancias entre todos los pares y se guardan en media tabla, porque d(a,b) = d(b,a). Consultarlas es leer un <em>array</em>.</p>
+<pre><code><span class="k">public int</span> getShortestPathDistance(<span class="k">int</span> fromNodeIndex, <span class="k">int</span> toNodeIndex) {
+    <span class="k">if</span> (fromNodeIndex == toNodeIndex) {
+        <span class="k">return</span> <span class="n">0</span>;
+    } <span class="k">else if</span> (fromNodeIndex &lt; toNodeIndex) {
+        <span class="k">return</span> currentMaze.shortestPathDistances[((toNodeIndex * (toNodeIndex + <span class="n">1</span>)) / <span class="n">2</span>) + fromNodeIndex];
+    } <span class="k">else</span> {
+        <span class="k">return</span> currentMaze.shortestPathDistances[((fromNodeIndex * (fromNodeIndex + <span class="n">1</span>)) / <span class="n">2</span>) + toNodeIndex];
+    }
+}</code></pre>
+      </section>
+
+      <section class="slide s-code" id="d33">
+        <span class="slide-num">Parte 4 · 33</span>
+        <h2>Cuidado: asume que puedes darte la vuelta</h2>
+        <p class="lede">
+          Es la distancia óptima <strong>en el grafo</strong>, pero ni Ms. Pac-Man ni los fantasmas pueden
+          invertir el sentido. La tabla dirá «a tres pasos» cuando hay que dar la vuelta a la manzana.
+        </p>
+<pre><code><span class="c">// Sin lastMoveMade: lectura de tabla. Óptima, pero no exacta para el juego.</span>
+<span class="k">int</span>[] camino = game.getShortestPath(desde, hasta);
+<span class="c">// Con lastMoveMade: ejecuta A* de verdad, respetando el no-retroceso.</span>
+<span class="k">int</span>[] camino = game.getShortestPath(desde, hasta, ultimoMovimiento);
+<span class="k">int</span>    pasos  = game.getShortestPathDistance(desde, hasta, ultimoMovimiento);</code></pre>
+        <p class="lede">Para <strong>los fantasmas</strong>, siempre la segunda.</p>
+      </section>
+
+      <section class="slide s-code" id="d34">
+        <span class="slide-num">Parte 4 · 34</span>
+        <h2>El A* del motor, por dentro</h2>
+<pre><code>start.g = <span class="n">0</span>;   start.h = game.getShortestPathDistance(start.index, target.index);   <span class="c">// h admisible</span>
+open.add(start);
+<span class="k">while</span> (!open.isEmpty()) {
+    N currentNode = open.poll();               <span class="c">// el de f = g + h menor</span>
+    closed.add(currentNode);   <span class="k">if</span> (currentNode.isEqual(target)) <span class="k">break</span>;
+    <span class="k">for</span> (E next : currentNode.adj) {
+        <span class="k">if</span> (next.move != currentNode.reached.opposite()) {   <span class="c">// ← la regla del juego</span>
+            <span class="c">// si es nuevo:  g, h, padre, y a la lista de abiertos</span>
+            <span class="c">// si ya estaba y este camino es mejor:  actualizo g y padre</span>
+        }
+    }
+}</code></pre>
+        <p class="lede"><code>AStar.java</code>, recortado. El pseudocódigo de antes, con <code>opposite()</code>.</p>
+      </section>
+
+      <section class="slide s-code" id="d35">
+        <span class="slide-num">Parte 4 · 35</span>
+        <h2><code>getNextMoveTowardsTarget</code> es voraz</h2>
+<pre><code><span class="c">// pacman.game.Game. Toda la implementación cabe aquí</span>
+<span class="k">public</span> MOVE getNextMoveTowardsTarget(<span class="k">int</span> from, <span class="k">int</span> to, DM dm) {
+    MOVE move = <span class="k">null</span>;
+    <span class="k">double</span> minDistance = Integer.MAX_VALUE;
+    <span class="k">for</span> (Entry&lt;MOVE, Integer&gt; entry : currentMaze.graph[from].neighbourhood.entrySet()) {
+        <span class="k">double</span> distance = getDistance(entry.getValue(), to, dm);
+        <span class="k">if</span> (distance &lt; minDistance) { minDistance = distance;  move = entry.getKey(); }
+    }
+    <span class="k">return</span> move;
+}</code></pre>
+        <p class="lede">
+          Mira los vecinos, se queda con el mejor, y ya. <strong>Un solo paso</strong>: sin búsqueda, sin
+          plan, sin memoria.
+        </p>
+      </section>
+
+      <section class="slide" id="d36">
+        <span class="slide-num">Parte 4 · 36</span>
+        <h2>Las tres familias, y cuál usar</h2>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">No-retroceso</th><th scope="col">Coste</th></tr></thead>
+            <tbody>
+              <tr><td><code>getNextMoveTowardsTarget(a, b, DM)</code></td><td>No</td><td>Cuatro lecturas de tabla.</td></tr>
+              <tr><td><code>getApproximateNextMoveTowardsTarget(a, b, últMov, DM)</code></td><td>Al elegir, no al medir</td><td>Tres lecturas de tabla.</td></tr>
+              <tr><td><code>getNextMoveTowardsTarget(a, b, últMov, DM)</code></td><td>Sí, también al medir</td><td>Tres A* cortos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede">
+          El nombre engaña: ninguna calcula nada «aproximado». Se separan cuando el camino corto desde el
+          vecino pasaría por el nodo del que vienes.
+        </p>
+      </section>
+
+      <section class="slide s-part" id="d37">
+        <span class="slide-num">Parte 5 · 37</span>
+        <p class="part-num">Parte 5</p>
+        <h2>Estrategias algorítmicas</h2>
+      </section>
+
+      <section class="slide s-figure" id="d38">
+        <span class="slide-num">Parte 5 · 38</span>
+        <h2>Por qué «huir del más cercano» falla</h2>
+        <figure>
+          <figcaption>El movimiento que más aleja ahora, y el que sobrevive</figcaption>
+          <svg class="diag dgs38" viewBox="0 0 470 220" role="img" aria-label="Ms. Pac-Man en un cruce con un fantasma acercándose por la izquierda. Hacia arriba hay un callejón sin salida, que es el movimiento que más la aleja ahora mismo; hacia la derecha el pasillo sigue hasta otro cruce y aleja menos pero deja salidas.">
+            <style>
+              .dgs38 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
+              .dgs38 .pc{fill:var(--pill)}
+              .dgs38 .gh{fill:var(--blinky)}
+              .dgs38 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgs38 .tb{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgs38 .tg{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dgs38 .fb{fill:none;stroke:var(--bad);stroke-width:2;stroke-dasharray:5 4;marker-end:url(#s38b)}
+              .dgs38 .fg{fill:none;stroke:var(--ok);stroke-width:2;marker-end:url(#s38g)}
+              .dgs38 .nd{fill:var(--ink-3);opacity:.5}
+            </style>
+            <defs>
+              <marker id="s38b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker>
+              <marker id="s38g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ok)"/></marker>
+            </defs>
+            <path d="M40 130 H190 M190 130 V50 M190 130 H430 M430 130 V60 M430 130 V196" class="pas"/>
+            <circle cx="190" cy="50" r="3" class="nd"/><circle cx="190" cy="90" r="3" class="nd"/>
+            <circle cx="260" cy="130" r="3" class="nd"/><circle cx="330" cy="130" r="3" class="nd"/>
+            <g transform="translate(203 117) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M52 121 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M206 104 V62" class="fb"/>
+            <path d="M212 130 H330" class="fg"/>
+            <text x="200" y="22" class="tb">+ distancia ahora</text>
+            <text x="200" y="36" class="tb">y es un callejón sin salida</text>
+            <text x="216" y="160" class="tg">− distancia ahora, pero quedan salidas</text>
+            <text x="40" y="196" class="t">el fantasma viene por aquí</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          Maximizar la distancia paso a paso no es estar a salvo. La corrección no es cambiar la métrica:
+          es <strong>mirar más lejos de un paso</strong>.
+        </p>
+      </section>
+
+      <section class="slide" id="d39">
+        <span class="slide-num">Parte 5 · 39</span>
+        <h2>Decidir sólo en los cruces</h2>
+        <ul>
+          <li>En un pasillo <strong>no hay decisión</strong>: sólo se puede seguir.</li>
+          <li>Devolver <code>null</code> hace que el motor mantenga la dirección.</li>
+          <li>Se acaban las oscilaciones, y sobra presupuesto para buscar de verdad en los 38 sitios que importan.</li>
+        </ul>
+<pre><code><span class="k">if</span> (!game.isJunction(game.getPacmanCurrentNodeIndex())) <span class="k">return null</span>;</code></pre>
+        <p class="lede">Y el grafo sobre el que conviene razonar deja de ser el de 1293 nodos: es el de <strong>cruces y tramos</strong>.</p>
+      </section>
+
+      <section class="slide s-code" id="d40">
+        <span class="slide-num">Parte 5 · 40</span>
+        <h2>Recorrer un tramo, anotando</h2>
+        <pre class="pseudo"><b>function</b> <span class="fn">siguienteCruce</span>(<span class="var">nodo</span>, <span class="var">dirección</span>)
+    <span class="var">pasos</span> ← 0
+    <b>repeat</b>
+        <span class="var">dirección</span> ← la única salida de <span class="var">nodo</span> que no sea volver atrás
+        <span class="var">nodo</span> ← vecino de <span class="var">nodo</span> en <span class="var">dirección</span>
+        <span class="var">pasos</span> ← <span class="var">pasos</span> + 1
+        anotar lo que haya: píldora, píldora de poder, fantasma
+    <b>until</b> <span class="fn">esCruce</span>(<span class="var">nodo</span>)
+    <b>return</b> {<span class="var">nodo</span>, <span class="var">dirección</span>, <span class="var">pasos</span>, lo anotado}
+<b>end function</b></pre>
+        <p class="lede">
+          Con <code>isJunction</code>, <code>getPossibleMoves</code>, <code>getNeighbour</code> y
+          <code>getMoveToMakeToReachDirectNeighbour</code>.
+        </p>
+      </section>
+
+      <section class="slide s-figure" id="d41">
+        <span class="slide-num">Parte 5 · 41</span>
+        <h2>La pregunta que ordena todo</h2>
+        <figure>
+          <figcaption>«¿Llego yo antes?» se mide al mismo punto, no de uno a otro</figcaption>
+          <svg class="diag dgs41" viewBox="0 0 470 176" role="img" aria-label="Un cruce en el centro. Ms. Pac-Man está a nueve pasos por la izquierda y un fantasma a seis pasos por arriba: el fantasma llega antes al cruce, así que ese tramo no es seguro.">
+            <style>
+              .dgs41 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
+              .dgs41 .pc{fill:var(--pill)}
+              .dgs41 .gh{fill:var(--blinky)}
+              .dgs41 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgs41 .tj{font-family:var(--f-display);font-weight:700;font-size:11px;text-anchor:middle;fill:var(--ink)}
+              .dgs41 .fy{fill:none;stroke:var(--maze);stroke-width:2;marker-end:url(#s41y)}
+              .dgs41 .fr{fill:none;stroke:var(--blinky);stroke-width:2;marker-end:url(#s41r)}
+              .dgs41 .cr{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.6}
+            </style>
+            <defs>
+              <marker id="s41y" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+              <marker id="s41r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <path d="M40 112 H430 M235 30 V112" class="pas"/>
+            <circle cx="235" cy="112" r="13" class="cr"/>
+            <g transform="translate(73 99) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M224 30 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M86 112 H214" class="fy"/>
+            <path d="M235 58 V92" class="fr"/>
+            <text x="150" y="102" class="t">9 pasos</text>
+            <text x="278" y="72" class="t">6 pasos</text>
+            <text x="235" y="146" class="tj">el cruce</text>
+            <text x="235" y="164" class="t">llega él antes: el tramo no es seguro</text>
+          </svg>
+        </figure>
+        <p class="foot">No es «¿a qué distancia está el fantasma?». Es «¿quién llega antes <strong>ahí</strong>?».</p>
+      </section>
+
+      <section class="slide s-code" id="d42">
+        <span class="slide-num">Parte 5 · 42</span>
+        <h2>Y en código</h2>
+<pre><code><span class="k">private boolean</span> llegoAntes(Game game, <span class="k">int</span> cruce, <span class="k">int</span> misPasos) {
+    <span class="k">for</span> (GHOST f : GHOST.values()) {
+        <span class="k">if</span> (game.isGhostEdible(f))       <span class="k">continue</span>;   <span class="c">// comestible: no es amenaza</span>
+        <span class="k">if</span> (game.getGhostLairTime(f) &gt; <span class="n">0</span>) <span class="k">continue</span>;   <span class="c">// encerrado: no está en el mapa</span>
+        <span class="k">int</span>  nodo = game.getGhostCurrentNodeIndex(f);
+        MOVE ult  = game.getGhostLastMoveMade(f);
+        <span class="k">int</span>  susPasos = game.getShortestPathDistance(nodo, cruce, ult);
+        <span class="k">if</span> (susPasos &lt; misPasos + HOLGURA) <span class="k">return false</span>;
+    }
+    <span class="k">return true</span>;
+}</code></pre>
+        <p class="lede">
+          Sin las dos exclusiones huyes de puntos gratis. Y la <code>HOLGURA</code> está porque
+          <strong>empatar es perder</strong>.
+        </p>
+      </section>
+
+      <section class="slide s-code" id="d43">
+        <span class="slide-num">Parte 5 · 43</span>
+        <h2>Dos cruces por delante</h2>
+        <pre class="pseudo"><b>function</b> <span class="fn">movimientosSeguros</span>()
+    <span class="var">árbol</span> ← mapa vacío
+    <b>for each</b> <span class="var">d</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">miNodo</span>, <span class="var">miÚltimoMov</span>) <b>do</b>
+        <span class="var">c1</span> ← <span class="fn">siguienteCruce</span>(<span class="var">miNodo</span>, <span class="var">d</span>)
+        <b>if</b> <span class="fn">hayFantasmaEnElTramo</span>(<span class="var">c1</span>) OR NOT <span class="fn">llegoAntes</span>(<span class="var">c1</span>.nodo, <span class="var">c1</span>.pasos) <b>then continue end if</b>
+        <span class="var">árbol</span>[<span class="var">d</span>] ← ∅
+        <b>for each</b> <span class="var">d2</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">c1</span>.nodo, <span class="var">c1</span>.dirección) <b>do</b>
+            <span class="var">c2</span> ← <span class="fn">siguienteCruce</span>(<span class="var">c1</span>.nodo, <span class="var">d2</span>)
+            <b>if</b> <span class="fn">llegoAntes</span>(<span class="var">c2</span>.nodo, <span class="var">c1</span>.pasos + <span class="var">c2</span>.pasos) <b>then</b> añadir <span class="var">d2</span> a <span class="var">árbol</span>[<span class="var">d</span>] <b>end if</b>
+        <b>end for</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">árbol</span>
+<b>end function</b></pre>
+        <p class="lede">Conjunto vacío = trampa, aunque el primer tramo sea seguro.</p>
+      </section>
+
+      <section class="slide s-code" id="d44">
+        <span class="slide-num">Parte 5 · 44</span>
+        <h2>Anchura, restringida a lo seguro</h2>
+        <pre class="pseudo"><b>function</b> <span class="fn">buscarObjetivoSeguro</span>(<span class="var">objetivos</span>, <span class="var">árbol</span>)
+    <span class="var">cola</span> ← cola FIFO;   <span class="var">visitados</span> ← {<span class="var">miNodo</span>}
+    <b>for each</b> <span class="var">d</span> <b>in</b> claves de <span class="var">árbol</span> <b>do</b>   <i>// sólo arranco por lo seguro</i>
+        <span class="var">v</span> ← vecino de <span class="var">miNodo</span> en <span class="var">d</span>;  <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">miNodo</span>;  añadir <span class="var">v</span> a <span class="var">visitados</span>;  <span class="fn">encolar</span>(<span class="var">cola</span>, {<span class="var">v</span>, <span class="var">d</span>})
+    <b>end for</b>
+    <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
+        {<span class="var">n</span>, <span class="var">dir</span>} ← <span class="fn">desencolar</span>(<span class="var">cola</span>);   <b>if</b> <span class="var">n</span> ∈ <span class="var">objetivos</span> <b>then return</b> primer paso de <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">n</span>, <span class="var">dir</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b> <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>;  añadir <span class="var">v</span> a <span class="var">visitados</span>;  <span class="fn">encolar</span>(<span class="var">cola</span>, {<span class="var">v</span>, dir. de <span class="var">n</span> a <span class="var">v</span>}) <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+<b>end function</b></pre>
+<p class="lede"><code>getClosestNodeIndexFromNodeIndex</code> hace lo mismo, pero no ve los fantasmas.</p>
+      </section>
+
+      <section class="slide s-code" id="d45">
+        <span class="slide-num">Parte 5 · 45</span>
+        <h2>Juntándolo todo: Ms. Pac-Man</h2>
+        <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>()
+    <b>if</b> NOT <span class="fn">esCruce</span>(<span class="var">miNodo</span>) <b>then return</b> NULL <b>end if</b>
+    <span class="var">seguros</span> ← <span class="fn">movimientosSeguros</span>()
+    <span class="var">comer</span> ← <span class="fn">buscarObjetivoSeguro</span>(<span class="fn">fantasmasComestibles</span>(), <span class="var">seguros</span>)
+    <b>if</b> <span class="var">comer</span> ≠ NULL AND <span class="var">comer</span>.pasos &lt; <span class="var">umbralComer</span> + <span class="fn">comidos</span>() × <span class="var">agresividad</span> <b>then</b>
+        <b>return</b> <span class="var">comer</span>.dirección
+    <b>end if</b>
+    <b>if</b> <span class="fn">fantasmasCerca</span>() ≥ <span class="var">cuántos</span> <b>then</b>
+        <span class="var">poder</span> ← <span class="fn">buscarObjetivoSeguro</span>(<span class="fn">píldorasDePoder</span>(), <span class="var">seguros</span>)
+        <b>if</b> <span class="var">poder</span> ≠ NULL AND <span class="var">poder</span>.pasos &lt; <span class="var">umbralPoder</span> <b>then return</b> <span class="var">poder</span>.dirección <b>end if</b>
+    <b>end if</b>
+    <span class="var">pill</span> ← <span class="fn">buscarObjetivoSeguro</span>(<span class="fn">píldoras</span>(), <span class="var">seguros</span>)
+    <b>if</b> <span class="var">pill</span> ≠ NULL <b>then return</b> <span class="var">pill</span>.dirección <b>end if</b>
+    <b>return</b> <span class="fn">laSalidaQueMásOpcionesDeja</span>(<span class="var">seguros</span>)
+<b>end function</b></pre>
+      </section>
+
+      <section class="slide s-code" id="d46">
+        <span class="slide-num">Parte 5 · 46</span>
+        <h2>Y los fantasmas</h2>
+        <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>()
+    <b>for each</b> <span class="var">f</span> <b>in</b> FANTASMAS <b>do</b>
+        <b>if</b> NOT <span class="fn">game.doesGhostRequireAction</span>(<span class="var">f</span>) <b>then continue end if</b>
+        <b>if</b> <span class="fn">tiempoDeNivel</span>() &lt; <span class="var">turnosDeDispersión</span> <b>then</b> <span class="var">movimientos</span>[<span class="var">f</span>] ← <span class="fn">haciaSuEsquina</span>(<span class="var">f</span>)
+        <b>else if</b> (<span class="fn">esComestible</span>(<span class="var">f</span>) OR <span class="fn">vaAPorUnaPíldoraDePoder</span>()) AND <span class="fn">meDaTiempoAAlcanzarme</span>(<span class="var">f</span>) <b>then</b>
+            <span class="var">movimientos</span>[<span class="var">f</span>] ← <span class="fn">huirSinMeterseEnCallejón</span>(<span class="var">f</span>)
+        <b>else</b>
+            <span class="var">movimientos</span>[<span class="var">f</span>] ← <span class="fn">segúnSuPapel</span>(<span class="var">f</span>)
+        <b>end if</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">movimientos</span>
+<b>end function</b></pre>
+        <p class="lede">Cuatro clones del mismo perseguidor son un fantasma con cuatro cuerpos.</p>
+      </section>
+
+      <section class="slide s-code" id="d47">
+        <span class="slide-num">Parte 5 · 47</span>
+        <h2>Papeles distintos, en código</h2>
+<pre><code><span class="k">switch</span> (f) {
+    <span class="k">case</span> BLINKY:   <span class="c">// persigue por el camino más corto</span>
+        <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, pacman, ult));
+    <span class="k">case</span> PINKY:    <span class="c">// intercepta: va al próximo cruce de Ms. Pac-Man</span>
+        <span class="k">int</span> destino = proximoCruceDe(game, pacman, game.getPacmanLastMoveMade());
+        <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, destino, ult));
+    <span class="k">case</span> INKY:     <span class="c">// cubre la píldora de poder más cercana a Ms. Pac-Man</span>
+        <span class="k">int</span>[] pp = game.getActivePowerPillsIndices();
+        <span class="k">int</span> guardar = game.getClosestNodeIndexFromNodeIndex(pacman, pp, DM.PATH);
+        <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, guardar, ult));
+    <span class="k">default</span>:      <span class="c">// SUE: persigue, pero de vez en cuando se sale del guion</span>
+        <span class="k">return</span> (game.getCurrentLevelTime() % <span class="n">10</span> == <span class="n">0</span>)
+                ? movimientoAleatorioLegal(game, nodo, ult)
+                : primerMovimientoDe(game, game.getShortestPath(nodo, pacman, ult));
+}</code></pre>
+      </section>
+
+      <section class="slide" id="d48">
+        <span class="slide-num">Parte 5 · 48</span>
+        <h2>El presupuesto</h2>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Operación</th><th scope="col">Cuesta</th></tr></thead>
+            <tbody>
+              <tr><td><code>getShortestPathDistance(a, b)</code></td><td>Una lectura de <em>array</em>. Gratis.</td></tr>
+              <tr><td><code>getShortestPath(a, b)</code></td><td>Empalmar tramos guardados. Barato.</td></tr>
+              <tr><td><code>getShortestPath(a, b, últMov)</code></td><td>Un A* de verdad. No lo llames cuatro veces igual.</td></tr>
+              <tr><td>Una anchura sobre los 1293 nodos</td><td>Asumible una vez por cruce.</td></tr>
+              <tr><td>Lo mismo, en los 4000 turnos</td><td>Empieza a notarse. Por eso se decide en los cruces.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="slide" id="d49">
+        <span class="slide-num">Parte 5 · 49</span>
+        <h2>Ver lo que piensa</h2>
+<pre><code><span class="c">// un color por motivo, todo detrás de un interruptor que se apaga al entregar</span>
+<span class="k">if</span> (DEBUG) {
+    GameView.addPoints(game, Color.ORANGE, caminoAlaPildora);   <span class="c">// a dónde voy</span>
+    GameView.addPoints(game, Color.RED,    tramosDescartados);  <span class="c">// qué he descartado</span>
+    GameView.addLines (game, Color.CYAN,   miNodo, fantasmaQueMePreocupa);
+}</code></pre>
+        <p class="lede">
+          Si la ventana no está abierta, no hacen nada. Cuando veas en pantalla los tramos que tu
+          controlador da por cerrados, los errores de «¿llego yo antes?» se hacen obvios en dos partidas.
+          Sin eso, no.
+        </p>
+      </section>
+
+      <section class="slide" id="d50">
+        <span class="slide-num">Tema 1 · 50</span>
+        <h2>Lo que hay que llevarse</h2>
+        <ol>
+          <li>El <em>pathfinding</em> son dos problemas: <strong>representar</strong> y <strong>buscar</strong>.</li>
+          <li>Todo algoritmo de búsqueda es el mismo bucle sobre abiertos y cerrados.</li>
+          <li>Anchura con costes unitarios ya es óptima. En el laberinto, es la herramienta.</li>
+          <li>Heurística <strong>admisible</strong> ⇒ A* óptimo.</li>
+          <li><code>DM.PATH</code> siempre: las otras dos atraviesan paredes.</li>
+          <li>El camino te lo da el motor. La <strong>decisión</strong> no, y ahí está la nota.</li>
+        </ol>
+      </section>
+
+      <section class="slide s-part" id="d51">
+        <span class="slide-num">Tema 1 · 51</span>
+        <p class="part-num">Y ahora</p>
+        <h2>Práctica 1 · Controladores algorítmicos</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="note tip" style="margin-top:1.5rem">
+    <span class="note-label">Cómo se maneja</span>
+    <p>
+      Flechas izquierda y derecha, o barra espaciadora, para pasar de diapositiva. La tecla
+      <kbd>F</kbd> o el botón <em>Pantalla completa</em> la ponen a tamaño de proyector, y
+      <kbd>Esc</kbd> o <em>Volver a la página</em> devuelven aquí. También se puede tocar la mitad
+      derecha o izquierda de la diapositiva, o deslizar el dedo en el móvil.
+    </p>
+  </div>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 16 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+<script src="../assets/js/deck.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 1 · Controladores algorítmicos · ICI</title>
+<meta name="description" content="Enunciado de la Práctica 1: implementar de forma algorítmica los comportamientos de Ms. Pac-Man y de los fantasmas, con el repertorio de técnicas que se espera y cómo se evalúa.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <span>Práctica 1</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Controladores algorítmicos
+      <span class="thin">Escribir a mano los comportamientos de Ms. Pac-Man y de los fantasmas.</span>
+    </h1>
+    <p class="standfirst">
+      El objetivo de esta práctica es implementar los comportamientos tanto de Ms.&nbsp;Pac-Man como de los
+      fantasmas <strong>de forma algorítmica</strong>, en Java, sin ninguna representación explícita del
+      conocimiento: condicionales, bucles y estructuras de datos. Es la línea base contra la que se van a
+      comparar todas las técnicas del resto del curso, así que conviene que sea buena.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Fecha de entrega</dt>
+      <dd>4 de octubre<small>Domingo, a través del Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Modalidad</dt>
+      <dd>Grupos de 2<small>Los mismos que en el resto del curso</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Límite</dt>
+      <dd>500 líneas<small>Por cada comportamiento</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Se entrega</dt>
+      <dd><code>practica1-grupoYY.zip</code><small>Los dos controladores</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="que-se-pide">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué se pide</h2>
+        </div>
+        <p>
+          Dos controladores, escritos de forma programática con el lenguaje Java:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Clase</th><th scope="col">Extiende</th><th scope="col">Devuelve</th></tr></thead>
+            <tbody>
+              <tr><td><code>MsPacMan</code></td><td><code>pacman.controllers.PacmanController</code></td><td>Un <code>MOVE</code> por turno.</td></tr>
+              <tr><td><code>Ghosts</code></td><td><code>pacman.controllers.GhostController</code></td><td>Un <code>EnumMap&lt;GHOST, MOVE&gt;</code> con el movimiento de cada fantasma que lo necesite.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Siendo una primera aproximación al diseño de los comportamientos, no se espera una implementación
+          exhaustiva. Por eso se fija un <strong>máximo de 500 líneas de código por cada
+          comportamiento</strong>. El límite no está para castigar: está para que la solución tenga que ser
+          <em>elegida</em> en vez de acumulada, que es exactamente la habilidad que se evalúa.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Nada de aprendizaje ni de persistencia</span>
+          <p>
+            En esta implementación <strong>no se permite ningún esquema de aprendizaje</strong> donde se
+            guarden datos sobre las partidas o los oponentes en cualquier medio de persistencia: bases de
+            datos, ficheros, ni nada parecido. Todo lo que decide tu controlador tiene que salir del
+            <code>Game</code> que recibe en ese turno y de lo que tú hayas escrito a mano.
+          </p>
+          <p>
+            Guardar estado <em>dentro</em> de la partida sí vale: el último movimiento, un contador, un objetivo
+            que estás siguiendo: eso no es aprender, es recordar.
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Antes de empezar</span>
+          <p>
+            Lee los apuntes del tema:
+            <a href="../guias/apuntes-pathfinding.html"><strong>Pathfinding y estrategias
+            algorítmicas</strong></a>. Están escritos para esta práctica, y las secciones 7 y 8 son
+            directamente el material de trabajo. Ten a mano también la
+            <a href="../guias/clase-game.html">referencia de la clase <code>Game</code></a>.
+          </p>
+        </div>
+      </section>
+
+      <section id="reglas-simulacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Reglas de simulación</h2>
+        </div>
+        <p>
+          El simulador se configurará <strong>sin visibilidad parcial</strong> y con el
+          <strong>tiempo máximo de razonamiento por defecto (40&nbsp;ms)</strong>. Es decir: tu controlador
+          ve el estado completo de la partida, y tiene 40&nbsp;ms anunciados para contestar.
+        </p>
+        <div class="codigo"><pre><code>Executor executor = <span class="k">new</span> Executor.Builder()
+        .setTickLimit(<span class="n">4000</span>)
+        .setPacmanPO(<span class="k">false</span>)      <span class="c">// sin visibilidad parcial</span>
+        .setGhostPO(<span class="k">false</span>)
+        .setGhostsMessage(<span class="k">false</span>) <span class="c">// sin mensajes entre fantasmas</span>
+        .setVisual(<span class="k">true</span>)
+        .setScaleFactor(<span class="n">2.5</span>)
+        .build();</code></pre></div>
+        <p>
+          La evaluación se hace con <code>runExperiment</code>, o sea varias partidas seguidas, y se usa la
+          <strong>puntuación media</strong>. Acostúmbrate desde el primer día a mirar la media de veinte
+          partidas y no el resultado de una: con controladores que tienen algo de azar, una partida suelta
+          no dice nada.
+        </p>
+        <h3 class="label">El presupuesto de 40 ms, con precisión</h3>
+        <p>
+          Esto genera bastante confusión, así que conviene dejarlo claro de una vez, porque cambia lo que
+          tiene sentido programar. <strong>Hay dos formas muy distintas de ejecutar una partida</strong>, y
+          el reloj sólo existe en una de ellas.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col"><code>runGame</code> · <code>runExperiment</code></th>
+                <th scope="col"><code>runGameTimed…</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cuándo se usa</td>
+                <td><strong>En clase y en la corrección.</strong></td>
+                <td>En la competición, y si lo pides tú.</td>
+              </tr>
+              <tr>
+                <td>Cómo te llama</td>
+                <td>Llama a tu <code>getMove(game, timeDue)</code> y <strong>se queda esperando</strong> a que vuelvas.</td>
+                <td>Te despierta un hilo aparte, duerme 40&nbsp;ms y sigue con lo que haya.</td>
+              </tr>
+              <tr>
+                <td>Si tardas 200&nbsp;ms</td>
+                <td>No pasa nada: la partida tarda 200&nbsp;ms más en ese turno. <strong>Tu movimiento se usa entero.</strong></td>
+                <td>El juego avanza 5 turnos con el <strong>último movimiento que dejaste puesto</strong>.</td>
+              </tr>
+              <tr>
+                <td>Qué es <code>timeDue</code></td>
+                <td>Un plazo <em>anunciado</em>: <code>ahora + 40&nbsp;ms</code>. Nadie lo comprueba.</td>
+                <td>El instante real en que el motor va a mirar tu respuesta.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">El detalle del modo con reloj que casi nadie espera</span>
+          <p>
+            Mientras tu cálculo anterior sigue corriendo, el motor <strong>no lanza otro</strong>: tu
+            <code>getMove</code> <em>ni siquiera se llama</em> para esos turnos. Un cálculo de 200&nbsp;ms no
+            son cinco turnos decididos con información vieja, son cinco turnos en los que no te preguntan
+            nada. Lo puedes ver en <code>Controller.run()</code>, en la línea
+            <code>if (!threadStillRunning)</code>.
+          </p>
+        </div>
+
+        <h3 class="label">¿Hay que devolver un movimiento en cada turno?</h3>
+        <p>
+          <strong>No.</strong> Y merece la pena saber exactamente qué hace el motor cuando no le das nada
+          utilizable, porque es lo que permite repartir el trabajo. Está en
+          <code>Game.correctPacManDir</code>, y la regla es esta, por orden:
+        </p>
+        <ol>
+          <li>Si el movimiento es <strong>legal</strong> en ese nodo y no es dar media vuelta, se usa.</li>
+          <li>Si no lo es —<code>null</code>, ilegal, o un giro de 180°—, <strong>se sigue en la dirección que llevabas</strong>.</li>
+          <li>Si tampoco se puede seguir recto, el motor elige por ti cualquier salida legal que no sea retroceder.</li>
+          <li>Y si no hay ninguna, <code>NEUTRAL</code>: te quedas quieto.</li>
+        </ol>
+        <p>
+          Con los fantasmas pasa lo mismo por otro camino: el fantasma que no aparezca en el
+          <code>EnumMap</code> se rellena con <code>NEUTRAL</code>, y <code>checkGhostDir</code> lo traduce
+          otra vez a seguir recto. Por eso el pseudocódigo de la
+          <a href="practica-0.html#ej3">Práctica&nbsp;0</a> se salta sin más los que no requieren acción.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Dos consecuencias que hay que tener presentes</span>
+          <p>
+            La primera: <strong>el giro de 180° se ignora en silencio</strong>. Si vas hacia la derecha y
+            devuelves <code>LEFT</code>, no te das la vuelta ni te quedas quieto: sigues hacia la derecha. La
+            única excepción del juego es el fantasma al que le cae encima una píldora de poder.
+          </p>
+          <p>
+            La segunda: en un cruce, <strong>«no decidir» no es neutral</strong>. Es «sigo recto», que es una
+            de las opciones, y muchas veces la mala.
+          </p>
+        </div>
+
+        <h3 class="label">Sí, puedes gastar 200 ms en un cruce</h3>
+        <p>
+          Que es justo lo que hay que hacer. El trabajo no está repartido por igual entre los 4000 turnos:
+          en un pasillo no hay nada que decidir y en un cruce hay que decidirlo todo. Así que concentra el
+          presupuesto donde sirve:
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · gastar donde importa</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>()
+    <b>if</b> NOT <span class="fn">esCruce</span>(<span class="var">miNodo</span>) <b>then return</b> NULL <b>end if</b>   <i>// gratis: el motor sigue recto</i>
+    <i>// aquí sí: búsqueda completa, lo que haga falta</i>
+    <b>return</b> <span class="fn">decidirEnSerio</span>()
+<b>end function</b></pre>
+        </figure>
+        <p>
+          En el modo con el que se corrige eso es legal y no cuesta nada más que reloj. Lo único que se paga
+          es el tiempo de la corrección, y conviene no olvidarlo: como en un laberinto sólo uno de cada diez
+          turnos es un cruce, un controlador que gaste 200&nbsp;ms en cada decisión convierte una partida de
+          4000 turnos en un minuto y medio largo, y la corrección son muchas partidas. Con 20&nbsp;ms por
+          cruce ni se nota.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Y si además quieres que aguante el modo con reloj</span>
+          <p>
+            La clase <code>Controller</code> te deja el campo <code>lastMove</code> como
+            <code>protected</code>, y el comentario del propio motor dice para qué:
+            <em lang="en">«You can set this directly in your getMove() method to save an immediate
+            response»</em>. Es el patrón <em lang="en">anytime</em> del que habla el tema 5: apunta enseguida
+            un movimiento decente, sigue calculando, y ve mejorándolo.
+          </p>
+<pre><code><span class="c">@Override</span>
+<span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+    lastMove = movimientoRapidoYSeguro(game);   <span class="c">// ya hay respuesta si preguntan</span>
+
+    <span class="k">while</span> (System.currentTimeMillis() &lt; timeDue - <span class="n">2</span>) {
+        MOVE mejor = seguirPensando(game);      <span class="c">// una vuelta más de búsqueda</span>
+        <span class="k">if</span> (mejor != <span class="k">null</span>) lastMove = mejor;
+    }
+    <span class="k">return</span> lastMove;
+}</code></pre>
+          <p>
+            Para esta práctica no hace falta, porque la corrección espera. Pero es la forma correcta de
+            escribirlo si alguna vez el reloj es de verdad, y no cuesta nada dejarlo así desde el principio.
+          </p>
+        </div>
+      </section>
+
+      <section id="evaluacion">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Cómo se evalúa</h2>
+        </div>
+        <p>
+          Al ser todavía una práctica introductoria, se evalúa de acuerdo a dos cosas: la
+          <strong>calidad del código</strong> y el <strong>rendimiento</strong> de los comportamientos
+          implementados.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Se mira</th><th scope="col">En concreto</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Rendimiento de <code>MsPacMan</code></td>
+                <td>Puntuación media en una serie de partidas contra fantasmas de referencia, y contra los fantasmas de otros grupos.</td>
+              </tr>
+              <tr>
+                <td>Rendimiento de <code>Ghosts</code></td>
+                <td>Lo contrario: cuánto consiguen bajar la puntuación de Ms.&nbsp;Pac-Man de referencia y de los demás grupos.</td>
+              </tr>
+              <tr>
+                <td>Calidad del código</td>
+                <td>Que se entienda qué decide y por qué. Métodos con nombre, umbrales con nombre, decisiones separadas del cálculo, nada de copiar y pegar el mismo bloque cuatro veces.</td>
+              </tr>
+              <tr>
+                <td>Repertorio de técnicas</td>
+                <td>Lo que viene en la sección siguiente. Un controlador que sólo encadena condicionales sobre distancias aprueba; no pasa de ahí.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Los dos comportamientos cuentan. Un grupo con una Ms.&nbsp;Pac-Man excelente y unos fantasmas que
+          se limitan a perseguir en línea recta ha hecho media práctica.
+        </p>
+      </section>
+
+      <section id="que-se-espera">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Qué se espera: el repertorio</h2>
+        </div>
+        <p>
+          Esta es la parte que el enunciado clásico no decía, y conviene decirla. No se trata de encadenar
+          condicionales sobre <code>getShortestPathDistance</code> hasta que la cosa más o menos funcione.
+          Lo que distingue una práctica notable de una de sobresaliente es <strong>qué preguntas se hace el
+          controlador antes de decidir</strong>, y son estas.
+        </p>
+        <p>
+          No hace falta implementarlas todas, y desde luego no caben todas en 500 líneas. Elegid tres o
+          cuatro, hacedlas bien, y que se note en la partida.
+        </p>
+
+        <h3 class="label">Para Ms. Pac-Man</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Técnica</th><th scope="col">Qué resuelve</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Decidir sólo en los cruces</strong></td>
+                <td>En un pasillo no hay decisión. Devolver <code>null</code> fuera de los cruces evita las oscilaciones y libera todo el presupuesto de cálculo para los 38 sitios donde sí importa.</td>
+              </tr>
+              <tr>
+                <td><strong>Razonar por tramos</strong></td>
+                <td>Recorrer el pasillo hasta el siguiente cruce anotando lo que hay por él (píldoras, píldora de poder, fantasmas) en vez de mirar nodo a nodo.</td>
+              </tr>
+              <tr>
+                <td><strong>«¿Llego yo antes?»</strong></td>
+                <td>Comparar tu distancia a un cruce con la de cada fantasma <em>a ese mismo cruce</em>, con un margen. Es la diferencia entre huir y ponerse a salvo.</td>
+              </tr>
+              <tr>
+                <td><strong>Mirar dos cruces por delante</strong></td>
+                <td>Un tramo seguro que desemboca en un cruce sin salidas seguras es una trampa. Con profundidad 2 se detecta; con más, la predicción ya no vale nada.</td>
+              </tr>
+              <tr>
+                <td><strong>Búsqueda propia restringida</strong></td>
+                <td>Una anchura sobre el grafo que sólo cruza nodos seguros contesta, en una pasada, cuál es el objetivo alcanzable más cercano <em>y</em> por dónde se va. <code>getClosestNodeIndexFromNodeIndex</code> no sabe que hay fantasmas.</td>
+              </tr>
+              <tr>
+                <td><strong>Prioridades explícitas</strong></td>
+                <td>Un orden de decisión escrito y defendible: primero comer fantasma comestible si compensa, luego píldora de poder si hay presión, luego píldora normal, y al final sobrevivir.</td>
+              </tr>
+              <tr>
+                <td><strong>Umbrales que se mueven</strong></td>
+                <td>Un umbral fijo es una decisión tomada a ciegas. Que la distancia a la que merece la pena perseguir crezca con la cadena de fantasmas ya comidos, por ejemplo, es conocimiento del dominio metido en un número.</td>
+              </tr>
+              <tr>
+                <td><strong>La píldora de poder como recurso</strong></td>
+                <td>Comérsela al pasar es desperdiciarla. Guardarla, y gastarla cuando hay varios fantasmas encima y cerca, multiplica la puntuación: los cuatro fantasmas con una sola píldora valen tanto como 300 píldoras normales.</td>
+              </tr>
+              <tr>
+                <td><strong>El final del nivel</strong></td>
+                <td>Cuando quedan cuatro píldoras en un callejón, el criterio de seguridad puro bloquea al controlador y la partida se muere de vieja. Hay que detectar ese caso y permitir el riesgo.</td>
+              </tr>
+              <tr>
+                <td><strong>Depuración visual con interruptor</strong></td>
+                <td>Pintar con <code>GameView</code> el camino elegido y los tramos descartados, cada motivo de un color, detrás de un <code>boolean</code> que se apaga al entregar.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Para los fantasmas</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Técnica</th><th scope="col">Qué resuelve</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Papeles distintos</strong></td>
+                <td>Un <code>switch</code> sobre <code>GHOST</code> y cuatro comportamientos: uno persigue, otro intercepta, otro cubre el túnel, otro vigila la píldora de poder. Cuatro clones del mismo perseguidor son un solo fantasma con cuatro cuerpos.</td>
+              </tr>
+              <tr>
+                <td><strong>Dispersión al empezar</strong></td>
+                <td>Los cuatro salen de la cárcel por el mismo nodo. Mandarlos a esquinas distintas durante los primeros turnos reparte el mapa desde el principio.</td>
+              </tr>
+              <tr>
+                <td><strong>Interceptar, no seguir</strong></td>
+                <td>Perseguir por el camino más corto es ir siempre por detrás. Predecir el próximo cruce de Ms.&nbsp;Pac-Man y dirigirse <em>ahí</em> es lo que la acorrala.</td>
+              </tr>
+              <tr>
+                <td><strong>Anticipar la píldora de poder</strong></td>
+                <td>Mirar si en el tramo que Ms.&nbsp;Pac-Man lleva hay una píldora de poder activa, y dispersarse <strong>antes</strong> de que se la coma, no después.</td>
+              </tr>
+              <tr>
+                <td><strong>Huir con criterio</strong></td>
+                <td><code>getNextMoveAwayFromTarget</code> se mete en callejones igual que en la Práctica&nbsp;0. Mejor: calcular por qué pasillo viene Ms.&nbsp;Pac-Man, descartar esa salida, y elegir entre las demás.</td>
+              </tr>
+              <tr>
+                <td><strong>Dejar de huir a tiempo</strong></td>
+                <td>Si el tiempo de comestible que queda es menor que la distancia a la que está Ms.&nbsp;Pac-Man, ya no te puede alcanzar: vuelve a perseguir y gana posición mientras los demás siguen huyendo.</td>
+              </tr>
+              <tr>
+                <td><strong>No perseguir todos lo mismo</strong></td>
+                <td>Repartirse cuadrantes, o que sólo dos persigan mientras los otros dos cortan las salidas, es coordinación de verdad aunque no haya mensajes: los cuatro ven el mismo estado y pueden repartirse el mapa por convenio.</td>
+              </tr>
+              <tr>
+                <td><strong>Respetar el ciclo</strong></td>
+                <td>Sólo se decide para los fantasmas con <code>doesGhostRequireAction</code>; a los demás no se les pone entrada en el mapa. Y para medir distancias, siempre la versión con <code>lastMoveMade</code>: no pueden darse la vuelta.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Una forma de organizarlo</h3>
+        <p>
+          El esqueleto de una Ms.&nbsp;Pac-Man con este repertorio cabe en muy pocas líneas, porque la
+          complicación está en las funciones auxiliares, no en la decisión:
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · <code>MsPacMan</code>, prioridades sobre movimientos seguros</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>()
+    <b>if</b> NOT <span class="fn">esCruce</span>(<span class="var">miNodo</span>) <b>then return</b> NULL <b>end if</b>    <i>// en pasillo no se decide</i>
+
+    <span class="var">seguros</span> ← <span class="fn">movimientosSeguros</span>()               <i>// árbol de dos niveles</i>
+
+    <span class="var">comer</span> ← <span class="fn">buscarObjetivoSeguro</span>(<span class="fn">fantasmasComestibles</span>(), <span class="var">seguros</span>)
+    <b>if</b> <span class="var">comer</span> ≠ NULL AND <span class="var">comer</span>.pasos &lt; <span class="var">umbralComer</span> + <span class="fn">comidos</span>() × <span class="var">agresividad</span> <b>then</b>
+        <b>return</b> <span class="var">comer</span>.dirección
+    <b>end if</b>
+
+    <b>if</b> <span class="fn">fantasmasCerca</span>() ≥ <span class="var">cuántos</span> <b>then</b>
+        <span class="var">poder</span> ← <span class="fn">buscarObjetivoSeguro</span>(<span class="fn">píldorasDePoder</span>(), <span class="var">seguros</span>)
+        <b>if</b> <span class="var">poder</span> ≠ NULL AND <span class="var">poder</span>.pasos &lt; <span class="var">umbralPoder</span> <b>then</b>
+            <b>return</b> <span class="var">poder</span>.dirección
+        <b>end if</b>
+    <b>end if</b>
+
+    <span class="var">pill</span> ← <span class="fn">buscarObjetivoSeguro</span>(<span class="fn">píldoras</span>(), <span class="var">seguros</span>)
+    <b>if</b> <span class="var">pill</span> ≠ NULL <b>then return</b> <span class="var">pill</span>.dirección <b>end if</b>
+
+    <b>return</b> <span class="fn">laSalidaQueMásOpcionesDeja</span>(<span class="var">seguros</span>)   <i>// nada es seguro: la menos mala</i>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Y el de los fantasmas, con papeles y con el orden de prioridades al revés:
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · <code>Ghosts</code>, para cada fantasma que requiera acción</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>()
+    <span class="var">movimientos</span> ← mapa vacío
+    <b>for each</b> <span class="var">f</span> <b>in</b> FANTASMAS <b>do</b>
+        <b>if</b> NOT <span class="fn">game.doesGhostRequireAction</span>(<span class="var">f</span>) <b>then continue end if</b>
+
+        <b>if</b> <span class="fn">tiempoDeNivel</span>() &lt; <span class="var">turnosDeDispersión</span> <b>then</b>
+            <span class="var">movimientos</span>[<span class="var">f</span>] ← <span class="fn">haciaSuEsquina</span>(<span class="var">f</span>)
+
+        <b>else if</b> (<span class="fn">esComestible</span>(<span class="var">f</span>) OR <span class="fn">vaAPorUnaPíldoraDePoder</span>()) AND <span class="fn">meDaTiempoAAlcanzarme</span>(<span class="var">f</span>) <b>then</b>
+            <span class="var">movimientos</span>[<span class="var">f</span>] ← <span class="fn">huirSinMeterseEnCallejón</span>(<span class="var">f</span>)
+
+        <b>else</b>
+            <span class="var">movimientos</span>[<span class="var">f</span>] ← <span class="fn">segúnSuPapel</span>(<span class="var">f</span>)   <i>// perseguir, interceptar, cortar…</i>
+        <b>end if</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">movimientos</span>
+<b>end function</b></pre>
+        </figure>
+        <div class="codigo"><pre><code><span class="c">// Los papeles, en código: un switch y cuatro estrategias distintas</span>
+<span class="k">private</span> MOVE segunSuPapel(Game game, GHOST f) {
+    <span class="k">int</span>  nodo = game.getGhostCurrentNodeIndex(f);
+    MOVE ult  = game.getGhostLastMoveMade(f);
+    <span class="k">int</span>  pacman = game.getPacmanCurrentNodeIndex();
+
+    <span class="k">switch</span> (f) {
+        <span class="k">case</span> BLINKY:   <span class="c">// persigue por el camino más corto</span>
+            <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, pacman, ult));
+
+        <span class="k">case</span> PINKY:    <span class="c">// intercepta: va al próximo cruce de Ms. Pac-Man</span>
+            <span class="k">int</span> destino = proximoCruceDe(game, pacman, game.getPacmanLastMoveMade());
+            <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, destino, ult));
+
+        <span class="k">case</span> INKY:     <span class="c">// cubre la píldora de poder activa más cercana a Ms. Pac-Man</span>
+            <span class="k">int</span>[] pp = game.getActivePowerPillsIndices();
+            <span class="k">if</span> (pp.length &gt; <span class="n">0</span>) {
+                <span class="k">int</span> guardar = game.getClosestNodeIndexFromNodeIndex(pacman, pp, DM.PATH);
+                <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, guardar, ult));
+            }
+            <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, pacman, ult));
+
+        <span class="k">default</span>:      <span class="c">// SUE: persigue, pero de vez en cuando se sale del guion</span>
+            <span class="k">return</span> (game.getCurrentLevelTime() % <span class="n">10</span> == <span class="n">0</span>)
+                    ? movimientoAleatorioLegal(game, nodo, ult)
+                    : primerMovimientoDe(game, game.getShortestPath(nodo, pacman, ult));
+    }
+}
+
+<span class="k">private</span> MOVE primerMovimientoDe(Game game, <span class="k">int</span>[] camino) {
+    <span class="k">if</span> (camino == <span class="k">null</span> || camino.length &lt; <span class="n">2</span>) <span class="k">return</span> MOVE.NEUTRAL;
+    <span class="k">return</span> game.getMoveToMakeToReachDirectNeighbour(camino[<span class="n">0</span>], camino[<span class="n">1</span>]);
+}</code></pre></div>
+        <div class="note trap">
+          <span class="note-label">Cuidado con <code>getShortestPath</code> de longitud 0 o 1</span>
+          <p>
+            Devuelve un <code>int[]</code> vacío si el origen es la cárcel, y de un solo elemento si ya
+            estás en el destino. Acceder a <code>camino[1]</code> sin comprobarlo es la excepción que te
+            tumba la partida en la corrección, y pasa poco: justo lo suficiente para que no la veas
+            probando.
+          </p>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Los umbrales, en un sitio</span>
+          <p>
+            Todos los números que aparecen en este enunciado (cuándo está «cerca» un fantasma, cuántos
+            hacen falta para ir a por la píldora, cuánta holgura se deja al comparar distancias) son
+            decisiones de diseño que hay que <strong>afinar jugando</strong>. Sácalos a una clase de
+            constantes con nombres y un comentario cada uno. Se nota en la nota de calidad de código, y
+            sobre todo se nota en lo rápido que podéis probar variantes.
+          </p>
+<pre><code><span class="k">public class</span> Constantes {
+    <span class="c">// distancia a la que se considera que un fantasma está cerca</span>
+    <span class="k">public static final int</span> CERCA = <span class="n">50</span>;
+    <span class="c">// cuántos fantasmas cerca hacen falta para ir a por la píldora de poder</span>
+    <span class="k">public static final int</span> FANTASMAS_PARA_PILDORA = <span class="n">3</span>;
+    <span class="c">// margen al comparar quién llega antes a un cruce: empatar es perder</span>
+    <span class="k">public static final int</span> HOLGURA = <span class="n">4</span>;
+    <span class="c">// interruptores de depuración visual</span>
+    <span class="k">public static final boolean</span> DEBUG_PACMAN = <span class="k">false</span>;
+    <span class="k">public static final boolean</span> DEBUG_GHOSTS = <span class="k">false</span>;
+}</code></pre>
+        </div>
+      </section>
+
+      <section id="proceso">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Cómo abordarlo</h2>
+        </div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Partir de algo que funcione</h3>
+            <p>
+              Empezad por los controladores del ejercicio 3 de la
+              <a href="practica-0.html">Práctica&nbsp;0</a>, que ya juegan. Medid su media en veinte
+              partidas y apuntadla: ese número es vuestra línea base, y todo lo que hagáis después se
+              compara contra él.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Una técnica cada vez</h3>
+            <p>
+              Meted <strong>una sola</strong> de las técnicas de la sección anterior, volved a medir, y
+              quedáosla sólo si la media sube. Suena lento y es lo contrario: evita las tardes enteras
+              persiguiendo una mejora que en realidad era ruido de una partida.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Mirar, no suponer</h3>
+            <p>
+              Cuando algo vaya mal, poned el <code>DEBUG</code> a <code>true</code> y ved la partida
+              despacio, con <code>runGame(pacman, ghosts, 60)</code>. Los errores de la función «¿llego yo
+              antes?» son invisibles en el código y obvios en pantalla.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Enfrentar los vuestros entre sí</h3>
+            <p>
+              Poned vuestra <code>MsPacMan</code> contra vuestros <code>Ghosts</code>. Es el mejor banco de
+              pruebas que vais a tener, porque los dos conocen las mismas debilidades, y cada arreglo de un
+              lado destapa un agujero del otro.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Limpiar antes de entregar</h3>
+            <p>
+              Apagad los interruptores de depuración, quitad el código muerto, comprobad las 500 líneas y
+              pasad la lista del final de esta página.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="entrega">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Reglas de entrega</h2>
+        </div>
+        <p>
+          Esta práctica se desarrolla en <strong>grupos de 2 estudiantes</strong>. Cada grupo entrega a
+          través del Campus Virtual el código que implementa los dos comportamientos, en un archivo zip
+          llamado <code>practica1-grupoYY.zip</code>, donde <code>YY</code> es la letra de vuestro grupo.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Qué</th><th scope="col">Cómo exactamente</th></tr></thead>
+            <tbody>
+              <tr><td>Paquete</td><td><code>es.ucm.fdi.ici.c2627.practica1.grupoYY</code></td></tr>
+              <tr><td>Controlador de Ms. Pac-Man</td><td><code>MsPacMan</code></td></tr>
+              <tr><td>Controlador de los fantasmas</td><td><code>Ghosts</code></td></tr>
+              <tr><td>Archivo</td><td><code>practica1-grupoYY.zip</code></td></tr>
+              <tr><td>Raíz del zip</td><td>La carpeta <code>es</code>, comprimiendo desde la raíz del código fuente.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          En caso de entregar varios controladores, indicad el nombre de cada uno en el correo o en el
+          comentario de la entrega.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Importante: la raíz del zip</span>
+          <p>
+            El archivo debe comprimirse <strong>desde la raíz del código fuente</strong>, es decir
+            comprimiendo la carpeta <code>es</code>. Al abrir el zip, lo primero que debe verse es
+            <code>es/</code>, no <code>src/</code> ni la carpeta del proyecto.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">No se modifica el simulador</span>
+          <p>
+            Obviamente no se permite modificar el código del simulador. Por lo tanto, la entrega
+            <strong>no debe contener el código del simulador</strong> (paquete <code>pacman.*</code>).
+          </p>
+        </div>
+        <p>
+          Todas las prácticas serán comprobadas para la detección de plagios.
+        </p>
+
+        <h3 class="label">Antes de subir el zip</h3>
+        <ul class="check">
+          <li>El paquete es <code>es.ucm.fdi.ici.c2627.practica1.grupoYY</code>, con vuestra letra.</li>
+          <li>Las clases se llaman exactamente <code>MsPacMan</code> y <code>Ghosts</code>.</li>
+          <li>Ninguno de los dos comportamientos pasa de 500 líneas.</li>
+          <li>Ambas compilan en un proyecto limpio que sólo referencia a <code>MsPacManEngine</code>.</li>
+          <li>No se lee ni se escribe ningún fichero, base de datos ni recurso externo.</li>
+          <li>Los interruptores de depuración visual están a <code>false</code>.</li>
+          <li><code>getName()</code> devuelve un nombre reconocible en los <em>logs</em>.</li>
+          <li>Al abrir el zip aparece <code>es/</code> en la raíz.</li>
+          <li>No hay ni un archivo del paquete <code>pacman.*</code> dentro.</li>
+          <li>Veinte partidas seguidas con <code>runExperiment</code> terminan sin una sola excepción.</li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#que-se-pide">Qué se pide</a></li>
+            <li><a href="#reglas-simulacion">Reglas de simulación</a></li>
+            <li><a href="#evaluacion">Cómo se evalúa</a></li>
+            <li><a href="#que-se-espera">Qué se espera: el repertorio</a></li>
+            <li><a href="#proceso">Cómo abordarlo</a></li>
+            <li><a href="#entrega">Reglas de entrega</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El tema</span>
+          <p style="margin:0">
+            <a href="../guias/apuntes-pathfinding.html">Pathfinding y estrategias algorítmicas</a>, y el
+            mismo contenido en <a href="../guias/apuntes-pathfinding-slides.html">diapositivas</a>.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Dudas</span>
+          <p style="margin:0">
+            <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a>. Mejor preguntar en la primera semana que
+            en la víspera de la entrega.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 16 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

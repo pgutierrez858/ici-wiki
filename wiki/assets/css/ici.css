@@ -542,6 +542,8 @@ kbd {
   white-space: nowrap;
   color: var(--ink);
 }
+/* una ruta de menús larga no cabe en un móvil, y sacaba la página de sitio */
+@media (max-width: 460px) { .path { white-space: normal; } }
 
 .lead-quote {
   max-width: 34rem;
@@ -793,10 +795,52 @@ td code { font-size: .79rem; }
   margin: 0 0 1rem;
   overflow-x: auto;
 }
+/* dos o más fórmulas hermanas, cada una en su caja y con su nombre encima */
+.formulas {
+  display: grid;
+  gap: .7rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  max-width: var(--measure);
+  margin: 0 0 1.2rem;
+}
+.formulas .formula { margin: 0; max-width: none; padding: .8rem .9rem 1rem; }
+.formula-et {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: .64rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: .8rem;
+}
+/* el radical: el signo fuera y la raya encima del radicando, que si no se
+   dibuja como un paréntesis cualquiera y no se entiende dónde acaba */
+.raiz { display: inline-block; white-space: nowrap; }
+.raiz::before { content: "\221A"; padding-right: .04em; }
+.raiz > span { border-top: 1px solid currentColor; padding: .18em .18em 0 .1em; display: inline-block; }
+.formula sub, .formula sup { font-size: .68em; }
+.formula em { font-style: italic; }
 
 /* identidad de los fantasmas */
 .ghost-name { font-family: var(--f-display); font-weight: 600; display: flex; align-items: center; gap: .5rem; white-space: nowrap; }
 .swatch { width: .8rem; height: .8rem; border-radius: 50% 50% 2px 2px; flex: none; }
+/* muestras cuadradas para la leyenda del paso a paso de la rejilla */
+.swatch.sw-vista, .swatch.sw-cola, .swatch.sw-ahora, .swatch.sw-nueva {
+  display: inline-block;
+  border-radius: 2px;
+  vertical-align: -.05em;
+  margin-right: .45rem;
+}
+.swatch.sw-vista { background: color-mix(in srgb, var(--maze) 26%, var(--surface)); }
+.swatch.sw-cola  { background: color-mix(in srgb, var(--pill) 50%, var(--surface)); border: 1px solid var(--pill-ink); }
+.swatch.sw-ahora { background: color-mix(in srgb, var(--blinky) 55%, var(--surface)); border: 1px solid var(--blinky); }
+.swatch.sw-nueva { background: var(--surface); border: 1.5px solid var(--pill-ink); }
+.swatch.sw-mejora, .swatch.sw-peor {
+  display: inline-block; border-radius: 1px; vertical-align: .05em;
+  width: 1.1rem; height: .18rem; margin-right: .1rem;
+}
+.swatch.sw-mejora { background: var(--ok); }
+.swatch.sw-peor   { background: repeating-linear-gradient(90deg, var(--bad) 0 3px, transparent 3px 6px); }
 .g-blinky { background: var(--blinky); }
 .g-pinky  { background: var(--pinky); }
 .g-inky   { background: var(--inky); }
@@ -1197,6 +1241,9 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
     --mx-ground: #f2f2f2; --mx-ink: #333;
   }
   .site, .rail, .skip, .theme, .mx-wave { display: none !important; }
+  /* de un ejemplo interactivo, en papel queda la escena y la lectura */
+  .demo-controls { display: none !important; }
+  .demo { break-inside: avoid; }
   body { background: #fff; font-size: 10.5pt; }
   .wrap { max-width: none; padding: 0 0 1rem; }
   .cols { grid-template-columns: minmax(0, 1fr) !important; gap: 0; padding-top: 1rem; }
@@ -1385,6 +1432,11 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
 .deck--js .s-figure figure img { flex: 1 1 auto; min-height: 0; }
 .deck--js .s-figure .foot { font-size: .7em; line-height: 1.45; color: var(--ink-2); max-width: 46em; margin-top: .45em; }
 
+/* s-code: la diapositiva cuyo contenido es un algoritmo. El bloque manda, así
+   que baja un punto para que quepan quince o dieciséis líneas sin recortarlo. */
+.deck--js .s-code pre { font-size: .6em; line-height: 1.45; }
+.deck--js .s-code .lede { font-size: .82em; }
+
 /* portada y separadores: el laberinto de noche */
 .deck--js .s-cover,
 .deck--js .s-part { background: #14192B; color: #F1F4FA; }
@@ -1465,7 +1517,7 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
   font-size: .7rem;
 }
 .deck-bar .grow { flex: 1; }
-.deck-btn {
+.deck-btn, .demo-btn {
   font: inherit;
   color: var(--ink-2);
   background: var(--surface);
@@ -1475,11 +1527,11 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
   cursor: pointer;
   transition: color .15s ease, border-color .15s ease, background-color .15s ease;
 }
-.deck-btn:hover:not([disabled]) { color: var(--ink); border-color: var(--ink); }
-.deck-btn:active:not([disabled]) { background: var(--maze-soft); color: var(--maze); }
-.deck-btn[disabled] { opacity: .45; cursor: default; }
+.deck-btn:hover:not([disabled]), .demo-btn:hover:not([disabled]) { color: var(--ink); border-color: var(--ink); }
+.deck-btn:active:not([disabled]), .demo-btn:active:not([disabled]) { background: var(--maze-soft); color: var(--maze); }
+.deck-btn[disabled], .demo-btn[disabled] { opacity: .45; cursor: default; }
 .deck-btn.primary { border-color: var(--ink-3); color: var(--ink); }
-.deck-btn.on { background: var(--maze-soft); border-color: var(--maze); color: var(--maze); }
+.deck-btn.on, .demo-btn[aria-pressed="true"] { background: var(--maze-soft); border-color: var(--maze); color: var(--maze); }
 .deck-count { color: var(--ink-3); font-variant-numeric: tabular-nums; padding: 0 .3rem; }
 .deck-count b { color: var(--ink); font-weight: 500; }
 .deck-hint { color: var(--ink-3); }
@@ -1714,3 +1766,152 @@ figure.lab-uno { max-width: 17rem; }
 
 /* diagrama explicativo dentro de una página de la wiki */
 .explica { display: block; width: 100%; height: auto; }
+
+/* ---------- ejemplo interactivo (assets/js/demos.js) ----------
+   Una escena editable en SVG, la barra de herramientas y la lectura del
+   resultado. Sin JavaScript queda el aviso de .demo-nojs y la página se lee
+   igual: los tres métodos están contados en el texto y en el pseudocódigo. */
+.demo {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  margin: 0 0 1.6rem;
+  overflow: hidden;
+}
+.demo-head { padding: .75rem .9rem .55rem; border-bottom: 1px solid var(--line-soft); }
+.demo-head .demo-label {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: .66rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: .25rem;
+}
+.demo-head h4 { margin: 0; font-size: 1rem; }
+.demo-stage { background: var(--surface-2); }
+.demo-svg { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+.demo-nojs { margin: 0; padding: 1rem .9rem; font-size: .92rem; color: var(--ink-3); max-width: none; }
+.demo-controls { border-top: 1px solid var(--line-soft); }
+.demo-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem .55rem;
+  padding: .55rem .9rem;
+}
+.demo-bar + .demo-bar { border-top: 1px dashed var(--line-soft); }
+.demo-bar-play { background: var(--surface-2); }
+.demo-tag {
+  font-family: var(--f-mono);
+  font-size: .64rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-right: .15rem;
+}
+.demo-btn { font-size: .82rem; }
+.demo-btn-mini { font-size: .74rem; padding: .3rem .45rem; }
+.demo-grupo { display: inline-flex; align-items: center; gap: .3rem; flex-wrap: wrap; }
+.demo-grupo[hidden] { display: none; }
+.demo-play { font-weight: 500; border-color: var(--ink-3); color: var(--ink); }
+.demo-campo { display: inline-flex; align-items: center; gap: .45rem; font-size: .78rem; color: var(--ink-2); }
+.demo-campo[hidden] { display: none; }
+.demo-campo input[type="range"] { width: 6.5rem; accent-color: var(--maze); }
+.demo-campo b { font-family: var(--f-mono); font-weight: 500; color: var(--ink); min-width: 1.6rem; }
+.demo-bar-paso { background: var(--surface-2); border-top: 1px solid var(--line-soft); }
+.demo-cuenta {
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.demo-traza {
+  margin: 0;
+  padding: .6rem .9rem;
+  border-top: 1px solid var(--line-soft);
+  background: var(--pill-soft);
+  font-family: var(--f-mono);
+  font-size: .7rem;
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: none;
+}
+.demo-traza[hidden] { display: none; }
+.demo-read {
+  margin: 0;
+  padding: .55rem .9rem .7rem;
+  border-top: 1px solid var(--line-soft);
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  max-width: none;
+}
+
+/* la escena: el suelo, los obstáculos y las marcas de salida y destino */
+.dm-suelo { fill: var(--surface); }
+.dm-obs { fill: var(--ink-3); fill-opacity: .34; stroke: var(--ink-3); stroke-width: 1; }
+.dm-a { fill: var(--pill); stroke: var(--pill-ink); stroke-width: 1.4; }
+.dm-b { fill: none; stroke: var(--blinky); stroke-width: 2; }
+.dm-b2 { fill: var(--blinky); }
+
+/* 1 · puntos de ruta */
+.dm-arista { stroke: var(--maze); stroke-width: .6; opacity: .45; }
+.dm-wp { fill: var(--maze); }
+
+/* 2 · rejilla. La celda bloqueada comparte color con el obstáculo, porque es
+   su aproximación; el azul queda libre para lo que hace la búsqueda. */
+.dm-celda { fill: none; stroke: var(--line); stroke-width: .5; }
+.dm-celda-no { fill: var(--ink-3); fill-opacity: .26; stroke: var(--ink-3); stroke-opacity: .35; }
+.dm-celda-ruta { fill: var(--pill); fill-opacity: .3; stroke: none; }
+/* el bucle, paso a paso: visitadas, las que esperan en la cola y la de ahora */
+.dm-celda-vista { fill: var(--maze); fill-opacity: .26; stroke: none; }
+.dm-celda-cola { fill: var(--pill); fill-opacity: .5; stroke: var(--pill-ink); stroke-width: .5; }
+.dm-celda-nueva { fill: none; stroke: var(--pill-ink); stroke-width: 1.3; }
+.dm-celda-ahora { fill: var(--blinky); fill-opacity: .55; stroke: var(--blinky); stroke-width: 1.2; }
+
+/* 4 · anchura y profundidad sobre un grafo */
+.dm-arista-g { stroke: var(--line); stroke-width: 1.4; }
+.dm-padre { stroke: var(--maze); stroke-width: 2.2; opacity: .85; }
+.dm-nodo { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.4; }
+.dm-nodo-visto { fill: color-mix(in srgb, var(--maze) 30%, var(--surface)); stroke: var(--maze); }
+.dm-nodo-frontera { fill: color-mix(in srgb, var(--pill) 60%, var(--surface)); stroke: var(--pill-ink); stroke-width: 1.6; }
+.dm-nodo-ahora { fill: color-mix(in srgb, var(--blinky) 55%, var(--surface)); stroke: var(--blinky); stroke-width: 1.8; }
+.dm-etq { font-family: var(--f-mono); font-size: 9px; font-weight: 500; text-anchor: middle; fill: var(--ink); }
+.dm-pie { font-family: var(--f-mono); font-size: 8px; text-anchor: middle; fill: var(--ink-3); letter-spacing: .08em; }
+.dm-plato { fill: var(--surface); opacity: .88; }
+.dm-anillo-a { fill: none; stroke: var(--pill-ink); stroke-width: 1.6; }
+.dm-anillo-b { fill: none; stroke: var(--blinky); stroke-width: 1.6; }
+.dm-elegido { fill: none; stroke: var(--maze); stroke-width: 1.4; stroke-dasharray: 3 2; }
+/* coste uniforme: el coste de cada arista, la g de cada nodo y la relajación */
+.dm-coste { font-family: var(--f-mono); font-size: 8px; text-anchor: middle; fill: var(--ink-2); }
+.dm-g { font-family: var(--f-mono); font-size: 8px; text-anchor: middle; fill: var(--ink-3); }
+.dm-g-nueva { fill: var(--ok); font-weight: 700; }
+.dm-relaja { stroke: var(--ok); stroke-width: 2.4; }
+.dm-relaja-no { stroke: var(--bad); stroke-width: 1.6; stroke-dasharray: 3 3; }
+.dm-lenta { stroke: var(--ink-3); stroke-width: 4.5; opacity: .5; }
+.dm-curva { fill: none; }
+/* el widget que junta partición y algoritmo: los nodos heredan los colores del
+   paso a paso de la rejilla, para que la lectura sea la misma en los cuatro */
+.dm-punto { stroke-width: .8; }
+.dm-punto.dm-celda-vista { fill: var(--maze); fill-opacity: 1; stroke: none; }
+.dm-punto.dm-celda-cola  { fill: var(--pill); fill-opacity: 1; stroke: var(--pill-ink); }
+.dm-punto.dm-celda-ahora { fill: var(--blinky); fill-opacity: 1; stroke: var(--blinky); }
+
+/* 3 · triangulación */
+.dm-sector { fill: var(--maze); fill-opacity: .06; stroke: var(--maze); stroke-width: .6; stroke-opacity: .5; }
+.dm-sector-on { fill-opacity: .18; }
+.dm-portal { stroke: var(--ink-3); stroke-width: .9; opacity: .55; stroke-dasharray: 3 2; }
+.dm-portal-on { stroke: var(--maze); stroke-width: 1.6; opacity: .95; stroke-dasharray: none; }
+
+/* la ruta, en todos */
+.dm-ruta { fill: none; stroke: var(--pill-ink); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+
+@media (max-width: 560px) {
+  .demo-campo input[type="range"] { width: 4.5rem; }
+  .demo-bar { padding: .5rem .6rem; }
+}

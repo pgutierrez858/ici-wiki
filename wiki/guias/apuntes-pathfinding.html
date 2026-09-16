@@ -1,0 +1,1793 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Pathfinding y estrategias algorítmicas · ICI</title>
+<meta name="description" content="Apuntes del tema 1: cómo se representa un mapa para buscar caminos, búsqueda en espacios de estados, búsquedas ciegas, heurísticas, A*, y cómo está todo eso resuelto y aprovechado en el simulador de Ms. Pac-Man.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Pathfinding y estrategias algorítmicas</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Pathfinding y estrategias algorítmicas
+      <span class="thin">Cómo se representa un mapa, cómo se busca un camino en él y qué hacer después con el camino.</span>
+    </h1>
+    <p class="standfirst">
+      Los apuntes del primer tema. Primero el problema general, tal como se plantea en cualquier videojuego:
+      representar el espacio, buscar en él y pagar por la búsqueda. Después, lo que de todo eso viene ya
+      resuelto en el simulador de Ms.&nbsp;Pac-Man, que es bastante, y lo que sigue siendo tuyo, que es
+      justo lo que se evalúa en la <a href="../practicas/practica-1.html">Práctica&nbsp;1</a>.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Tema</dt>
+      <dd>01<small>Pathfinding y algorítmica</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Práctica asociada</dt>
+      <dd><a href="../practicas/practica-1.html">Práctica 1</a><small>Controladores algorítmicos</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Diapositivas</dt>
+      <dd><a href="apuntes-pathfinding-slides.html">Verlas</a><small>Lo mismo, para clase</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Antes de leer</dt>
+      <dd><a href="clase-game.html">La clase <code>Game</code></a><small>De ahí sale todo el estado</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="problema">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El problema</h2>
+        </div>
+        <p>
+          Un personaje está en un sitio y quiere ir a otro. Dicho así parece trivial, y lo es mientras el
+          mapa esté vacío: apuntas y andas. Deja de serlo en cuanto hay paredes, porque entonces la línea
+          recta ya no es un camino y hace falta <em>buscar</em> uno.
+        </p>
+        <figure class="wide">
+          <figcaption>Un interior cualquiera de un juego en 3D: pasillos, puertas y trastos por medio</figcaption>
+          <img class="shot" src="../assets/img/pf-escena.jpg" width="1020" height="742" loading="lazy"
+               alt="Interior de una nave espacial en un videojuego en 3D: pasillos, puertas, cajas, barandillas y tuberías. Un personaje que quisiera cruzarlo no puede ir en línea recta.">
+        </figure>
+        <p>
+          Esa escena tiene cientos de miles de triángulos, y ninguno de ellos le sirve al personaje para
+          decidir por dónde ir. El problema de la búsqueda de caminos, o <em><span lang="en">pathfinding</span></em>,
+          se parte siempre en dos mitades que conviene no mezclar:
+        </p>
+        <ol>
+          <li>
+            <strong>Representar el espacio.</strong> Convertir el mundo, que es continuo y complicado, en un
+            <strong>grafo</strong>: un conjunto finito de sitios donde se puede estar, y qué sitios están
+            conectados con cuáles.
+          </li>
+          <li>
+            <strong>Buscar en el grafo.</strong> Dado ese grafo, encontrar una secuencia de pasos que lleve
+            del nodo de salida al de destino, idealmente la más corta, idealmente sin mirarlo entero.
+          </li>
+        </ol>
+        <div class="note tip">
+          <span class="note-label">Por qué se separan</span>
+          <p>
+            Porque el algoritmo de búsqueda es el mismo sea cual sea la representación. Cambiar de rejilla a
+            malla de navegación no obliga a reescribir A*; cambiar de A* a búsqueda en anchura no obliga a
+            recalcular el mapa. En Ms.&nbsp;Pac-Man la primera mitad viene <strong>hecha y precalculada</strong>,
+            así que este tema se concentra en la segunda y en qué hacer con el resultado.
+          </p>
+        </div>
+      </section>
+
+      <section id="representacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Representar el espacio</h2>
+        </div>
+        <p>
+          Tres familias de soluciones, por orden histórico. Las tres producen un grafo; se diferencian en
+          quién lo construye, cuánta memoria cuesta y qué tal se ven las rutas que salen.
+        </p>
+
+        <h3 class="label">Puntos de ruta (<span lang="en">waypoints</span>)</h3>
+        <figure class="wide">
+          <figcaption>Una lista de puntos interconectados sobre la misma escena</figcaption>
+          <img class="shot" src="../assets/img/pf-waypoints.jpg" width="1020" height="742" loading="lazy"
+               alt="La misma escena de la nave, con esferas blancas colocadas en los sitios de paso y líneas que las unen formando un grafo por el que los personajes pueden moverse.">
+        </figure>
+        <p>
+          Se marcan a mano, o se sacan analizando el terreno y quedándose con los puntos de interés, unos
+          cuantos puntos del mapa, y se anota cuáles se ven entre sí. El NPC busca el punto más cercano a
+          su posición, el más cercano a su destino, y calcula la ruta entre esos dos por el grafo.
+        </p>
+        <p>
+          Los puntos de interés son casi siempre las <strong>esquinas convexas</strong> de los obstáculos.
+          Una esquina es convexa cuando el obstáculo <em>sobresale</em> hacia el suelo libre: el ángulo
+          medido por dentro del obstáculo es menor de 180°, y por fuera queda más de media vuelta de
+          espacio despejado. Es cóncava cuando pasa lo contrario, o sea cuando la esquina es el rincón de
+          un entrante y lo que sobra es obstáculo.
+        </p>
+        <figure class="wide">
+          <figcaption>Un obstáculo en L: cinco esquinas convexas y una cóncava</figcaption>
+          <svg class="explica dgc1" viewBox="0 0 470 200" role="img" aria-label="Un obstáculo con forma de L. En cinco de sus seis esquinas, las que sobresalen hacia el suelo libre, hay un punto de ruta colocado un poco por fuera. La sexta, el rincón de dentro de la L, está marcada como cóncava y no lleva punto porque ninguna ruta dobla por ahí.">
+            <style>
+              .dgc1 .obs{fill:var(--ink-3);fill-opacity:.34;stroke:var(--ink-3);stroke-width:1.4}
+              .dgc1 .cx{fill:none;stroke:var(--maze);stroke-width:1.8}
+              .dgc1 .cc{fill:none;stroke:var(--bad);stroke-width:1.8}
+              .dgc1 .wp{fill:var(--maze)}
+              .dgc1 .gu{fill:none;stroke:var(--maze);stroke-width:1;stroke-dasharray:2 2;opacity:.7}
+              .dgc1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgc1 .tm{font-family:var(--f-mono);font-size:10px;fill:var(--maze)}
+              .dgc1 .tb{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgc1 .fl{fill:none;stroke:var(--bad);stroke-width:1.4;marker-end:url(#c1a)}
+            </style>
+            <defs><marker id="c1a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker></defs>
+            <path d="M60 35 H140 V75 H180 V155 H60 Z" class="obs"/>
+            <path d="M60 35 L50 25 M140 35 L150 25 M180 75 L190 65 M180 155 L190 165 M60 155 L50 165" class="gu"/>
+            <circle cx="60" cy="35" r="4.5" class="cx"/><circle cx="140" cy="35" r="4.5" class="cx"/>
+            <circle cx="180" cy="75" r="4.5" class="cx"/><circle cx="180" cy="155" r="4.5" class="cx"/>
+            <circle cx="60" cy="155" r="4.5" class="cx"/>
+            <circle cx="140" cy="75" r="4.5" class="cc"/>
+            <circle cx="50" cy="25" r="3.4" class="wp"/><circle cx="150" cy="25" r="3.4" class="wp"/>
+            <circle cx="190" cy="65" r="3.4" class="wp"/><circle cx="190" cy="165" r="3.4" class="wp"/>
+            <circle cx="50" cy="165" r="3.4" class="wp"/>
+            <path d="M204 56 L150 72" class="fl"/>
+            <text x="208" y="52" class="tb">cóncava: el rincón de dentro</text>
+            <text x="208" y="68" class="t">ninguna ruta dobla por ahí,</text>
+            <text x="208" y="82" class="t">así que no lleva punto</text>
+            <text x="208" y="118" class="tm">convexas: sobresalen al suelo</text>
+            <text x="208" y="134" class="t">el punto va un poco por fuera,</text>
+            <text x="208" y="148" class="t">para que quepa el personaje</text>
+            <text x="16" y="192" class="t">Círculo: la esquina.  Punto relleno: su punto de ruta.</text>
+          </svg>
+        </figure>
+        <p>
+          El motivo de quedarse sólo con las convexas es que son las únicas por las que una ruta tiene que
+          <em>doblar</em>: el camino más corto entre dos puntos separados por un obstáculo se pega a sus
+          salientes. Un punto en una esquina cóncava estaría metido en el rincón, no lo vería casi nadie y
+          no acortaría ningún camino.
+        </p>
+        <ul>
+          <li>Es el sistema más sencillo de todos: no guarda información del terreno ni delimita zonas transitables.</li>
+          <li>Una arista significa exactamente una cosa: «desde aquí se puede llegar hasta ahí», esquivando los obstáculos locales por el camino.</li>
+          <li>Se adapta muy bien a interiores con pasillos, funciona en 3D y aguanta cualquier tipo de movimiento.</li>
+          <li>Es lo que se usa para rutas prefijadas, como las patrullas.</li>
+          <li>Y su defecto salta a la vista: las rutas salen <strong>poco naturales</strong>, como si los personajes fueran por raíles, porque literalmente van por raíles.</li>
+        </ul>
+        <div class="demo" data-demo="waypoints">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Pon obstáculos y mira qué grafo sale</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí al lado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Coloca obstáculos con las formas de la barra, mueve la salida y el destino, toca los parámetros
+          del método, y pulsa <strong>Calcular la ruta</strong>. La descomposición se rehace sola cada vez
+          que cambias algo: lo que ves dibujado es lo que el algoritmo tiene para buscar.
+        </p>
+        <p>
+          Prueba a apagar <em>Puntos en las esquinas</em> y ponerlos tú, uno a uno, con la herramienta
+          <em>Punto de ruta</em>: verás enseguida por qué esto se hacía a mano y por qué se hacía mal. Sube
+          el <em>margen</em> y fíjate en que los puntos se despegan de las paredes, que es lo que necesita
+          un personaje con volumen; súbelo demasiado y empiezan a desaparecer, porque ya no caben.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · puntos de ruta</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">construirGrafo</span>(<span class="var">obstáculos</span>, <span class="var">margen</span>)
+    <span class="var">puntos</span> ← lista vacía
+    <b>for each</b> <span class="var">o</span> <b>in</b> <span class="var">obstáculos</span> <b>do</b>
+        <b>for each</b> esquina convexa <span class="var">e</span> de <span class="var">o</span> <b>do</b>
+            <span class="var">p</span> ← <span class="var">e</span> desplazada <span class="var">margen</span> hacia fuera
+            <b>if</b> <span class="var">p</span> cae en suelo libre <b>then</b> añadir <span class="var">p</span> a <span class="var">puntos</span> <b>end if</b>
+        <b>end for</b>
+    <b>end for</b>
+    añadir a <span class="var">puntos</span> los que se hayan puesto a mano
+
+    <span class="var">aristas</span> ← lista vacía
+    <b>for each</b> par (<span class="var">p</span>, <span class="var">q</span>) de <span class="var">puntos</span> <b>do</b>
+        <b>if</b> el segmento <span class="var">p</span>–<span class="var">q</span> no corta ningún obstáculo <b>then</b>
+            añadir (<span class="var">p</span>, <span class="var">q</span>, <span class="fn">distancia</span>(<span class="var">p</span>, <span class="var">q</span>)) a <span class="var">aristas</span>
+        <b>end if</b>
+    <b>end for</b>
+    <b>return</b> {<span class="var">puntos</span>, <span class="var">aristas</span>}
+<b>end function</b>
+
+<b>function</b> <span class="fn">ruta</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">grafo</span>)
+    enganchar <span class="var">A</span> y <span class="var">B</span> a todos los puntos que vean
+    <b>return</b> <span class="fn">dijkstra</span>(<span class="var">grafo</span>, <span class="var">A</span>, <span class="var">B</span>)
+<b>end function</b></pre>
+        </figure>
+        <p>
+          «Desplazada hacia fuera» quiere decir en la dirección que bisecta la esquina por el lado del
+          suelo libre. Y la comprobación de que el punto cae en suelo libre no sobra: en un pasillo
+          estrecho, el punto de una esquina convexa se sale por el otro lado y hay que descartarlo.
+        </p>
+        <p>
+          Queda por decir cómo se comprueba que «el segmento <em>p</em>–<em>q</em> no corta ningún
+          obstáculo», que es donde este método se pasa todo el tiempo: con <em>n</em> puntos hay
+          <em>n</em>(<em>n</em>&nbsp;−&nbsp;1)/2 parejas, y cada una se mide contra todos los lados de
+          todos los obstáculos. Son tres pasos, y el primero es el que lo hace barato.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · ¿corta el segmento a este obstáculo?</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">corta</span>(<span class="var">p</span>, <span class="var">q</span>, <span class="var">obstáculo</span>)
+    <i>// 1. descarte rápido: si las cajas no se tocan, no hay nada que mirar</i>
+    <b>if</b> la caja de <span class="var">obstáculo</span> no solapa con la caja de <span class="var">p</span>–<span class="var">q</span> <b>then return</b> False <b>end if</b>
+
+    <i>// 2. ¿cruza alguno de sus lados?</i>
+    <b>for each</b> lado (<span class="var">u</span>, <span class="var">v</span>) de <span class="var">obstáculo</span> <b>do</b>
+        <b>if</b> <span class="fn">cruzan</span>(<span class="var">p</span>, <span class="var">q</span>, <span class="var">u</span>, <span class="var">v</span>) <b>then return</b> True <b>end if</b>
+    <b>end for</b>
+
+    <i>// 3. sin cruzar ningún lado sólo queda estar entero dentro</i>
+    <b>return</b> <span class="fn">dentro</span>(punto medio de <span class="var">p</span>–<span class="var">q</span>, <span class="var">obstáculo</span>)
+<b>end function</b>
+
+<b>function</b> <span class="fn">cruzan</span>(<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span>, <span class="var">d</span>)
+    <i>// lado(a, b, x) = (b.x − a.x)(x.y − a.y) − (x.x − a.x)(b.y − a.y)</i>
+    <i>// sale positivo si x queda a un lado de la recta a–b, negativo si al otro</i>
+    <i>// y cero si está justo encima</i>
+    <b>return</b> <span class="fn">lado</span>(<span class="var">c</span>, <span class="var">d</span>, <span class="var">a</span>) y <span class="fn">lado</span>(<span class="var">c</span>, <span class="var">d</span>, <span class="var">b</span>) tienen signos <b>opuestos y no nulos</b>
+       AND <span class="fn">lado</span>(<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span>) y <span class="fn">lado</span>(<span class="var">a</span>, <span class="var">b</span>, <span class="var">d</span>) tienen signos <b>opuestos y no nulos</b>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Las tres cosas que hay que mirar con lupa:
+        </p>
+        <ul>
+          <li>
+            <strong>Rozar no es cortar.</strong> Si alguno de los cuatro <code>lado</code> sale cero, los
+            segmentos se tocan en un extremo o son colineales, y eso tiene que dar <em>False</em>. Aquí no
+            es una sutileza teórica: los puntos de ruta viven pegados a las esquinas, y con el signo cero
+            contando como cruce el grafo se quedaría prácticamente sin aristas.
+          </li>
+          <li>
+            <strong>El paso 3 no sobra.</strong> Un segmento enteramente dentro de un obstáculo no cruza
+            ninguno de sus lados, así que los dos primeros pasos lo darían por bueno. Basta con mirar si su
+            punto medio cae dentro, con la regla de la paridad: se lanza un rayo desde el punto y se cuenta
+            cuántos lados atraviesa; impar significa dentro.
+          </li>
+          <li>
+            <strong>El descarte por cajas es lo que lo salva.</strong> La comprobación completa es
+            <em>O</em>(<em>n</em>²&nbsp;·&nbsp;lados), y en la escena de arriba eso son más de cien mil
+            pruebas de signo cada vez que mueves un obstáculo. Comparando primero los dos rectángulos
+            envolventes, la inmensa mayoría de las parejas se resuelve en cuatro comparaciones.
+          </li>
+        </ul>
+
+        <h3 class="label">Rejillas</h3>
+        <figure class="wide">
+          <figcaption>Una rejilla sobre el terreno: cada casilla lleva su tipo y si se puede pisar</figcaption>
+          <img class="shot" src="../assets/img/pf-rejilla-terreno.jpg" width="928" height="704" loading="lazy"
+               alt="Vista aérea de un mapa de estrategia con una rejilla blanca dibujada encima. Se distinguen zonas de agua en azul, hierba en verde, bosque y roca, y unidades repartidas por el mapa.">
+        </figure>
+        <p>
+          El mapa se guarda en un <em>array</em> bidimensional y una posición son dos coordenadas enteras.
+          Viene de los juegos 2D y sigue siendo la representación por defecto en estrategia; también las hay
+          hexagonales.
+        </p>
+        <ul>
+          <li>Cada casilla lleva información del terreno: el <strong>tipo</strong> (tierra, hierba, parquet, cemento) y la <strong>transitabilidad</strong>, o sea si se puede pasar o no.</li>
+          <li>El personaje tiene una posición real, con decimales, que se trunca para saber en qué casilla está.</li>
+          <li>Se genera a mano o muestreando el mapa 3D, y pide bastante homogeneidad: si el mapa tiene detalles más finos que la casilla, la rejilla no los ve.</li>
+        </ul>
+        <figure class="wide">
+          <figcaption>La misma idea en tres dimensiones: la cuadrícula, proyectada sobre el suelo de la escena</figcaption>
+          <img class="shot" src="../assets/img/pf-rejilla.jpg" width="1020" height="742" loading="lazy"
+               alt="La escena de la nave con una cuadrícula regular proyectada sobre el suelo, dividiéndolo en casillas cuadradas del mismo tamaño.">
+        </figure>
+        <div class="demo" data-demo="rejilla">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Baja el lado de la celda hasta que quepa el paso</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí al lado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Coloca obstáculos con las formas de la barra, mueve la salida y el destino, toca los parámetros
+          del método, y pulsa <strong>Calcular la ruta</strong>. La descomposición se rehace sola cada vez
+          que cambias algo: lo que ves dibujado es lo que el algoritmo tiene para buscar.
+        </p>
+        <p>
+          Aquí está el compromiso de la rejilla, entero y en una pantalla. Con celdas grandes hay pocas
+          casillas y la búsqueda vuela, pero la rejilla <strong>engorda los obstáculos</strong> hasta el
+          borde de su casilla: un pasillo estrecho se cierra y el algoritmo dice, con toda la razón del
+          mundo, que no hay camino. Bájala y el paso aparece, a cambio de multiplicar por cuatro el número
+          de celdas cada vez que la partes por la mitad. Cambia también la vecindad de 4 a 8 y mira lo que
+          le pasa a la forma de la ruta.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · rejilla</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">construirRejilla</span>(<span class="var">obstáculos</span>, <span class="var">lado</span>)
+    <b>for each</b> casilla (<span class="var">c</span>, <span class="var">f</span>) de la rejilla <b>do</b>
+        <span class="var">r</span> ← el rectángulo que ocupa esa casilla
+        <span class="var">bloqueada</span>[<span class="var">c</span>, <span class="var">f</span>] ← algún obstáculo se solapa con <span class="var">r</span>
+    <b>end for</b>
+    <b>return</b> <span class="var">bloqueada</span>
+<b>end function</b>
+
+<b>function</b> <span class="fn">ruta</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">bloqueada</span>, <span class="var">vecindad</span>)
+    <span class="var">ini</span> ← casilla que contiene <span class="var">A</span>;   <span class="var">fin</span> ← casilla que contiene <span class="var">B</span>
+    <b>if</b> <span class="var">bloqueada</span>[<span class="var">ini</span>] OR <span class="var">bloqueada</span>[<span class="var">fin</span>] <b>then return</b> SIN&nbsp;CAMINO <b>end if</b>
+    <span class="var">cola</span> ← cola FIFO con {<span class="var">ini</span>};   <span class="var">visitados</span> ← {<span class="var">ini</span>}
+    <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
+        <span class="var">k</span> ← <span class="fn">desencolar</span>(<span class="var">cola</span>)
+        <b>if</b> <span class="var">k</span> = <span class="var">fin</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">k</span>) <b>end if</b>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">vecinas</span>(<span class="var">k</span>, <span class="var">vecindad</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> está dentro AND NOT <span class="var">bloqueada</span>[<span class="var">v</span>] AND <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">k</span>;  añadir <span class="var">v</span> a <span class="var">visitados</span>;  <span class="fn">encolar</span>(<span class="var">cola</span>, <span class="var">v</span>)
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;CAMINO
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Ese bucle es el que se puede ver correr. En el ejemplo, después de calcular la ruta se abre la
+          fila <em>Paso a paso</em>: cada paso es una vuelta del <code>while</code>, o sea
+          <strong>una sola llamada a <code>desencolar</code></strong> más el examen de sus vecinas. La tira
+          de abajo enseña las dos estructuras del pseudocódigo con sus nombres, y el laberinto se colorea
+          así:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">En la escena</th><th scope="col">En el pseudocódigo</th></tr></thead>
+            <tbody>
+              <tr><td><span class="swatch sw-vista"></span> Azul flojo</td><td>Está en <code>visitados</code>: ya se ha encolado alguna vez y no se volverá a mirar.</td></tr>
+              <tr><td><span class="swatch sw-cola"></span> Amarillo</td><td>Sigue en la <code>cola</code>, esperando turno. Es la frontera de la búsqueda.</td></tr>
+              <tr><td><span class="swatch sw-ahora"></span> Rojo</td><td>La <code>k</code> de esta vuelta, la que acaba de salir de la cola.</td></tr>
+              <tr><td><span class="swatch sw-nueva"></span> Filo dorado</td><td>Las <code>v</code> que se han encolado en esta misma vuelta.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Lo que se ve es el rasgo que define la anchura: <strong>la mancha azul crece en anillos</strong>,
+          y el amarillo es siempre la capa de fuera. Por eso, cuando el destino aparece, aparece por el
+          camino más corto. Merece la pena pararse en dos momentos: cuando la frontera se parte en dos al
+          chocar con un obstáculo y rodearlo por los dos lados a la vez, y cuando las dos mitades se
+          vuelven a juntar por detrás y una de ellas ya no encola nada, porque la otra había pasado antes
+          por ahí.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Cómo mirarlo</span>
+          <p>
+            Con celdas de 20 salen unos cien pasos, que es un tamaño cómodo para ir de uno en uno.
+            Bajando el lado a 5 son varios miles: ahí conviene usar <em>Reproducir</em> o arrastrar el
+            deslizador, y sirve para ver de golpe cuántas casillas de más visita una rejilla fina. Y con
+            <em>Vecindad&nbsp;8</em> los anillos dejan de ser rombos y pasan a ser cuadrados.
+          </p>
+        </div>
+
+        <h3 class="label">Malla de navegación (<span lang="en">navigation mesh</span>)</h3>
+        <figure class="wide">
+          <figcaption>El suelo transitable de la escena, cubierto de polígonos convexos</figcaption>
+          <img class="shot" src="../assets/img/pf-navmesh.jpg" width="1020" height="742" loading="lazy"
+               alt="La escena de la nave con el suelo dividido en polígonos irregulares grandes que se adaptan a la forma de la zona por la que se puede caminar.">
+        </figure>
+        <p>
+          Se cubre el suelo con polígonos, llamados <strong>sectores</strong>, calculados automáticamente a
+          partir de la geometría de la escena: de las posiciones donde el agente puede pararse sale una
+          triangulación (<em lang="en">Constrained Delaunay Triangulation</em>) que funciona como una
+          alfombra sobre la zona que los NPC pueden recorrer, y da una representación pseudo-2D del mapa.
+        </p>
+        <p>
+          Los sectores se conectan entre sí por sus aristas, que se llaman <strong>portales</strong>, y son
+          <strong>convexos</strong>, que es la propiedad que lo hace funcionar: dentro de un sector puedo ir
+          en línea recta de cualquier punto a cualquier otro sin salirme.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">A favor</th><th scope="col">En contra</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Los polígonos se adaptan a lo que sea y se ajustan muy bien a la zona transitable.</td>
+                <td>Cuesta memoria: un mapa grande necesita muchos sectores.</td>
+              </tr>
+              <tr>
+                <td>Las rutas que salen son de calidad, y no parecen de raíles.</td>
+                <td>Sufre con ciertos movimientos 3D: saltos, vuelo, movimiento libre. Se basa mucho en mantener al personaje pegado al suelo.</td>
+              </tr>
+              <tr>
+                <td>Se construye sola desde la escena, sin marcar puntos a mano.</td>
+                <td><em>Quake III</em> y <em>Doom III</em> usan una variante con volúmenes en vez de polígonos, los AAS, precisamente por eso.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="demo" data-demo="malla">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Triangula el suelo y tira de la cuerda</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí al lado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Coloca obstáculos con las formas de la barra, mueve la salida y el destino, toca los parámetros
+          del método, y pulsa <strong>Calcular la ruta</strong>. La descomposición se rehace sola cada vez
+          que cambias algo: lo que ves dibujado es lo que el algoritmo tiene para buscar.
+        </p>
+        <p>
+          Fíjate en el orden de las cosas. Primero se <strong>cose</strong> el suelo: el rectángulo del mapa
+          con un agujero por obstáculo no se puede triangular de golpe, así que a cada agujero se le abre un
+          puente hasta el contorno. Después se recortan orejas hasta dejarlo todo en triángulos. Y sólo
+          entonces, con <em>Fundir en sectores</em>, se juntan los triángulos vecinos mientras el resultado
+          siga siendo convexo: de ahí salen los polígonos grandes de una malla de verdad, y el número de
+          sectores cae a la mitad o menos.
+        </p>
+        <p>
+          Con <em>Tirar de la cuerda</em> apagado, la ruta pasa por el centro de cada portal y se nota el
+          zigzag. Enciéndelo y la ruta se tensa contra las esquinas: eso es lo que quiere decir
+          <em>rutas de calidad</em>, y es justo lo que un grafo de puntos de ruta no puede dar.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · malla de navegación</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">construirMalla</span>(<span class="var">obstáculos</span>)
+    <span class="var">contorno</span> ← el rectángulo del mapa
+    <b>for each</b> <span class="var">o</span> <b>in</b> <span class="var">obstáculos</span> <b>do</b>        <i>// cada obstáculo es un agujero</i>
+        <span class="var">contorno</span> ← <span class="fn">coserAgujero</span>(<span class="var">contorno</span>, <span class="var">o</span>)   <i>// un puente hasta el borde</i>
+    <b>end for</b>
+    <span class="var">triángulos</span> ← <span class="fn">recortarOrejas</span>(<span class="var">contorno</span>)
+    <span class="var">sectores</span> ← <span class="var">triángulos</span>
+    <b>while</b> queden dos sectores vecinos cuya unión sea convexa <b>do</b>
+        fundirlos en uno                    <i>// Hertel-Mehlhorn</i>
+    <b>end while</b>
+    <span class="var">portales</span> ← los lados que comparten dos sectores
+    <b>return</b> {<span class="var">sectores</span>, <span class="var">portales</span>}
+<b>end function</b>
+
+<b>function</b> <span class="fn">ruta</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">sectores</span>, <span class="var">portales</span>)
+    <span class="var">sA</span> ← sector que contiene <span class="var">A</span>;   <span class="var">sB</span> ← sector que contiene <span class="var">B</span>
+    <span class="var">cadena</span> ← <span class="fn">aEstrella</span>(grafo de sectores, <span class="var">sA</span>, <span class="var">sB</span>)
+    <span class="var">p</span> ← los portales que cruza <span class="var">cadena</span>, cada uno con su izquierda y su derecha
+    <b>return</b> <span class="fn">tirarDeLaCuerda</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">p</span>)   <i>// el hilo más corto que pasa por todos</i>
+<b>end function</b></pre>
+        </figure>
+
+        <h3 class="label">Y en Ms. Pac-Man</h3>
+        <p>
+          Aquí no hay que elegir: el laberinto <strong>ya es un grafo</strong>, y de los sencillos. Cada
+          nodo es un sitio donde se puede estar, cada arista une dos nodos pegados, y el grado del nodo
+          nunca pasa de cuatro porque sólo hay cuatro direcciones. Un cruce es un nodo con tres vecinos o
+          más.
+        </p>
+        <figure class="lab-uno">
+          <figcaption>Cruces en amarillo: los 38 sitios donde una decisión cambia algo</figcaption>
+          <img class="lab pixel" src="../assets/img/laberinto-a-anotado.png" width="684" height="780" loading="lazy"
+               alt="El primer laberinto del simulador con círculos amarillos sobre los nodos que son cruce, círculos azules en los extremos de los túneles y marcas en la cárcel y su puerta.">
+        </figure>
+        <p>
+          Eso es una suerte pedagógica: como la representación no estorba, se ve con toda claridad lo que
+          hace el algoritmo. Y es también la razón de que en esta práctica el mérito no esté en encontrar el
+          camino, que te lo da el motor, sino en <strong>decidir hacia dónde</strong>.
+        </p>
+      </section>
+
+      <section id="espacios">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Búsqueda en espacios de estados</h2>
+        </div>
+        <p>
+          Con el mapa ya convertido en grafo, la búsqueda de caminos deja de ser un problema de geometría y
+          pasa a ser el problema clásico de <strong>exploración de espacios de estados</strong>, que es una
+          de las técnicas más importantes de la IA y con diferencia la más utilizada en videojuegos. Buscar
+          un camino en un laberinto y resolver un puzle son, vistos así, exactamente el mismo problema.
+        </p>
+        <dl class="gloss">
+          <div><dt>Estado</dt><dd>Cada configuración posible del problema, representada con una estructura de datos. En el laberinto, el nodo donde estás; en el 8-puzle, la disposición de las fichas.</dd></div>
+          <div><dt>Transición</dt><dd>La lista de estados a los que se llega desde un estado previo tras aplicar una operación del dominio. También se les llama <em>sucesores</em>.</dd></div>
+          <div><dt>Coste</dt><dd>Lo que cuesta una transición. Puede ser 1 para todas, o el tiempo de cambiar de estación, o el terreno que cruzas.</dd></div>
+          <div><dt>Camino</dt><dd>Una secuencia de estados que lleva de uno a otro.</dd></div>
+          <div><dt>Camino solución</dt><dd>El que va del estado inicial al estado objetivo.</dd></div>
+          <div><dt>Camino parcial</dt><dd>El que va del inicial a un estado que todavía no es solución: el estado actual de la búsqueda.</dd></div>
+          <div><dt>Función objetivo</dt><dd>La que decide si un estado es o no el estado solución. A veces es una comparación; a veces es una condición.</dd></div>
+        </dl>
+        <figure class="wide">
+          <figcaption>Un camino solución del 8-puzle: cuatro transiciones del estado inicial al objetivo</figcaption>
+          <img class="shot" src="../assets/img/pf-8puzzle.png" width="1500" height="246" loading="lazy"
+               alt="Cinco tableros de 3 por 3 en fila. El primero, marcado como inicial, tiene el hueco arriba a la izquierda. Entre cada par de tableros una flecha con el movimiento: 1 izquierda, 2 arriba, 5 izquierda, 6 arriba. El último, marcado como objetivo, tiene las fichas del 1 al 8 en orden y el hueco abajo a la derecha.">
+        </figure>
+        <p>
+          Fíjate en que la figura no muestra el espacio de estados: muestra <strong>un camino dentro de
+          él</strong>. El espacio entero son todas las configuraciones alcanzables, que en el 8-puzle son
+          181&#8239;440, y en el laberinto de Ms.&nbsp;Pac-Man son 1&#8239;293 nodos. Buscar es recorrer
+          ese espacio sin tener que verlo todo.
+        </p>
+        <figure class="wide">
+          <figcaption>El mismo mapa, dos veces: como rejilla y como grafo con costes en las aristas</figcaption>
+          <img class="shot" src="../assets/img/pf-grafo-costes.png" width="468" height="233" loading="lazy"
+               alt="A la izquierda, una rejilla con muros negros, una casilla de salida marcada S y una de meta marcada G. A la derecha, el mismo mapa reducido a un grafo de puntos rojos unidos por aristas, cada una con un número que es su coste.">
+        </figure>
+
+        <h3 class="label">El esquema general</h3>
+        <p>
+          Todos los algoritmos de búsqueda que vienen después son el mismo bucle. Cambia una sola cosa:
+          <strong>de qué estructura se saca el siguiente nodo a expandir</strong>. Ese detalle es el que
+          convierte el esquema en anchura, en profundidad o en A*.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · esquema general de búsqueda</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">buscar</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">frontera</span> ← estructura con {<span class="var">inicio</span>}       <i>// abiertos</i>
+    <span class="var">visitados</span> ← conjunto vacío            <i>// cerrados</i>
+    <span class="var">padre</span>[<span class="var">inicio</span>] ← NULL
+
+    <b>while</b> <span class="var">frontera</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← <span class="fn">sacar</span>(<span class="var">frontera</span>)
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then</b>
+            <b>return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>)
+        <b>end if</b>
+        añadir <span class="var">n</span> a <span class="var">visitados</span>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> AND <span class="var">v</span> ∉ <span class="var">frontera</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>
+                añadir <span class="var">v</span> a <span class="var">frontera</span>
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;SOLUCIÓN
+<b>end function</b>
+
+<b>function</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>)
+    <span class="var">camino</span> ← lista vacía
+    <b>while</b> <span class="var">n</span> ≠ NULL <b>do</b>
+        insertar <span class="var">n</span> al principio de <span class="var">camino</span>
+        <span class="var">n</span> ← <span class="var">padre</span>[<span class="var">n</span>]
+    <b>end while</b>
+    <b>return</b> <span class="var">camino</span>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Las dos estructuras tienen nombre propio y los vas a ver en todas partes: la frontera son los
+          <strong>nodos abiertos</strong>, los candidatos a seguir; y los visitados son los <strong>nodos
+          cerrados</strong>, los ya expandidos. El diccionario <code>padre</code> es lo que permite
+          devolver el camino y no sólo la distancia.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Las preguntas que hay que contestar</span>
+          <p>
+            ¿Qué vecino visito primero? ¿Se controlan los ciclos? ¿Cuándo cambio de camino? ¿Cuándo termino
+            la búsqueda? ¿Cuánto cuesta la solución, y es óptima? Cada algoritmo es un juego de respuestas
+            distinto a esas cinco preguntas, y ninguna respuesta es gratis.
+          </p>
+        </div>
+
+        <h3 class="label">El repertorio</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Métodos no informados o ciegos</th><th scope="col">Métodos informados o heurísticos</th></tr></thead>
+            <tbody>
+              <tr><td>Primero en anchura</td><td>Búsqueda primero el mejor</td></tr>
+              <tr><td>Coste uniforme</td><td>Búsqueda voraz (<span lang="en">greedy</span>)</td></tr>
+              <tr><td>Primero en profundidad</td><td><strong>Búsqueda óptima: algoritmo A*</strong></td></tr>
+              <tr><td>Profundidad limitada</td><td>Búsqueda local: escalada, enfriamiento simulado, genéticos</td></tr>
+              <tr><td>Profundización iterativa</td><td>Búsqueda con adversario: minimax, poda alfa-beta</td></tr>
+              <tr><td>Bidireccional</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          La diferencia entre las dos columnas es una sola: si el algoritmo tiene o no una
+          <strong>heurística</strong>, o sea una pista sobre hacia dónde puede estar la solución. Tenerla
+          mejora muchísimo el tiempo de búsqueda, y no cambia nada más. Las dos últimas filas de la derecha
+          no buscan caminos, y salen en los temas 5 y 6; aquí interesan las tres primeras.
+        </p>
+      </section>
+
+      <section id="ciegas">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Búsquedas ciegas</h2>
+        </div>
+        <p>
+          Sin heurística, lo único que se puede hacer es fijar un orden de expansión y ser sistemático. Las
+          tres que importan salen de cambiar una línea del esquema general.
+        </p>
+
+        <h3 class="label">Primero en anchura</h3>
+        <p>
+          La frontera es una <strong>cola FIFO</strong>: se expande siempre el nodo que lleva más tiempo
+          esperando. Como consecuencia, se exploran todos los nodos a distancia 1, luego todos a distancia 2,
+          y así. Cuando encuentra el objetivo, lo encuentra por un camino de longitud mínima.
+        </p>
+        <figure class="wide">
+          <figcaption>Anchura desde el nodo de salida: el frente avanza a la vez en todas direcciones</figcaption>
+          <svg class="explica dga1" viewBox="0 0 470 200" role="img" aria-label="Un grafo con el nodo de salida a la izquierda. Los nodos se agrupan en cuatro capas según su distancia al inicio: la capa 1 tiene dos nodos, la 2 tiene tres, la 3 tiene cuatro y en la 4 está el objetivo. La búsqueda en anchura visita una capa completa antes de pasar a la siguiente.">
+            <style>
+              .dga1 .ar{stroke:var(--line);stroke-width:1.4;fill:none}
+              .dga1 .nd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.4}
+              .dga1 .n0{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.8}
+              .dga1 .ng{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.8}
+              .dga1 .cap{fill:var(--surface-2)}
+              .dga1 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-3)}
+              .dga1 .tb{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+            </style>
+            <rect x="72" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="180" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="288" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="396" y="16" width="62" height="146" rx="4" class="cap"/>
+            <path d="M40 89 L107 55 M40 89 L107 123 M107 55 L215 40 M107 55 L215 89 M107 123 L215 89 M107 123 L215 138 M215 40 L323 40 M215 89 L323 76 M215 89 L323 112 M215 138 L323 148 M323 40 L427 89 M323 76 L427 89 M323 112 L427 89" class="ar"/>
+            <circle cx="40" cy="89" r="10" class="n0"/>
+            <circle cx="107" cy="55" r="9" class="nd"/><circle cx="107" cy="123" r="9" class="nd"/>
+            <circle cx="215" cy="40" r="9" class="nd"/><circle cx="215" cy="89" r="9" class="nd"/><circle cx="215" cy="138" r="9" class="nd"/>
+            <circle cx="323" cy="40" r="9" class="nd"/><circle cx="323" cy="76" r="9" class="nd"/><circle cx="323" cy="112" r="9" class="nd"/><circle cx="323" cy="148" r="9" class="nd"/>
+            <circle cx="427" cy="89" r="10" class="ng"/>
+            <text x="40" y="180" class="tb">salida</text>
+            <text x="107" y="180" class="t">capa 1</text>
+            <text x="215" y="180" class="t">capa 2</text>
+            <text x="323" y="180" class="t">capa 3</text>
+            <text x="427" y="180" class="tb">objetivo</text>
+          </svg>
+        </figure>
+        <figure>
+          <figcaption>Pseudocódigo · primero en anchura</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">anchura</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">cola</span> ← cola FIFO con {<span class="var">inicio</span>}
+    <span class="var">visitados</span> ← {<span class="var">inicio</span>}
+    <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← <span class="fn">desencolar</span>(<span class="var">cola</span>)
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>
+                añadir <span class="var">v</span> a <span class="var">visitados</span>
+                <span class="fn">encolar</span>(<span class="var">cola</span>, <span class="var">v</span>)
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+<b>end function</b></pre>
+        </figure>
+        <div class="note tip">
+          <span class="note-label">Por qué esta es la que vas a escribir</span>
+          <p>
+            Todas las aristas del laberinto cuestan lo mismo, un turno, y en ese caso la anchura ya es
+            <strong>óptima</strong>: el primer camino que encuentra es el más corto. Y además responde a la
+            pregunta que de verdad te interesa, que no es «¿cuánto hay hasta ese nodo?» sino <strong>«¿cuál
+            de todos estos nodos me pilla más cerca, y por dónde se va?»</strong>. Una sola anchura desde tu
+            posición contesta eso para todos los objetivos a la vez.
+          </p>
+        </div>
+
+        <h3 class="label">Primero en profundidad</h3>
+        <p>
+          La frontera es una <strong>pila LIFO</strong>: se expande el último añadido, así que la búsqueda
+          se lanza por una rama hasta el fondo y sólo retrocede cuando se queda sin salidas. Gasta poquísima
+          memoria y encuentra soluciones rápido, pero <strong>no son las más cortas</strong>, y en un grafo
+          con ciclos se pierde si no se controlan los visitados.
+        </p>
+        <figure class="wide">
+          <figcaption>Profundidad: se agota una rama entera, y el objetivo aparece por un camino de cinco pasos habiendo uno de tres</figcaption>
+          <svg class="explica dga2" viewBox="0 0 470 200" role="img" aria-label="Un grafo con dos ramas entre la salida y el objetivo: una por arriba de cinco pasos y otra por abajo de tres. La búsqueda en profundidad se lanza por la de arriba, la agota entera y llega al objetivo por ella, sin haber mirado nunca la corta.">
+            <style>
+              .dga2 .ar{stroke:var(--line);stroke-width:1.4;fill:none}
+              .dga2 .arc{stroke:var(--ok);stroke-width:1.8;fill:none}
+              .dga2 .arv{stroke:var(--maze);stroke-width:2.6;fill:none}
+              .dga2 .nd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.4}
+              .dga2 .nv{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.7}
+              .dga2 .ng{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.9}
+              .dga2 .o{font-family:var(--f-mono);font-size:9px;text-anchor:middle;fill:var(--maze);dominant-baseline:middle}
+              .dga2 .tb{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dga2 .tm{font-family:var(--f-mono);font-size:10px;fill:var(--maze)}
+              .dga2 .tk{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+            </style>
+            <path d="M30 96 L112 140 M112 140 L258 144 M258 144 L424 96" class="arc"/>
+            <path d="M30 96 L96 44 M96 44 L168 30 M168 30 L244 34 M244 34 L322 60 M322 60 L424 96" class="arv"/>
+            <circle cx="112" cy="140" r="9" class="nd"/><circle cx="258" cy="144" r="9" class="nd"/>
+            <circle cx="30" cy="96" r="10" class="nv"/><text x="30" y="96" class="o">1</text>
+            <circle cx="96" cy="44" r="9" class="nv"/><text x="96" y="44" class="o">2</text>
+            <circle cx="168" cy="30" r="9" class="nv"/><text x="168" y="30" class="o">3</text>
+            <circle cx="244" cy="34" r="9" class="nv"/><text x="244" y="34" class="o">4</text>
+            <circle cx="322" cy="60" r="9" class="nv"/><text x="322" y="60" class="o">5</text>
+            <circle cx="424" cy="96" r="10" class="ng"/><text x="424" y="96" class="o">6</text>
+            <text x="110" y="14" class="tm">se lanza por aquí y la agota: 5 pasos</text>
+            <text x="110" y="180" class="tk">y había un camino de 3 pasos</text>
+            <text x="30" y="122" class="tb">salida</text>
+            <text x="424" y="122" class="tb">objetivo</text>
+          </svg>
+        </figure>
+
+        <h3 class="label">Las dos, sobre el mismo grafo</h3>
+        <p>
+          Aquí se ven a la vez, y sobre todo se ven <strong>las estructuras</strong>, que es lo que de
+          verdad las distingue. Elige el método, pulsa <strong>Calcular la ruta</strong> y después recorre
+          el bucle vuelta a vuelta: cada paso es una sola llamada a <code>sacar(frontera)</code>.
+        </p>
+        <div class="demo" data-demo="grafo">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Saca de una cola o saca de una pila</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí al lado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          El grafo también se edita: con <em>Nodo</em> se ponen vértices nuevos, con <em>Arista</em> se
+          pincha en dos nodos para unirlos (o para separarlos si ya estaban unidos), y con
+          <em>Salida&nbsp;A</em> y <em>Destino&nbsp;B</em> se elige entre qué dos se busca. La tira de
+          abajo enseña la frontera con el elemento que va a salir <strong>entre corchetes</strong>, el
+          conjunto <code>visitados</code> y el diccionario <code>padre</code>, que es el que guarda el
+          camino.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · las dos, con una sola línea de diferencia</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">buscar</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>, <span class="var">modo</span>)
+    <span class="var">frontera</span> ← {(<span class="var">inicio</span>, NULL)}    <i>// cola FIFO si anchura, pila LIFO si profundidad</i>
+    <span class="var">visitados</span> ← ∅
+    <b>if</b> <span class="var">modo</span> = anchura <b>then</b> añadir <span class="var">inicio</span> a <span class="var">visitados</span> <b>end if</b>
+
+    <b>while</b> <span class="var">frontera</span> no esté vacía <b>do</b>
+        (<span class="var">n</span>, <span class="var">desde</span>) ← <span class="fn">sacar</span>(<span class="var">frontera</span>)   <i>// ← LA ÚNICA DIFERENCIA</i>
+                                     <i>//   anchura: el primero que entró</i>
+                                     <i>//   profundidad: el último que entró</i>
+        <b>if</b> <span class="var">modo</span> = profundidad AND <span class="var">n</span> ∈ <span class="var">visitados</span> <b>then continue end if</b>
+        añadir <span class="var">n</span> a <span class="var">visitados</span>;   <span class="var">padre</span>[<span class="var">n</span>] ← <span class="var">desde</span>
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">vecinos</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∈ <span class="var">visitados</span> <b>then continue end if</b>
+            <b>if</b> <span class="var">modo</span> = anchura <b>then</b> añadir <span class="var">v</span> a <span class="var">visitados</span> <b>end if</b>
+            añadir (<span class="var">v</span>, <span class="var">n</span>) a <span class="var">frontera</span>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;CAMINO
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Hay una segunda diferencia, más pequeña y más fácil de pasar por alto: <strong>cuándo se
+          marca</strong>. La anchura marca al <em>encolar</em>, y por eso ningún nodo entra dos veces en la
+          cola y el primer camino con el que llega a cada uno es el más corto. La profundidad marca al
+          <em>sacar</em>, así que su pila <strong>sí lleva repetidos</strong>: un mismo nodo puede entrar
+          por dos ramas y, cuando sale la segunda vez, se descarta. En el ejemplo se ve en la tira de
+          abajo, y es la razón de esa línea de <code>continue</code>.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <p>
+            Con <strong>anchura</strong>, la frontera es siempre la capa de fuera y el árbol azul crece a la
+            par en todas direcciones; el camino que sale tiene el mínimo número de aristas. Con
+            <strong>profundidad</strong>, la pila se hace honda y estrecha, el árbol azul se lanza por una
+            rama hasta el fondo, y el camino que sale suele ser bastante más largo. Compara las dos cifras
+            que da la lectura: vueltas del bucle y aristas del camino.
+          </p>
+          <p>
+            Y prueba a alargar una rama con la herramienta <em>Nodo</em>: la anchura ni se entera, porque
+            no baja por ahí hasta el final; la profundidad se mete entera.
+          </p>
+        </div>
+
+        <h3 class="label">Coste uniforme, o Dijkstra</h3>
+        <p>
+          La frontera es una <strong>cola de prioridad</strong> ordenada por <em>g</em>(n), el coste real
+          acumulado desde la salida. Es la anchura generalizada a aristas con coste distinto, y es
+          exactamente el algoritmo de Dijkstra. Con todos los costes a 1 la cola de prioridad se comporta
+          como una FIFO y sale la anchura, tal cual; por eso en el laberinto de Ms.&nbsp;Pac-Man no aporta
+          nada, y sólo se gana algo si decides que unos pasillos «cuestan» más que otros, por ejemplo por
+          ser peligrosos.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Cambiar la FIFO por una cola de prioridad no basta</span>
+          <p>
+            La idea es esa, pero con el contenedor solo no sale: hay que cambiar además <strong>cuándo se
+            marca</strong> y <strong>qué se hace con un nodo que ya estaba en la frontera</strong>.
+          </p>
+          <ul>
+            <li>
+              <strong>Ya no se puede marcar al encolar.</strong> La anchura puede porque, con todas las
+              aristas iguales, la primera vez que llegas a un nodo es por un camino de longitud mínima. Con
+              costes distintos eso es falso: se puede llegar pronto por un camino caro y más tarde por uno
+              barato. Así que Dijkstra marca <strong>al sacar</strong>, como la profundidad, y un nodo que
+              sale y ya estaba marcado se descarta.
+            </li>
+            <li>
+              <strong>Un nodo de la frontera puede mejorar.</strong> Si aparece un camino más barato hasta
+              él, hay que bajarle la <em>g</em> y <strong>cambiarle el padre</strong>. Dos formas de
+              hacerlo: reordenar la cola (<em lang="en">decrease-key</em>), o meterlo otra vez y descartar
+              la copia vieja cuando salga.
+            </li>
+          </ul>
+          <p>
+            Sin lo segundo el camino que devuelves puede no ser el barato aunque la distancia sí lo sea,
+            que es un error incómodo de encontrar porque el número que imprimes es correcto.
+          </p>
+        </div>
+        <figure>
+          <figcaption>Pseudocódigo · coste uniforme, con lo que cambia marcado</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">costeUniforme</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">frontera</span> ← cola de <b>prioridad por g</b>, con <span class="var">inicio</span>
+    <span class="var">g</span>[<span class="var">inicio</span>] ← 0;   <span class="var">cerrados</span> ← ∅
+
+    <b>while</b> <span class="var">frontera</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← el de <span class="var">g</span> menor          <i>// ← aquí estaba la FIFO</i>
+        <b>if</b> <span class="var">n</span> ∈ <span class="var">cerrados</span> <b>then continue end if</b>   <i>// ← se marca al SACAR, no al meter</i>
+        añadir <span class="var">n</span> a <span class="var">cerrados</span>
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">vecinos</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∈ <span class="var">cerrados</span> <b>then continue end if</b>
+            <span class="var">gNuevo</span> ← <span class="var">g</span>[<span class="var">n</span>] + <span class="fn">coste</span>(<span class="var">n</span>, <span class="var">v</span>)
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">frontera</span> OR <span class="var">gNuevo</span> &lt; <span class="var">g</span>[<span class="var">v</span>] <b>then</b>
+                <span class="var">g</span>[<span class="var">v</span>] ← <span class="var">gNuevo</span>;   <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>   <i>// ← el nodo puede mejorar</i>
+                insertar o reordenar <span class="var">v</span> en <span class="var">frontera</span>
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;CAMINO
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Compáralo con el A* de la sección 6 y verás que <strong>son el mismo código</strong>: lo único
+          que le falta aquí es sumarle la heurística al ordenar. Dicho al revés, y es la forma corta de
+          recordarlo: <strong>A* con <em>h</em>&nbsp;=&nbsp;0 es Dijkstra, y Dijkstra con todos los costes
+          iguales es la anchura</strong>. Los tres son el bucle de la sección 3 con otra cosa dentro de la
+          frontera.
+        </p>
+        <div class="demo" data-demo="dijkstra">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Mira cómo se mueven las g</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí arriba.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Cada arista lleva su coste y cada nodo, debajo, su <code>g</code> de ahora mismo, que empieza en
+          ∞ para todos menos la salida. Pulsa <strong>Calcular la ruta</strong> y ve vuelta a vuelta: en
+          cada una se cierra el nodo de <code>g</code> menor y se relajan sus vecinos, en
+          <span class="swatch sw-mejora"></span>&nbsp;verde los que mejoran y en
+          <span class="swatch sw-peor"></span>&nbsp;rojo discontinuo los que no. La <code>g</code> que
+          acaba de bajar se pone en verde y en negrita.
+        </p>
+        <p>
+          Hay tres momentos que merece la pena cazar, y el grafo de ejemplo está hecho para que salgan los
+          tres:
+        </p>
+        <ul>
+          <li>
+            <strong>Una <code>g</code> que baja después de estar puesta.</strong> A <code>D</code> se llega
+            primero por <code>B</code> con 9, y al cerrar <code>C</code> resulta que por ahí son 5. Baja la
+            <code>g</code> y <strong>le cambia el padre</strong>: si sólo bajaras el número, la distancia
+            sería correcta y el camino no.
+          </li>
+          <li>
+            <strong>Una relajación rechazada.</strong> Al cerrar <code>F</code>, el camino que ofrece a
+            <code>H</code> es peor que el que ya tenía. Se mira y se descarta, y ese «se mira» también
+            cuesta.
+          </li>
+          <li>
+            <strong>Una entrada vieja en la cola.</strong> <code>D</code> entró dos veces, con 9 y con 5.
+            Cuando sale la de 9 ya estaba cerrado, así que se tira. Es la otra forma de hacer lo del
+            <em lang="en">decrease-key</em>: no tocar la cola y descartar la copia rancia al salir.
+          </li>
+        </ul>
+        <div class="note tip">
+          <span class="note-label">Y la comprobación que cierra el círculo</span>
+          <p>
+            Pon los <em>Costes</em> a <strong>todos a 1</strong> y vuelve a calcular. La cola de prioridad
+            deja de reordenar nada, los nodos salen en el orden en que entraron, y lo que recorre la
+            pantalla es <strong>exactamente la anchura</strong> de dos secciones más arriba: el camino que
+            sale es el de menos aristas. Con la herramienta <em>Coste</em> y el deslizador de al lado puedes
+            volver a poner los costes que quieras y ver cómo cambia la decisión.
+          </p>
+        </div>
+
+      </section>
+
+      <section id="heuristicas">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Heurísticas</h2>
+        </div>
+        <p>
+          Una <strong>función heurística</strong> <em>h(n)</em> es una función matemática que devuelve un
+          valor numérico menor cuanto más cerca está un estado cualquiera del estado objetivo. Es una
+          estimación, no una medida: si supiéramos la distancia real ya no haría falta buscar.
+        </p>
+        <figure class="wide">
+          <figcaption>Cuatro caminos entre los mismos dos puntos · Taxicab geometry, Wikimedia Commons, dominio público</figcaption>
+          <img class="shot" src="../assets/img/pf-metricas.png" width="900" height="900" loading="lazy"
+               alt="Una cuadrícula con dos puntos negros en esquinas opuestas. Tres caminos escalonados, en rojo, azul y amarillo, los unen siguiendo las calles: los tres miden lo mismo. Una línea verde en diagonal los une en línea recta, y es más corta.">
+        </figure>
+        <p>
+          En la figura, los tres caminos escalonados miden lo mismo, doce tramos, porque la
+          <strong>distancia Manhattan</strong> sólo cuenta cuánto hay que moverse en cada eje:
+          |x₁ − x₂| + |y₁ − y₂|. La diagonal verde es la <strong>distancia euclídea</strong>, la línea
+          recta, que siempre es menor o igual. Y ninguna de las dos es el camino que de verdad se recorre si
+          hay paredes por medio.
+        </p>
+        <div class="formulas">
+          <div class="formula">
+            <span class="formula-et">Euclídea</span>
+            <em>d</em><sub>E</sub> =
+            <span class="raiz"><span>(<em>x</em><sub>1</sub> − <em>x</em><sub>2</sub>)<sup>2</sup> + (<em>y</em><sub>1</sub> − <em>y</em><sub>2</sub>)<sup>2</sup></span></span>
+          </div>
+          <div class="formula">
+            <span class="formula-et">Manhattan</span>
+            <em>d</em><sub>M</sub> =
+            |<em>x</em><sub>1</sub> − <em>x</em><sub>2</sub>| + |<em>y</em><sub>1</sub> − <em>y</em><sub>2</sub>|
+          </div>
+        </div>
+
+        <h3 class="label">Admisible y consistente</h3>
+        <p>
+          Para que la heurística sirva sin estropear la solución tiene que cumplir dos propiedades, y la
+          primera es la que de verdad importa:
+        </p>
+        <dl class="gloss">
+          <div><dt>Admisible</dt><dd>Nunca sobreestima el coste real de alcanzar el objetivo desde ese nodo: <em>h(n) ≤ h*(n)</em>. Una heurística optimista no descarta el camino bueno; una pesimista sí puede.</dd></div>
+          <div><dt>Consistente o monótona</dt><dd>Para cualquier nodo, el coste estimado desde él no puede ser mayor que el de llegar a un sucesor más el estimado desde ese sucesor: <em>h(n) ≤ c(n, n′) + h(n′)</em>. Es la desigualdad triangular, y garantiza además que un nodo cerrado ya tiene su mejor camino.</dd></div>
+        </dl>
+        <p>
+          Tanto la euclídea como la Manhattan son admisibles en una rejilla sin paredes, porque cualquier
+          camino real tiene que recorrer al menos esa separación. En cuanto hay paredes siguen siendo
+          admisibles, porque el camino real sólo puede ser más largo, pero se vuelven <strong>malas</strong>: el
+          número que dan se parece cada vez menos al real, y la búsqueda vuelve a explorar de más.
+        </p>
+
+        <h3 class="label">Las tres métricas del motor</h3>
+        <p>
+          El simulador tiene las tres, en un enumerado que le pasas a casi cualquier método que hable de
+          distancias:
+        </p>
+        <div class="codigo"><pre><code><span class="c">/**
+ * DM stands for Distance Metric, a simple enumeration for use with methods that
+ * require a distance metric. The metric available are as follows:
+ * PATH: the actual path distance (i.e., number of step required to reach target)
+ * EUCLID: Euclidean distance using the nodes' x and y coordinates
+ * MANHATTAN: Manhattan distance (absolute distance between x and y coordinates)
+ */</span>
+<span class="k">public enum</span> DM {
+    PATH, EUCLID, MANHATTAN
+}</code></pre></div>
+        <div class="note trap">
+          <span class="note-label">En el laberinto, <code>EUCLID</code> y <code>MANHATTAN</code> mienten</span>
+          <p>
+            Las dos miden sobre las coordenadas de pantalla, y por tanto <strong>atraviesan las
+            paredes</strong>. Dos nodos separados por un muro salen pegadísimos, y un fantasma que está al
+            otro lado del túnel sale lejísimos. Para decidir, usa siempre <code>DM.PATH</code>, que cuenta
+            los pasos de verdad por los pasillos y además está precalculada, así que no es más cara. Las
+            otras dos existen porque en el motor original hacían falta como heurística: aquí ya no.
+          </p>
+        </div>
+      </section>
+
+      <section id="astar">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">A*</h2>
+        </div>
+        <p>
+          El algoritmo más usado, por sus buenas propiedades: es <strong>completo</strong> (si existe
+          solución siempre la encuentra), es <strong>óptimo</strong> (si hay varias, encuentra la mejor) y
+          es <strong>eficiente</strong> en el caso medio, aunque eso último depende enteramente de lo buena
+          que sea la heurística.
+        </p>
+        <p>
+          La idea cabe en una fórmula. Cada nodo abierto se ordena por
+        </p>
+        <div class="formula">
+          <em>f</em>(n) = <em>g</em>(n) + <em>h′</em>(n)
+        </div>
+        <ul>
+          <li><em>g</em>(n): el <strong>coste real</strong> del camino recorrido para llegar a ese nodo desde el inicial.</li>
+          <li><em>h′</em>(n): el <strong>valor heurístico</strong>, lo que estimamos que queda desde él hasta el final.</li>
+        </ul>
+        <p>
+          Y la combinación es lo que lo hace funcionar: <em>g</em> por sí solo tiende a primero en anchura,
+          <em>h′</em> por sí solo tiende a primero en profundidad, que es la búsqueda voraz, y sumados dan una
+          búsqueda que se lanza hacia el objetivo pero <strong>cambia de camino</strong> en cuanto aparecen
+          nodos más prometedores.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Si...</th><th scope="col">A* se convierte en</th><th scope="col">Y entonces</th></tr></thead>
+            <tbody>
+              <tr><td><em>h</em> = 0</td><td>Coste uniforme (Dijkstra)</td><td>Sigue siendo óptimo, pero explora muchísimo más.</td></tr>
+              <tr><td><em>g</em> = 0</td><td>Búsqueda voraz</td><td>Muy rápido y ya no es óptimo: se traga el primer camino que apunte bien.</td></tr>
+              <tr><td><em>h</em> = coste real</td><td>El camino, directamente</td><td>No expande ni un nodo de más. Es el límite teórico.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Las dos listas</h3>
+        <ul>
+          <li>
+            <strong>Nodos abiertos.</strong> El último nodo, de momento, de un posible camino. El camino
+            entero se puede reconstruir porque cada nodo guarda un puntero a su padre.
+          </li>
+          <li>
+            <strong>Nodos cerrados.</strong> Los ya expandidos: todos los nodos intermedios de algún camino.
+          </li>
+        </ul>
+        <p>
+          Las dos listas están ahí para gestionar la <strong>repetición de estados</strong>, que es la
+          pregunta difícil: ¿qué hago si llego al mismo estado por otro camino? Respuesta: quedarme con el
+          mejor. Si el hijo aparece por primera vez, calculo su coste previsto y lo guardo en abiertos; si
+          ya había aparecido y el camino nuevo es mejor que el que tenía, sustituyo su padre y su
+          <em>g</em>, y descarto el otro.
+        </p>
+        <figure class="wide">
+          <figcaption>A* terminado: en azul los nodos cerrados, en verde los que quedaron abiertos, y el camino en amarillo</figcaption>
+          <img class="shot" src="../assets/img/pf-astar-listas.png" width="700" height="437" loading="lazy"
+               alt="Una rejilla con un muro gris en forma de U. Desde la casilla verde de salida se extiende una mancha de casillas azul claro, los nodos cerrados, bordeada por una franja de casillas verdes, los abiertos. Una línea amarilla rodea el muro y llega a la casilla roja del destino.">
+        </figure>
+        <p>
+          La forma de esa mancha es el resumen de todo el tema. No es un círculo, que sería lo que dibujaría el coste
+          uniforme, sino un óvalo estirado hacia el destino: la heurística está tirando de la búsqueda. Y
+          se abre en abanico al chocar con el muro, porque ahí la heurística deja de acertar y el algoritmo
+          tiene que mirar a los lados.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · A*</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">aEstrella</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">abiertos</span> ← cola de prioridad, ordenada por <span class="var">f</span>
+    <span class="var">cerrados</span> ← conjunto vacío
+    <span class="var">g</span>[<span class="var">inicio</span>] ← 0
+    <span class="var">f</span>[<span class="var">inicio</span>] ← <span class="fn">h</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">padre</span>[<span class="var">inicio</span>] ← NULL
+    insertar <span class="var">inicio</span> en <span class="var">abiertos</span>
+
+    <b>while</b> <span class="var">abiertos</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← el de <span class="var">f</span> menor en <span class="var">abiertos</span>       <i>// el más prometedor</i>
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        sacar <span class="var">n</span> de <span class="var">abiertos</span>; añadir <span class="var">n</span> a <span class="var">cerrados</span>
+
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∈ <span class="var">cerrados</span> <b>then continue end if</b>
+            <span class="var">gNuevo</span> ← <span class="var">g</span>[<span class="var">n</span>] + <span class="fn">coste</span>(<span class="var">n</span>, <span class="var">v</span>)
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">abiertos</span> OR <span class="var">gNuevo</span> &lt; <span class="var">g</span>[<span class="var">v</span>] <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>              <i>// me quedo con el mejor camino</i>
+                <span class="var">g</span>[<span class="var">v</span>] ← <span class="var">gNuevo</span>
+                <span class="var">f</span>[<span class="var">v</span>] ← <span class="var">gNuevo</span> + <span class="fn">h</span>(<span class="var">v</span>, <span class="var">objetivo</span>)
+                insertar o reordenar <span class="var">v</span> en <span class="var">abiertos</span>
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;SOLUCIÓN
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Compáralo con el esquema general de la sección 3: son el mismo bucle. Lo único que ha cambiado es
+          que la frontera está ordenada por <em>f</em> y que un nodo ya visto puede mejorar.
+        </p>
+        <div class="demo" data-demo="astar">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Sube y baja el peso de la heurística</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí arriba.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Una retícula de la esquina de abajo a la izquierda a la de abajo a la derecha. El coste de cada
+          arista es su longitud, salvo las pintadas <strong>más gruesas</strong>, que son terreno lento: la
+          fila de abajo, que cuesta el cuádruple, y sobre todo el <strong>atajo</strong> que une las dos
+          esquinas de un tirón, dibujado combado por debajo para que no se confunda con la fila. Cuesta 39,
+          y dando el rodeo por arriba son 36: lo que <em>parece</em> el camino bueno es el malo, por poco.
+          Encima de cada nodo va su <code>g</code>, su <code>h</code> y la suma; mientras no se haya
+          llegado a él sólo se enseña la <code>h</code>, porque es lo único que se sabe.
+          La <em>h</em> es la distancia en línea recta al destino, así que encima de cada
+          uno puedes leer <strong><code>g</code>+<code>h</code>=<code>f</code></strong> y ver de qué se
+          compone el número por el que se ordena la cola.
+        </p>
+        <p>
+          El grafo se edita entero. Con <em>Mover</em> se arrastra un nodo —pincha en él y vuelve a pinchar
+          donde lo quieras— y los costes y las <em>h</em> se recalculan solos, porque salen de la geometría.
+          Con <em>Terreno</em> y el deslizador de al lado se encarece o se abarata la arista que pinches:
+          es un multiplicador sobre su longitud, así que 1 es terreno normal y 4, cuatro veces más lento.
+          Y las aristas nuevas que pongas con <em>Arista</em> salen con el terreno que tenga puesto el
+          deslizador.
+        </p>
+        <div class="note tip">
+          <span class="note-label">El multiplicador nunca baja de 1, y no es por capricho</span>
+          <p>
+            Es lo que mantiene la heurística admisible: mientras ninguna arista cueste menos que su
+            longitud, la distancia en línea recta al destino no puede pasarse. Si se pudiera poner terreno
+            <em>rápido</em>, con un multiplicador por debajo de 1, la <em>h</em> dejaría de ser una cota
+            inferior y A* perdería la garantía aunque el peso estuviera a 1.
+          </p>
+        </div>
+        <p>
+          El deslizador multiplica la heurística, y con él se recorren los tres regímenes de la tabla de
+          arriba sin tocar una línea de código. Calcula con cada uno y compara las dos cifras de la lectura:
+          <strong>coste del camino</strong> y <strong>nodos cerrados</strong>.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Peso</th><th scope="col">Qué es</th><th scope="col">Qué le pasa</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="num-col">0</td>
+                <td><em>h</em> = 0, o sea coste uniforme</td>
+                <td>La <em>f</em> es la <em>g</em>: la mancha crece a la redonda y cierra <strong>22</strong> de los 25 nodos. Camino de coste <strong>36</strong>, el mejor.</td>
+              </tr>
+              <tr>
+                <td class="num-col">1</td>
+                <td>A* con la heurística tal cual, <strong>admisible</strong></td>
+                <td>La búsqueda se estira hacia el destino: <strong>13</strong> nodos cerrados en vez de 22, y el mismo camino de <strong>36</strong>. Gratis.</td>
+              </tr>
+              <tr>
+                <td class="num-col">1,25</td>
+                <td>Inflada, pero poco</td>
+                <td><strong>8</strong> nodos, y todavía acierta con el 36. La garantía ya no existe, pero aquí aún no se nota.</td>
+              </tr>
+              <tr>
+                <td class="num-col">1,5 o más</td>
+                <td>Inflada: <strong>ya no es admisible</strong></td>
+                <td>Cierra <strong>2</strong> nodos y se acabó: se traga el atajo y devuelve <strong>39</strong>. Tres unidades peor, veinte nodos menos de trabajo.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Por qué con peso 1 la heurística de aquí es admisible pase lo que pase</span>
+          <p>
+            Porque está construida para serlo: el coste de una arista es su longitud redondeada
+            <strong>hacia arriba</strong> (y multiplicada, en el terreno lento) y la <em>h</em> es la
+            distancia en línea recta redondeada <strong>hacia abajo</strong>. Como la recta es el camino
+            más corto entre dos puntos y ninguna arista cuesta menos que su longitud, la <em>h</em> no
+            puede pasarse por mucho que muevas los nodos.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Dónde exactamente se rompe</span>
+          <p>
+            Sube el deslizador despacio mirando el coste. Con 1 y con 1,25 sigue saliendo 36; en 1,5 salta a
+            39 y el dibujo cambia de golpe: la ruta deja de rodear por arriba y se va por el atajo. Eso es
+            que A* ha <strong>cerrado el destino</strong> con la <em>g</em> del atajo antes de que el rodeo
+            tuviera tiempo de llegar, y un nodo cerrado ya no se vuelve a mirar.
+          </p>
+          <p>
+            Con peso <em>w</em> lo único que se puede prometer es que el camino no costará más de <em>w</em>
+            veces el mejor. Aquí, con <em>w</em> = 1,5, sale un 8&#8239;% peor a cambio de mirar veinte
+            nodos menos. <strong>Ese es el trato</strong>, y se hace a sabiendas cuando no hay tiempo, que
+            es exactamente la situación de un personaje con 40&nbsp;ms por turno.
+          </p>
+          <p>
+            Con la herramienta <em>Mover</em> puedes cambiar la geometría y buscar el punto en el que se
+            rompe con otra disposición.
+          </p>
+        </div>
+        <p>
+          Y fíjate en dónde se le atraganta a la heurística: apunta al destino en línea recta, que es justo
+          por donde está lo caro. Así que A* mira esa zona antes de decidirse a subir. Es la misma forma que
+          tiene la mancha de la figura de arriba al abrirse en abanico contra el muro. Una heurística es una
+          pista, no una respuesta: donde se equivoca, se paga en nodos mirados de más, y si la fuerzas, en
+          calidad del camino.
+        </p>
+      </section>
+
+      <section id="todo-junto">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Todo junto</h2>
+        </div>
+        <p>
+          Este es el remate de las dos primeras partes, y conviene jugar con él un rato. A la izquierda se
+          elige <strong>cómo se parte el espacio</strong> —puntos de ruta, rejilla o triangulación— y debajo
+          <strong>qué algoritmo busca</strong> en el grafo que sale. Las dos decisiones son independientes:
+          <strong>doce combinaciones</strong>, la misma escena, y se pueden cambiar por separado.
+        </p>
+        <div class="demo" data-demo="todo">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Elige la partición y elige el algoritmo</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto: representar el espacio y buscar en él son dos problemas distintos, y se eligen por separado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Pon obstáculos, mueve la salida y el destino, y calcula. La lectura da las tres cifras con las que
+          se compara: <strong>nodos de la partición</strong>, <strong>nodos explorados</strong> y
+          <strong>longitud de la ruta</strong>. El paso a paso funciona igual que en los ejemplos
+          anteriores, con los mismos colores: azul lo cerrado, amarillo la frontera, rojo el nodo de esta
+          vuelta.
+        </p>
+        <p>
+          Para que los cuatro algoritmos puedan correr sobre las tres particiones sin cambiar una línea,
+          todas producen lo mismo: un grafo con posiciones. El coste de una arista es la distancia entre sus
+          dos nodos, así que la distancia en línea recta al destino vale de heurística admisible en las tres.
+          En la rejilla los nodos son las casillas libres; en los puntos de ruta, los puntos; en la
+          triangulación, el centro de cada sector.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Tres cosas que se ven mejor aquí que en ningún sitio</span>
+          <ul>
+            <li>
+              <strong>La partición manda sobre el coste.</strong> Cambia de triangulación a rejilla de 10 sin
+              tocar el algoritmo: el número de nodos se multiplica por veinte y el de explorados también.
+              Elegir bien la representación ahorra más que elegir bien el algoritmo.
+            </li>
+            <li>
+              <strong>El algoritmo manda sobre la calidad.</strong> Con la misma partición, pon profundidad y
+              luego anchura: la ruta se alarga o se acorta sin que el mapa haya cambiado.
+            </li>
+            <li>
+              <strong>A* no siempre gana por mucho.</strong> En un grafo pequeño, como el de la
+              triangulación, la heurística casi no tiene nada que podar y A* y coste uniforme exploran
+              parecido. Cuanto más grande es el grafo, más se separa.
+            </li>
+          </ul>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Y una cosa que el widget deja a medias a propósito</span>
+          <p>
+            Con la triangulación, la ruta va del centro de un sector al del siguiente y sale con más
+            esquinas de las que necesita. Es lo que pasa cuando se busca sobre la malla y no se tira de la
+            cuerda después: compárala con la del
+            <a href="#representacion">ejemplo de la sección 2</a>, que sí la tensa. El grafo te dice
+            <em>por qué sectores</em> pasar; convertir eso en una ruta bonita es un paso aparte.
+          </p>
+        </div>
+      </section>
+
+      <section id="astar-mspacman">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">A* en Ms. Pac-Man: ya está hecho</h2>
+        </div>
+        <p>
+          Y aquí viene la parte que cambia la práctica. En el simulador,
+          <strong>A* está precalculado</strong>. El laberinto no cambia nunca, así que al cargarlo el motor
+          computa de una vez todas las distancias entre todos los pares de nodos y las guarda en una tabla.
+          Preguntar por una distancia es leer una posición de un <em>array</em>.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// pacman.game.Game. La tabla es triangular: como d(a,b) = d(b,a), sólo se
+// guarda la mitad, y el índice se calcula con la fórmula del número triangular</span>
+<span class="k">public int</span> getShortestPathDistance(<span class="k">int</span> fromNodeIndex, <span class="k">int</span> toNodeIndex) {
+    <span class="k">if</span> (fromNodeIndex == toNodeIndex) {
+        <span class="k">return</span> <span class="n">0</span>;
+    } <span class="k">else if</span> (fromNodeIndex &lt; toNodeIndex) {
+        <span class="k">return</span> currentMaze.shortestPathDistances[((toNodeIndex * (toNodeIndex + <span class="n">1</span>)) / <span class="n">2</span>) + fromNodeIndex];
+    } <span class="k">else</span> {
+        <span class="k">return</span> currentMaze.shortestPathDistances[((fromNodeIndex * (fromNodeIndex + <span class="n">1</span>)) / <span class="n">2</span>) + toNodeIndex];
+    }
+}</code></pre></div>
+        <p>
+          Los caminos completos, no sólo las distancias, salen de <code>PathsCache</code>, que guarda las
+          rutas entre cruces y las empalma. Consultar uno también es barato:
+        </p>
+        <div class="codigo"><pre><code><span class="k">int</span>[] camino = game.getShortestPath(desde, hasta);   <span class="c">// la secuencia de nodos</span>
+<span class="k">int</span>    pasos  = game.getShortestPathDistance(desde, hasta);</code></pre></div>
+
+        <h3 class="label">La trampa: darse la vuelta</h3>
+        <p>
+          Esa distancia precalculada es la distancia óptima <em>en el grafo</em>, y el grafo no sabe que en
+          el juego <strong>no se puede dar media vuelta</strong> en mitad de un pasillo. Ni Ms.&nbsp;Pac-Man
+          ni los fantasmas pueden invertir el sentido, salvo los fantasmas en el instante en que te comes
+          una píldora de poder. Así que la tabla puede decirte «ese fantasma está a tres pasos» cuando en
+          realidad tiene que dar la vuelta a la manzana.
+        </p>
+        <p>
+          Para eso están las versiones con <code>lastMoveMade</code>, y <strong>estas sí ejecutan A* de
+          verdad</strong>, cada vez que se llaman:
+        </p>
+        <div class="codigo"><pre><code><span class="c">// Respeta la regla de no invertir el sentido. Es lo que de verdad se va a recorrer.</span>
+<span class="k">int</span>[] camino = game.getShortestPath(desde, hasta, ultimoMovimiento);
+<span class="k">int</span>    pasos  = game.getShortestPathDistance(desde, hasta, ultimoMovimiento);</code></pre></div>
+        <p>
+          Y la heurística que usa ese A* es justo la tabla precalculada, que es admisible por construcción:
+          el camino sin poder dar la vuelta nunca puede ser más corto que el camino pudiendo.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// pacman.game.internal.AStar: el corazón del algoritmo, tal cual está en el motor</span>
+start.g = <span class="n">0</span>;
+start.h = game.getShortestPathDistance(start.index, target.index);   <span class="c">// h admisible</span>
+start.reached = lastMoveMade;
+open.add(start);
+
+<span class="k">while</span> (!open.isEmpty()) {
+    N currentNode = open.poll();          <span class="c">// el de f = g + h menor</span>
+    closed.add(currentNode);
+    <span class="k">if</span> (currentNode.isEqual(target)) <span class="k">break</span>;
+
+    <span class="k">for</span> (E next : currentNode.adj) {
+        <span class="k">if</span> (next.move != currentNode.reached.opposite()) {   <span class="c">// aquí vive la regla</span>
+            <span class="k">double</span> currentDistance = next.cost;
+            <span class="k">if</span> (!open.contains(next.node) &amp;&amp; !closed.contains(next.node)) {
+                next.node.g = currentDistance + currentNode.g;
+                next.node.h = game.getShortestPathDistance(next.node.index, target.index);
+                next.node.parent = currentNode;
+                next.node.reached = next.move;
+                open.add(next.node);
+            } <span class="k">else if</span> (currentDistance + currentNode.g &lt; next.node.g) {
+                next.node.g = currentDistance + currentNode.g;   <span class="c">// camino mejor: me lo quedo</span>
+                next.node.parent = currentNode;
+                next.node.reached = next.move;
+            }
+        }
+    }
+}</code></pre></div>
+        <p>
+          Es literalmente el pseudocódigo de la sección anterior, con la condición del <code>opposite()</code>
+          añadida. Merece la pena abrirlo en Eclipse y leerlo entero una vez: está en el proyecto
+          <code>MsPacManEngine</code>, bajo <span class="path">pacman.game.internal</span>.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Cuál usar</span>
+          <p>
+            Para <strong>los fantasmas</strong>, siempre la versión con <code>lastMoveMade</code>: no pueden
+            darse la vuelta y la diferencia es real. Para <strong>Ms.&nbsp;Pac-Man</strong>, la versión sin
+            él vale como estimación rápida, pero en cuanto midas «¿llego yo antes que el fantasma?» tienes
+            que comparar peras con peras.
+          </p>
+        </div>
+
+        <h3 class="label">De la distancia al movimiento</h3>
+        <p>
+          El motor no sólo te da caminos: te da directamente el siguiente movimiento. Y la implementación es
+          tan corta que conviene verla, porque explica sus dos defectos:
+        </p>
+        <div class="codigo"><pre><code><span class="c">// pacman.game.Game</span>
+<span class="k">public</span> MOVE getNextMoveTowardsTarget(<span class="k">int</span> fromNodeIndex, <span class="k">int</span> toNodeIndex, DM distanceMeasure) {
+    MOVE move = <span class="k">null</span>;
+    <span class="k">double</span> minDistance = Integer.MAX_VALUE;
+
+    <span class="k">for</span> (Entry&lt;MOVE, Integer&gt; entry : currentMaze.graph[fromNodeIndex].neighbourhood.entrySet()) {
+        <span class="k">double</span> distance = getDistance(entry.getValue(), toNodeIndex, distanceMeasure);
+        <span class="k">if</span> (distance &lt; minDistance) {
+            minDistance = distance;
+            move = entry.getKey();
+        }
+    }
+    <span class="k">return</span> move;
+}</code></pre></div>
+        <ul>
+          <li>
+            Es <strong>voraz de un solo paso</strong>: mira los vecinos, se queda con el que está más cerca
+            del objetivo, y ya. No hay búsqueda, no hay plan, no hay memoria.
+          </li>
+          <li>
+            Y en la versión <code>getApproximateNextMove…</code>, que es idéntica salvo que recorre
+            <code>allNeighbourhoods.get(lastMoveMade)</code>, se descarta además el vecino del que vienes.
+          </li>
+        </ul>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Respeta el no-retroceso</th><th scope="col">Coste</th></tr></thead>
+            <tbody>
+              <tr><td><code>getNextMoveTowardsTarget(a, b, DM)</code></td><td>No</td><td>Cuatro consultas a tabla.</td></tr>
+              <tr><td><code>getApproximateNextMoveTowardsTarget(a, b, últMov, DM)</code></td><td>Sólo al elegir el vecino, no al medir</td><td>Tres consultas a tabla.</td></tr>
+              <tr><td><code>getNextMoveTowardsTarget(a, b, últMov, DM)</code></td><td>Sí, también al medir</td><td>Tres A* cortos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          El nombre engaña: hoy ninguna de las tres calcula nada «aproximado», viene de versiones viejas del
+          motor. La diferencia real está en si la distancia con la que compara sabe o no por dónde has
+          llegado. Casi siempre coinciden; se separan justo cuando el camino corto desde el vecino pasaría
+          por el nodo del que vienes, que es el que el juego no te va a dejar tomar.
+        </p>
+      </section>
+
+      <section id="estrategias">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">Estrategias algorítmicas</h2>
+        </div>
+        <p>
+          Con el camino resuelto por el motor, lo que queda es la pregunta de verdad: <strong>¿hacia dónde?</strong>
+          Un controlador es una función que, cada turno, mira el estado y devuelve una de cuatro
+          direcciones. Todo el diseño está en cómo se elige.
+        </p>
+
+        <h3 class="label">Por qué la regla voraz no basta</h3>
+        <p>
+          «Huye del fantasma más cercano» es la primera idea de todo el mundo, y es la que se escribe en el
+          ejercicio 2 de la <a href="../practicas/practica-0.html">Práctica&nbsp;0</a>. Falla siempre por el
+          mismo sitio: maximizar la distancia paso a paso no es lo mismo que estar a salvo.
+        </p>
+        <figure class="wide">
+          <figcaption>Dos movimientos: el que aleja más ahora, y el que sobrevive</figcaption>
+          <svg class="explica dge1" viewBox="0 0 470 220" role="img" aria-label="Un trozo de laberinto. Ms. Pac-Man está en un cruce. Hacia arriba sale un pasillo corto que termina en un callejón sin salida, y es el movimiento que más la aleja del fantasma ahora mismo. Hacia la derecha sale un pasillo que sigue hasta otro cruce, y aleja menos pero mantiene salidas abiertas.">
+            <style>
+              .dge1 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
+              .dge1 .pc{fill:var(--pill)}
+              .dge1 .gh{fill:var(--blinky)}
+              .dge1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dge1 .tb{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dge1 .tg{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dge1 .fb{fill:none;stroke:var(--bad);stroke-width:2;stroke-dasharray:5 4;marker-end:url(#e1b)}
+              .dge1 .fg{fill:none;stroke:var(--ok);stroke-width:2;marker-end:url(#e1g)}
+              .dge1 .nd{fill:var(--ink-3);opacity:.5}
+            </style>
+            <defs>
+              <marker id="e1b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker>
+              <marker id="e1g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ok)"/></marker>
+            </defs>
+            <path d="M40 130 H190 M190 130 V50 M190 130 H430 M430 130 V60 M430 130 V196" class="pas"/>
+            <circle cx="190" cy="50" r="3" class="nd"/><circle cx="190" cy="90" r="3" class="nd"/>
+            <circle cx="260" cy="130" r="3" class="nd"/><circle cx="330" cy="130" r="3" class="nd"/>
+            <g transform="translate(203 117) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M52 121 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M206 104 V62" class="fb"/>
+            <path d="M212 130 H330" class="fg"/>
+            <text x="200" y="22" class="tb">+ distancia ahora</text>
+            <text x="200" y="36" class="tb">y es un callejón sin salida</text>
+            <text x="216" y="160" class="tg">− distancia ahora, pero quedan salidas</text>
+            <text x="40" y="196" class="t">el fantasma viene por aquí</text>
+          </svg>
+        </figure>
+        <p>
+          El voraz elige arriba porque en ese instante gana un nodo de ventaja, y se encierra. La corrección
+          no es cambiar la fórmula de distancia: es <strong>mirar más lejos de un paso</strong>. Y eso, en
+          este laberinto, tiene una unidad natural.
+        </p>
+
+        <h3 class="label">Pensar en cruces, no en nodos</h3>
+        <p>
+          En un pasillo no hay nada que decidir: sólo se puede seguir. Los únicos sitios donde una decisión
+          cambia algo son los <strong>38 cruces</strong> del primer laberinto. Eso sugiere dos cosas a la
+          vez: que puedes <strong>decidir sólo cuando estás en un cruce</strong>, y que el grafo sobre el
+          que conviene razonar no es el de 1&#8239;293 nodos sino el de cruces y los tramos que los unen.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · recorrer un tramo hasta el siguiente cruce, anotando lo que hay</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">siguienteCruce</span>(<span class="var">nodo</span>, <span class="var">dirección</span>)
+    <span class="var">pasos</span> ← 0
+    <b>repeat</b>
+        <span class="var">dirección</span> ← la única salida de <span class="var">nodo</span> que no sea volver atrás
+        <span class="var">nodo</span> ← vecino de <span class="var">nodo</span> en <span class="var">dirección</span>
+        <span class="var">pasos</span> ← <span class="var">pasos</span> + 1
+        anotar lo que haya en <span class="var">nodo</span>: píldora, píldora de poder, fantasma
+    <b>until</b> <span class="fn">esCruce</span>(<span class="var">nodo</span>) OR <span class="var">nodo</span> es objetivo
+    <b>return</b> {<span class="var">nodo</span>, <span class="var">dirección</span>, <span class="var">pasos</span>, lo anotado}
+<b>end function</b></pre>
+        </figure>
+        <div class="codigo"><pre><code><span class="c">// Los métodos del motor con los que se escribe ese bucle</span>
+game.isJunction(nodo)                       <span class="c">// ¿es un cruce?</span>
+game.getPossibleMoves(nodo, ultimoMov)      <span class="c">// salidas legales, ya sin la de volver atrás</span>
+game.getNeighbour(nodo, movimiento)         <span class="c">// el nodo que hay en esa dirección</span>
+game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección que lleva de a a b</span></code></pre></div>
+        <div class="note tip">
+          <span class="note-label">Devolver <code>null</code> es legítimo</span>
+          <p>
+            Si tu <code>getMove</code> devuelve <code>null</code>, el motor lo descarta y el personaje sigue
+            recto. Eso convierte «decidir sólo en los cruces» en una línea:
+          </p>
+<pre><code><span class="k">if</span> (!game.isJunction(game.getPacmanCurrentNodeIndex())) <span class="k">return null</span>;</code></pre>
+          <p>
+            Y de paso te ahorra el 90&#8239;% de las llamadas, con lo que el presupuesto de 40&nbsp;ms deja
+            de ser un problema aunque hagas una búsqueda de verdad en cada cruce.
+          </p>
+        </div>
+
+        <h3 class="label">La pregunta que ordena todo: ¿llego yo antes?</h3>
+        <p>
+          Un tramo es transitable si llegas al cruce del final antes que cualquier fantasma que pueda
+          comerte. Eso no se mide con la distancia al fantasma: se mide comparando <strong>la distancia de
+          cada uno al mismo punto</strong>.
+        </p>
+        <figure class="wide">
+          <figcaption>La comparación correcta: los dos al cruce, no uno al otro</figcaption>
+          <svg class="explica dge2" viewBox="0 0 470 176" role="img" aria-label="Un cruce en el centro. Ms. Pac-Man está a nueve pasos por la izquierda y un fantasma a seis por arriba. Aunque el fantasma esté lejos de Ms. Pac-Man en línea de pasillo, llega antes al cruce, así que ese tramo no es seguro.">
+            <style>
+              .dge2 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
+              .dge2 .pc{fill:var(--pill)}
+              .dge2 .gh{fill:var(--blinky)}
+              .dge2 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dge2 .tj{font-family:var(--f-display);font-weight:700;font-size:11px;text-anchor:middle;fill:var(--ink)}
+              .dge2 .fy{fill:none;stroke:var(--maze);stroke-width:2;marker-end:url(#e2y)}
+              .dge2 .fr{fill:none;stroke:var(--blinky);stroke-width:2;marker-end:url(#e2r)}
+              .dge2 .cr{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.6}
+            </style>
+            <defs>
+              <marker id="e2y" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+              <marker id="e2r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <path d="M40 112 H430 M235 30 V112" class="pas"/>
+            <circle cx="235" cy="112" r="13" class="cr"/>
+            <g transform="translate(73 99) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M224 30 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M86 112 H214" class="fy"/>
+            <path d="M235 58 V92" class="fr"/>
+            <text x="150" y="102" class="t">9 pasos</text>
+            <text x="278" y="72" class="t">6 pasos</text>
+            <text x="235" y="146" class="tj">el cruce</text>
+            <text x="235" y="164" class="t">llega él antes: el tramo no es seguro</text>
+          </svg>
+        </figure>
+        <figure>
+          <figcaption>Pseudocódigo · ¿es seguro este tramo?</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">llegoAntes</span>(<span class="var">cruce</span>, <span class="var">misPasos</span>)
+    <b>for each</b> <span class="var">f</span> <b>in</b> FANTASMAS <b>do</b>
+        <b>if</b> <span class="fn">esComestible</span>(<span class="var">f</span>) <b>then continue end if</b>       <i>// no me puede comer</i>
+        <b>if</b> <span class="fn">estáEnLaCárcel</span>(<span class="var">f</span>) <b>then continue end if</b>     <i>// no está en el laberinto</i>
+        <span class="var">susPasos</span> ← <span class="fn">distanciaSinDarLaVuelta</span>(<span class="var">f</span>, <span class="var">cruce</span>)
+        <b>if</b> <span class="var">susPasos</span> &lt; <span class="var">misPasos</span> + <span class="var">holgura</span> <b>then return</b> False <b>end if</b>
+    <b>end for</b>
+    <b>return</b> True
+<b>end function</b></pre>
+        </figure>
+        <div class="codigo"><pre><code><span class="c">// Y en código, con las dos exclusiones y la distancia que respeta el no-retroceso</span>
+<span class="k">private boolean</span> llegoAntes(Game game, <span class="k">int</span> cruce, <span class="k">int</span> misPasos) {
+    <span class="k">for</span> (GHOST f : GHOST.values()) {
+        <span class="k">if</span> (game.isGhostEdible(f))       <span class="k">continue</span>;   <span class="c">// comestible: no es amenaza</span>
+        <span class="k">if</span> (game.getGhostLairTime(f) &gt; <span class="n">0</span>) <span class="k">continue</span>;   <span class="c">// encerrado: no está en el mapa</span>
+
+        <span class="k">int</span>  nodo = game.getGhostCurrentNodeIndex(f);
+        MOVE ult  = game.getGhostLastMoveMade(f);
+        <span class="k">int</span>  susPasos = game.getShortestPathDistance(nodo, cruce, ult);
+
+        <span class="k">if</span> (susPasos &lt; misPasos + HOLGURA) <span class="k">return false</span>;
+    }
+    <span class="k">return true</span>;
+}</code></pre></div>
+        <p>
+          Las dos exclusiones del principio no son detalles: sin ellas el controlador huye de fantasmas
+          comestibles, que son puntos gratis, y de fantasmas encerrados, cuyo nodo ni siquiera está
+          conectado con el laberinto. Y la <code>HOLGURA</code> está ahí porque empatar es perder: si
+          llegáis a la vez, te come.
+        </p>
+
+        <h3 class="label">Mirar dos cruces por delante</h3>
+        <p>
+          Con eso ya no te metes en un pasillo cortado. Falta el otro medio error: meterte en un tramo
+          seguro que desemboca en un cruce del que <strong>no sale nada seguro</strong>. La trampa de la
+          figura de antes, pero un nivel más arriba.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · movimientos seguros con dos niveles de profundidad</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">movimientosSeguros</span>()
+    <span class="var">árbol</span> ← mapa vacío
+    <b>for each</b> <span class="var">d</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">miNodo</span>, <span class="var">miÚltimoMov</span>) <b>do</b>
+        <span class="var">c1</span> ← <span class="fn">siguienteCruce</span>(<span class="var">miNodo</span>, <span class="var">d</span>)
+        <b>if</b> <span class="fn">hayFantasmaEnElTramo</span>(<span class="var">c1</span>) <b>then continue end if</b>
+        <b>if</b> NOT <span class="fn">llegoAntes</span>(<span class="var">c1</span>.nodo, <span class="var">c1</span>.pasos) <b>then continue end if</b>
+
+        <span class="var">árbol</span>[<span class="var">d</span>] ← conjunto vacío
+        <b>for each</b> <span class="var">d2</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">c1</span>.nodo, <span class="var">c1</span>.dirección) <b>do</b>
+            <span class="var">c2</span> ← <span class="fn">siguienteCruce</span>(<span class="var">c1</span>.nodo, <span class="var">d2</span>)
+            <b>if</b> <span class="fn">llegoAntes</span>(<span class="var">c2</span>.nodo, <span class="var">c1</span>.pasos + <span class="var">c2</span>.pasos) <b>then</b>
+                añadir <span class="var">d2</span> a <span class="var">árbol</span>[<span class="var">d</span>]
+            <b>end if</b>
+        <b>end for</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">árbol</span>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Lo que sale es un arbolito de dos niveles: por cada dirección inmediata, cuántas salidas seguras
+          hay después. Una dirección cuyo conjunto está vacío es una trampa aunque el primer tramo sea
+          seguro; y cuando no hay más remedio que arriesgar, la que <strong>más salidas conserva</strong> es
+          la menos mala. Profundidad 2 basta: a partir de ahí la predicción del movimiento de los fantasmas
+          ya no vale nada.
+        </p>
+
+        <h3 class="label">Buscar el objetivo dentro de lo seguro</h3>
+        <p>
+          Y aquí es donde vuelve la búsqueda en anchura de la sección 4, con una sola modificación: no
+          expande cualquier vecino, sino sólo los que caen dentro del árbol de movimientos seguros. Con eso,
+          una sola pasada contesta «¿cuál es la píldora alcanzable más cercana <em>sin morir por el
+          camino</em>, y qué dirección me lleva a ella?».
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · anchura restringida al espacio seguro</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">buscarObjetivoSeguro</span>(<span class="var">objetivos</span>, <span class="var">árbol</span>)
+    <span class="var">cola</span> ← cola FIFO
+    <span class="var">visitados</span> ← {<span class="var">miNodo</span>}
+    <b>for each</b> <span class="var">d</span> <b>in</b> claves de <span class="var">árbol</span> <b>do</b>        <i>// sólo arranco por lo seguro</i>
+        <span class="var">v</span> ← vecino de <span class="var">miNodo</span> en <span class="var">d</span>
+        <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">miNodo</span>
+        <span class="fn">encolar</span>(<span class="var">cola</span>, {<span class="var">v</span>, <span class="var">d</span>})
+        añadir <span class="var">v</span> a <span class="var">visitados</span>
+    <b>end for</b>
+
+    <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
+        {<span class="var">n</span>, <span class="var">dir</span>} ← <span class="fn">desencolar</span>(<span class="var">cola</span>)
+        <b>if</b> <span class="var">n</span> ∈ <span class="var">objetivos</span> <b>then</b>
+            <b>return</b> primera dirección del camino <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>)
+        <b>end if</b>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">n</span>, <span class="var">dir</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>
+                añadir <span class="var">v</span> a <span class="var">visitados</span>
+                <span class="fn">encolar</span>(<span class="var">cola</span>, {<span class="var">v</span>, dirección de <span class="var">n</span> a <span class="var">v</span>})
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> NULL      <i>// no hay ningún objetivo alcanzable con seguridad</i>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Compárala con <code>getClosestNodeIndexFromNodeIndex</code>, que hace lo mismo pero midiendo en
+          línea recta por la tabla y sin enterarse de los fantasmas. La versión propia cuesta unos pocos
+          miles de operaciones en el peor caso, se ejecuta sólo en los cruces, y es la diferencia entre un
+          controlador que come y uno que come <em>y sobrevive</em>.
+        </p>
+
+        <h3 class="label">El presupuesto</h3>
+        <p>
+          Cada llamada a <code>getMove</code> tiene 40&nbsp;ms <em>anunciados</em> en el parámetro
+          <code>timeDue</code>, pero conviene saber qué significa eso exactamente. En
+          <code>runGame</code> y <code>runExperiment</code>, que son el modo de clase y el de corrección, el
+          motor llama a tu método y <strong>se queda esperando</strong>: nadie lo corta, y un cálculo de
+          200&nbsp;ms se usa entero. Lo único que pagas es reloj. Y como además <strong>no hace falta
+          devolver un movimiento en cada turno</strong> —si devuelves <code>null</code> el motor sigue
+          recto—, lo sensato es no repartir el presupuesto a partes iguales: gastar en los cruces, que son
+          uno de cada diez turnos, y no gastar nada en los pasillos.
+        </p>
+        <p>
+          El detalle completo, con lo que cambia en los modos que sí llevan reloj, está en las
+          <a href="../practicas/practica-1.html#reglas-simulacion">reglas de simulación de la
+          Práctica&nbsp;1</a>. Órdenes de magnitud con los que contar:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Operación</th><th scope="col">Cuesta</th></tr></thead>
+            <tbody>
+              <tr><td><code>getShortestPathDistance(a, b)</code></td><td>Una lectura de <em>array</em>. Gratis.</td></tr>
+              <tr><td><code>getShortestPath(a, b)</code></td><td>Empalmar tramos ya guardados. Barato.</td></tr>
+              <tr><td><code>getShortestPath(a, b, últMov)</code></td><td>Un A* de verdad. Barato, pero no gratis: no lo llames cuatro veces con los mismos argumentos.</td></tr>
+              <tr><td>Una anchura sobre el laberinto entero</td><td>1&#8239;293 nodos. Perfectamente asumible una vez por cruce.</td></tr>
+              <tr><td>Lo mismo, en cada uno de los 4000 turnos</td><td>Empieza a notarse. Por eso se decide en los cruces.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Ver lo que piensa</h3>
+        <p>
+          Nada de esto se depura leyendo el código: se depura mirándolo. <code>GameView</code> pinta encima
+          del laberinto y, si la ventana no está abierta, no hace nada, así que puedes dejar las llamadas
+          puestas.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// un color por motivo, y todo detrás de un interruptor que se apaga al entregar</span>
+<span class="k">if</span> (DEBUG) {
+    GameView.addPoints(game, Color.ORANGE, caminoAlaPildora);   <span class="c">// a dónde voy</span>
+    GameView.addPoints(game, Color.RED,    tramosDescartados);  <span class="c">// qué he descartado</span>
+    GameView.addLines (game, Color.CYAN,   miNodo, nodoDelFantasmaQueMePreocupa);
+}</code></pre></div>
+        <p>
+          Cuando veas en pantalla los tramos que tu controlador considera cerrados, los errores de la
+          función «¿llego yo antes?» se hacen obvios en dos partidas. Sin eso, no.
+        </p>
+      </section>
+
+      <section id="resumen">
+        <div class="sec-head">
+          <span class="num">10</span>
+          <h2 class="sec">Lo que hay que llevarse</h2>
+        </div>
+        <ol>
+          <li>El <em>pathfinding</em> son dos problemas: <strong>representar</strong> el espacio como grafo y <strong>buscar</strong> en ese grafo. Se resuelven por separado.</li>
+          <li>Waypoints, rejillas y mallas de navegación son tres formas de hacer lo primero, con tres compromisos distintos entre memoria, esfuerzo manual y calidad de las rutas.</li>
+          <li>Todo algoritmo de búsqueda es el mismo bucle sobre <strong>abiertos</strong> y <strong>cerrados</strong>. Lo que cambia es de qué estructura se saca el siguiente nodo.</li>
+          <li>Anchura con costes unitarios ya es óptima. En el laberinto, es la herramienta correcta.</li>
+          <li>Una heurística <strong>admisible</strong>, o sea que nunca sobreestime, hace a A* óptimo. En Ms.&nbsp;Pac-Man, la tabla precalculada sirve de heurística admisible para el A* de los fantasmas.</li>
+          <li>En el laberinto, <code>DM.PATH</code> siempre: las otras dos métricas atraviesan paredes.</li>
+          <li>El camino te lo da el motor. La decisión, el <strong>hacia dónde</strong>, no: y ahí está la nota.</li>
+          <li>Decide en los cruces, razona por tramos, compara distancias <strong>al mismo punto</strong>, y mira dos cruces por delante.</li>
+        </ol>
+        <div class="note mine">
+          <span class="note-label">Y a continuación</span>
+          <p>
+            Todo esto se aplica en la <a href="../practicas/practica-1.html">Práctica&nbsp;1</a>, escribiendo
+            los dos controladores a mano. En la Práctica&nbsp;2 el mismo comportamiento se reescribe como
+            máquina de estados, y la comparación entre las dos versiones es el argumento del curso entero.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#problema">El problema</a></li>
+            <li><a href="#representacion">Representar el espacio</a></li>
+            <li><a href="#espacios">Espacios de estados</a></li>
+            <li><a href="#ciegas">Búsquedas ciegas</a></li>
+            <li><a href="#heuristicas">Heurísticas</a></li>
+            <li><a href="#astar">A*</a></li>
+            <li><a href="#todo-junto">Todo junto</a></li>
+            <li><a href="#astar-mspacman">A* en Ms. Pac-Man</a></li>
+            <li><a href="#estrategias">Estrategias algorítmicas</a></li>
+            <li><a href="#resumen">Lo que hay que llevarse</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">También en diapositivas</span>
+          <p style="margin:0">
+            <a href="apuntes-pathfinding-slides.html">Las diapositivas de clase</a>, con los mismos dibujos y el
+            mismo orden.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 16 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+<script src="../assets/js/demos.js" defer></script>
+</body>
+</html>
