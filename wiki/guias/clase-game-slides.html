@@ -674,7 +674,7 @@
         <h2>Para qué sirve la métrica</h2>
         <figure>
           <figcaption>Aquí EUCLID y PATH no eligen el mismo movimiento</figcaption>
-          <svg class="diag dgm1" viewBox="0 0 420 250" role="img" aria-label="Fragmento de laberinto: Ms. Pac-Man está en un cruce y el objetivo queda arriba a la derecha. Hacia arriba sale un pasillo que se corta, pero en línea recta parece el camino más corto, así que la métrica euclídea elige ese movimiento. El camino de verdad va hacia la derecha y sube por el otro pasillo.">
+          <svg class="diag dgm1" viewBox="0 0 420 250" role="img" aria-label="Fragmento de laberinto: Ms. Pac-Man está en un cruce y el objetivo queda arriba a la derecha. Hacia arriba sale un pasillo que acaba dando toda la vuelta, pero en línea recta parece el camino más corto, así que la métrica euclídea elige ese movimiento. El camino de verdad va hacia la derecha y sube por el otro pasillo.">
             <style>
               .dgm1 .pasillo{fill:none;stroke:var(--surface-2);stroke-width:17;stroke-linecap:round}
               .dgm1 .mal{fill:none;stroke:var(--bad);stroke-width:2.2;stroke-dasharray:5 4;marker-end:url(#gm1)}
@@ -683,7 +683,6 @@
               .dgm1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
               .dgm1 .tm{fill:var(--bad)}
               .dgm1 .tb{fill:var(--ok)}
-              .dgm1 .corte{stroke:var(--ink-3);stroke-width:2}
             </style>
             <defs>
               <marker id="gm1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker>
@@ -691,12 +690,12 @@
             </defs>
             <g class="pasillo">
               <path d="M60 200 H340"/>
-              <path d="M120 200 V112"/>
+              <path d="M120 200 V112 H70"/>
               <path d="M280 200 V60"/>
               <path d="M280 60 H170"/>
             </g>
-            <path d="M108 104 L132 104" class="corte"/>
-            <text x="140" y="108" class="t">sin salida</text>
+            <text x="48" y="116" class="t">…</text>
+            <text x="64" y="98" class="t">por aquí también se llega, dando toda la vuelta</text>
             <path d="M120 200 L180 60" class="recta"/>
             <circle cx="180" cy="60" r="7" fill="var(--pill)" stroke="var(--ink)" stroke-width="1.5"/>
             <text x="192" y="64" class="t">objetivo</text>
@@ -820,7 +819,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 16 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

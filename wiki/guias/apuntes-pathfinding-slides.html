@@ -463,17 +463,21 @@
         <h2>Admisible y consistente</h2>
         <ul>
           <li>
-            <strong>Admisible:</strong> nunca sobreestima. <em>h</em>(n) ≤ <em>h*</em>(n). Una heurística
-            optimista no descarta el camino bueno; una pesimista sí.
+            <strong>Admisible:</strong> nunca se pasa. <em>h</em>(n) ≤ <em>h*</em>(n). Es lo que hace
+            óptimo a A*.
           </li>
           <li>
-            <strong>Consistente</strong> o monótona: <em>h</em>(n) ≤ <em>c</em>(n, n′) + <em>h</em>(n′). La
-            desigualdad triangular. Garantiza que un nodo cerrado ya tiene su mejor camino.
+            <strong>Consistente:</strong> <em>h</em>(n) − <em>h</em>(n′) ≤ <em>c</em>(n, n′). Dar un paso no
+            puede bajar la estimación más de lo que cuesta el paso.
+          </li>
+          <li>
+            De ahí el otro nombre, <strong>monótona</strong>: <strong>la <em>f</em> nunca baja</strong> a lo
+            largo de un camino, y por eso se puede cerrar un nodo y no volver a mirarlo.
           </li>
         </ul>
         <p class="lede">
-          Con paredes por medio, Manhattan y euclídea siguen siendo admisibles, porque el camino real sólo
-          puede ser más largo, pero se vuelven <strong>malas</strong>, y la búsqueda explora de más.
+          Cualquier <em>h</em> geométrica razonable sale consistente de regalo. Se rompe al multiplicarla
+          por un peso mayor que 1.
         </p>
       </section>
 
@@ -652,13 +656,15 @@ open.add(start);
         <span class="slide-num">Parte 5 · 38</span>
         <h2>Por qué «huir del más cercano» falla</h2>
         <figure>
-          <figcaption>El movimiento que más aleja ahora, y el que sobrevive</figcaption>
-          <svg class="diag dgs38" viewBox="0 0 470 220" role="img" aria-label="Ms. Pac-Man en un cruce con un fantasma acercándose por la izquierda. Hacia arriba hay un callejón sin salida, que es el movimiento que más la aleja ahora mismo; hacia la derecha el pasillo sigue hasta otro cruce y aleja menos pero deja salidas.">
+          <figcaption>Las dos salidas ganan exactamente un nodo: la regla no las distingue</figcaption>
+          <svg class="diag dgs38" viewBox="0 0 470 210" role="img" aria-label="Ms. Pac-Man en un cruce con un fantasma rojo acercándose por la izquierda a seis nodos. Del cruce salen dos caminos que se alejan de él: hacia arriba, por donde baja un segundo fantasma, y hacia la derecha, despejado. Los dos ganan exactamente un nodo, así que la regla de huir del más cercano no puede distinguirlos.">
             <style>
               .dgs38 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
               .dgs38 .pc{fill:var(--pill)}
               .dgs38 .gh{fill:var(--blinky)}
+              .dgs38 .gh2{fill:var(--pinky)}
               .dgs38 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgs38 .tc{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
               .dgs38 .tb{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
               .dgs38 .tg{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
               .dgs38 .fb{fill:none;stroke:var(--bad);stroke-width:2;stroke-dasharray:5 4;marker-end:url(#s38b)}
@@ -669,22 +675,30 @@ open.add(start);
               <marker id="s38b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker>
               <marker id="s38g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ok)"/></marker>
             </defs>
-            <path d="M40 130 H190 M190 130 V50 M190 130 H430 M430 130 V60 M430 130 V196" class="pas"/>
-            <circle cx="190" cy="50" r="3" class="nd"/><circle cx="190" cy="90" r="3" class="nd"/>
-            <circle cx="260" cy="130" r="3" class="nd"/><circle cx="330" cy="130" r="3" class="nd"/>
-            <g transform="translate(203 117) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
-            <path d="M52 121 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
-            <path d="M206 104 V62" class="fb"/>
-            <path d="M212 130 H330" class="fg"/>
-            <text x="200" y="22" class="tb">+ distancia ahora</text>
-            <text x="200" y="36" class="tb">y es un callejón sin salida</text>
-            <text x="216" y="160" class="tg">− distancia ahora, pero quedan salidas</text>
-            <text x="40" y="196" class="t">el fantasma viene por aquí</text>
+            <path d="M40 140 H430 M190 140 V40 M190 40 H330" class="pas"/>
+            <circle cx="120" cy="140" r="3" class="nd"/><circle cx="155" cy="140" r="3" class="nd"/>
+            <circle cx="260" cy="140" r="3" class="nd"/><circle cx="300" cy="140" r="3" class="nd"/>
+            <circle cx="190" cy="115" r="3" class="nd"/>
+            <g transform="translate(203 127) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M52 131 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M179 58 a11 11 0 0 1 22 0 v11 h-22 z" class="gh2"/>
+            <path d="M206 122 V88" class="fb"/>
+            <path d="M212 140 H320" class="fg"/>
+            <text x="63" y="118" class="tc">a 6 nodos</text>
+            <text x="63" y="170" class="t">viene por aquí</text>
+            <text x="215" y="96" class="tb">+1 nodo… y por aquí baja el otro</text>
+            <text x="216" y="168" class="tg">+1 nodo, exactamente lo mismo,</text>
+            <text x="216" y="182" class="tg">y está despejado</text>
+            <text x="345" y="44" class="t">…</text>
+            <text x="444" y="144" class="t">…</text>
           </svg>
         </figure>
         <p class="foot">
-          Maximizar la distancia paso a paso no es estar a salvo. La corrección no es cambiar la métrica:
-          es <strong>mirar más lejos de un paso</strong>.
+          En estos laberintos <strong>no hay callejones</strong>: 1293 nodos, todos con dos, tres o cuatro
+          salidas. Ninguna huida gana más de un nodo, así que en el 99&#8239;% de los casos empatan todas y
+          el desempate lo decide el orden del <code>enum MOVE</code>: <code>UP</code> antes que
+          <code>RIGHT</code>. Y como no se puede dar media vuelta, entrar en un pasillo es comprometerse a
+          salir por el otro extremo.
         </p>
       </section>
 
@@ -871,6 +885,172 @@ open.add(start);
 
       <section class="slide" id="d48">
         <span class="slide-num">Parte 5 · 48</span>
+        <h2>Tres formas de escribir la decisión</h2>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Reglas con prioridad</th>
+                <th scope="col">Función de evaluación</th>
+                <th scope="col">Mapa de costes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Decide</td>
+                <td>El primer <code>if</code> que se cumple.</td>
+                <td>La opción con mejor puntuación.</td>
+                <td>La búsqueda sobre el grafo con pesos.</td>
+              </tr>
+              <tr>
+                <td>Se afina</td>
+                <td>El orden y los umbrales.</td>
+                <td>Los pesos.</td>
+                <td>El coste pintado alrededor de cada cosa.</td>
+              </tr>
+              <tr>
+                <td>Falla</td>
+                <td>Cuando dos criterios empatan.</td>
+                <td>Cuando los pesos se pisan.</td>
+                <td>Cuando se vuelve magia negra.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede">Las tres dependen de lo mismo: que «¿llego yo antes?» esté bien medido.</p>
+      </section>
+
+      <section class="slide s-code" id="d49">
+        <span class="slide-num">Parte 5 · 49</span>
+        <h2>Puntuar, en vez de encadenar condiciones</h2>
+        <pre class="pseudo"><b>for each</b> <span class="var">d</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">miNodo</span>, <span class="var">miÚltimoMov</span>) <b>do</b>
+    <span class="var">c</span> ← <span class="fn">siguienteCruce</span>(<span class="var">miNodo</span>, <span class="var">d</span>)
+
+    <span class="var">valor</span> ← <span class="var">wPíldoras</span> × <span class="fn">píldorasEnElTramo</span>(<span class="var">c</span>)
+           − <span class="var">wAmenaza</span>  × <span class="fn">amenaza</span>(<span class="var">c</span>)
+           + <span class="var">wSalidas</span>  × <span class="fn">salidasDe</span>(<span class="var">c</span>.nodo)
+           + <span class="var">wComible</span>  × <span class="fn">premioPorFantasmaComestible</span>(<span class="var">c</span>)
+           + <span class="var">wPoder</span>    × <span class="fn">valorDeLaPíldoraDePoder</span>(<span class="var">c</span>)
+
+    <b>if</b> <span class="var">valor</span> &gt; <span class="var">mejorValor</span> <b>then</b> <span class="var">mejor</span> ← <span class="var">d</span> <b>end if</b>
+<b>end for</b></pre>
+        <p class="lede">
+          El término de la píldora de poder es el mismo peso con el signo cambiado: premio si hay dos
+          fantasmas encima, castigo si no. Un término sustituye a media docena de <code>if</code>.
+        </p>
+      </section>
+
+      <section class="slide s-code" id="d50">
+        <span class="slide-num">Parte 5 · 50</span>
+        <h2>El laberinto como mapa de costes</h2>
+        <pre class="pseudo"><span class="fn">ponerTodosLosNodosA</span>(<span class="var">costeBase</span>)
+<b>for each</b> <span class="var">f</span> <b>in</b> FANTASMAS <b>do</b>
+    <b>if</b> <span class="fn">esComestible</span>(<span class="var">f</span>) <b>then</b>
+        <span class="fn">abaratarAlrededorDe</span>(<span class="fn">nodo</span>(<span class="var">f</span>), radio, factor)
+    <b>else</b>
+        <span class="fn">encarecerAlrededorDe</span>(<span class="fn">nodo</span>(<span class="var">f</span>), radio, factor)
+        <span class="fn">encarecerElCamino</span>(<span class="fn">caminoHastaMí</span>(<span class="var">f</span>), factor)
+    <b>end if</b>
+<b>end for</b>
+<b>return</b> <span class="fn">búsquedaDeCosteMínimo</span>(<span class="var">miNodo</span>)</pre>
+        <p class="lede">
+          La decisión deja de estar en un <code>if</code> y pasa a estar en el mapa. Es el
+          <em lang="en">influence map</em> de los juegos de estrategia. Se depura pintándolo.
+        </p>
+      </section>
+
+      <section class="slide" id="d51">
+        <span class="slide-num">Parte 5 · 51</span>
+        <h2>Predecir a quien no controlas</h2>
+        <ol>
+          <li><strong>Proyectar en recta</strong> hasta el siguiente cruce. Fiable al 100&#8239;%: dentro de un pasillo el otro <em>no puede</em> elegir.</li>
+          <li><strong>El abanico de cruces.</strong> Desde ahí no hay un destino, hay un conjunto. Si no sabes por cuál sale, cúbrelos todos: para eso sois cuatro.</li>
+          <li><strong>Coincidir en el tiempo.</strong> Dos anchuras a la vez, anotando en qué turno llega cada uno a cada nodo.</li>
+        </ol>
+        <p class="lede">Más de dos cruces por delante ya no es predecir: es inventar.</p>
+      </section>
+
+      <section class="slide s-figure" id="d52">
+        <span class="slide-num">Parte 5 · 52</span>
+        <h2>Interceptar es coincidir en el nodo <em>y</em> en el turno</h2>
+        <figure>
+          <figcaption>Los dos llegan al cruce en t+9, y de frente</figcaption>
+          <svg class="diag dgs52" viewBox="0 0 470 190" role="img" aria-label="Un cruce en el centro. Ms. Pac-Man avanza por el pasillo de la izquierda y alcanza el cruce en el turno nueve. Un fantasma baja por el pasillo vertical y alcanza el mismo cruce también en el turno nueve, de frente. Coinciden en el nodo y en el instante: es una interceptación.">
+            <style>
+              .dgs52 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
+              .dgs52 .pc{fill:var(--pill)}
+              .dgs52 .gh{fill:var(--blinky)}
+              .dgs52 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgs52 .tk{font-family:var(--f-mono);font-size:9px;text-anchor:middle;fill:var(--ink-3)}
+              .dgs52 .tj{font-family:var(--f-display);font-weight:700;font-size:11px;text-anchor:middle;fill:var(--ok)}
+              .dgs52 .fy{fill:none;stroke:var(--maze);stroke-width:2;marker-end:url(#s52y)}
+              .dgs52 .fr{fill:none;stroke:var(--blinky);stroke-width:2;marker-end:url(#s52r)}
+              .dgs52 .cr{fill:none;stroke:var(--ok);stroke-width:2}
+              .dgs52 .nd{fill:var(--ink-3);opacity:.45}
+            </style>
+            <defs>
+              <marker id="s52y" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+              <marker id="s52r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <path d="M40 120 H430 M235 24 V120" class="pas"/>
+            <circle cx="235" cy="120" r="14" class="cr"/>
+            <circle cx="118" cy="120" r="3" class="nd"/><circle cx="176" cy="120" r="3" class="nd"/>
+            <circle cx="235" cy="56" r="3" class="nd"/><circle cx="235" cy="88" r="3" class="nd"/>
+            <g transform="translate(73 107) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M224 24 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M86 120 H214" class="fy"/>
+            <path d="M235 48 V98" class="fr"/>
+            <text x="118" y="110" class="tk">t+3</text>
+            <text x="176" y="110" class="tk">t+6</text>
+            <text x="268" y="60" class="tk">t+3</text>
+            <text x="268" y="92" class="tk">t+6</text>
+            <text x="235" y="150" class="tj">los dos, en t+9</text>
+            <text x="235" y="168" class="t">llegar antes pero por detrás no sirve de nada</text>
+          </svg>
+        </figure>
+        <p class="foot">
+          Los visitados se marcan por <strong>(nodo, turno)</strong>, no por nodo.
+        </p>
+      </section>
+
+      <section class="slide" id="d53">
+        <span class="slide-num">Parte 5 · 53</span>
+        <h2>Coordinación sin mensajes</h2>
+        <ul>
+          <li>Los cuatro fantasmas los decide el mismo método, con el mismo <code>Game</code>, en el mismo turno: <strong>ya comparten todo</strong>.</li>
+          <li><strong>Repartir</strong>: los cruces que Ms. Pac-Man puede pisar, uno distinto para cada fantasma, el más cercano que quede libre.</li>
+          <li><strong>Papeles como puestos</strong>: perseguidor es el que está más cerca ahora, no siempre Blinky.</li>
+          <li><strong>Memoria en los cruces</strong>: cada cruce recuerda la última salida tomada; el siguiente elige otra.</li>
+        </ul>
+        <p class="lede">
+          Y no recalcular el reparto en cada turno: sólo cuando Ms. Pac-Man cambia de dirección, entra en un
+          cruce o se acerca a una píldora de poder. Si no, la coordinación oscila y no se mueve nadie.
+        </p>
+      </section>
+
+      <section class="slide" id="d54">
+        <span class="slide-num">Parte 5 · 54</span>
+        <h2>El reloj del modo comestible</h2>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Constante</th><th scope="col">Valor</th><th scope="col">Consecuencia</th></tr></thead>
+            <tbody>
+              <tr><td><code>EDIBLE_TIME</code></td><td class="num-col">200</td><td>Y un 10&#8239;% menos por nivel: los umbrales fijos envejecen.</td></tr>
+              <tr><td><code>GHOST_SPEED_REDUCTION</code></td><td class="num-col">2</td><td>El comestible va a media velocidad. Alcanzarlo cuesta ≈ 2 × distancia.</td></tr>
+              <tr><td><code>GHOST_EAT_SCORE</code></td><td class="num-col">200</td><td>Se dobla: 200, 400, 800, 1600. La cadena son 3000 puntos.</td></tr>
+              <tr><td><code>POWER_PILL</code></td><td class="num-col">50</td><td>Comérsela sola vale cinco píldoras. Con la cadena, trescientas.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede">
+          Dos reglas: persigue sólo si el tiempo comestible da para el doble de la distancia; deja de huir
+          en cuanto ese tiempo sea menor que lo que tardáis en encontraros.
+        </p>
+      </section>
+
+      <section class="slide" id="d55">
+        <span class="slide-num">Parte 5 · 55</span>
         <h2>El presupuesto</h2>
         <div class="table-scroll">
           <table>
@@ -886,8 +1066,8 @@ open.add(start);
         </div>
       </section>
 
-      <section class="slide" id="d49">
-        <span class="slide-num">Parte 5 · 49</span>
+      <section class="slide" id="d56">
+        <span class="slide-num">Parte 5 · 56</span>
         <h2>Ver lo que piensa</h2>
 <pre><code><span class="c">// un color por motivo, todo detrás de un interruptor que se apaga al entregar</span>
 <span class="k">if</span> (DEBUG) {
@@ -902,8 +1082,8 @@ open.add(start);
         </p>
       </section>
 
-      <section class="slide" id="d50">
-        <span class="slide-num">Tema 1 · 50</span>
+      <section class="slide" id="d57">
+        <span class="slide-num">Tema 1 · 57</span>
         <h2>Lo que hay que llevarse</h2>
         <ol>
           <li>El <em>pathfinding</em> son dos problemas: <strong>representar</strong> y <strong>buscar</strong>.</li>
@@ -915,8 +1095,8 @@ open.add(start);
         </ol>
       </section>
 
-      <section class="slide s-part" id="d51">
-        <span class="slide-num">Tema 1 · 51</span>
+      <section class="slide s-part" id="d58">
+        <span class="slide-num">Tema 1 · 58</span>
         <p class="part-num">Y ahora</p>
         <h2>Práctica 1 · Controladores algorítmicos</h2>
       </section>
@@ -947,7 +1127,7 @@ open.add(start);
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 16 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

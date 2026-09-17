@@ -135,8 +135,9 @@
           <p>
             Lee los apuntes del tema:
             <a href="../guias/apuntes-pathfinding.html"><strong>Pathfinding y estrategias
-            algorítmicas</strong></a>. Están escritos para esta práctica, y las secciones 7 y 8 son
-            directamente el material de trabajo. Ten a mano también la
+            algorítmicas</strong></a>. Están escritos para esta práctica, y las secciones 8 y
+            <a href="../guias/apuntes-pathfinding.html#estrategias">9</a> son directamente el material de
+            trabajo. Ten a mano también la
             <a href="../guias/clase-game.html">referencia de la clase <code>Game</code></a>.
           </p>
         </div>
@@ -388,7 +389,7 @@
               </tr>
               <tr>
                 <td><strong>El final del nivel</strong></td>
-                <td>Cuando quedan cuatro píldoras en un callejón, el criterio de seguridad puro bloquea al controlador y la partida se muere de vieja. Hay que detectar ese caso y permitir el riesgo.</td>
+                <td>Cuando quedan cuatro píldoras sueltas en la otra punta del mapa, el criterio de seguridad puro bloquea al controlador y la partida se muere de vieja. Hay que detectar ese caso y permitir el riesgo.</td>
               </tr>
               <tr>
                 <td><strong>Depuración visual con interruptor</strong></td>
@@ -421,7 +422,7 @@
               </tr>
               <tr>
                 <td><strong>Huir con criterio</strong></td>
-                <td><code>getNextMoveAwayFromTarget</code> se mete en callejones igual que en la Práctica&nbsp;0. Mejor: calcular por qué pasillo viene Ms.&nbsp;Pac-Man, descartar esa salida, y elegir entre las demás.</td>
+                <td><code>getNextMoveAwayFromTarget</code> mira un paso y un perseguidor, y como casi todas las huidas empatan, elige por el orden del <code>enum MOVE</code>: los cuatro fantasmas resuelven el empate igual y huyen en fila. Mejor: calcular por qué pasillo viene Ms.&nbsp;Pac-Man, descartar esa salida, y elegir entre las demás.</td>
               </tr>
               <tr>
                 <td><strong>Dejar de huir a tiempo</strong></td>
@@ -557,9 +558,213 @@
         </div>
       </section>
 
-      <section id="proceso">
+      <section id="curso-pasado">
         <div class="sec-head">
           <span class="num">05</span>
+          <h2 class="sec">Lo que salió el año pasado</h2>
+        </div>
+        <p>
+          Esta práctica termina en una competición de todos contra todos: cada Ms.&nbsp;Pac-Man se enfrenta a
+          los fantasmas de todos los grupos, y al revés. El curso pasado fueron <strong>trece controladores
+          de cada tipo</strong> y <strong>300 partidas por emparejamiento</strong>, y la puntuación de
+          rendimiento sale de esas medias. Merece la pena mirar cómo quedó, porque el reparto dice bastante
+          sobre dónde está el trabajo.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Controlador</th><th scope="col">Media de puntos</th><th scope="col">Qué significa</th></tr></thead>
+            <tbody>
+              <tr><td>La mejor Ms. Pac-Man</td><td class="num-col">8&#8239;075</td><td>Casi el doble que la siguiente.</td></tr>
+              <tr><td>La segunda mejor</td><td class="num-col">4&#8239;398</td><td>Y de ahí para abajo, muy agrupadas.</td></tr>
+              <tr><td>La peor</td><td class="num-col">2&#8239;103</td><td>Sobrevive poco y no elige a dónde va.</td></tr>
+              <tr><td>Los mejores fantasmas</td><td class="num-col">2&#8239;939</td><td>Lo que dejaron marcar de media a todas las Ms. Pac-Man.</td></tr>
+              <tr><td>Los peores</td><td class="num-col">5&#8239;029</td><td>Casi el doble de puntuación para el rival.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Dónde está el margen</span>
+          <p>
+            Entre la mejor Ms.&nbsp;Pac-Man y la peor hay un factor de <strong>casi cuatro</strong>; entre los
+            mejores fantasmas y los peores, de <strong>menos de dos</strong>. Unos fantasmas decentes salen
+            con poco esfuerzo —perseguir ya funciona— y una Ms.&nbsp;Pac-Man decente no. Ahí es donde se
+            separan las notas, y es donde conviene gastar las tardes.
+          </p>
+          <p>
+            La otra lectura: la que ganó no inventó nada que no esté en la sección anterior. Decidía sólo en
+            los cruces, razonaba por tramos, comparaba distancias al mismo punto, miraba dos cruces por
+            delante y tenía sus umbrales en un archivo aparte. Eso, hecho bien, dobló al resto.
+          </p>
+        </div>
+
+        <h3 class="label">Ideas que aparecieron en las Ms. Pac-Man</h3>
+        <p>
+          Ninguna es obligatoria y varias se estorban entre sí. Están aquí para que veáis el abanico de
+          formas distintas de contestar a la misma pregunta.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">La idea</th><th scope="col">En qué consistía</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Prioridades sobre lo seguro</strong></td>
+                <td>Calcular primero qué salidas son seguras a dos cruces vista, y sólo dentro de ese conjunto aplicar el orden comer&nbsp;→ píldora de poder&nbsp;→ píldora&nbsp;→ sobrevivir. Es el esqueleto de la sección anterior, y es el que ganó.</td>
+              </tr>
+              <tr>
+                <td><strong>Función de evaluación con pesos</strong></td>
+                <td>En vez de reglas, puntuar cada salida del cruce sumando términos con signo: distancia al siguiente cruce, amenaza del fantasma más cercano, píldoras que hay por el tramo, número de salidas que deja el cruce de destino, premio si hay píldora de poder y hay fantasmas encima. Se queda la de mejor puntuación.</td>
+              </tr>
+              <tr>
+                <td><strong>Pesos distintos al final del nivel</strong></td>
+                <td>El mismo grupo multiplicaba sus pesos cuando quedaba menos del 30&#8239;% de las píldoras: al final de un nivel las prioridades no son las mismas que al principio.</td>
+              </tr>
+              <tr>
+                <td><strong>Mapa de costes sobre el laberinto</strong></td>
+                <td>Repartir un coste por nodo —caro alrededor de un perseguidor, barato alrededor de la comida y de los fantasmas comestibles, y la píldora de poder cara o barata según haga falta— y dejar que una búsqueda de coste mínimo decida sola. La decisión deja de ser un <code>if</code> y pasa a ser el mapa.</td>
+              </tr>
+              <tr>
+                <td><strong>Juzgar el camino, no el destino</strong></td>
+                <td>Descartar una píldora si <em>algún nodo</em> del camino hasta ella pasa a menos de cierta distancia de un fantasma. Filtrar objetivos por el trayecto entero, no por dónde acaban.</td>
+              </tr>
+              <tr>
+                <td><strong>La píldora de poder como zona prohibida</strong></td>
+                <td>Mientras no haya al menos tres fantasmas fuera y cerca, mantenerse <strong>lejos</strong> de la píldora para no gastarla de pasada. Dos grupos lo implementaron así, en negativo, y es la forma más simple de que la píldora deje de desperdiciarse.</td>
+              </tr>
+              <tr>
+                <td><strong>Contar píldoras por tramo</strong></td>
+                <td>Al recorrer el pasillo hasta el siguiente cruce, ir sumando cuántas píldoras hay. Entre dos salidas igual de seguras, la que más come. La píldora más cercana casi nunca es el mejor pasillo.</td>
+              </tr>
+              <tr>
+                <td><strong>Distancia media, no distancia mínima</strong></td>
+                <td>Al huir, elegir la salida que maximiza la distancia <em>media</em> a todas las amenazas cercanas en vez de la distancia al fantasma más próximo. Alejarse del más cercano es exactamente cómo se cae en la pinza de los otros dos.</td>
+              </tr>
+              <tr>
+                <td><strong>¿Me da tiempo a comérmelo?</strong></td>
+                <td>Perseguir un fantasma comestible sólo si el tiempo comestible que le queda da para alcanzarlo, contando que huyendo se acerca la mitad de rápido. Perseguir a uno que deja de ser comestible por el camino es la forma más tonta de morir.</td>
+              </tr>
+              <tr>
+                <td><strong>La píldora invierte la carrera</strong></td>
+                <td>Un tramo al que un fantasma llega antes que tú deja de ser malo si hay una píldora de poder en ese tramo y a <em>ella</em> llegas tú antes. La excepción vale la pena escribirla: convierte huidas en emboscadas.</td>
+              </tr>
+              <tr>
+                <td><strong>El final, con otro criterio</strong></td>
+                <td>Cuando quedan cuatro píldoras sueltas, recorrer las candidatas por distancia y quedarse con la primera a la que se pueda llegar, aunque el criterio de seguridad normal no la aprobara. Si no, la partida se muere de vieja.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Ideas que aparecieron en los fantasmas</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">La idea</th><th scope="col">En qué consistía</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Una clase por fantasma</strong></td>
+                <td>En vez de un <code>switch</code> gigante, una interfaz con un único método y cuatro clases que la implementan. El controlador sólo decide <em>quién</em> contesta. Se lee mucho mejor, y es literalmente el paso previo a la Práctica&nbsp;2.</td>
+              </tr>
+              <tr>
+                <td><strong>Papeles como puestos, no como identidades</strong></td>
+                <td>El papel de «cazador» no es de Blinky: es del fantasma que ahora mismo esté más cerca. Reasignarlos cada turno, con un cupo máximo por papel, hace que la formación se mantenga aunque los fantasmas se mezclen.</td>
+              </tr>
+              <tr>
+                <td><strong>Repartirse los cruces</strong></td>
+                <td>Calcular los cruces por los que Ms.&nbsp;Pac-Man puede pasar en los próximos dos niveles de profundidad y asignar a cada fantasma uno <strong>distinto</strong>, el más cercano que quede libre. Sin mensajes, y sin que dos vayan al mismo sitio.</td>
+              </tr>
+              <tr>
+                <td><strong>Cercar a distintas profundidades</strong></td>
+                <td>Una variante: uno va al primer cruce que le queda por delante, otro al segundo, otro al tercero. Cierran los anillos en vez de amontonarse en el mismo pasillo.</td>
+              </tr>
+              <tr>
+                <td><strong>Memoria en los cruces</strong></td>
+                <td>Un mapa que guarda, por cada cruce, la última dirección que tomó un fantasma allí; el siguiente que pase tiene que elegir otra, y el mapa se borra cada pocos turnos. Dispersión emergente, sin coordinar a nadie.</td>
+              </tr>
+              <tr>
+                <td><strong>Interceptar coincidiendo en el tiempo</strong></td>
+                <td>Expandir a la vez dos búsquedas en anchura, la de Ms.&nbsp;Pac-Man y la del fantasma, anotando <em>en qué turno</em> llega cada uno a cada nodo, y buscar un nodo al que los dos lleguen en el mismo instante y de frente. Es interceptar de verdad, no seguir por detrás.</td>
+              </tr>
+              <tr>
+                <td><strong>Dispersarse antes, no después</strong></td>
+                <td>Todos los grupos que puntuaron bien miraban la píldora de poder: si Ms.&nbsp;Pac-Man está a menos de X de una píldora activa, huir <em>ya</em>. Huir cuando ya eres comestible es tarde.</td>
+              </tr>
+              <tr>
+                <td><strong>Taponar la píldora</strong></td>
+                <td>La variante agresiva de lo anterior: si el fantasma llega a la píldora antes que Ms.&nbsp;Pac-Man, no huye: se planta encima y le cierra el acceso.</td>
+              </tr>
+              <tr>
+                <td><strong>Dejar de huir a tiempo</strong></td>
+                <td>Si el tiempo comestible que queda es menor que lo que tardaríais en encontraros, cuando os crucéis ya no seré comestible: dejo de huir y gano posición mientras los otros tres siguen corriendo.</td>
+              </tr>
+              <tr>
+                <td><strong>No huir en manada</strong></td>
+                <td>Dos fantasmas comestibles que huyen por el mismo pasillo son dos presas en fila. Separarse de los otros comestibles, o refugiarse cerca de un compañero que no lo sea, sale bastante más barato.</td>
+              </tr>
+              <tr>
+                <td><strong>Custodiar la comida</strong></td>
+                <td>Un fantasma que se dirige siempre a la píldora más cercana a Ms.&nbsp;Pac-Man no la persigue: la espera donde va a tener que ir. Contra una Ms.&nbsp;Pac-Man voraz es demoledor.</td>
+              </tr>
+              <tr>
+                <td><strong>Un poco de ruido, medido</strong></td>
+                <td>Un 5&#8239;% de movimientos aleatorios rompe los bucles y hace que el rival no pueda memorizar el patrón. Más de eso ya es jugar mal: varios grupos se pasaron y se les nota en la tabla.</td>
+              </tr>
+              <tr>
+                <td><strong>Sacrificar a uno</strong></td>
+                <td>Con los cuatro comestibles, uno deja de huir y sigue presionando. Le cuesta 200 puntos al equipo y evita que Ms.&nbsp;Pac-Man recorra el mapa tranquila encadenando a los otros tres.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Y los fallos que se repitieron</h3>
+        <p>
+          Estos salieron en varias entregas a la vez, y todos cuestan puntos en la corrección o en la
+          competición. Van aquí para que no vuelvan a salir.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">El fallo</th><th scope="col">Por qué cuesta puntos</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Restar índices de nodo</strong></td>
+                <td>Los nodos están numerados por filas: dos índices consecutivos pueden tener una pared en medio. Una resta de índices no es una distancia, aunque a veces lo parezca. La distancia es <code>getShortestPathDistance</code>, siempre.</td>
+              </tr>
+              <tr>
+                <td><strong>Medir sin el último movimiento</strong></td>
+                <td>La distancia sin <code>lastMove</code> deja que el fantasma se dé la vuelta, que es justo lo que no puede hacer. Sale un «llego antes» que es mentira, y se paga en los cruces.</td>
+              </tr>
+              <tr>
+                <td><strong>Dejar la depuración encendida</strong></td>
+                <td>Buena parte de la clase entregó con llamadas a <code>GameView</code> fuera del <code>if (DEBUG)</code>, o con el interruptor a <code>true</code>. No rompe nada: es lo primero que se ve al corregir.</td>
+              </tr>
+              <tr>
+                <td><strong>Acceder a <code>camino[1]</code> sin comprobar la longitud</strong></td>
+                <td>Pasa poco, y cuando pasa tumba la partida entera. Justo lo suficientemente raro como para no verlo probando.</td>
+              </tr>
+              <tr>
+                <td><strong>Gastar la píldora de poder al pasar</strong></td>
+                <td>Los cuatro fantasmas encadenados con una sola píldora valen 3&#8239;000 puntos, tanto como 300 píldoras normales. Comérsela sola vale 50.</td>
+              </tr>
+              <tr>
+                <td><strong>No mirar nunca el tiempo comestible</strong></td>
+                <td>Ni para dejar de perseguir a un fantasma que va a dejar de serlo por el camino, ni —del otro lado— para dejar de huir cuando ya no hace falta.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Cómo usar todo esto</span>
+          <p>
+            No es una lista de la compra. Las entregas que mejor puntuaron tenían <strong>tres o cuatro</strong>
+            de estas ideas bien hechas, no doce a medias; y las que peor puntuaron solían tener muchas
+            condiciones sueltas sin una estructura que las ordenara. Elegid las que os parezcan defendibles,
+            metedlas de una en una, y medid después de cada una.
+          </p>
+        </div>
+      </section>
+
+      <section id="proceso">
+        <div class="sec-head">
+          <span class="num">06</span>
           <h2 class="sec">Cómo abordarlo</h2>
         </div>
         <div class="step">
@@ -621,7 +826,7 @@
 
       <section id="entrega">
         <div class="sec-head">
-          <span class="num">06</span>
+          <span class="num">07</span>
           <h2 class="sec">Reglas de entrega</h2>
         </div>
         <p>
@@ -690,6 +895,7 @@
             <li><a href="#reglas-simulacion">Reglas de simulación</a></li>
             <li><a href="#evaluacion">Cómo se evalúa</a></li>
             <li><a href="#que-se-espera">Qué se espera: el repertorio</a></li>
+            <li><a href="#curso-pasado">Lo que salió el año pasado</a></li>
             <li><a href="#proceso">Cómo abordarlo</a></li>
             <li><a href="#entrega">Reglas de entrega</a></li>
           </ol>
@@ -724,7 +930,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 16 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
