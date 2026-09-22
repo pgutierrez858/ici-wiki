@@ -1059,6 +1059,7 @@
           correcto. Están aquí porque todos vuelven en la <a href="practica-1.html">Práctica&nbsp;1</a>, donde
           ya cuestan puntos, y porque casi todos son invisibles mirando una partida.
         </p>
+        <h3 class="label">Los fallos que se repiten</h3>
         <div class="table-scroll">
           <table>
             <thead><tr><th scope="col">El fallo</th><th scope="col">Cuántos</th><th scope="col">Qué provoca</th></tr></thead>
@@ -1137,6 +1138,97 @@
             dentro. Está contado, con el resto de las reglas del concurso, en
             <a href="../guias/competicion.html"><strong>Probar los controladores y la
             competición</strong></a>.
+          </p>
+        </div>
+
+        <h3 class="label">El concurso</h3>
+        <p>
+          Con las 21 entregas se jugó el concurso de todos contra todos: 21 × 21 = <strong>441
+          emparejamientos</strong> a 10 partidas cada uno, o sea 4&#8239;410 partidas, 210 por controlador,
+          con la configuración de la <a href="practica-1.html#reglas-simulacion">Práctica&nbsp;1</a>. Los
+          resultados completos van por el Campus Virtual; lo que sigue es lo que enseñan.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Ranking</th><th scope="col">El mejor</th><th scope="col">El peor</th><th scope="col">Factor</th></tr></thead>
+            <tbody>
+              <tr><td>Ms. Pac-Man <span class="pick ok">más es mejor</span></td><td class="num-col">3&#8239;263</td><td class="num-col">573</td><td class="num-col">× 5,7</td></tr>
+              <tr><td>Fantasmas <span class="pick ok">menos es mejor</span></td><td class="num-col">1&#8239;898</td><td class="num-col">3&#8239;669</td><td class="num-col">× 1,9</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Con la misma gente, el mismo enunciado y el mismo pseudocódigo, <strong>Ms.&nbsp;Pac-Man se abre
+          casi seis veces y los fantasmas menos de dos</strong>. Es exactamente el reparto que salió en la
+          Práctica&nbsp;1 del curso pasado: unos fantasmas decentes salen casi solos —perseguir ya
+          funciona— y una Ms.&nbsp;Pac-Man decente no. Ahí es donde se gana la nota.
+        </p>
+
+        <div class="note mine">
+          <span class="note-label">El podio de los fantasmas no existe</span>
+          <p>
+            Los tres primeros dejaron 1&#8239;898, 1&#8239;904 y 1&#8239;911 puntos, con un error típico de
+            ±77 cada uno. O sea que <strong>están separados por 13 puntos y el margen de cada uno es seis
+            veces mayor</strong>: el error típico de la diferencia es √(77² + 73²) ≈ 106, y para creerse una
+            diferencia hacen falta unos tres de esos, 318 puntos. Con 10 partidas por emparejamiento, el
+            orden del podio es azar, y volver a lanzarlo lo cambia.
+          </p>
+          <p>
+            No es un defecto del concurso: es lo que pasa cuando se mide poco, y está contado con sus
+            fórmulas en <a href="../guias/competicion.html">Probar los controladores y la competición</a>.
+            La competición de verdad juega 300 partidas por emparejamiento justamente por esto.
+          </p>
+        </div>
+
+        <h3 class="label">Lo que de verdad separó a unos de otros</h3>
+        <p>
+          Cruzando el ranking con el código aparecen dos cosas, y ninguna es la que uno esperaría.
+        </p>
+        <div class="note trap">
+          <span class="note-label">1 · El método <em lang="en">sin</em> <code>Approximate</code> juega peor que el aproximado</span>
+          <p>
+            Cinco personas usaron <code>getNextMoveTowardsTarget(desde, hasta, últimoMov, DM.PATH)</code> en
+            vez de <code>getApproximateNextMoveTowardsTarget(…)</code>. En el ranking de Ms.&nbsp;Pac-Man
+            quedaron en el <strong>puesto 15 de 21 de media</strong>, frente al 10 de las otras dieciséis;
+            en el de fantasmas, en el <strong>17</strong>, frente al 9. Cuatro de las cinco son las mismas
+            personas en los dos rankings, así que no son diez casos independientes; pero el motivo está en
+            el motor y se puede leer.
+          </p>
+          <p>
+            Los dos métodos hacen lo mismo —mirar las salidas y quedarse con la que deja más cerca del
+            objetivo— y se diferencian en <strong>qué distancia miden</strong>. El
+            <em lang="en">approximate</em> pregunta, para cada vecino <em>v</em>, la distancia de
+            <em>v</em> al objetivo sin más. El otro la pregunta <strong>imponiendo que el último movimiento
+            fue el del nodo de partida</strong>, que sólo es cierto para el vecino de frente: para los de
+            los lados está prohibiendo la dirección equivocada, y la distancia que sale de ahí no es la de
+            ese vecino. El resultado es un método que evalúa bien seguir recto y mal girar.
+          </p>
+          <p>
+            La moraleja no es «usad el aproximado y ya»: es que <strong>los dos son aproximaciones</strong>,
+            y que en cuanto la decisión importe conviene calcular la distancia vosotros, con
+            <code>getShortestPathDistance(vecino, objetivo, movimientoConElQueLlegoAlVecino)</code>, que es
+            la comparación que de verdad queríais hacer.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">2 · El umbral de 20 era un punto de partida, no una respuesta</span>
+          <p>
+            El enunciado propone <code>limit = 20</code> y dice «pruébalo y ajústalo». Casi todo el mundo lo
+            dejó en 20. De los que lo tocaron: los <strong>tres que lo subieron a 30 o 40 quedaron 1.º, 2.º y
+            4.º</strong>; los <strong>cuatro que lo pusieron en 50 o más quedaron 11.º, 15.º, 18.º y
+            19.º</strong>. Son pocos casos y dentro del grupo de 20 hay de todo, así que no es una ley; pero
+            la dirección se entiende: con un umbral grande casi siempre hay un fantasma «cerca», así que
+            Ms.&nbsp;Pac-Man se pasa la partida huyendo y no come.
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Y un número para calibrar</span>
+          <p>
+            El último de la tabla sacó <strong>573 puntos</strong>, y su controlador
+            <strong>no decide nada</strong>: es el del campo <code>lastMove</code> heredado, que hace que
+            devuelva <code>NEUTRAL</code> en todos los turnos. Esos 573 puntos son los que se sacan
+            <em>dejándose llevar</em>, porque el motor mantiene la dirección y Ms.&nbsp;Pac-Man va comiendo lo
+            que se encuentra. Sirve de listón: por debajo de unos 600, el controlador no está jugando.
           </p>
         </div>
       </section>
