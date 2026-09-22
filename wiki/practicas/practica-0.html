@@ -1047,6 +1047,100 @@
         </ul>
       </section>
 
+      <section id="entregado">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">Lo que salió en la entrega</h2>
+        </div>
+        <p>
+          Se entregaron <strong>21 controladores de cada tipo</strong>, y todos hacen lo que pide el
+          ejercicio 3: huyen, persiguen y comen. Los fallos que se repiten no son de diseño —el diseño venía
+          dado en el pseudocódigo— sino de <strong>API</strong>: llamar al método parecido en vez de al
+          correcto. Están aquí porque todos vuelven en la <a href="practica-1.html">Práctica&nbsp;1</a>, donde
+          ya cuestan puntos, y porque casi todos son invisibles mirando una partida.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">El fallo</th><th scope="col">Cuántos</th><th scope="col">Qué provoca</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>El movimiento aleatorio sale de las cuatro direcciones</strong></td>
+                <td class="num-col">11 / 21</td>
+                <td><code>MOVE.values()[rnd.nextInt(…)]</code> elige entre las cuatro direcciones y <code>NEUTRAL</code>, sin mirar el laberinto. En un pasillo sólo una de ellas es legal y no es dar media vuelta, así que el motor descarta casi siempre lo que devuelves y el fantasma sigue recto: el 10&#8239;% de azar que pedía el enunciado se queda en mucho menos. Lo que hay que sortear son las salidas que devuelve <code>getPossibleMoves(nodo, últimoMovimiento)</code>.</td>
+              </tr>
+              <tr>
+                <td><strong>Medir o moverse sin el último movimiento</strong></td>
+                <td class="num-col">10 / 21</td>
+                <td><code>getShortestPathDistance(a, b)</code> con dos argumentos, <code>getNextMoveTowardsTarget(a, b, DM.PATH)</code> con tres, o pasar <code>MOVE.NEUTRAL</code> donde va el último movimiento. Las tres asumen que el personaje puede darse la vuelta, y no puede: sale una distancia más corta que la real y un movimiento que el motor va a ignorar.</td>
+              </tr>
+              <tr>
+                <td><strong>Huir de un fantasma que está en la cárcel</strong></td>
+                <td class="num-col">5 / 21</td>
+                <td>Sin comprobar <code>getGhostLairTime(ghost) &gt; 0</code>, los cuatro fantasmas cuentan como amenaza desde el primer turno. El que está encerrado ni siquiera tiene un nodo conectado con el laberinto, así que la distancia que sale de ahí no significa nada.</td>
+              </tr>
+              <tr>
+                <td><strong>Ir a por píldoras ya comidas</strong></td>
+                <td class="num-col">3 / 21</td>
+                <td><code>getPillIndices()</code> devuelve <em>todas</em> las píldoras del laberinto, estén o no. Las que quedan son <code>getActivePillsIndices()</code>. Con la primera, Ms.&nbsp;Pac-Man se dirige una y otra vez a un sitio donde ya no hay nada y se queda dando vueltas.</td>
+              </tr>
+              <tr>
+                <td><strong>Una métrica que atraviesa paredes</strong></td>
+                <td class="num-col">2 / 21</td>
+                <td><code>DM.EUCLID</code> y <code>DM.MANHATTAN</code> miden en línea recta: dos nodos pegados en la pantalla pueden estar a media vuelta por el pasillo. En el laberinto, <code>DM.PATH</code> siempre, que además es una consulta a una tabla ya calculada y no cuesta más.</td>
+              </tr>
+              <tr>
+                <td><strong>El <code>EnumMap</code> de los fantasmas sin vaciar</strong></td>
+                <td class="num-col">2 / 21</td>
+                <td>Declarado como campo y nunca vaciado con <code>clear()</code>. Los fantasmas que no requieren acción se quedan con la entrada del turno anterior, así que se les está dando una orden vieja en vez de dejar que sigan su camino.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Los que salieron una sola vez, pero merecen estar</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">El fallo</th><th scope="col">Qué provoca</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Confundir el índice de una píldora con su nodo</strong></td>
+                <td><code>getPillIndex(nodo)</code> no devuelve un nodo: devuelve la posición de esa píldora en el <em>array</em> de píldoras, un número entre 0 y 219. Usarlo como destino manda a Ms.&nbsp;Pac-Man a la esquina de arriba a la izquierda del mapa.</td>
+              </tr>
+              <tr>
+                <td><strong>Usar el campo <code>lastMove</code> que se hereda</strong></td>
+                <td><code>Controller</code> tiene un campo <code>lastMove</code> <em>protected</em>, y no es el último movimiento de Ms.&nbsp;Pac-Man: es lo que devolvió tu controlador la última vez, y en el modo con el que se corrige nadie lo rellena, así que vale <code>null</code> siempre. Pasárselo a <code>getApproximateNextMoveAwayFromTarget</code> hace que devuelva <code>NEUTRAL</code> en todos los turnos. El del juego es <code>game.getPacmanLastMoveMade()</code>.</td>
+              </tr>
+              <tr>
+                <td><strong>Un <code>return</code> que falta</strong></td>
+                <td>Se calcula el movimiento para perseguir al fantasma comestible… y se tira, porque la llamada está suelta en un <code>else</code> sin <code>return</code>. El control sigue de largo y se va a por la píldora. Compila, se ejecuta y no hace lo que dice el código.</td>
+              </tr>
+              <tr>
+                <td><strong>Pedir el nodo de un fantasma antes de comprobar que existe</strong></td>
+                <td><code>getGhostCurrentNodeIndex(null)</code> lanza una excepción. Cuando la función que busca al fantasma más cercano devuelve <code>null</code> —por ejemplo, con los cuatro comestibles— la partida se cae. En la corrección eso no resta puntos: hace que la partida se repita, y si pasa siempre, deja el experimento dando vueltas para siempre.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note trap">
+          <span class="note-label">Y uno que estaba en las 21 entregas</span>
+          <p>
+            <strong><code>getName()</code> devolvía lo mismo en todas</strong>: <code>"MsPacMan"</code>,
+            <code>"Ghosts"</code>, o nada —y entonces <code>Controller</code> devuelve
+            <code>"Unknown Controller"</code>—. En la Práctica&nbsp;0 da igual. En la competición no, porque
+            el evaluador <strong>indexa la tabla de resultados por ese nombre</strong>: con veintiuna
+            entregas llamadas igual, los resultados de unas pisan los de otras y la tabla sale vacía.
+          </p>
+          <p>
+            Para jugar el concurso de esta práctica hubo que renombrarlas una a una. Poned un nombre
+            reconocible y distinto en los dos controladores, y en la Práctica&nbsp;1 con la letra del grupo
+            dentro. Está contado, con el resto de las reglas del concurso, en
+            <a href="../guias/competicion.html"><strong>Probar los controladores y la
+            competición</strong></a>.
+          </p>
+        </div>
+      </section>
+
     </main>
 
     <aside class="rail">
@@ -1066,6 +1160,7 @@
             <li><a href="#ej2"><em>Ejercicio 2</em>Perseguir y huir</a></li>
             <li><a href="#ej3"><em>Ejercicio 3</em>Los controladores de la entrega</a></li>
             <li><a href="#entrega">Cómo se entrega</a></li>
+            <li><a href="#entregado">Lo que salió en la entrega</a></li>
           </ol>
         </nav>
         <div class="note mine rail-nota">
