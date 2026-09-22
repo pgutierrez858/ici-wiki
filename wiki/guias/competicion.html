@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Probar los controladores y la competición · ICI</title>
+<meta name="description" content="Cómo probar los controladores de Ms. Pac-Man en serio: medias y error típico, el concurso de todos contra todos, cómo se calcula el ranking y el punto extra, y cómo guardar métricas, logs y repeticiones.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Probar y competir</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Probar los controladores y la competición
+      <span class="thin">Cómo medir lo que hacen, cómo se juega el concurso y de dónde sale el punto extra.</span>
+    </h1>
+    <p class="standfirst">
+      Un controlador no se juzga viéndolo jugar una partida: se juzga con la media de unos cuantos cientos.
+      Aquí está cómo montar esas pruebas, cómo se ejecuta el concurso de todos contra todos con el que se
+      cierra cada práctica, con qué cuenta exacta sale el punto extra, y qué herramientas trae el motor para
+      guardar métricas, depurar y ver lo que está pasando.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Formato</dt>
+      <dd>Todos contra todos<small>Cada Ms. Pac-Man contra todos los fantasmas</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Partidas</dt>
+      <dd>300<small>Por cada emparejamiento</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Punto extra</dt>
+      <dd>0,5 + 0,5<small>Un ranking por controlador</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Herramienta</dt>
+      <dd><code>PacManParallelEvaluator</code><small>Viene en el propio motor</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="tres-formas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Tres formas de ejecutar, y cuándo usar cada una</h2>
+        </div>
+        <p>
+          El <code>Executor</code> tiene muchos métodos para lanzar partidas, pero en la práctica sólo se
+          usan tres, y cada uno contesta a una pregunta distinta. Confundirlos es la causa número uno de
+          «pero si a mí me iba bien».
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Qué</th>
+                <th scope="col">Para qué</th>
+                <th scope="col">Ventana</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>runGame(pacman, ghosts, delay)</code></td>
+                <td><strong>Mirar.</strong> Una partida, con pausa entre turnos, para ver qué decide vuestro controlador y por qué se muere. No sirve para comparar nada.</td>
+                <td>Sí</td>
+              </tr>
+              <tr>
+                <td><code>runExperiment(pacman, ghosts, n, desc)</code></td>
+                <td><strong>Medir.</strong> <em>n</em> partidas seguidas, sin dibujar, y devuelve un <code>Stats</code> con la media. Es el modo con el que se corrige.</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>PacManParallelEvaluator</code></td>
+                <td><strong>Competir.</strong> Todos los controladores contra todos, en paralelo, y saca la tabla y los dos rankings. Es el modo con el que se juega el concurso.</td>
+                <td>No</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Los tres esperan a que vuestro <code>getMove</code> conteste: <strong>no hay reloj</strong>. Si tardáis
+          200&nbsp;ms, la partida tarda 200&nbsp;ms más en ese turno y vuestro movimiento se usa entero. Lo único
+          que se paga es que la tanda entera tarde más, y en 50&#8239;000 partidas eso sí se nota. El detalle completo está
+          en las <a href="../practicas/practica-1.html#reglas-simulacion">reglas de simulación de la
+          Práctica&nbsp;1</a>.
+        </p>
+        <h3 class="label">El banco de pruebas mínimo</h3>
+        <p>
+          Este es el <code>main</code> que conviene tener desde el primer día, con un interruptor para pasar
+          de mirar a medir sin tocar nada más:
+        </p>
+        <div class="codigo"><pre><code><span class="k">public class</span> ExecutorTest {
+
+    <span class="k">private static final boolean</span> VER = <span class="k">false</span>;   <span class="c">// true: una partida mirándola</span>
+    <span class="k">private static final int</span>     N   = <span class="n">100</span>;     <span class="c">// false: N partidas midiendo</span>
+
+    <span class="k">public static void</span> main(String[] args) {
+        PacmanController pacMan = <span class="k">new</span> MsPacMan();
+        GhostController  ghosts = <span class="k">new</span> Ghosts();
+
+        Executor executor = <span class="k">new</span> Executor.Builder()
+                .setTickLimit(<span class="n">4000</span>)
+                .setPacmanPO(<span class="k">false</span>)
+                .setGhostPO(<span class="k">false</span>)
+                .setGhostsMessage(<span class="k">false</span>)
+                .setVisual(VER)
+                .setScaleFactor(<span class="n">2.5</span>)
+                .build();
+
+        <span class="k">if</span> (VER) {
+            executor.runGame(pacMan, ghosts, <span class="n">40</span>);
+        } <span class="k">else</span> {
+            Stats[] stats = executor.runExperiment(pacMan, ghosts, N, <span class="s">"nuestros contra nuestros"</span>);
+            System.out.println(stats[<span class="n">0</span>]);   <span class="c">// puntuación</span>
+            System.out.println(stats[<span class="n">1</span>]);   <span class="c">// turnos por partida</span>
+        }
+    }
+}</code></pre></div>
+        <div class="note tip">
+          <span class="note-label">Los dos <code>Stats</code> que devuelve</span>
+          <p>
+            <code>runExperiment</code> devuelve un array de dos: el <strong>primero</strong> es la puntuación
+            y el <strong>segundo</strong> los turnos que duró cada partida. El segundo se ignora siempre y es
+            una pena, porque cuenta cosas que la puntuación esconde: una Ms.&nbsp;Pac-Man que puntúa poco
+            <em>y</em> dura poco se está muriendo; una que puntúa poco y dura 4000 turnos está viva y no
+            come, que es un problema completamente distinto.
+          </p>
+        </div>
+      </section>
+
+      <section id="medir">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Medir: la media y el error típico</h2>
+        </div>
+        <p>
+          Una partida no dice nada. Dos controladores idénticos pueden separarse 3&#8239;000 puntos en una
+          partida suelta, porque el motor arranca cada partida con una semilla distinta y porque una píldora
+          de poder bien gastada vale 3&#8239;000 puntos ella sola. Lo que se compara es la media, y la media
+          viene con su propio margen de error.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método de <code>Stats</code></th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><code>getAverage()</code></td><td>La media de todas las partidas. Es el número con el que se ordenan los rankings del concurso.</td></tr>
+              <tr><td><code>getStandardDeviation()</code></td><td>Cuánto se separan unas <strong>partidas</strong> de otras. Es lo irregular que es vuestro controlador, así que jugar más partidas <em>no</em> la baja: no mide el experimento, os mide a vosotros.</td></tr>
+              <tr><td><code>getStandardError()</code></td><td>Lo mismo pero un piso más arriba: cuánto se separarían unas <strong>medias</strong> de otras si repitierais el experimento entero. Sale de dividir la anterior por la raíz de las partidas jugadas, y es <strong>el número que decide si una mejora es real</strong>. Explicado justo debajo.</td></tr>
+              <tr><td><code>getN()</code></td><td>Partidas que han contado de verdad. Si salen menos de las que pedisteis, ha habido excepciones.</td></tr>
+              <tr><td><code>getMin()</code> · <code>getMax()</code></td><td>La peor y la mejor de todas las partidas. La peor dice más: si es 0, hay partidas en las que Ms.&nbsp;Pac-Man muere sin comerse una sola píldora.</td></tr>
+              <tr><td><code>getMsTaken()</code></td><td>Lo que ha tardado el experimento entero, en milisegundos. Dividido entre las partidas da lo que cuesta una, que es lo que hay que saber antes de planificar: a 300&#8239;ms por partida, las 3&#8239;900 de un controlador en el concurso son veinte minutos, y la tabla completa, horas.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="label">¿La mejora es real? Tres cuentas</h3>
+        <p>
+          Vuestra media no es «lo que vale» vuestro controlador: es lo que han dado <em>esas</em> partidas.
+          Si repetís el mismo experimento con otras tantas, sale un número distinto. Estas son las tres
+          cuentas que hay que hacer antes de quedarse con un cambio, con un ejemplo real de principio a fin.
+        </p>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h4>Cuánto baila vuestra media</h4>
+            <p>
+              Aquí hay que separar dos cosas que se confunden todo el rato, porque son dos dispersiones
+              distintas de dos cosas distintas.
+            </p>
+            <p>
+              La primera: <strong>las partidas no dan todas lo mismo</strong>. Con el mismo controlador y el
+              mismo rival, una sale en 1&#8239;200 y la siguiente en 7&#8239;000. Lo que mide cuánto se
+              separan unas partidas de otras es la <strong>desviación típica</strong>, y es una propiedad de
+              vuestro controlador: jugar más partidas no la baja.
+            </p>
+            <p>
+              La segunda: <strong>lo que vais a comparar no es una partida, es una media de cien</strong>. Y
+              las medias, como cualquier otra cosa que se mide, también se separan unas de otras: si
+              lanzarais el experimento entero muchas veces, cada tanda de 100 partidas os daría una media
+              distinta. Se separan mucho menos que las partidas sueltas —para eso se promedia—, pero se
+              separan. Y a esa dispersión, la <em>de las medias</em>, es a la que se le llama
+              <strong>error típico</strong>:
+            </p>
+            <div class="formula">
+              <em>error típico</em> &nbsp;=&nbsp; desviación típica <strong>de las medias</strong>
+              &nbsp;=&nbsp; <em>desviación típica de las partidas</em> / √<em>partidas</em>
+            </div>
+            <p>
+              Conviene leer esa igualdad despacio, porque es la que contesta a la pregunta obvia: el error
+              típico <strong>es</strong> una desviación típica. No es una media, ni se comporta «como si»
+              fuera nada: es la desviación típica de otra cosa —de las medias en vez de las partidas—, y por
+              eso se le aplican las mismas reglas que a cualquier desviación típica. Lo único que dice la
+              fórmula es que promediar cien partidas encoge la dispersión diez veces, porque √100 = 10.
+            </p>
+            <p>
+              Ejemplo. Medís vuestra versión actual con 100 partidas y <code>Stats</code> os da una media de
+              <strong>3&#8239;850</strong> y una desviación típica de <strong>2&#8239;100</strong>:
+            </p>
+            <div class="formula">
+              <em>error típico</em> = 2100 / √100 = 2100 / 10 = <strong>210</strong>
+            </div>
+            <p>
+              Las partidas bailan ±2&#8239;100; vuestra media de cien baila ±210. O sea que ese
+              3&#8239;850 es en realidad «3&#8239;850, más o menos 210». No hace falta calcularlo a mano: es
+              lo que devuelve <code>getStandardError()</code>.
+            </p>
+            <p>
+              Lo que significa, en concreto: si repitierais el experimento muchas veces, <strong>dos de cada
+              tres</strong> medias caerían a menos de un error típico de la verdadera, y sólo
+              <strong>una de cada veinte</strong> se separaría más del doble.
+            </p>
+            <p>
+              Esos dos números no son de esta asignatura ni de este juego: salen de que las medias de muchas
+              partidas se reparten, aproximadamente, como una <strong>campana de Gauss</strong> centrada en el
+              valor verdadero, y en una campana el 68&#8239;% de los casos cae dentro de una desviación típica
+              y el 95&#8239;% dentro de dos. Que se repartan así lo garantiza el
+              <a href="https://es.wikipedia.org/wiki/Teorema_del_l%C3%ADmite_central"><strong>teorema
+              central del límite</strong></a>: la media de muchas medidas independientes tiende a la campana <em>aunque las
+              medidas de una en una no se parezcan a una campana ni de lejos</em>. Y desde luego no se
+              parecen: la puntuación de una partida suelta tiene suelo en 0, un pico donde se muere la
+              mayoría y una cola larga hacia arriba cuando la píldora de poder sale bien.
+            </p>
+            <p>
+              Y ahí es donde encaja todo: la desviación típica <em>de esa campana</em> —la campana de las
+              medias, no la de las partidas— es exactamente el error típico. Por eso la regla del 68 y el 95,
+              que es una regla sobre desviaciones típicas, se lee directamente con él.
+            </p>
+            <div class="note tip">
+              <span class="note-label">Y no hace falta creérselo: se comprueba</span>
+              <p>
+                Si el error típico es la desviación típica de las medias, hay una forma directa de verlo:
+                conseguid unas cuantas medias y calculadles la desviación típica. Lanzad veinte veces
+                seguidas el <em>mismo</em> experimento de 100 partidas, meted las veinte medias en un
+                <code>Stats</code> como si cada una fuera una observación, y pedidle su desviación típica:
+                <strong>tiene que parecerse al error típico que os anunciaba cada tanda por
+                separado</strong>. Ahí está la demostración de que la división por √<em>n</em> dice la
+                verdad.
+              </p>
+              <pre><code>Stats resumen = <span class="k">new</span> Stats(<span class="s">"las 20 medias"</span>);
+
+<span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; <span class="n">20</span>; i++) {
+    Stats[] tanda = executor.runExperiment(<span class="k">new</span> MsPacMan(), ghosts, <span class="n">100</span>, <span class="s">"tanda "</span> + i);
+    System.out.printf(<span class="s">"tanda %2d: media %8.1f, error típico anunciado %6.1f%n"</span>,
+                      i, tanda[<span class="n">0</span>].getAverage(), tanda[<span class="n">0</span>].getStandardError());
+    resumen.add(tanda[<span class="n">0</span>].getAverage());   <span class="c">// una media, como si fuera una observación</span>
+}
+
+<span class="c">// esta desviación típica ≈ el error típico de arriba: eso es lo que había que ver</span>
+System.out.println(<span class="s">"Desviación típica de las 20 medias: "</span> + resumen.getStandardDeviation());</code></pre>
+              <p>
+                De paso os contesta a la otra mitad: contad cuántas de las veinte medias caen a menos de un
+                error típico de la media de todas. Salen unas catorce.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h4>Si la diferencia cabe dentro del margen, no es una mejora</h4>
+            <p>
+              Ahora cambiáis <strong>una sola cosa</strong> —por ejemplo, la distancia a partir de la cual
+              dais por peligroso a un fantasma, que pasa de 50 a 60 nodos—, volvéis a medir con otras 100
+              partidas y os sale <strong>3&#8239;980</strong>. Habéis ganado 130 puntos. ¿Os lo quedáis?
+            </p>
+            <p>
+              La tentación es comparar los 130 puntos con el margen de una de las dos medidas, pero eso no es
+              lo que hay que hacer, porque <strong>lo que os interesa ya no es una media: es la diferencia
+              entre dos</strong>. Y la diferencia tiene su propio margen, porque las dos medias aportan el
+              suyo.
+            </p>
+            <p>
+              Lo que <em>no</em> se hace es sumar los dos márgenes. Eso sería contar con que las dos medidas
+              se equivocan a la vez y en sentidos contrarios, que es el caso peor y casi nunca ocurre: lo
+              normal es que los dos errores se pisen un poco entre ellos. La regla correcta es que, cuando dos
+              cantidades son <strong>independientes</strong>, lo que se suma no son sus desviaciones típicas
+              sino sus <strong>varianzas</strong>, que son esas mismas desviaciones al cuadrado. Y aquí son
+              independientes porque cada tanda juega partidas distintas: para esto sirve que no haya semilla
+              fija. Que la diferencia sea una resta no cambia nada, porque restar dispersa tanto como sumar.
+            </p>
+            <div class="formula">
+              <em>ET</em><sub>diferencia</sub><sup>2</sup> &nbsp;=&nbsp;
+              <em>ET</em><sub>vieja</sub><sup>2</sup> + <em>ET</em><sub>nueva</sub><sup>2</sup>
+              &nbsp;&nbsp;⟹&nbsp;&nbsp; <em>ET</em><sub>diferencia</sub> &nbsp;=&nbsp;
+              <span class="raiz"><span>210<sup>2</sup> + 210<sup>2</sup></span></span>
+              &nbsp;=&nbsp; √2 × 210 &nbsp;=&nbsp; <strong>297</strong>
+            </div>
+            <p>
+              Mirad el número, que es la mitad de la explicación: sumando los dos márgenes saldría 420, y el
+              de verdad es <strong>297</strong>. Combinar dos errores independientes sale más barato que
+              temerse lo peor. Y sí, la fórmula tiene la forma de la hipotenusa de un triángulo rectángulo y a
+              mucha gente le sirve para acordarse, pero el motivo no tiene nada de geométrico: es,
+              simplemente, que lo que se suma son los cuadrados.
+            </p>
+            <p>
+              Y ahora ya se puede aplicar la regla de la campana del paso anterior, porque vuelve a ser una
+              desviación típica: <strong>si el cambio no sirviera absolutamente para nada</strong>, la
+              diferencia entre las dos medias sería una campana centrada en 0 con esa dispersión. Y en una
+              campana, 19 de cada 20 casos caen dentro de dos desviaciones típicas. O sea que una diferencia
+              producida por puro azar se queda casi siempre por debajo de:
+            </p>
+            <div class="formula">
+              2 × <em>error típico de la diferencia</em> &nbsp;=&nbsp; 2 × 297 &nbsp;=&nbsp;
+              <strong>594</strong> &nbsp;&nbsp;·&nbsp;&nbsp; o sea, 2 × √2 ≈ <strong>3 errores
+              típicos</strong>
+            </div>
+            <p>
+              De ahí sale la regla de bolsillo, con el 3 en vez del 2,83 porque redondear hacia arriba aquí
+              sólo os hace más prudentes:
+            </p>
+            <div class="formula">
+              creedla sólo si &nbsp; |<em>media nueva</em> − <em>media vieja</em>| &nbsp;&gt;&nbsp;
+              3 × <em>error típico</em>
+            </div>
+            <p>
+              En el ejemplo, 3 × 210 = 630, y vosotros habéis sacado 130. <strong>No habéis mejorado nada,
+              habéis cambiado de ruido</strong>: con esas dos medidas, la versión nueva y la vieja son
+              indistinguibles. Y si algún día os sale justo por encima del umbral, repetid las dos medidas
+              antes de celebrarlo.
+            </p>
+            <div class="note tip">
+              <span class="note-label">Si las dos tandas no tienen el mismo número de partidas</span>
+              <p>
+                El ×3 sale de suponer que las dos medidas se han hecho igual, con lo que sus dos errores
+                típicos son parecidos y √(<em>ET</em>² + <em>ET</em>²) = √2 × <em>ET</em>. Si habéis medido
+                una versión con 100 partidas y la otra con 400, usad la fórmula de la raíz con los dos
+                errores típicos de verdad y comparad la diferencia con el doble de lo que salga.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h4>Cuántas partidas harían falta para verlo</h4>
+            <p>
+              Si de verdad queréis saber si esos 130 puntos existen, hay que jugar más partidas. Cuántas sale
+              de juntar las dos fórmulas anteriores: queréis que la diferencia supere 3 errores típicos, y el
+              error típico es <em>sd</em>&nbsp;/&nbsp;√<em>partidas</em>, así que basta con despejar de
+              <em>diferencia</em>&nbsp;&gt;&nbsp;3&nbsp;<em>sd</em>&nbsp;/&nbsp;√<em>partidas</em>:
+            </p>
+            <div class="formula">
+              <em>partidas</em> &nbsp;≈&nbsp; ( 3 × <em>desviación típica</em> / <em>diferencia</em> )<sup>2</sup>
+            </div>
+            <p>
+              Con la desviación típica de 2&#8239;100 y los 130 puntos del ejemplo:
+              (3&nbsp;×&nbsp;2100&nbsp;/&nbsp;130)<sup>2</sup> = 48,5<sup>2</sup> ≈ <strong>2&#8239;350
+              partidas por versión</strong>. Casi media hora de máquina, a 300&nbsp;ms por partida, sólo para
+              confirmar una mejora del 3&#8239;%.
+            </p>
+            <p>
+              Conviene tener esta tabla a mano antes de ponerse a medir: dice, para cada número de
+              partidas, cuál es la mejora más pequeña que podríais llegar a ver. Está calculada con una
+              desviación típica de 2&#8239;000 puntos, que es un orden de magnitud razonable; la vuestra os
+              la dice <code>getStandardDeviation()</code>:
+            </p>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">Partidas</th><th scope="col">Error típico</th><th scope="col">Mejora mínima creíble (3 ET)</th><th scope="col">Y eso es…</th></tr></thead>
+                <tbody>
+                  <tr><td class="num-col">1</td><td class="num-col">2&#8239;000</td><td>—</td><td>Una partida no se compara con nada.</td></tr>
+                  <tr><td class="num-col">10</td><td class="num-col">632</td><td class="num-col">1&#8239;900</td><td>Sólo veis cambios brutales.</td></tr>
+                  <tr><td class="num-col">100</td><td class="num-col">200</td><td class="num-col">600</td><td>El mínimo para trabajar.</td></tr>
+                  <tr><td class="num-col">300</td><td class="num-col">115</td><td class="num-col">345</td><td>Lo que usa el concurso en cada casilla.</td></tr>
+                  <tr><td class="num-col">1&#8239;000</td><td class="num-col">63</td><td class="num-col">190</td><td>Para afinar constantes al final.</td></tr>
+                  <tr><td class="num-col">3&#8239;900</td><td class="num-col">32</td><td class="num-col">96</td><td>Las que juega cada controlador en el concurso entero.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="note mine">
+              <span class="note-label">La conclusión práctica</span>
+              <p>
+                Medir barato sólo detecta mejoras grandes. Con 100 partidas, que es lo que vais a lanzar
+                mientras trabajáis, <strong>cualquier cosa por debajo de 600 puntos es invisible</strong>. Así
+                que id a por los cambios que mueven la media cientos de puntos —comer la píldora de poder
+                cuando toca, dejar de meterse en tramos cerrados— y no gastéis la tarde moviendo una
+                constante de 50 a 52 a ver si sube: para demostrar una mejora de 50 puntos harían falta más
+                de 14&#8239;000 partidas por versión.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="note trap">
+          <span class="note-label">No hay semilla fija</span>
+          <p>
+            El <code>Executor</code> crea su <code>Random</code> sin semilla, así que
+            <strong>dos ejecuciones del mismo experimento no dan el mismo número</strong> y dos controladores
+            distintos no juegan las mismas partidas. No es un fallo: es lo que obliga a mirar medias de
+            muchas partidas en vez de casos. Si al comparar dos versiones os sale una diferencia pequeña,
+            volved a lanzar las dos antes de creérosla.
+          </p>
+        </div>
+      </section>
+
+      <section id="concurso">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El concurso: todos contra todos</h2>
+        </div>
+        <p>
+          Cada práctica con competición se cierra igual: se cogen <strong>los controladores tal y como se
+          entregaron</strong>, se enfrenta cada Ms.&nbsp;Pac-Man a cada conjunto de fantasmas, y de esa
+          tabla salen los dos rankings. Con trece grupos son 169 emparejamientos y, a 300 partidas cada uno,
+          <strong>50&#8239;700 partidas</strong>.
+        </p>
+        <figure>
+          <figcaption>La tabla del concurso · cada casilla es la media de 300 partidas</figcaption>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th scope="col"></th><th scope="col">GhostsA</th><th scope="col">GhostsB</th><th scope="col">…</th><th scope="col">GhostsM</th><th scope="col">Media</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">PacManA</th><td class="num-col">2&#8239;246</td><td class="num-col">2&#8239;239</td><td>…</td><td class="num-col">2&#8239;152</td><td class="num-col"><strong>2&#8239;103</strong></td></tr>
+                <tr><th scope="row">PacManB</th><td class="num-col">4&#8239;522</td><td class="num-col">3&#8239;391</td><td>…</td><td class="num-col">5&#8239;779</td><td class="num-col"><strong>3&#8239;867</strong></td></tr>
+                <tr><th scope="row">…</th><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+                <tr><th scope="row">PacManM</th><td class="num-col">3&#8239;391</td><td class="num-col">3&#8239;697</td><td>…</td><td class="num-col">4&#8239;918</td><td class="num-col"><strong>3&#8239;438</strong></td></tr>
+                <tr><th scope="row">Media</th><td class="num-col"><strong>3&#8239;905</strong></td><td class="num-col"><strong>4&#8239;018</strong></td><td>…</td><td class="num-col"><strong>4&#8239;842</strong></td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </figure>
+        <p>
+          Las medias de la <strong>derecha</strong> son el ranking de Ms.&nbsp;Pac-Man: cuánto puntúa cada
+          una contra todos los fantasmas del curso. Las de <strong>abajo</strong> son el de los fantasmas:
+          cuánto dejan puntuar a todas las Ms.&nbsp;Pac-Man del curso. Son los datos reales del curso pasado.
+        </p>
+
+        <h3 class="label">Lanzarlo vosotros</h3>
+        <p>
+          El motor ya trae el evaluador, así que podéis jugar vuestro propio concurso en casa con todos los
+          controladores que tengáis a mano. Son dos archivos. El primero, un <code>main</code> de tres
+          líneas:
+        </p>
+        <div class="codigo"><pre><code><span class="k">import</span> es.ucm.fdi.ici.PacManParallelEvaluator;
+<span class="k">import</span> es.ucm.fdi.ici.Scores;
+
+<span class="k">public class</span> Evaluate {
+    <span class="k">public static void</span> main(String[] args) {
+        PacManParallelEvaluator evaluator = <span class="k">new</span> PacManParallelEvaluator();
+        Scores scores = evaluator.evaluate();
+        scores.printScoreAndRanking();     <span class="c">// la tabla y los dos rankings</span>
+    }
+}</code></pre></div>
+        <p>
+          El segundo es <code>config.properties</code>, y dónde lo pongáis importa: va en la <strong>raíz de
+          <code>src</code></strong>, al lado de la carpeta <code>es</code> de vuestros paquetes, y no en la
+          carpeta del proyecto.
+        </p>
+        <p>
+          El motivo es que el evaluador <strong>no abre un fichero por su ruta</strong>: le pide a Java un
+          <em>recurso</em> llamado <code>config.properties</code>, y Java los busca donde estén las clases ya
+          compiladas, que en Eclipse es la carpeta <code>bin</code>. Lo que hace que esto funcione es que
+          Eclipse copia a <code>bin</code> todo lo que encuentra en <code>src</code> y no sea código Java, así
+          que un archivo puesto aquí acaba también allí:
+        </p>
+        <div class="codigo"><pre><code>Practica1/
+├── src/
+│   ├── config.properties          <span class="c">← ponedlo aquí</span>
+│   ├── Evaluate.java
+│   └── es/ucm/fdi/ici/c2627/practica1/grupoA/
+│       ├── MsPacMan.java
+│       └── Ghosts.java
+└── bin/
+    ├── config.properties          <span class="c">← y aquí lo copia Eclipse, que es donde se busca</span>
+    └── es/ucm/…</code></pre></div>
+        <p>
+          En la carpeta del proyecto, en cambio, no lo copia nadie, y entonces el programa arranca y se muere
+          en la primera línea con un mensaje que ya dice exactamente lo que pasa:
+          <code>property file 'config.properties' not found in the classpath</code>. Este es el contenido:
+        </p>
+        <div class="codigo"><pre><code><span class="c"># partidas por emparejamiento</span>
+trials = 300
+<span class="c"># visibilidad parcial</span>
+po = false
+
+MsPacManTeams = \
+es.ucm.fdi.ici.c2627.practica1.grupoA.MsPacMan, \
+es.ucm.fdi.ici.c2627.practica1.grupoB.MsPacMan
+
+GhostsTeams = \
+es.ucm.fdi.ici.c2627.practica1.grupoA.Ghosts, \
+es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Clave</th><th scope="col">Qué configura</th><th scope="col">Por defecto</th></tr></thead>
+            <tbody>
+              <tr><td><code>trials</code></td><td>Partidas de cada emparejamiento.</td><td class="num-col">100</td></tr>
+              <tr><td><code>po</code></td><td>Visibilidad parcial, para los dos bandos a la vez.</td><td><code>false</code></td></tr>
+              <tr><td><code>sightLimit</code></td><td>Alcance de la vista cuando <code>po</code> está activa.</td><td class="num-col">50</td></tr>
+              <tr><td><code>ticks</code></td><td>Turnos máximos por partida.</td><td class="num-col">4000</td></tr>
+              <tr><td><code>time</code></td><td>Los milisegundos que se anuncian en <code>timeDue</code>.</td><td class="num-col">40</td></tr>
+              <tr><td><code>MsPacManTeams</code> · <code>GhostsTeams</code></td><td>Las clases, por su nombre completo, separadas por comas. La barra invertida continúa la línea.</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          El evaluador reparte los emparejamientos entre <strong>todos los núcleos menos uno</strong> y va
+          imprimiendo el avance. Si queréis dejar la máquina usable mientras tanto, se le puede decir cuántos
+          usar: <code>new PacManParallelEvaluator(2)</code>.
+        </p>
+
+        <h3 class="label">La configuración oficial</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Parámetro</th><th scope="col">Valor</th></tr></thead>
+            <tbody>
+              <tr><td>Partidas por emparejamiento</td><td><code>trials = 300</code></td></tr>
+              <tr><td>Visibilidad parcial</td><td><code>po = false</code> en la Práctica&nbsp;1. Cada enunciado dice la suya.</td></tr>
+              <tr><td>Turnos por partida</td><td><code>ticks = 4000</code></td></tr>
+              <tr><td>Plazo anunciado</td><td><code>time = 40</code></td></tr>
+              <tr><td>Mensajes entre fantasmas</td><td>Desactivados</td></tr>
+              <tr><td>Participantes</td><td>Todos los controladores entregados, sin tocar una línea.</td></tr>
+              <tr><td>Emparejamientos</td><td>La matriz completa, <strong>diagonal incluida</strong>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Sí: vuestra Ms.&nbsp;Pac-Man juega también contra vuestros fantasmas. Es una casilla de 169 y le
+          pasa a todo el mundo igual.
+        </p>
+
+        <h3 class="label">Cuatro cosas que descalifican sin que os enteréis</h3>
+        <div class="note trap">
+          <span class="note-label">1 · <code>getName()</code> tiene que ser único</span>
+          <p>
+            El evaluador guarda los resultados en una tabla <strong>indexada por el nombre que devuelve
+            <code>getName()</code></strong>, no por la clase. Dos controladores con el mismo nombre son la
+            misma fila: los resultados de uno pisan los del otro y el segundo se queda con la media a cero.
+            Y si no lo sobreescribís, <code>Controller</code> devuelve <code>"Unknown Controller"</code> para
+            todos, con lo que todos los grupos que lo olviden colisionan entre sí. El curso pasado pasó, y
+            más de una vez.
+          </p>
+          <p>
+            Poned algo inconfundible y con la letra del grupo dentro, en los dos controladores.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">2 · Una excepción no resta: repite la partida</span>
+          <p>
+            Cuando vuestro controlador lanza una excepción, <code>runExperiment</code> la captura, imprime la
+            traza, <strong>descarta esa partida y la vuelve a jugar</strong> con otra semilla hasta completar
+            las 300. O sea que un fallo ocasional no baja la media —sólo cuentan las partidas que terminan—,
+            pero un fallo <em>sistemático</em> deja al evaluador dando vueltas para siempre en esa casilla y
+            cuelga el concurso entero.
+          </p>
+          <p>
+            Antes de entregar: 300 partidas seguidas contra varios rivales, con la consola a la vista y sin
+            una sola traza. Si aparece una, es un <code>camino[1]</code> sin comprobar la longitud, o un
+            fantasma en la cárcel al que le habéis pedido la distancia.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">3 · No se juega contra el rival, se juega contra el juego</span>
+          <p>
+            Antes de cada partida el motor llama a <code>preCompute(String opponent)</code> y os pasa
+            <strong>el nombre de la clase del rival</strong>. Está ahí por la Práctica&nbsp;6, donde hace
+            falta cargar la base de casos. Usarlo para cambiar de comportamiento según quién esté enfrente
+            —y muy en particular para que vuestros fantasmas se dejen comer por vuestra Ms.&nbsp;Pac-Man— es
+            hacer trampa, se ve leyendo el código y deja los dos controladores fuera del concurso.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">4 · Nada que dependa del entorno</span>
+          <p>
+            El evaluador corre varios emparejamientos <strong>a la vez, en hilos distintos y con instancias
+            distintas</strong> de vuestra clase. Un <code>static</code> mutable se comparte entre partidas
+            simultáneas y os va a dar resultados imposibles de reproducir. Y nada de leer o escribir
+            ficheros, abrir ventanas, lanzar hilos propios o llamar a <code>System.exit</code>: además de
+            estar prohibido por el enunciado, tumba la ejecución de todos los demás.
+          </p>
+        </div>
+      </section>
+
+      <section id="ranking">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Cómo se calcula el ranking</h2>
+        </div>
+        <p>
+          Hay <strong>dos rankings independientes</strong>, uno de Ms.&nbsp;Pac-Man y otro de fantasmas, y
+          cada controlador entra sólo en el suyo. Un grupo puede ganar uno y quedar último en el otro; de
+          hecho es lo normal.
+        </p>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">La media de cada casilla</h3>
+            <p>
+              Cada emparejamiento se juega 300 veces y se guarda la <strong>media de la puntuación
+              final</strong> de esas 300 partidas. Ni la mejor, ni la mediana: la media, que es lo que
+              devuelve <code>Stats.getAverage()</code>.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">La media de cada controlador</h3>
+            <p>
+              La puntuación de una <strong>Ms.&nbsp;Pac-Man</strong> es la media de su fila: lo que saca, de
+              media, contra los fantasmas de todo el curso. La de unos <strong>fantasmas</strong> es la media
+              de su columna: lo que dejan sacar, de media, a las Ms.&nbsp;Pac-Man de todo el curso. Como
+              todas las casillas tienen las mismas 300 partidas, es exactamente la media de las 3&#8239;900
+              partidas de ese controlador.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">El orden</h3>
+            <p>
+              En Ms.&nbsp;Pac-Man gana <strong>la media más alta</strong>. En fantasmas gana <strong>la más
+              baja</strong>: vuestro trabajo es que la gente no puntúe. Es literalmente el mismo número
+              leído al revés, y por eso no hace falta inventarse una métrica de «cuánto dañan»: la
+              puntuación del rival ya lo es.
+            </p>
+          </div>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Por qué la media de la fila y no otra cosa</span>
+          <p>
+            Porque todos juegan contra exactamente el mismo campo. Si a alguien le tocan fantasmas duros,
+            le tocan a todos; si un grupo entrega unos fantasmas que no persiguen, ese regalo se lo reparten
+            las trece Ms.&nbsp;Pac-Man por igual. Con la matriz completa, la media de la fila es una
+            comparación limpia y no hace falta corregir nada.
+          </p>
+        </div>
+      </section>
+
+      <section id="punto-extra">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">El punto extra</h2>
+        </div>
+        <p>
+          La competición reparte <strong>un punto sobre la nota de la práctica</strong>, y se reparte en dos
+          mitades independientes: <strong>medio punto por el ranking de Ms.&nbsp;Pac-Man</strong> y
+          <strong>medio punto por el de fantasmas</strong>. En cada uno, el mejor se lleva su medio punto
+          entero y el peor se queda a cero; los de en medio, lo que les toque en proporción.
+        </p>
+        <div class="formulas">
+          <div class="formula">
+            <span class="formula-et">Ms. Pac-Man · más es mejor</span>
+            0,5 × (<em>mía</em> − <em>peor</em>) / (<em>mejor</em> − <em>peor</em>)
+          </div>
+          <div class="formula">
+            <span class="formula-et">Fantasmas · menos es mejor</span>
+            0,5 × (<em>peor</em> − <em>mía</em>) / (<em>peor</em> − <em>mejor</em>)
+          </div>
+        </div>
+        <p>
+          Donde <em>mía</em> es la media de vuestra fila o vuestra columna, y <em>mejor</em> y <em>peor</em>
+          son la mayor y la menor de ese ranking. Para los fantasmas, <em>mejor</em> es la media más baja.
+          El resultado se redondea a dos decimales y los dos medios puntos se suman.
+        </p>
+
+        <h3 class="label">Con los números del curso pasado</h3>
+        <p>
+          Aplicando esta regla a los resultados reales de la Práctica&nbsp;1 del año pasado, el reparto
+          habría quedado así:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Ranking de Ms. Pac-Man</th><th scope="col">Media</th><th scope="col">Punto</th></tr></thead>
+            <tbody>
+              <tr><td>La mejor</td><td class="num-col">8&#8239;075</td><td class="num-col">0,50</td></tr>
+              <tr><td>La segunda</td><td class="num-col">4&#8239;398</td><td class="num-col">0,19</td></tr>
+              <tr><td>La de en medio</td><td class="num-col">3&#8239;889</td><td class="num-col">0,15</td></tr>
+              <tr><td>La peor</td><td class="num-col">2&#8239;103</td><td class="num-col">0,00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Ranking de fantasmas</th><th scope="col">Media</th><th scope="col">Punto</th></tr></thead>
+            <tbody>
+              <tr><td>Los mejores</td><td class="num-col">2&#8239;939</td><td class="num-col">0,50</td></tr>
+              <tr><td>Los segundos</td><td class="num-col">2&#8239;954</td><td class="num-col">0,50</td></tr>
+              <tr><td>Los de en medio</td><td class="num-col">3&#8239;884</td><td class="num-col">0,27</td></tr>
+              <tr><td>Los peores</td><td class="num-col">5&#8239;029</td><td class="num-col">0,00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Mide la distancia al mejor, no el puesto</span>
+          <p>
+            Comparad las dos tablas. Los <strong>segundos</strong> fantasmas se llevan el medio punto entero
+            porque quedaron a quince puntos del primero: en la práctica empataron. La <strong>segunda</strong>
+            Ms.&nbsp;Pac-Man se lleva 0,19 porque la primera le sacó casi el doble. No es una nota por
+            posición en la lista, es una nota por lo cerca que quedasteis del mejor, y eso es deliberado:
+            quedar segundo a un palmo vale casi tanto como ganar, y quedar segundo a media tabla de
+            distancia, no.
+          </p>
+        </div>
+
+        <h3 class="label">La letra pequeña</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Caso</th><th scope="col">Qué pasa</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Un controlador no compila, o no juega</td>
+                <td>Queda fuera del concurso y se lleva <strong>0 en su ranking</strong>. Y no entra en la escala: no sirve de suelo para subir a los demás.</td>
+              </tr>
+              <tr>
+                <td>Un controlador falla en algunas partidas</td>
+                <td>Esas partidas se repiten, así que sólo cuentan las que terminan. Si falla siempre, es el caso anterior.</td>
+              </tr>
+              <tr>
+                <td>Dos medias iguales</td>
+                <td>Mismo punto para los dos. No hay desempate.</td>
+              </tr>
+              <tr>
+                <td>Sólo hay dos participantes, o todos empatan</td>
+                <td>Si <em>mejor</em> y <em>peor</em> coinciden, todo el mundo se lleva el medio punto.</td>
+              </tr>
+              <tr>
+                <td>El punto extra y la nota</td>
+                <td>Se suma a la nota de la práctica, que se corrige aparte por código y por rendimiento. El punto no sustituye a nada: es extra.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Es una nota relativa, con lo que eso implica</span>
+          <p>
+            Los dos extremos los ponéis vosotros, no yo: la escala se construye con los controladores que se
+            entreguen ese año. Un grupo que se salga de la tabla comprime a todos los demás hacia abajo, y un
+            controlador muy flojo estira la escala por el otro lado. Es lo que tiene un concurso, y es
+            también la razón de que <strong>el grueso de la nota de la práctica no dependa de esto</strong>.
+          </p>
+        </div>
+      </section>
+
+      <section id="metricas">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Guardar métricas y logs</h2>
+        </div>
+        <p>
+          En cuanto probéis más de dos variantes vais a necesitar apuntar los resultados, porque la memoria
+          humana es muy mala comparando medias de cuatro cifras. El motor trae lo justo para no montar nada:
+          <code>Stats</code> sabe convertirse en una línea de texto y volver de ella.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// Una línea por cada variante que probéis, en un CSV que se abre con cualquier hoja de cálculo</span>
+<span class="k">try</span> (PrintWriter out = <span class="k">new</span> PrintWriter(<span class="k">new</span> FileWriter(<span class="s">"medidas.csv"</span>, <span class="k">true</span>))) {
+
+    <span class="k">for</span> (GhostController rival : rivales) {
+        Stats[] s = executor.runExperiment(<span class="k">new</span> MsPacMan(), rival, <span class="n">100</span>,
+                                           <span class="s">"v7-umbral60 vs "</span> + rival.getName());
+
+        out.println(s[<span class="n">0</span>].fileRepresentation(<span class="s">";"</span>));   <span class="c">// ms;descripción;max;min;n;sumsq;suma</span>
+        System.out.printf(<span class="s">"%-28s media %8.1f ± %5.1f  (peor %5.0f)%n"</span>,
+                          rival.getName(),
+                          s[<span class="n">0</span>].getAverage(),
+                          s[<span class="n">0</span>].getStandardError(),
+                          s[<span class="n">0</span>].getMin());
+    }
+}</code></pre></div>
+        <p>
+          La descripción que se le pasa a <code>runExperiment</code> acaba dentro del CSV, así que
+          <strong>metedle la versión del controlador y los umbrales que estáis probando</strong>: dentro de
+          dos semanas es lo único que os va a permitir saber qué era cada fila. Para volver a leer el
+          fichero, <code>new Stats(linea, ";")</code> reconstruye el objeto entero.
+        </p>
+        <h3 class="label">Una traza por turno, sin llenar la consola</h3>
+        <p>
+          El <code>Executor</code> tiene un gancho para esto que casi nadie usa: <code>setPeek</code> recibe
+          una función que se llama en <strong>cada turno</strong> con el <code>Game</code>, y lo que
+          devuelva se manda al log. Sirve para sacar una serie temporal de lo que os interese sin ensuciar
+          el controlador:
+        </p>
+        <div class="codigo"><pre><code>Executor executor = <span class="k">new</span> Executor.Builder()
+        .setTickLimit(<span class="n">4000</span>)
+        .setPeek(game -&gt; String.format(<span class="s">"%d;%d;%d;%d"</span>,
+                 game.getTotalTime(),
+                 game.getScore(),
+                 game.getNumberOfActivePills(),
+                 game.getPacmanNumberOfLivesRemaining()))
+        .build();</code></pre></div>
+        <div class="note trap">
+          <span class="note-label">El <code>System.out.println</code> dentro de <code>getMove</code></span>
+          <p>
+            Es el reflejo natural y es un problema serio aquí: se llama 4000 veces por partida. En un
+            experimento de 300 son más de un millón de líneas, la consola de Eclipse se atraganta y el
+            experimento pasa de tardar dos minutos a tardar veinte. Si necesitáis imprimir, que sea detrás
+            del mismo interruptor que la depuración visual, o sólo en los cruces.
+          </p>
+        </div>
+      </section>
+
+      <section id="depurar">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Depurar y ver lo que está pasando</h2>
+        </div>
+        <p>
+          Los errores de un controlador casi nunca se ven leyendo el código: se ven en pantalla, en dos
+          partidas. Estas son las cuatro herramientas, de menos a más.
+        </p>
+
+        <h3 class="label">1 · La partida a cámara lenta</h3>
+        <p>
+          <code>runGame(pacMan, ghosts, delay)</code> con <code>setVisual(true)</code>. El
+          <code>delay</code> son los milisegundos de pausa entre turnos: con 5 va rapidísimo y no se ve nada,
+          con 40 va al ritmo del juego, y con 150 se pueden seguir las decisiones de una en una. Es lo primero
+          que hay que hacer cuando algo va mal, siempre.
+        </p>
+
+        <h3 class="label">2 · Pintar lo que el controlador está pensando</h3>
+        <p>
+          <code>GameView</code> dibuja encima del laberinto y, si no hay ventana abierta, no hace nada: las
+          llamadas se pueden dejar puestas. Un color por motivo, y todo detrás de un interruptor que se
+          apaga al entregar.
+        </p>
+        <div class="codigo"><pre><code><span class="k">if</span> (Constantes.DEBUG_PACMAN) {
+    GameView.addPoints(game, Color.ORANGE, caminoElegido);      <span class="c">// a dónde voy</span>
+    GameView.addPoints(game, Color.RED,    tramosDescartados);  <span class="c">// qué he descartado, y por qué</span>
+    GameView.addLines (game, Color.CYAN,   miNodo, nodoDelFantasmaQueMePreocupa);
+}</code></pre></div>
+        <p>
+          Lo importante no es pintar el camino bueno: es pintar <strong>lo que has descartado</strong>. Un
+          controlador que se queda encerrado sin motivo aparente os lo explica solo en cuanto veis de rojo los
+          tres tramos que ha dado por cerrados.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Si necesitáis dibujar algo que no son puntos ni líneas</span>
+          <p>
+            Vuestro controlador de Ms.&nbsp;Pac-Man puede implementar <code>pacman.game.Drawable</code>
+            —un <code>enabled()</code> y un <code>draw(Graphics2D)</code>— y el motor lo llamará en cada
+            repintado para que dibujéis lo que queráis: el estado en el que estáis, el valor de los umbrales
+            en ese turno, la puntuación de cada salida. El <code>enabled()</code> es vuestro interruptor.
+            Con los fantasmas no funciona: ahí sólo <code>GameView</code>.
+          </p>
+        </div>
+
+        <h3 class="label">3 · Grabar la partida rara y volver a verla</h3>
+        <p>
+          La partida en la que pasó la cosa imposible no se repite: cada una tiene una semilla nueva. Por eso
+          el motor sabe grabarlas y reproducirlas:
+        </p>
+        <div class="codigo"><pre><code>executor.runGameTimedRecorded(pacMan, ghosts, <span class="s">"partida-rara.txt"</span>);
+<span class="c">// y luego, las veces que haga falta:</span>
+executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">true</span>);</code></pre></div>
+        <p>
+          La repetición guarda el estado del juego turno a turno, no vuestras decisiones, así que sirve para
+          ver <em>qué</em> pasó, no para depurar con puntos de ruptura. Para eso está lo siguiente.
+        </p>
+
+        <h3 class="label">4 · Un aviso en cada decisión</h3>
+        <p>
+          <code>runGame</code> admite un <code>GameObserver</code>, al que el motor avisa de cada movimiento
+          indicando además <strong>si se tomó en un cruce</strong>. Es la forma limpia de contar cosas
+          —cuántas decisiones reales tomáis, cuántas veces devolvéis <code>null</code>— sin meter contadores
+          dentro del controlador:
+        </p>
+        <div class="codigo"><pre><code>executor.runGame(pacMan, ghosts, <span class="n">40</span>, <span class="k">new</span> GameObserver() {
+    <span class="k">public void</span> pacManMove(MOVE move, <span class="k">boolean</span> inJunction) {
+        <span class="k">if</span> (inJunction) decisiones++;
+    }
+    <span class="k">public void</span> ghostsMove(EnumMap&lt;GHOST, MOVE&gt; moves, EnumMap&lt;GHOST, Boolean&gt; inJunction) { }
+});</code></pre></div>
+
+        <h3 class="label">Síntomas y dónde mirar</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Lo que veis</th><th scope="col">Dónde está casi siempre</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Se queda temblando en un cruce, adelante y atrás</td>
+                <td>Estáis decidiendo en todos los turnos y no sólo en los cruces, y la decisión cambia de un turno al siguiente. Devolved <code>null</code> fuera de los cruces.</td>
+              </tr>
+              <tr>
+                <td>Va hacia el fantasma como si no lo viera</td>
+                <td>Una distancia medida sin <code>lastMove</code>, o un fantasma en la cárcel contando como amenaza, o <code>DM.EUCLID</code> donde tenía que ir <code>DM.PATH</code>.</td>
+              </tr>
+              <tr>
+                <td>Se queda quieto al final del nivel y la partida se agota</td>
+                <td>El criterio de seguridad ha cerrado todas las salidas y no hay caso de escape. Falta la excepción de «quedan cuatro píldoras».</td>
+              </tr>
+              <tr>
+                <td>La media es buena pero el mínimo es 0</td>
+                <td>Hay partidas en las que muere pronto y sin comer. Mirad <code>getMin()</code> y grabad una.</td>
+              </tr>
+              <tr>
+                <td>Va perfecto en <code>runGame</code> y mal en <code>runExperiment</code></td>
+                <td>Estado que sobrevive entre partidas: un campo que no reiniciáis, o algo <code>static</code>.</td>
+              </tr>
+              <tr>
+                <td>El experimento no termina nunca</td>
+                <td>Excepción sistemática: el motor está repitiendo la misma partida una y otra vez. Mirad la consola de errores.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="rivales">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Contra quién probar</h2>
+        </div>
+        <p>
+          Medir contra un solo rival no vale: se acaba afinando el controlador contra <em>ese</em> rival, que
+          es justo lo que el concurso castiga. Por orden de facilidad:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Rival</th><th scope="col">Para qué sirve</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Los vuestros, entre ellos</strong></td>
+                <td>El mejor banco de pruebas que vais a tener: los dos conocen las mismas debilidades, y cada arreglo de un lado destapa un agujero del otro.</td>
+              </tr>
+              <tr>
+                <td><strong>Los de la <a href="../practicas/practica-0.html">Práctica&nbsp;0</a></strong></td>
+                <td>Aleatorios, agresivos y huidizos. Son la línea base: si no ganáis holgadamente a <code>GhostsRandom</code>, no hay nada que afinar todavía.</td>
+              </tr>
+              <tr>
+                <td><strong>Los de otros grupos</strong></td>
+                <td>Intercambiad los <code>.class</code> ya compilados, nunca el código fuente. Es lo más parecido al concurso que podéis montar, no hay nada que copiar en un compilado, y se aprende mucho más perdiendo contra alguien que ganando a un aleatorio.</td>
+              </tr>
+              <tr>
+                <td><strong>Los de cursos anteriores</strong></td>
+                <td>Si se publican en el Campus Virtual, van en un <code>.jar</code> que se añade al proyecto con <span class="path">Build Path &gt; Add JARs</span> y se referencia en <code>config.properties</code> por su nombre de clase completo, igual que los vuestros.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Y el calendario de todo esto</span>
+          <p>
+            Medir cuesta tiempo de reloj: un experimento de 100 partidas contra cinco rivales son unos
+            minutos, y el concurso completo, horas. Eso significa que <strong>la víspera de la entrega no da
+            tiempo</strong> a hacer esto bien. Reservad la última tarde para limpiar y comprobar la lista de
+            la entrega, no para descubrir que el controlador falla una partida de cada treinta.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#tres-formas">Tres formas de ejecutar</a></li>
+            <li><a href="#medir">Medir: la media y el error</a></li>
+            <li><a href="#concurso">El concurso</a></li>
+            <li><a href="#ranking">Cómo se calcula el ranking</a></li>
+            <li><a href="#punto-extra">El punto extra</a></li>
+            <li><a href="#metricas">Guardar métricas y logs</a></li>
+            <li><a href="#depurar">Depurar y visualizar</a></li>
+            <li><a href="#rivales">Contra quién probar</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El enunciado</span>
+          <p style="margin:0">
+            Las reglas de la <a href="../practicas/practica-1.html">Práctica&nbsp;1</a>, con el repertorio de
+            técnicas y la lista de comprobación de la entrega.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">El motor</span>
+          <p style="margin:0">
+            La <a href="clase-game.html">referencia de la clase <code>Game</code></a>: es lo único que
+            vuestro controlador puede preguntar.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

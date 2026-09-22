@@ -521,7 +521,11 @@ code {
   background: var(--surface-2);
   padding: .12em .34em;
   border-radius: 3px;
-  word-break: break-word;
+  /* Parte un identificador sólo si de verdad no cabe. Con word-break: break-word
+     el navegador da por hecho que getAverage() puede romperse por cualquier sitio,
+     y entonces en una tabla estrecha la columna de los métodos se queda en dos
+     centímetros y sale «getAver / age()». Con esto, primero se ensancha la columna. */
+  overflow-wrap: break-word;
 }
 kbd {
   font-family: var(--f-mono);
