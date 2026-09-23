@@ -869,9 +869,9 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
 
         <h3 class="label">2 · Pintar lo que el controlador está pensando</h3>
         <p>
-          <code>GameView</code> dibuja encima del laberinto y, si no hay ventana abierta, no hace nada: las
-          llamadas se pueden dejar puestas. Un color por motivo, y todo detrás de un interruptor que se
-          apaga al entregar.
+          <code>GameView</code> dibuja encima del laberinto: un color por motivo, y todo detrás de un
+          interruptor que se apaga al entregar. Lo del interruptor no es una manía de estilo, por el motivo
+          que viene justo debajo.
         </p>
         <div class="codigo"><pre><code><span class="k">if</span> (Constantes.DEBUG_PACMAN) {
     GameView.addPoints(game, Color.ORANGE, caminoElegido);      <span class="c">// a dónde voy</span>
@@ -883,6 +883,24 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
           controlador que se queda encerrado sin motivo aparente os lo explica solo en cuanto veis de rojo los
           tres tramos que ha dado por cerrados.
         </p>
+        <div class="note trap">
+          <span class="note-label">Dejarlo encendido tumba la corrección, y no es una exageración</span>
+          <p>
+            <code>GameView.addPoints</code> y <code>addLines</code> no dibujan: <strong>apuntan</strong> lo que
+            hay que dibujar en dos listas <code>static</code>, y el motor las vacía al repintar la ventana. En
+            un experimento sin ventana no repinta nunca, así que las listas crecen turno a turno y no las
+            vacía nadie. Y no vale con que no haya ventana: el interruptor del propio motor,
+            <code>GameView.isVisible</code>, nace a <code>true</code> y no lo pone a <code>false</code> nadie
+            —podéis buscarlo—.
+          </p>
+          <p>
+            En una partida suelta da igual. En las decenas de miles de partidas de un concurso,
+            <strong>se acaba la memoria y se cae la ejecución entera</strong>, la vuestra y la de todos los
+            demás. Pasó con las entregas de la Práctica&nbsp;0 la primera vez que se lanzó el concurso con 100
+            partidas por emparejamiento. Por eso «apagad la depuración» está en la lista de comprobación de la
+            entrega, y por eso el interruptor tiene que envolver <em>la llamada</em>, no ir por dentro.
+          </p>
+        </div>
         <div class="note tip">
           <span class="note-label">Si necesitáis dibujar algo que no son puntos ni líneas</span>
           <p>
@@ -1045,7 +1063,7 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

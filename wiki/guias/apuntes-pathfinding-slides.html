@@ -1076,9 +1076,10 @@ open.add(start);
     GameView.addLines (game, Color.CYAN,   miNodo, fantasmaQueMePreocupa);
 }</code></pre>
         <p class="lede">
-          Si la ventana no está abierta, no hacen nada. Cuando veas en pantalla los tramos que tu
-          controlador da por cerrados, los errores de «¿llego yo antes?» se hacen obvios en dos partidas.
-          Sin eso, no.
+          Cuando veas en pantalla los tramos que tu controlador da por cerrados, los errores de «¿llego yo
+          antes?» se hacen obvios en dos partidas. Sin eso, no. <strong>Y el interruptor es
+          obligatorio</strong>: sin ventana, lo que se pinta se acumula en dos listas estáticas que no vacía
+          nadie, y en una corrección de miles de partidas eso se come la memoria.
         </p>
       </section>
 
@@ -1127,7 +1128,7 @@ open.add(start);
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

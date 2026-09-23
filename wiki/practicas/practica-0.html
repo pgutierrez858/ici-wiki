@@ -1269,6 +1269,24 @@
           </p>
         </div>
 
+        <div class="note trap">
+          <span class="note-label">Y la primera vez no arrancó</span>
+          <p>
+            Con 100 partidas por emparejamiento, el concurso se quedó sin memoria a la media hora. La culpa
+            no era de nadie de la clase: <code>GameView.addPoints</code> y <code>addLines</code> no dibujan,
+            <strong>apuntan</strong> lo que hay que dibujar en dos listas <code>static</code> que el motor
+            sólo vacía cuando repinta la ventana. Sin ventana no repinta, así que las listas crecen turno a
+            turno para siempre; y el interruptor que debería evitarlo, <code>GameView.isVisible</code>, nace
+            a <code>true</code> y no lo pone a <code>false</code> nadie.
+          </p>
+          <p>
+            Trece de las veintiuna Ms.&nbsp;Pac-Man pintan algo en cada turno, así que en 44&#8239;100
+            partidas eso son cientos de millones de objetos. Es la razón de verdad por la que la depuración
+            visual tiene que ir detrás de un interruptor que se apague al entregar: no es que quede feo, es
+            que <strong>tumba la corrección de todo el mundo</strong>.
+          </p>
+        </div>
+
         <h3 class="label">Lo que de verdad separó a unos de otros</h3>
         <p>
           Cruzando el ranking con el código aparecen dos cosas, y ninguna es la que uno esperaría.
@@ -1367,7 +1385,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

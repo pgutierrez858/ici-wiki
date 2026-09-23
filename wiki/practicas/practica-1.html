@@ -745,7 +745,7 @@
               </tr>
               <tr>
                 <td><strong>Dejar la depuración encendida</strong></td>
-                <td>Buena parte de la clase entregó con llamadas a <code>GameView</code> fuera del <code>if (DEBUG)</code>, o con el interruptor a <code>true</code>. No rompe nada: es lo primero que se ve al corregir.</td>
+                <td>Buena parte de la clase entregó con llamadas a <code>GameView</code> fuera del <code>if (DEBUG)</code>, o con el interruptor a <code>true</code>. Y no es un detalle de estilo: lo que se pinta se acumula en dos listas <code>static</code> que sólo se vacían al repintar la ventana, y en la corrección no hay ventana. En decenas de miles de partidas <strong>se acaba la memoria y se cae la ejecución entera</strong>, la vuestra y la de todos los demás.</td>
               </tr>
               <tr>
                 <td><strong>Acceder a <code>camino[1]</code> sin comprobar la longitud</strong></td>
@@ -948,7 +948,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

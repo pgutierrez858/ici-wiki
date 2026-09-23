@@ -2212,8 +2212,8 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
         <h3 class="label">Ver lo que piensa</h3>
         <p>
           Nada de esto se depura leyendo el código: se depura mirándolo. <code>GameView</code> pinta encima
-          del laberinto y, si la ventana no está abierta, no hace nada, así que puedes dejar las llamadas
-          puestas.
+          del laberinto, y siempre detrás de un interruptor: no se puede dejar encendido al entregar, por el
+          motivo que hay debajo del código.
         </p>
         <div class="codigo"><pre><code><span class="c">// un color por motivo, y todo detrás de un interruptor que se apaga al entregar</span>
 <span class="k">if</span> (DEBUG) {
@@ -2225,6 +2225,16 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
           Cuando veas en pantalla los tramos que tu controlador considera cerrados, los errores de la
           función «¿llego yo antes?» se hacen obvios en dos partidas. Sin eso, no.
         </p>
+        <div class="note trap">
+          <span class="note-label">El interruptor es obligatorio, no una costumbre</span>
+          <p>
+            <code>addPoints</code> y <code>addLines</code> no dibujan: apuntan lo que habría que dibujar en
+            dos listas <code>static</code> que sólo se vacían cuando se repinta la ventana. Sin ventana no se
+            vacían nunca, y el interruptor del motor que debería evitarlo
+            —<code>GameView.isVisible</code>— nace a <code>true</code> y no lo cambia nadie. En una partida
+            da igual; en las miles de partidas de una corrección, la memoria se acaba y se cae todo.
+          </p>
+        </div>
       </section>
 
       <section id="resumen">
@@ -2297,7 +2307,7 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
