@@ -1017,6 +1017,55 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
         </div>
       </section>
 
+      <section id="descargas">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">Los dos archivos, para llevar</h2>
+        </div>
+        <p>
+          Todo lo de esta guía se monta con dos archivos, y son los mismos con los que se jugó el concurso de
+          la <a href="../practicas/practica-0.html#entregado">Práctica&nbsp;0</a>. Los dos van en la
+          <strong>raíz de <code>src</code></strong>, uno al lado del otro, en un proyecto que dependa de
+          <code>MsPacManEngine</code>:
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../recursos/Concurso.java" download>
+              <span class="lt"><code>Concurso.java</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">El <code>main</code> del concurso · 263 líneas</span>
+              <span class="ld">
+                Lanza el evaluador, agrega las medias de cada fila y de cada columna, imprime los dos
+                rankings con su error típico y el reparto del punto extra, y deja la tabla completa en un
+                CSV. Trae comentado por qué hace cada cuenta, y el hilo que vacía lo que los controladores
+                pintan con <code>GameView</code>, sin el cual un concurso largo se queda sin memoria.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="../recursos/config.properties" download>
+              <span class="lt"><code>config.properties</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Quién juega y cuántas partidas</span>
+              <span class="ld">
+                Viene con los 42 controladores de la Práctica&nbsp;0 y <code>trials = 100</code>. Cambiad las
+                dos listas por vuestras clases y ya está. Acordaos de que se carga del
+                <em>classpath</em>: tiene que quedar en <code>src</code> para que Eclipse lo copie a
+                <code>bin</code>.
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div class="note tip">
+          <span class="note-label">Lo mínimo para que arranque</span>
+          <p>
+            Proyecto nuevo con <code>MsPacManEngine</code> en el <em>Build Path</em>, los dos archivos en
+            <code>src</code>, vuestras clases en las dos listas de <code>config.properties</code>, y
+            <span class="path">Run As &gt; Java Application</span> sobre <code>Concurso.java</code>. El CSV
+            aparece en la carpeta del proyecto —hay que refrescar con <kbd>F5</kbd> para verlo desde
+            Eclipse—.
+          </p>
+        </div>
+      </section>
+
     </main>
 
     <aside class="rail">
@@ -1032,6 +1081,7 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
             <li><a href="#metricas">Guardar métricas y logs</a></li>
             <li><a href="#depurar">Depurar y visualizar</a></li>
             <li><a href="#rivales">Contra quién probar</a></li>
+            <li><a href="#descargas">Los dos archivos, para llevar</a></li>
           </ol>
         </nav>
         <div class="note mine rail-nota">
