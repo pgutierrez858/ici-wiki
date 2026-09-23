@@ -1877,7 +1877,7 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
           bien lo que la lista resuelve mal.
         </p>
         <div class="table-scroll">
-          <table>
+          <table class="ancha">
             <thead>
               <tr>
                 <th scope="col"></th>
@@ -1971,6 +1971,284 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
     <b>if</b> <span class="fn">hayFantasmasEncima</span>() <b>then</b> <span class="fn">abaratarAlrededorDe</span>(<span class="fn">píldoraDePoderMásCercana</span>(), radio, factor) <b>end if</b>
 <b>end function</b></pre>
         </figure>
+        <h3 class="label">Pintar el mapa, capa por capa</h3>
+        <p>
+          El pseudocódigo de arriba dice «encarecer alrededor de» sin decir cuánto ni hasta dónde, y ahí
+          está toda la técnica. Así que conviene verla con números. Una <strong>capa</strong> es un número
+          por nodo que mide <em>una sola cosa</em>: lo cerca que se está de la comida, de un perseguidor, de
+          una píldora de poder. Cada fuente vale 1 en su nodo y va perdiendo fuerza a cada paso, con una
+          <strong>caída</strong> que es el único parámetro que tiene.
+        </p>
+        <figure class="wide">
+          <figcaption>Una sola fuente: 1 donde está, y un 25&#8239;% menos por cada paso de pasillo</figcaption>
+          <svg class="explica dgi1" viewBox="0 0 320 200" role="img" aria-label="Un laberinto de rejilla de dieciséis por diez casillas con un fantasma en el pasillo central. Cada casilla libre lleva escrito un número entre 0 y 1: vale 1 en la casilla del fantasma y va bajando a medida que se aleja contando pasos por el pasillo. Dos casillas están recuadradas: una justo encima del fantasma, a cuatro pasos, con 0,32, y otra dos casillas por debajo en línea recta pero a once pasos de pasillo, con 0,04.">
+            <style>
+              .dgi1 .sue{fill:var(--surface)}
+              .dgi1 .mal{fill:var(--blinky)}
+              .dgi1 .mu{fill:var(--maze);fill-opacity:.16;stroke:var(--maze);stroke-opacity:.45;stroke-width:.5}
+              .dgi1 .nu text{font-family:var(--f-mono);font-size:6.2px;text-anchor:middle;fill:var(--ink-2)}
+              .dgi1 .gh{fill:var(--blinky)}
+              .dgi1 .mar{fill:none;stroke:var(--ink);stroke-width:1.2}
+            </style>
+            <rect class="sue" x="0" y="0" width="320" height="200"/>
+            <path class="mal" fill-opacity="0.14" d="M20 20h20v20h-20zM40 20h20v20h-20zM60 20h20v20h-20zM180 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM220 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM220 80h20v20h-20zM20 100h20v20h-20zM220 100h20v20h-20zM20 140h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM80 160h20v20h-20zM100 160h20v20h-20zM120 160h20v20h-20z"/>
+            <path class="mal" fill-opacity="0.3" d="M80 20h20v20h-20zM100 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM20 40h20v20h-20zM180 40h20v20h-20zM20 60h20v20h-20zM180 60h20v20h-20zM200 60h20v20h-20zM20 80h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM80 120h20v20h-20zM80 140h20v20h-20z"/>
+            <path class="mal" fill-opacity="0.46" d="M120 20h20v20h-20zM120 40h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM80 80h20v20h-20zM80 100h20v20h-20z"/>
+            <path class="mal" fill-opacity="0.62" d="M80 60h20v20h-20zM120 60h20v20h-20z"/>
+            <path class="mal" fill-opacity="0.8" d="M100 60h20v20h-20z"/>
+            <path class="mu" d="M0 0h20v20h-20zM20 0h20v20h-20zM40 0h20v20h-20zM60 0h20v20h-20zM80 0h20v20h-20zM100 0h20v20h-20zM120 0h20v20h-20zM140 0h20v20h-20zM160 0h20v20h-20zM180 0h20v20h-20zM200 0h20v20h-20zM220 0h20v20h-20zM240 0h20v20h-20zM260 0h20v20h-20zM280 0h20v20h-20zM300 0h20v20h-20zM0 20h20v20h-20zM300 20h20v20h-20zM0 40h20v20h-20zM40 40h20v20h-20zM60 40h20v20h-20zM80 40h20v20h-20zM100 40h20v20h-20zM140 40h20v20h-20zM160 40h20v20h-20zM200 40h20v20h-20zM220 40h20v20h-20zM240 40h20v20h-20zM260 40h20v20h-20zM300 40h20v20h-20zM0 60h20v20h-20zM300 60h20v20h-20zM0 80h20v20h-20zM40 80h20v20h-20zM60 80h20v20h-20zM100 80h20v20h-20zM120 80h20v20h-20zM140 80h20v20h-20zM160 80h20v20h-20zM180 80h20v20h-20zM200 80h20v20h-20zM240 80h20v20h-20zM260 80h20v20h-20zM300 80h20v20h-20zM0 100h20v20h-20zM100 100h20v20h-20zM200 100h20v20h-20zM300 100h20v20h-20zM0 120h20v20h-20zM20 120h20v20h-20zM40 120h20v20h-20zM60 120h20v20h-20zM100 120h20v20h-20zM140 120h20v20h-20zM160 120h20v20h-20zM200 120h20v20h-20zM240 120h20v20h-20zM260 120h20v20h-20zM280 120h20v20h-20zM300 120h20v20h-20zM0 140h20v20h-20zM100 140h20v20h-20zM140 140h20v20h-20zM160 140h20v20h-20zM200 140h20v20h-20zM300 140h20v20h-20zM0 160h20v20h-20zM300 160h20v20h-20zM0 180h20v20h-20zM20 180h20v20h-20zM40 180h20v20h-20zM60 180h20v20h-20zM80 180h20v20h-20zM100 180h20v20h-20zM120 180h20v20h-20zM140 180h20v20h-20zM160 180h20v20h-20zM180 180h20v20h-20zM200 180h20v20h-20zM220 180h20v20h-20zM240 180h20v20h-20zM260 180h20v20h-20zM280 180h20v20h-20zM300 180h20v20h-20z"/>
+            <g class="nu">
+            <text x="30" y="33">.18</text><text x="50" y="33">.13</text><text x="70" y="33">.18</text><text x="90" y="33">.24</text><text x="110" y="33">.32</text><text x="130" y="33">.42</text><text x="150" y="33">.32</text><text x="170" y="33">.24</text><text x="190" y="33">.18</text><text x="210" y="33">.13</text><text x="230" y="33">.1</text><text x="250" y="33">.08</text><text x="270" y="33">.06</text><text x="290" y="33">.04</text>
+            <text x="30" y="53">.24</text><text x="130" y="53">.56</text><text x="190" y="53">.24</text><text x="290" y="53">.06</text>
+            <text x="30" y="73">.32</text><text x="50" y="73">.42</text><text x="70" y="73">.56</text><text x="90" y="73">.75</text><text x="110" y="73">1</text><text x="130" y="73">.75</text><text x="150" y="73">.56</text><text x="170" y="73">.42</text><text x="190" y="73">.32</text><text x="210" y="73">.24</text><text x="230" y="73">.18</text><text x="250" y="73">.13</text><text x="270" y="73">.1</text><text x="290" y="73">.08</text>
+            <text x="30" y="93">.24</text><text x="90" y="93">.56</text><text x="230" y="93">.13</text><text x="290" y="93">.06</text>
+            <text x="30" y="113">.18</text><text x="50" y="113">.24</text><text x="70" y="113">.32</text><text x="90" y="113">.42</text><text x="130" y="113">.04</text><text x="150" y="113">.03</text><text x="170" y="113">.02</text><text x="190" y="113">.02</text><text x="230" y="113">.1</text><text x="250" y="113">.08</text><text x="270" y="113">.06</text><text x="290" y="113">.04</text>
+            <text x="90" y="133">.32</text><text x="130" y="133">.06</text><text x="190" y="133">.02</text><text x="230" y="133">.08</text>
+            <text x="30" y="153">.1</text><text x="50" y="153">.13</text><text x="70" y="153">.18</text><text x="90" y="153">.24</text><text x="130" y="153">.08</text><text x="190" y="153">.03</text><text x="230" y="153">.06</text><text x="250" y="153">.04</text><text x="270" y="153">.03</text><text x="290" y="153">.02</text>
+            <text x="30" y="173">.08</text><text x="50" y="173">.1</text><text x="70" y="173">.13</text><text x="90" y="173">.18</text><text x="110" y="173">.13</text><text x="130" y="173">.1</text><text x="150" y="173">.08</text><text x="170" y="173">.06</text><text x="190" y="173">.04</text><text x="210" y="173">.03</text><text x="230" y="173">.04</text><text x="250" y="173">.03</text><text x="270" y="173">.02</text><text x="290" y="173">.02</text>
+            </g>
+            <rect class="mar" x="101.5" y="21.5" width="17" height="17"/><rect class="mar" x="121.5" y="101.5" width="17" height="17"/>
+            <path class="gh" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+          </svg>
+        </figure>
+        <p>
+          Con una caída de 0,75, cada paso vale tres cuartos de lo que valía el anterior:
+        </p>
+        <figure>
+          <figcaption>Cuenta · lo que vale un fantasma según lo lejos que estés</figcaption>
+          <pre class="pseudo">a 0 pasos   1
+a 1 paso    1    × 0,75  =  0,75
+a 2 pasos   0,75 × 0,75  =  0,56
+a 3 pasos   0,56 × 0,75  =  0,42
+a 4 pasos   0,42 × 0,75  =  0,32
+…
+a 11 pasos                  0,04</pre>
+        </figure>
+        <p>
+          Y ahora fijaos en las dos casillas recuadradas de la figura. Están <strong>las dos a dos casillas
+          del fantasma en línea recta</strong>, una por encima y otra por debajo, y valen
+          <strong>0,32</strong> y <strong>0,04</strong>: la de arriba está a cuatro pasos de pasillo y la de
+          abajo a once, porque para llegar hay que dar toda la vuelta. El mapa hereda la forma del laberinto
+          <em>porque se propaga por él</em>, y eso es justo lo que no consigue ningún radio pintado con la
+          distancia en línea recta. Es la lección de la sección&nbsp;1 otra vez, ahora del lado del mapa.
+        </p>
+        <p>
+          Con varias fuentes se suman las influencias, y después <strong>cada capa se divide por su
+          máximo</strong>. Ese paso parece de adorno y no lo es: sin él, una capa alimentada por veinte
+          píldoras llega a valores mucho más altos que la de un solo fantasma, y su peso acaba pesando más
+          sin que nadie lo haya decidido. Los pesos sólo se pueden comparar entre sí si todas las capas
+          están en la misma escala.
+        </p>
+        <p>
+          Hecho eso, la <strong>función objetivo</strong> es una suma con pesos, y el signo de cada término
+          dice si esa capa atrae o repele:
+        </p>
+        <figure>
+          <figcaption>La función objetivo, entera</figcaption>
+          <pre class="pseudo">U(<span class="var">c</span>) =   <span class="var">wComida</span>  × <span class="fn">comida</span>(<span class="var">c</span>)
+     − <span class="var">wAmenaza</span> × <span class="fn">amenaza</span>(<span class="var">c</span>)
+     + <span class="var">wPresa</span>   × <span class="fn">presa</span>(<span class="var">c</span>)      <i>// fantasmas comestibles</i>
+     + <span class="var">wPoder</span>   × <span class="fn">poder</span>(<span class="var">c</span>)      <i>// píldoras de poder</i>
+     + <span class="var">wSalidas</span> × <span class="fn">salidas</span>(<span class="var">c</span>)    <i>// cuántas salidas tiene el nodo: la única capa que no cambia nunca</i></pre>
+        </figure>
+        <figure class="wide">
+          <figcaption>Tres de las cinco capas, y lo que sale de sumarlas con sus pesos</figcaption>
+          <svg class="explica dgi2" viewBox="0 0 372 268" role="img" aria-label="Cuatro veces el mismo laberinto, con Ms. Pac-Man abajo en el centro, dos fantasmas rojos en el pasillo de en medio, uno azul comestible arriba a la derecha, píldoras repartidas y dos píldoras de poder en esquinas opuestas. En el primero se tiñe de amarillo lo que está cerca de la comida; en el segundo de rojo lo que está cerca de los fantasmas rojos; en el tercero de amarillo los cruces con más salidas. El cuarto es la suma de las cinco capas con sus pesos: el pasillo central sale rojo y parte el laberinto en dos, y las dos esquinas de abajo salen amarillas.">
+            <style>
+              .dgi2 .sue{fill:var(--surface)}
+              .dgi2 .bien{fill:var(--pill)}
+              .dgi2 .mal{fill:var(--blinky)}
+              .dgi2 .mu{fill:var(--maze);fill-opacity:.16;stroke:var(--maze);stroke-opacity:.45;stroke-width:.5}
+              .dgi2 .pi{fill:var(--pill-ink)}
+              .dgi2 .po{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1}
+              .dgi2 .gh{fill:var(--blinky)}
+              .dgi2 .gc{fill:var(--maze)}
+              .dgi2 .pc{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1.4}
+              .dgi2 .ti{font-family:var(--f-mono);font-size:8px;letter-spacing:.06em;fill:var(--ink-3)}
+            </style>
+            <defs>
+              <g id="dgi2-lab">
+                <path class="mu" d="M0 0h20v20h-20zM20 0h20v20h-20zM40 0h20v20h-20zM60 0h20v20h-20zM80 0h20v20h-20zM100 0h20v20h-20zM120 0h20v20h-20zM140 0h20v20h-20zM160 0h20v20h-20zM180 0h20v20h-20zM200 0h20v20h-20zM220 0h20v20h-20zM240 0h20v20h-20zM260 0h20v20h-20zM280 0h20v20h-20zM300 0h20v20h-20zM0 20h20v20h-20zM300 20h20v20h-20zM0 40h20v20h-20zM40 40h20v20h-20zM60 40h20v20h-20zM80 40h20v20h-20zM100 40h20v20h-20zM140 40h20v20h-20zM160 40h20v20h-20zM200 40h20v20h-20zM220 40h20v20h-20zM240 40h20v20h-20zM260 40h20v20h-20zM300 40h20v20h-20zM0 60h20v20h-20zM300 60h20v20h-20zM0 80h20v20h-20zM40 80h20v20h-20zM60 80h20v20h-20zM100 80h20v20h-20zM120 80h20v20h-20zM140 80h20v20h-20zM160 80h20v20h-20zM180 80h20v20h-20zM200 80h20v20h-20zM240 80h20v20h-20zM260 80h20v20h-20zM300 80h20v20h-20zM0 100h20v20h-20zM100 100h20v20h-20zM200 100h20v20h-20zM300 100h20v20h-20zM0 120h20v20h-20zM20 120h20v20h-20zM40 120h20v20h-20zM60 120h20v20h-20zM100 120h20v20h-20zM140 120h20v20h-20zM160 120h20v20h-20zM200 120h20v20h-20zM240 120h20v20h-20zM260 120h20v20h-20zM280 120h20v20h-20zM300 120h20v20h-20zM0 140h20v20h-20zM100 140h20v20h-20zM140 140h20v20h-20zM160 140h20v20h-20zM200 140h20v20h-20zM300 140h20v20h-20zM0 160h20v20h-20zM300 160h20v20h-20zM0 180h20v20h-20zM20 180h20v20h-20zM40 180h20v20h-20zM60 180h20v20h-20zM80 180h20v20h-20zM100 180h20v20h-20zM120 180h20v20h-20zM140 180h20v20h-20zM160 180h20v20h-20zM180 180h20v20h-20zM200 180h20v20h-20zM220 180h20v20h-20zM240 180h20v20h-20zM260 180h20v20h-20zM280 180h20v20h-20zM300 180h20v20h-20z"/>
+                <path class="pi" d="M30 148a2 2 0 1 0 .1 0zM50 148a2 2 0 1 0 .1 0zM70 148a2 2 0 1 0 .1 0zM30 168a2 2 0 1 0 .1 0zM50 168a2 2 0 1 0 .1 0zM70 168a2 2 0 1 0 .1 0zM30 108a2 2 0 1 0 .1 0zM50 108a2 2 0 1 0 .1 0zM230 108a2 2 0 1 0 .1 0zM250 108a2 2 0 1 0 .1 0zM270 108a2 2 0 1 0 .1 0zM290 108a2 2 0 1 0 .1 0zM230 88a2 2 0 1 0 .1 0zM250 148a2 2 0 1 0 .1 0zM270 148a2 2 0 1 0 .1 0zM130 28a2 2 0 1 0 .1 0zM190 28a2 2 0 1 0 .1 0z"/>
+                <circle class="po" cx="30" cy="30" r="4"/><circle class="po" cx="290" cy="170" r="4"/>
+                <path class="gh" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/><path class="gh" d="M203.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/><path class="gc" d="M263.8 35.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+                <g transform="translate(157 163) scale(-0.54 0.54)"><path class="pc" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/></g>
+              </g>
+            </defs>
+            <text class="ti" x="0" y="9">+ comida · peso 1</text>
+            <g transform="translate(0 13) scale(0.55)">
+              <rect class="sue" x="0" y="0" width="320" height="200"/>
+              <path class="bien" fill-opacity="0.14" d="M140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.3" d="M20 20h20v20h-20zM40 20h20v20h-20zM60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM20 60h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM120 100h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM280 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.46" d="M120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM180 20h20v20h-20zM120 40h20v20h-20zM180 40h20v20h-20zM80 60h20v20h-20zM100 60h20v20h-20zM120 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM180 60h20v20h-20zM200 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM280 60h20v20h-20zM20 80h20v20h-20zM80 80h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM280 140h20v20h-20zM120 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.62" d="M220 60h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM80 100h20v20h-20zM280 100h20v20h-20zM80 120h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM80 160h20v20h-20zM100 160h20v20h-20zM220 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.8" d="M220 80h20v20h-20zM220 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM80 140h20v20h-20zM20 160h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20z"/>
+              <use href="#dgi2-lab"/>
+            </g>
+            <text class="ti" x="196" y="9">− amenaza · peso 2</text>
+            <g transform="translate(196 13) scale(0.55)">
+              <rect class="sue" x="0" y="0" width="320" height="200"/>
+              <path class="mal" fill-opacity="0.14" d="M20 20h20v20h-20zM40 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 100h20v20h-20zM280 100h20v20h-20zM20 140h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM280 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM80 160h20v20h-20zM100 160h20v20h-20zM120 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.3" d="M60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM20 60h20v20h-20zM280 60h20v20h-20zM20 80h20v20h-20zM280 80h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM80 120h20v20h-20zM220 120h20v20h-20zM80 140h20v20h-20zM220 140h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.46" d="M120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM180 20h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM80 80h20v20h-20zM220 80h20v20h-20zM80 100h20v20h-20zM220 100h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.62" d="M120 40h20v20h-20zM180 40h20v20h-20zM80 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM220 60h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.8" d="M100 60h20v20h-20zM120 60h20v20h-20zM180 60h20v20h-20zM200 60h20v20h-20z"/>
+              <use href="#dgi2-lab"/>
+            </g>
+            <text class="ti" x="0" y="154">+ salidas · peso 0,5</text>
+            <g transform="translate(0 158) scale(0.55)">
+              <rect class="sue" x="0" y="0" width="320" height="200"/>
+              <path class="bien" fill-opacity="0.3" d="M20 20h20v20h-20zM40 20h20v20h-20zM60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 40h20v20h-20zM120 40h20v20h-20zM180 40h20v20h-20zM280 40h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM100 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM200 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM20 80h20v20h-20zM80 80h20v20h-20zM220 80h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM120 100h20v20h-20zM140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM280 100h20v20h-20zM80 120h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM280 140h20v20h-20zM20 160h20v20h-20zM100 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM200 160h20v20h-20zM280 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.62" d="M120 20h20v20h-20zM180 20h20v20h-20zM20 60h20v20h-20zM80 60h20v20h-20zM120 60h20v20h-20zM180 60h20v20h-20zM220 60h20v20h-20zM280 60h20v20h-20zM80 100h20v20h-20zM220 100h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM80 140h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM80 160h20v20h-20zM120 160h20v20h-20zM180 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+              <use href="#dgi2-lab"/>
+            </g>
+            <text class="ti" x="196" y="154">la suma de las cinco</text>
+            <g transform="translate(196 158) scale(0.55)">
+              <rect class="sue" x="0" y="0" width="320" height="200"/>
+              <path class="bien" fill-opacity="0.14" d="M100 20h20v20h-20zM120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM220 80h20v20h-20zM80 100h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.3" d="M60 20h20v20h-20zM80 20h20v20h-20zM180 20h20v20h-20zM200 20h20v20h-20zM20 60h20v20h-20zM260 60h20v20h-20zM20 80h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM120 100h20v20h-20zM140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20zM80 120h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM100 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.46" d="M40 20h20v20h-20zM220 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM280 60h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM220 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM280 100h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM80 140h20v20h-20zM20 160h20v20h-20zM80 160h20v20h-20zM120 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.62" d="M20 20h20v20h-20zM240 20h20v20h-20zM280 20h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM280 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.8" d="M260 20h20v20h-20zM260 160h20v20h-20zM280 160h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.14" d="M120 40h20v20h-20zM60 60h20v20h-20zM80 80h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.3" d="M80 60h20v20h-20zM120 60h20v20h-20zM160 60h20v20h-20zM180 60h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.46" d="M140 60h20v20h-20zM200 60h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.62" d="M100 60h20v20h-20z"/>
+              <use href="#dgi2-lab"/>
+            </g>
+          </svg>
+        </figure>
+        <p>
+          Mirad el panel de la amenaza: no es un círculo alrededor del fantasma, es una mancha con la forma
+          de los pasillos. Y mirad el total. El pasillo de en medio queda en rojo y <strong>parte el
+          laberinto en dos</strong>, así que cualquier búsqueda de coste mínimo que use este mapa va a dar
+          el rodeo sin que nadie haya escrito en ninguna parte «no pases por ahí». Ahí está la gracia de la
+          técnica: el conocimiento no está en el código que decide, está en el mapa que se le da.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Mapa de costes y mapa de utilidad son el mismo objeto</span>
+          <p>
+            Lo único que cambia es el signo. Donde la utilidad sube, entrar sale barato:
+            <code>coste(c) = máx(mínimo, base − U(c))</code>. Se usa una forma u otra según lo que venga
+            detrás: si la decisión la va a tomar una <strong>búsqueda de coste mínimo</strong> —la de la
+            sección&nbsp;4, sin tocar una línea— hacen falta costes; si la va a tomar un
+            <strong>máximo</strong> sobre las salidas, hace falta utilidad. El suelo del coste no es un
+            detalle: sin él, una zona muy buena saldría gratis y la distancia dejaría de contar.
+          </p>
+        </div>
+        <div class="demo" data-demo="influencia" id="influencia-demo">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Cambia los pesos y mira cómo cambia el mapa</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está en las dos figuras de aquí arriba y en el pseudocódigo.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          El mismo laberinto de las figuras, ahora vivo. Con <em>Colocas</em> se pone y se quita todo:
+          Ms.&nbsp;Pac-Man, fantasmas perseguidores, fantasmas comestibles, píldoras, píldoras de poder y
+          muros. El mapa se repinta solo en cuanto tocas cualquier cosa. La barra de <em>Pesos</em> es la
+          función objetivo de aquí arriba, un deslizador por término, y los cuatro botones de al lado son
+          juegos de pesos con nombre para comparar deprisa. Con <em>Ver</em> se mira una capa sola en vez de
+          la suma, que es la única forma de entender de dónde sale una mancha; con <em>Números</em>, el
+          valor exacto de cada casilla. Y <em>Jugar</em> repite la decisión turno a turno: no es el juego
+          —los fantasmas de aquí persiguen por el camino más corto y pierden un turno de cada tres—, pero
+          basta para ver a dónde lleva decidir así cien veces seguidas.
+        </p>
+        <p>
+          Las tres técnicas de la tabla están sobre la misma escena, y lo que cambia entre ellas no es sólo
+          el resultado: es <strong>qué se toca para afinarlas</strong>. Al pasar a las reglas, la barra de
+          pesos desaparece de la pantalla, porque allí no pinta nada.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col">Con el ejemplo</th>
+                <th scope="col">Qué hacer</th>
+                <th scope="col">Qué se ve</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Los pesos deciden la estrategia</td>
+                <td>Pulsa <em>A lo miedosa</em> y <em>Jugar</em>. Luego <em>A lo glotona</em>, <em>Al principio</em> y <em>Jugar</em> otra vez.</td>
+                <td>Los mismos cinco números, con otros valores. La miedosa se lleva el nivel entero; la glotona dura once turnos.</td>
+              </tr>
+              <tr>
+                <td>La amenaza no juega en la misma liga</td>
+                <td>Sube sólo el peso de la amenaza, de 0 a 4, mirando el pasillo de en medio.</td>
+                <td>En 0 el laberinto es todo amarillo y ella cruza por delante de los fantasmas. Subiendo, el pasillo se cierra y la ruta se va por los bordes.</td>
+              </tr>
+              <tr>
+                <td>La caída manda en cuánto se ve</td>
+                <td>Baja la caída a 0,4 y súbela a 0,95.</td>
+                <td>Con 0,4 el mapa es miope: sólo sabe lo que tiene pegado. Con 0,95 todo el laberinto se entera de todo y el mapa se aplana hasta no distinguir nada.</td>
+              </tr>
+              <tr>
+                <td>Por dónde viene, no sólo dónde está</td>
+                <td>Enciende <em>Por dónde viene</em> con un fantasma a media distancia.</td>
+                <td>Se encarece también el pasillo que le trae hasta ti, que es el sitio exacto donde no hay que meterse.</td>
+              </tr>
+              <tr>
+                <td>Una capa sola</td>
+                <td>En <em>Ver</em>, pasa por comida, amenaza y salidas.</td>
+                <td>Las tres manchas que se suman en el mapa entero. Es así como se depura: capa por capa, no mirando el total.</td>
+              </tr>
+              <tr>
+                <td>La función de evaluación mira mucho menos</td>
+                <td>Cambia a <em>Una función de evaluación</em>.</td>
+                <td>Sólo se puntúan los dos o tres cruces a los que se puede salir. Debajo está el desglose por términos, que es lo que hay que imprimir para depurar: los términos, nunca el total.</td>
+              </tr>
+              <tr>
+                <td>El orden decide a ciegas</td>
+                <td>Cambia a <em>Reglas con prioridad</em> y prueba los dos órdenes con varios umbrales.</td>
+                <td>Con <em>Primero comer</em> el umbral da exactamente igual, porque la primera regla siempre se cumple y las demás no llegan a mirarse.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">El horizonte, y por qué hace falta</span>
+          <p>
+            Con el mapa pintado, la decisión más corta sería «vete a la casilla vecina que más valga». Eso
+            se atasca en cuanto hay un <strong>máximo local</strong>: un cruce que es mejor que sus cuatro
+            vecinas y peor que media docena de sitios a seis pasos, y ahí se queda oscilando. Por eso el
+            ejemplo mira primero <em>la mejor casilla dentro de un horizonte</em> y después va hasta ella
+            por el camino más barato. Baja el horizonte a 3 y se ve el atasco; súbelo a 16 y empieza a
+            cruzar el laberinto entero detrás de algo que para cuando llegue ya no estará.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">El peso de la amenaza no está en la misma liga que los demás</span>
+          <p>
+            Comer una píldora son 10 puntos y que te coman es la partida. Cuando pongáis pesos de verdad,
+            el de la amenaza va a salir varias veces más grande que todos los demás juntos, y eso
+            <strong>no es que esté mal afinado</strong>: es que las dos cosas no se miden en la misma
+            escala. Lo que sí es un aviso serio es lo otro: con cinco pesos hay cinco maneras de que el
+            controlador haga algo raro y ninguna de decir cuál ha sido. Por eso se toca <em>un peso cada
+            vez</em>, se mira la capa sola antes que el total, y se escriben los términos por separado en
+            el <code>println</code>.
+          </p>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Lo que cuesta pintarlo en el laberinto de verdad</span>
+          <p>
+            El primer laberinto tiene 1&#8239;293 nodos y al empezar el nivel hay unas 220 píldoras. Si la
+            capa de comida se calcula sumando una propagación por píldora, la cuenta por <em>tick</em> es
+            ésta:
+          </p>
+          <pre class="pseudo">sumando una anchura por fuente    220 × 1 293   =  284 460 nodos visitados
+una sola anchura con las 220 fuentes ya en la cola  =    1 293 nodos visitados</pre>
+          <p>
+            Doscientas veinte veces menos, y lo que se pierde es poco: la anchura multifuente no da la suma
+            de las influencias, da la de <strong>la fuente más cercana</strong>, que para decidir casi
+            siempre vale igual. Y hay otro ahorro más gordo todavía: la capa de comida sólo cambia cuando
+            te comes una píldora, y la de salidas no cambia nunca. Lo único que hay que repintar en cada
+            <em>tick</em> son los fantasmas.
+          </p>
+        </div>
         <div class="note trap">
           <span class="note-label">Las tres tienen el mismo agujero</span>
           <p>

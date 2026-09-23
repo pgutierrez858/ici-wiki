@@ -418,8 +418,8 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
                   </tr>
                   <tr>
                     <td class="num-col">5</td>
-                    <td><code>si ET<sub>A</sub> = ET<sub>B</sub> = ET &nbsp;→&nbsp; ET<sub>D</sub> = √(2·ET<sup>2</sup>) = √2 · ET</code></td>
-                    <td>Cuando las dos tandas tienen el mismo número de partidas sus errores típicos son parecidos, así que se puede sacar factor común y queda un √2 ≈ 1,41.</td>
+                    <td><code>si ET<sub>A</sub> ≈ ET<sub>B</sub> ≈ ET &nbsp;→&nbsp; ET<sub>D</sub> ≈ √(2·ET<sup>2</sup>) = √2 · ET</code></td>
+                    <td><strong>Esto ya no es un paso de la cuenta: es una suposición</strong>, y la única de las cinco filas. Los dos errores típicos no tienen por qué ser iguales; si se parecen, se puede sacar factor común y queda un √2 ≈ 1,41, que es lo que permite hacer la comparación de cabeza. Si no se parecen, la buena es la fila 4.</td>
                   </tr>
                 </tbody>
               </table>
@@ -466,12 +466,26 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
               antes de celebrarlo.
             </p>
             <div class="note tip">
-              <span class="note-label">Si las dos tandas no tienen el mismo número de partidas</span>
+              <span class="note-label">Cuándo no vale el ×3</span>
               <p>
-                El ×3 sale de suponer que las dos medidas se han hecho igual, con lo que sus dos errores
-                típicos son parecidos y √(<em>ET</em>² + <em>ET</em>²) = √2 × <em>ET</em>. Si habéis medido
-                una versión con 100 partidas y la otra con 400, usad la fórmula de la raíz con los dos
-                errores típicos de verdad y comparad la diferencia con el doble de lo que salga.
+                El ×3 sale de suponer <em>ET</em><sub>A</sub> ≈ <em>ET</em><sub>B</sub>, y eso es una
+                suposición, no un hecho: aunque las dos tandas tengan el mismo número de partidas, el error
+                típico de cada una es su propia desviación típica dividida por √<em>n</em>, y dos versiones
+                del controlador no tienen por qué ser igual de irregulares. Mirad los dos números que os da
+                <code>getStandardError()</code> antes de fiaros del atajo.
+              </p>
+              <p>
+                Mientras se parezcan —y dos versiones que se diferencian en un umbral suelen parecerse—, da
+                igual cuál de los dos uséis para el ×3. Cuando no, no hay atajo: sacad
+                <em>ET</em><sub>D</sub> con la fila 4 y comparad la diferencia con <strong>2 ×
+                <em>ET</em><sub>D</sub></strong>, que es de donde salía el ×3 en realidad.
+              </p>
+              <p>
+                Un ejemplo de los que no se parecen está en el concurso de la
+                <a href="../practicas/practica-0.html#entregado">Práctica&nbsp;0</a>: el primero tenía un
+                error típico de ±50,8 y el último, que no decidía nada, de ±5,3. Ahí
+                √(50,8² + 5,3²) = 51,1, o sea prácticamente el error típico del primero a secas, y no
+                1,41 veces nada.
               </p>
             </div>
           </div>
@@ -504,7 +518,7 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
               la dice <code>getStandardDeviation()</code>:
             </p>
             <div class="table-scroll">
-              <table>
+              <table class="ancha">
                 <thead><tr><th scope="col">Partidas</th><th scope="col">Error típico</th><th scope="col">Mejora mínima creíble (3 ET)</th><th scope="col">Y eso es…</th></tr></thead>
                 <tbody>
                   <tr><td class="num-col">1</td><td class="num-col">2&#8239;000</td><td>—</td><td>Una partida no se compara con nada.</td></tr>
