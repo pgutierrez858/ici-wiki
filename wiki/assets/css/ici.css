@@ -658,6 +658,17 @@ pre code { background: none; padding: 0; font-size: inherit; }
 }
 .pseudo .var { font-style: italic; }
 
+/* Una cuenta de varios pasos, un paso por línea. Aquí sí manda la
+   monoespaciada: lo que hay que poder hacer es seguir la columna de números con
+   el dedo, y en la serif del pseudocódigo no cuadran. */
+.cuenta {
+  font-size: .78rem;
+  line-height: 1.75;
+  background: var(--pill-soft);
+  border-left-color: var(--pill);
+  font-variant-numeric: tabular-nums;
+}
+
 figure { margin: 0 0 1.6rem; max-width: var(--measure); }
 .shot {
   display: block;
@@ -708,6 +719,14 @@ figcaption {
 
 .table-scroll { overflow-x: auto; margin: 0 0 1rem; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
 table { border-collapse: collapse; width: 100%; font-size: .89rem; min-width: 32rem; }
+/* Una tabla de comparación, con varias columnas de frases, necesita más suelo
+   que una de cifras: a 32rem toca a ocho caracteres por línea y cada celda se
+   parte en tres. Con .ancha el mínimo sube a 46rem, que es justo lo que mide la
+   columna de texto en pantalla ancha: ahí no cambia nada, y en cuanto la
+   pantalla se estrecha la tabla se desplaza en vez de encogerse. Por encima de
+   eso no se sube: obligaría a desplazarla también en el escritorio, y para eso
+   es mejor quitar una columna. */
+table.ancha { min-width: 46rem; }
 thead th {
   text-align: left;
   font-family: var(--f-mono);
@@ -1260,7 +1279,7 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
   .cal-week.mx .d::before { display: none; }
   .d.today { box-shadow: inset 0 0 0 1.5px #000; }
   .table-scroll { overflow: visible; }
-  table { min-width: 0; }
+  table, table.ancha { min-width: 0; }
   /* la URL detrás de los enlaces externos, que en papel no se pueden pulsar */
   a[href^="http"]::after { content: " (" attr(href) ")"; font-family: var(--f-mono); font-size: .8em; color: #444; }
 }
