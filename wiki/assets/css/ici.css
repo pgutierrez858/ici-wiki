@@ -1863,6 +1863,48 @@ figure.lab-uno { max-width: 17rem; }
   max-width: none;
 }
 .demo-traza[hidden] { display: none; }
+/* qué calcula el ejemplo: el coste de una arista y, si hay, la heurística */
+.demo-def {
+  margin: 0;
+  padding: .5rem .9rem;
+  border-top: 1px solid var(--line-soft);
+  background: var(--surface-2);
+  font-family: var(--f-mono);
+  font-size: .69rem;
+  line-height: 1.7;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: none;
+}
+/* La leyenda del mapa, pegada al tablero y fuera de la barra de controles: el
+   color no se puede leer sin ella —el rojo sale dos veces y el amarillo
+   cuatro— y al imprimir tiene que quedarse, aunque los controles se vayan. */
+.demo-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem 1.1rem;
+  padding: .5rem .9rem;
+  border-top: 1px solid var(--line-soft);
+  background: var(--surface);
+  font-family: var(--f-mono);
+  font-size: .68rem;
+  line-height: 1.3;
+  color: var(--ink-3);
+}
+.demo-leyenda .lg { display: inline-flex; align-items: center; gap: .32rem; }
+.demo-leyenda .lg-figs { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .32rem .9rem; }
+.demo-leyenda .lg-escala { gap: .32rem; }
+.demo-leyenda .lg-escala .lg-tramos + b, .demo-leyenda .lg-escala b + .lg-tramos { margin: 0; }
+.demo-leyenda b { color: var(--ink-2); font-weight: 500; font-variant-numeric: tabular-nums; }
+.demo-leyenda .lg-tag { font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; }
+.demo-leyenda .lg-fig { display: block; flex: none; }
+.lg-tramos { display: inline-flex; }
+.lg-tramos i { display: block; width: .8rem; height: .8rem; }
+.lg-tramos i.bien { background: var(--pill); }
+.lg-tramos i.mal { background: var(--blinky); }
+
 .demo-read {
   margin: 0;
   padding: .55rem .9rem .7rem;
@@ -1931,10 +1973,56 @@ figure.lab-uno { max-width: 17rem; }
 .dm-portal { stroke: var(--ink-3); stroke-width: .9; opacity: .55; stroke-dasharray: 3 2; }
 .dm-portal-on { stroke: var(--maze); stroke-width: 1.6; opacity: .95; stroke-dasharray: none; }
 
+/* 8 · mapas de influencia. Una rejilla con el mapa pintado encima: el color
+   dice lo que vale cada casilla y no decora nada. Dos tintes y cinco tramos,
+   porque un mapa se depura leyéndolo y para leerlo hacen falta escalones:
+   píldora para lo que atrae, Blinky para lo que repele, y el mismo par sirve
+   para el mapa entero con el cero en el papel. */
+.dm-inf-suelo { fill: var(--surface); }
+.dm-inf-red { fill: none; stroke: var(--line-soft); stroke-width: .4; }
+.dm-inf-muro {
+  fill: var(--maze);
+  fill-opacity: .16;
+  stroke: var(--maze);
+  stroke-opacity: .45;
+  stroke-width: .5;
+}
+.dm-inf-bien { fill: var(--pill); }
+.dm-inf-mal { fill: var(--blinky); }
+.dm-inf-pi { fill: var(--pill-ink); }
+.dm-inf-po { fill: var(--pill); stroke: var(--pill-ink); stroke-width: 1; }
+.dm-inf-gh { fill: var(--blinky); }
+.dm-inf-gc { fill: var(--maze); }
+.dm-inf-num {
+  font-family: var(--f-mono);
+  font-size: 5.8px;
+  text-anchor: middle;
+  fill: var(--ink-2);
+}
+.dm-inf-halo {
+  fill: none;
+  stroke: var(--surface);
+  stroke-width: 4.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: .85;
+}
+/* el sitio que ha elegido la decisión. En verde, y no en la diana roja del
+   resto de los ejemplos: aquí el rojo ya significa «por ahí te comen», y marcar
+   de rojo el mejor sitio del mapa diría lo contrario de lo que pasa */
+.dm-inf-meta { fill: none; stroke: var(--ok); stroke-width: 2; }
+.dm-inf-meta2 { fill: var(--ok); }
+/* las salidas que la función de evaluación mira y descarta */
+.dm-inf-opcion { fill: none; stroke: var(--ink-3); stroke-width: 1.2; stroke-dasharray: 3 2; opacity: .8; }
+.dm-inf-gana { fill: var(--ok); font-weight: 700; }
+
 /* la ruta, en todos */
 .dm-ruta { fill: none; stroke: var(--pill-ink); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
 
 @media (max-width: 560px) {
   .demo-campo input[type="range"] { width: 4.5rem; }
   .demo-bar { padding: .5rem .6rem; }
+  /* a este ancho la cifra de cada casilla mide tres píxeles: estorba más de lo
+     que dice, y el color sigue contando lo mismo */
+  .dm-inf-num { display: none; }
 }

@@ -964,8 +964,8 @@ open.add(start);
         <span class="slide-num">Parte 5 · 51</span>
         <h2>Una capa por cada cosa que importa</h2>
         <figure>
-          <figcaption>Tres de las cinco capas, y lo que sale de sumarlas con sus pesos</figcaption>
-          <svg class="diag dgs51" viewBox="0 0 372 268" role="img" aria-label="Cuatro veces el mismo laberinto, con Ms. Pac-Man abajo en el centro, dos fantasmas rojos en el pasillo de en medio, uno azul comestible arriba a la derecha, píldoras repartidas y dos píldoras de poder en esquinas opuestas. En el primero se tiñe de amarillo lo que está cerca de la comida; en el segundo de rojo lo que está cerca de los fantasmas rojos; en el tercero de amarillo los cruces con más salidas. El cuarto es la suma de las cinco capas con sus pesos: el pasillo central sale rojo y parte el laberinto en dos, y las dos esquinas de abajo salen amarillas.">
+          <figcaption>Tres de las cinco capas, y lo que sale de sumarlas con sus pesos · amarillo suma, rojo resta</figcaption>
+          <svg class="diag dgs51" viewBox="0 0 372 288" role="img" aria-label="Cuatro veces el mismo laberinto, con Ms. Pac-Man abajo en el centro, dos fantasmas rojos en el pasillo de en medio, uno azul comestible arriba a la derecha, píldoras repartidas y dos píldoras de poder en esquinas opuestas. En el primero se tiñe de amarillo lo que está cerca de la comida; en el segundo de rojo lo que está cerca de los fantasmas rojos; en el tercero de amarillo los cruces con más salidas. El cuarto es la suma de las cinco capas con sus pesos: el pasillo central sale rojo y parte el laberinto en dos, y las dos esquinas de abajo salen amarillas.">
           <style>
           .dgs51 .sue{fill:var(--surface)}
           .dgs51 .bien{fill:var(--pill)}
@@ -1027,6 +1027,21 @@ open.add(start);
           <path class="mal" fill-opacity="0.46" d="M140 60h20v20h-20zM200 60h20v20h-20z"/>
           <path class="mal" fill-opacity="0.62" d="M100 60h20v20h-20z"/>
           <use href="#dgs51-lab"/>
+          </g>
+          <g transform="translate(0 282)">
+            <text class="ti" x="0" y="0">peor</text>
+            <rect class="mal" x="30" y="-7" width="9" height="9" fill-opacity="0.8"/>
+            <rect class="mal" x="40" y="-7" width="9" height="9" fill-opacity="0.62"/>
+            <rect class="mal" x="50" y="-7" width="9" height="9" fill-opacity="0.46"/>
+            <rect class="mal" x="60" y="-7" width="9" height="9" fill-opacity="0.3"/>
+            <rect class="mal" x="70" y="-7" width="9" height="9" fill-opacity="0.14"/>
+            <text class="ti" x="82" y="0">0</text>
+            <rect class="bien" x="92" y="-7" width="9" height="9" fill-opacity="0.14"/>
+            <rect class="bien" x="102" y="-7" width="9" height="9" fill-opacity="0.3"/>
+            <rect class="bien" x="112" y="-7" width="9" height="9" fill-opacity="0.46"/>
+            <rect class="bien" x="122" y="-7" width="9" height="9" fill-opacity="0.62"/>
+            <rect class="bien" x="132" y="-7" width="9" height="9" fill-opacity="0.8"/>
+            <text class="ti" x="146" y="0">mejor</text>
           </g>
           </svg>
         </figure>

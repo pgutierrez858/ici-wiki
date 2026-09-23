@@ -986,6 +986,1002 @@
     };
   }
 
+  /* ==================== 8 · mapas de influencia ==================== */
+
+  // Un laberinto de juguete de 16 x 10 casillas: 20 unidades de lado, así que
+  // ocupa el mismo lienzo que el resto de los ejemplos. Es de bucles y sin
+  // callejones, como los cuatro del juego de verdad, para que la capa de
+  // salidas diga algo más que «aquí se acaba el mundo».
+  var IW = 16, IH = 10, IC = W / 16;
+  var LAB = [
+    '################',
+    '#..............#',
+    '#.####.##.####.#',
+    '#..............#',
+    '#.##.######.##.#',
+    '#....#....#....#',
+    '####.#.##.#.####',
+    '#....#.##.#....#',
+    '#..............#',
+    '################'
+  ];
+  var ICELDAS = IW * IH;
+
+  function icx(k) { return k % IW; }
+  function icy(k) { return Math.floor(k / IW); }
+  function iid(x, y) { return y * IW + x; }
+  function icentro(k) { return pt(icx(k) * IC + IC / 2, icy(k) * IC + IC / 2); }
+
+  function ilibres() {
+    var l = [], x, y;
+    for (y = 0; y < IH; y++) for (x = 0; x < IW; x++) l.push(LAB[y].charAt(x) !== '#');
+    return l;
+  }
+
+  function ivecinas(libre, k) {
+    var x = icx(k), y = icy(k), v = [];
+    if (x > 0 && libre[k - 1]) v.push(k - 1);
+    if (x < IW - 1 && libre[k + 1]) v.push(k + 1);
+    if (y > 0 && libre[k - IW]) v.push(k - IW);
+    if (y < IH - 1 && libre[k + IW]) v.push(k + IW);
+    return v;
+  }
+
+  // Distancias por el pasillo desde una casilla, y de quién viene cada una.
+  // Es la anchura de la sección 4, sin más: en una rejilla sin costes, la
+  // anchura ya da el camino mínimo.
+  function ibfs(libre, ini) {
+    var d = [], p = [], k, cola, i, n, vs, j;
+    for (k = 0; k < ICELDAS; k++) { d.push(-1); p.push(-1); }
+    if (!libre[ini]) return { d: d, p: p };
+    d[ini] = 0;
+    cola = [ini]; i = 0;
+    while (i < cola.length) {
+      n = cola[i++]; vs = ivecinas(libre, n);
+      for (j = 0; j < vs.length; j++) {
+        if (d[vs[j]] < 0) { d[vs[j]] = d[n] + 1; p[vs[j]] = n; cola.push(vs[j]); }
+      }
+    }
+    return { d: d, p: p };
+  }
+
+  // Una capa: cada fuente vale 1 en su casilla y va perdiendo fuerza a razón
+  // de un factor por paso. Varias fuentes se suman.
+  function icapaDesde(libre, fuentes, caida) {
+    var cap = [], k, i, d;
+    for (k = 0; k < ICELDAS; k++) cap.push(0);
+    for (i = 0; i < fuentes.length; i++) {
+      d = ibfs(libre, fuentes[i]).d;
+      for (k = 0; k < ICELDAS; k++) if (d[k] >= 0) cap[k] += Math.pow(caida, d[k]);
+    }
+    return cap;
+  }
+
+  // Sin normalizar no se pueden comparar los pesos entre sí: una capa con diez
+  // fuentes llegaría a 10 y otra con una se quedaría en 1, y el peso de la
+  // primera valdría diez veces más sin que nadie lo haya decidido.
+  function inormaliza(cap, libre) {
+    var m = 0, k, out = [];
+    for (k = 0; k < ICELDAS; k++) if (libre[k] && cap[k] > m) m = cap[k];
+    if (m <= 0) return cap;
+    for (k = 0; k < ICELDAS; k++) out.push(cap[k] / m);
+    return out;
+  }
+
+  // Cuántas salidas tiene la casilla, de 0 a 1. No depende de nadie, así que
+  // se calcula una vez: es la única capa que no cambia en toda la partida.
+  function icapaSalidas(libre) {
+    var out = [], k;
+    for (k = 0; k < ICELDAS; k++) out.push(libre[k] ? (ivecinas(libre, k).length - 1) / 3 : 0);
+    return out;
+  }
+
+  function icapas(esc, par) {
+    var libre = esc.libre, k, i, r, n, extra, mx;
+    var cazan = [], presa = [];
+    for (i = 0; i < esc.fantasmas.length; i++) {
+      (esc.fantasmas[i].comestible ? presa : cazan).push(esc.fantasmas[i].c);
+    }
+    var am = inormaliza(icapaDesde(libre, cazan, par.caida), libre);
+    if (par.rastro && cazan.length) {
+      // No sólo dónde está: por dónde viene. Se encarece el camino que le trae
+      // hasta mí, que es justo el sitio donde no hay que estar.
+      extra = [];
+      for (k = 0; k < ICELDAS; k++) extra.push(0);
+      for (i = 0; i < cazan.length; i++) {
+        r = ibfs(libre, cazan[i]); n = esc.pac; k = 0;
+        while (n >= 0 && n !== cazan[i] && k++ < ICELDAS) { extra[n] += 1; n = r.p[n]; }
+      }
+      mx = 0;
+      for (k = 0; k < ICELDAS; k++) if (extra[k] > mx) mx = extra[k];
+      if (mx > 0) for (k = 0; k < ICELDAS; k++) am[k] = Math.min(1, am[k] + 0.45 * extra[k] / mx);
+    }
+    return {
+      comida: inormaliza(icapaDesde(libre, esc.pildoras, par.caida), libre),
+      amenaza: am,
+      presa: inormaliza(icapaDesde(libre, presa, par.caida), libre),
+      poder: inormaliza(icapaDesde(libre, esc.poder, par.caida), libre),
+      salidas: icapaSalidas(libre)
+    };
+  }
+
+  var ICAPAS = [
+    { id: 'comida',  txt: 'comida',  signo:  1 },
+    { id: 'amenaza', txt: 'amenaza', signo: -1 },
+    { id: 'presa',   txt: 'presa',   signo:  1 },
+    { id: 'poder',   txt: 'poder',   signo:  1 },
+    { id: 'salidas', txt: 'salidas', signo:  1 }
+  ];
+
+  function iutilidad(cs, w) {
+    var u = [], k, i, v;
+    for (k = 0; k < ICELDAS; k++) {
+      v = 0;
+      for (i = 0; i < ICAPAS.length; i++) {
+        v += ICAPAS[i].signo * w[ICAPAS[i].id] * cs[ICAPAS[i].id][k];
+      }
+      u.push(v);
+    }
+    return u;
+  }
+
+  // La otra cara del mismo mapa: donde la utilidad sube, entrar sale barato.
+  // El suelo de 0,2 evita que una zona buena salga gratis y la distancia deje
+  // de contar.
+  function icostes(u, base) {
+    var c = [], k;
+    for (k = 0; k < ICELDAS; k++) c.push(Math.max(0.2, base - u[k]));
+    return c;
+  }
+
+  // Coste uniforme sobre el mapa: el coste es el de ENTRAR en cada casilla.
+  function idijkstra(libre, ini, cst) {
+    var g = [], p = [], listo = [], k, mejor, mv, vs, i, ng;
+    for (k = 0; k < ICELDAS; k++) { g.push(Infinity); p.push(-1); listo.push(false); }
+    if (!libre[ini]) return { g: g, p: p };
+    g[ini] = 0;
+    for (;;) {
+      mejor = -1; mv = Infinity;
+      for (k = 0; k < ICELDAS; k++) if (!listo[k] && g[k] < mv) { mv = g[k]; mejor = k; }
+      if (mejor < 0) break;
+      listo[mejor] = true;
+      vs = ivecinas(libre, mejor);
+      for (i = 0; i < vs.length; i++) {
+        ng = g[mejor] + cst[vs[i]];
+        if (ng < g[vs[i]]) { g[vs[i]] = ng; p[vs[i]] = mejor; }
+      }
+    }
+    return { g: g, p: p };
+  }
+
+  function icamino(p, ini, fin) {
+    var cam = [], k, guarda = 0;
+    if (fin < 0 || fin === ini) return [ini];
+    for (k = fin; k >= 0 && guarda++ < ICELDAS; k = p[k]) { cam.push(k); if (k === ini) break; }
+    if (cam[cam.length - 1] !== ini) return [ini];
+    return cam.reverse();
+  }
+
+  // Salir por ahí y seguir el pasillo hasta que vuelva a haber elección. Es la
+  // unidad natural de decisión del laberinto: dentro de un pasillo no se elige.
+  function isiguienteCruce(libre, desde, primero) {
+    var ant = desde, n = primero, celdas = [primero], vs, g;
+    for (g = 0; g < ICELDAS; g++) {
+      vs = ivecinas(libre, n).filter(function (v) { return v !== ant; });
+      if (vs.length !== 1) break;
+      ant = n; n = vs[0]; celdas.push(n);
+    }
+    return { nodo: n, pasos: celdas.length, celdas: celdas };
+  }
+
+  function imasCerca(ks, d) {
+    var mejor = -1, mv = Infinity, i;
+    for (i = 0; i < ks.length; i++) if (d[ks[i]] >= 0 && d[ks[i]] < mv) { mv = d[ks[i]]; mejor = ks[i]; }
+    return mejor;
+  }
+
+  // --- las tres formas de escribir la decisión, sobre la misma escena ---
+
+  // 1 · el mapa contesta: el mejor sitio al alcance de la vista lo dice la
+  // utilidad, y por dónde ir hasta él lo dice el coste, que es el mismo mapa
+  // con el signo cambiado.
+  function idecideMapa(esc, u, par) {
+    var libre = esc.libre, d = ibfs(libre, esc.pac).d, k, destino = -1, mv = -Infinity;
+    for (k = 0; k < ICELDAS; k++) {
+      if (!libre[k] || k === esc.pac || d[k] < 0 || d[k] > par.horizonte) continue;
+      if (u[k] > mv) { mv = u[k]; destino = k; }
+    }
+    var cst = icostes(u, par.base);
+    var dij = idijkstra(libre, esc.pac, cst);
+    var cam = icamino(dij.p, esc.pac, destino);
+    return {
+      paso: cam.length > 1 ? cam[1] : -1, destino: destino, camino: cam,
+      valor: mv, coste: destino >= 0 ? dij.g[destino] : 0
+    };
+  }
+
+  // 2 · la función de evaluación: se puntúa cada salida por lo que hay en el
+  // cruce al que lleva, y gana la mejor. Los términos son las mismas capas.
+  function idecideEvaluacion(esc, cs, par, w) {
+    var libre = esc.libre, salidas = ivecinas(libre, esc.pac);
+    var filas = [], mejor = -1, mv = -Infinity;
+    salidas.forEach(function (k) {
+      var c = isiguienteCruce(libre, esc.pac, k), t = {}, v = 0, i;
+      for (i = 0; i < ICAPAS.length; i++) {
+        t[ICAPAS[i].id] = ICAPAS[i].signo * w[ICAPAS[i].id] * cs[ICAPAS[i].id][c.nodo];
+        v += t[ICAPAS[i].id];
+      }
+      filas.push({ paso: k, cruce: c.nodo, pasos: c.pasos, celdas: c.celdas, t: t, valor: v });
+      if (v > mv) { mv = v; mejor = k; }
+    });
+    return { paso: mejor, valor: mv, filas: filas };
+  }
+
+  // 3 · las reglas con prioridad: la primera que se cumple manda, y lo que se
+  // toca para afinarlas no son pesos, es el orden y los umbrales.
+  function idecideReglas(esc, par) {
+    var libre = esc.libre, dpac = ibfs(libre, esc.pac).d, i, cazan = [], presa = [];
+    for (i = 0; i < esc.fantasmas.length; i++) {
+      (esc.fantasmas[i].comestible ? presa : cazan).push(esc.fantasmas[i]);
+    }
+    var cerca = cazan.map(function (f) { return dpac[f.c]; })
+                     .filter(function (v) { return v >= 0; }).sort(function (a, b) { return a - b; });
+    var dpresa = presa.map(function (f) { return dpac[f.c] < 0 ? Infinity : dpac[f.c]; });
+    var reglas = {
+      huir: {
+        txt: 'si un fantasma está a ' + par.umbral + ' pasos o menos → al sitio que más me aleje de él',
+        vale: cerca.length > 0 && cerca[0] <= par.umbral,
+        destino: function () {
+          var f = cazan[0], j;
+          for (j = 1; j < cazan.length; j++) if (dpac[cazan[j].c] >= 0 && dpac[cazan[j].c] < dpac[f.c]) f = cazan[j];
+          var df = ibfs(libre, f.c).d, mejor = -1, mv = -Infinity, k, v;
+          for (k = 0; k < ICELDAS; k++) {
+            if (!libre[k] || k === esc.pac || dpac[k] < 0 || dpac[k] > par.horizonte) continue;
+            v = df[k] - dpac[k];
+            if (v > mv) { mv = v; mejor = k; }
+          }
+          return mejor;
+        }
+      },
+      poder: {
+        txt: 'si hay dos o más encima y queda píldora de poder → a por ella',
+        vale: esc.poder.length > 0 && cerca.filter(function (v) { return v <= par.umbral * 1.5; }).length >= 2,
+        destino: function () { return imasCerca(esc.poder, dpac); }
+      },
+      cazar: {
+        txt: 'si hay un fantasma comestible a tiro → a por él',
+        vale: presa.length > 0 && Math.min.apply(null, dpresa) <= par.umbral * 2,
+        destino: function () { return imasCerca(presa.map(function (f) { return f.c; }), dpac); }
+      },
+      comer: {
+        txt: 'si no → a la píldora más cercana',
+        vale: esc.pildoras.length > 0,
+        destino: function () { return imasCerca(esc.pildoras, dpac); }
+      }
+    };
+    var orden = par.orden === 'goloso' ? ['comer', 'cazar', 'poder', 'huir']
+                                       : ['huir', 'poder', 'cazar', 'comer'];
+    var lista = orden.map(function (id) {
+      return { id: id, txt: reglas[id].txt, vale: reglas[id].vale };
+    });
+    var cual = -1;
+    for (i = 0; i < lista.length; i++) if (lista[i].vale) { cual = i; break; }
+    if (cual < 0) return { paso: -1, lista: lista, regla: -1 };
+    var destino = reglas[lista[cual].id].destino();
+    var r = ibfs(libre, esc.pac);
+    var cam = icamino(r.p, esc.pac, destino);
+    return {
+      paso: cam.length > 1 ? cam[1] : -1, destino: destino, camino: cam,
+      lista: lista, regla: cual
+    };
+  }
+
+  function idecide(esc, cs, u, par, w) {
+    if (par.tecnica === 'mapa') return idecideMapa(esc, u, par);
+    if (par.tecnica === 'evaluacion') return idecideEvaluacion(esc, cs, par, w);
+    return idecideReglas(esc, par);
+  }
+
+  // --- un turno ---
+  // No es el juego: es lo justo para ver a dónde lleva la decisión repetida.
+  // Los fantasmas persiguen por el camino más corto y pierden un turno de cada
+  // tres, que aquí hace las veces de lo que en el juego de verdad son unos
+  // fantasmas que no siempre aciertan.
+  var ILENTO = 3;
+  var IPODER = 25;        // turnos que dura el efecto de la píldora de poder
+
+  function iturno(esc, par, w) {
+    var cs = icapas(esc, par), u = iutilidad(cs, w), dec = idecide(esc, cs, u, par, w);
+    if (esc.fin) return dec;
+    if (dec.paso >= 0) { esc.ult = esc.pac; esc.pac = dec.paso; }
+    var i = esc.pildoras.indexOf(esc.pac);
+    if (i >= 0) { esc.pildoras.splice(i, 1); esc.comidas++; }
+    i = esc.poder.indexOf(esc.pac);
+    if (i >= 0) {
+      esc.poder.splice(i, 1);
+      esc.reloj = IPODER;
+      esc.fantasmas.forEach(function (f) { f.comestible = true; });
+    }
+    if (!ichoque(esc)) {
+      esc.fantasmas.forEach(function (f) {
+        if (f.comestible ? esc.turnos % 2 === 0 : esc.turnos % ILENTO === 0) return;
+        var d = ibfs(esc.libre, esc.pac).d, vs = ivecinas(esc.libre, f.c);
+        // no darse la vuelta, como en el juego: sólo vale si no hay más remedio
+        var sinVolver = vs.filter(function (v) { return v !== f.ult; });
+        if (sinVolver.length) vs = sinVolver;
+        var mejor = vs[0], mv = f.comestible ? -Infinity : Infinity;
+        vs.forEach(function (v) {
+          if (d[v] < 0) return;
+          if (f.comestible ? d[v] > mv : d[v] < mv) { mv = d[v]; mejor = v; }
+        });
+        f.ult = f.c; f.c = mejor;
+      });
+      if (esc.reloj > 0 && --esc.reloj === 0) esc.fantasmas.forEach(function (f) { f.comestible = false; });
+      ichoque(esc);
+    }
+    esc.turnos++;
+    if (!esc.fin && !esc.pildoras.length && !esc.poder.length) esc.fin = 'limpio';
+    return dec;
+  }
+
+  function ichoque(esc) {
+    var muerto = false;
+    esc.fantasmas.forEach(function (f) {
+      var encima = f.c === esc.pac || (f.c === esc.ult && f.ult === esc.pac);
+      if (!encima) return;
+      if (f.comestible) { f.c = f.casa; f.ult = -1; f.comestible = false; esc.cazados++; }
+      else muerto = true;
+    });
+    if (muerto) esc.fin = 'comida';
+    return muerto;
+  }
+
+  // La escena de ejemplo: dos perseguidores en el pasillo de en medio, uno
+  // comestible arriba a la derecha, dos montones de píldoras en las esquinas
+  // de abajo y las dos de poder en diagonal. Está puesta así para que el mapa
+  // por defecto tenga las tres cosas a la vez: una zona roja que parte el
+  // laberinto en dos y dos zonas buenas a las que no se llega igual de barato.
+  function iescena() {
+    var libre = ilibres();
+    var fant = [[5, 3, false], [10, 3, false], [13, 1, true]].map(function (f) {
+      return { c: iid(f[0], f[1]), casa: iid(f[0], f[1]), comestible: f[2], ult: -1 };
+    });
+    var pi = [[1,7],[2,7],[3,7],[1,8],[2,8],[3,8],[1,5],[2,5],
+              [11,5],[12,5],[13,5],[14,5],[11,4],[12,7],[13,7],[6,1],[9,1]];
+    return {
+      libre: libre, pac: iid(7, 8), ult: -1, fantasmas: fant,
+      pildoras: pi.map(function (p) { return iid(p[0], p[1]); }),
+      poder: [iid(1, 1), iid(14, 8)],
+      turnos: 0, comidas: 0, cazados: 0, reloj: 0, fin: ''
+    };
+  }
+
+  function icopia(e) {
+    return {
+      libre: e.libre.slice(), pac: e.pac, ult: e.ult,
+      fantasmas: e.fantasmas.map(function (f) {
+        return { c: f.c, casa: f.casa, comestible: f.comestible, ult: f.ult };
+      }),
+      pildoras: e.pildoras.slice(), poder: e.poder.slice(),
+      turnos: e.turnos, comidas: e.comidas, cazados: e.cazados, reloj: e.reloj, fin: e.fin
+    };
+  }
+
+  // Cuatro juegos de pesos con nombre. No son un adorno: es la forma más
+  // rápida de ver que la misma técnica, con otros pesos, juega a otra cosa.
+  var IPESOS = [
+    ['Equilibrada', { comida: 1,   amenaza: 2,   presa: 1.5, poder: 1,   salidas: 0.5 }],
+    ['Glotona',     { comida: 3,   amenaza: 0.5, presa: 1,   poder: 0,   salidas: 0   }],
+    ['Miedosa',     { comida: 0.5, amenaza: 3,   presa: 0,   poder: 1.5, salidas: 1   }],
+    ['Cazadora',    { comida: 1,   amenaza: 1,   presa: 3,   poder: 2.5, salidas: 0   }]
+  ];
+
+  var IHERR = [
+    ['pac', 'Ms. Pac-Man'], ['fantasma', 'Fantasma'], ['comestible', 'Comestible'],
+    ['pildora', 'Píldora'], ['poder', 'Píldora de poder'], ['muro', 'Muro'], ['borrar', 'Borrar']
+  ];
+
+  // Cinco tramos y no un degradado continuo: un mapa se depura leyéndolo, y
+  // para leerlo hacen falta escalones. Es la misma razón por la que un mapa
+  // de alturas lleva curvas de nivel.
+  var IBANDA = [0.2, 0.4, 0.6, 0.8, 1];
+  var IOPAC = [0.14, 0.3, 0.46, 0.62, 0.8];
+
+  // La retícula, para poder contar pasos con el dedo. Es fija, así que se
+  // arma una sola vez.
+  var IRED = (function () {
+    var d = '', i;
+    for (i = 1; i < IW; i++) d += 'M' + i * IC + ' 0V' + H;
+    for (i = 1; i < IH; i++) d += 'M0 ' + i * IC + 'H' + W;
+    return d;
+  })();
+  function iredPath() { return IRED; }
+
+  // Las figuras se dibujan por centro y radio, y no por casilla, porque la
+  // leyenda tiene que enseñar exactamente las mismas.
+  function ipathFantasma(x, y, r) {
+    var m = r * 0.5;
+    return 'M' + (x - r) + ' ' + (y + r * 0.95) + 'v' + (-r * 0.95) +
+           'a' + r + ' ' + r + ' 0 0 1 ' + (2 * r) + ' 0v' + (r * 0.95) +
+           'l' + (-m) + ' ' + (-r * 0.34) + 'l' + (-m) + ' ' + (r * 0.34) +
+           'l' + (-m) + ' ' + (-r * 0.34) + 'z';
+  }
+  function icunaPac(g, x, y, r, giro) {
+    var e = svgEl('g', {
+      transform: 'translate(' + x + ' ' + y + ') rotate(' + giro + ') scale(' + (r / 13) + ')'
+    });
+    e.appendChild(svgEl('path', { d: 'M0 0 L11.26 -6.5 A13 13 0 1 0 11.26 6.5 Z', class: 'dm-a' }));
+    g.appendChild(e);
+    return e;
+  }
+  // El sitio que ha elegido la decisión. Va en verde y no en la diana roja del
+  // resto de los ejemplos: en este el rojo ya significa «aquí te comen», y
+  // marcar de rojo el mejor sitio del mapa diría justo lo contrario.
+  function imarcaMeta(g, p) {
+    g.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 6.5, class: 'dm-inf-meta' }));
+    g.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 2.4, class: 'dm-inf-meta2' }));
+  }
+
+  function ibandas(g, val, max, libre, cls) {
+    var d = ['', '', '', '', ''], k, v, b;
+    if (!(max > 0)) return;
+    for (k = 0; k < ICELDAS; k++) {
+      if (!libre[k]) continue;
+      v = Math.abs(val[k]) / max;
+      if (v < 0.1) continue;
+      b = 0;
+      while (b < 4 && v > IBANDA[b]) b++;
+      d[b] += 'M' + icx(k) * IC + ' ' + icy(k) * IC + 'h' + IC + 'v' + IC + 'h-' + IC + 'z';
+    }
+    for (b = 0; b < 5; b++) {
+      if (d[b]) g.appendChild(svgEl('path', { class: cls, 'fill-opacity': IOPAC[b], d: d[b] }));
+    }
+  }
+
+  function icifra(v) {
+    return (Math.round(v * 100) / 100).toFixed(2).replace('.', ',').replace('-', '−');
+  }
+  // la misma cifra sin ceros de relleno, para lo que se lee como una fórmula
+  function icorta(v) {
+    return icifra(v).replace(/,?0+$/, '') || '0';
+  }
+  function imaxAbs(v) {
+    var m = 0, k;
+    for (k = 0; k < v.length; k++) if (Math.abs(v[k]) > m) m = Math.abs(v[k]);
+    return m;
+  }
+  function inombreCelda(k) { return '(' + icx(k) + ',' + icy(k) + ')'; }
+  // Columna de ancho fijo, con sitio de sobra para la cabecera más larga: una
+  // tabla con las columnas justas se lee a saltos y deja de servir para comparar.
+  function col(txt, ancho) {
+    var s = String(txt);
+    while (s.length < ancho) s += ' ';
+    return s;
+  }
+  function idireccion(desde, hasta) {
+    if (hasta < 0) return '—';
+    var dx = icx(hasta) - icx(desde), dy = icy(hasta) - icy(desde);
+    if (dx > 0) return 'derecha';
+    if (dx < 0) return 'izquierda';
+    if (dy > 0) return 'abajo';
+    if (dy < 0) return 'arriba';
+    return '—';
+  }
+
+  function creaInfluencia(nodo) {
+    var esc = iescena(), inicio = icopia(esc);
+    var par = {
+      tecnica: 'mapa', caida: 0.75, horizonte: 8, base: 1, rastro: false,
+      ver: 'total', numeros: false, umbral: 5, orden: 'seguro'
+    };
+    var w = {}, herramienta = 'pac', cs = null, u = null, dec = null, reloj = null, aviso = '';
+    Object.keys(IPESOS[0][1]).forEach(function (k) { w[k] = IPESOS[0][1][k]; });
+
+    /* ---- armazón ---- */
+    var escenario = nodo.querySelector('.demo-stage');
+    escenario.textContent = '';
+    var svg = svgEl('svg', {
+      viewBox: '0 0 ' + W + ' ' + H, class: 'demo-svg',
+      role: 'img', 'aria-label': 'Laberinto de ejemplo con el mapa pintado encima'
+    });
+    escenario.appendChild(svg);
+    svg.addEventListener('pointerdown', enPulsacion);
+
+    var leyenda = el('div', 'demo-leyenda');
+    escenario.parentNode.insertBefore(leyenda, escenario.nextSibling);
+
+    var barras = nodo.querySelector('.demo-controls');
+    barras.textContent = '';
+    var barraTec = el('div', 'demo-bar');
+    var barraColoca = el('div', 'demo-bar');
+    var barraPesos = el('div', 'demo-bar');
+    var barraMapa = el('div', 'demo-bar');
+    var barraReglas = el('div', 'demo-bar');
+    var barraPlay = el('div', 'demo-bar demo-bar-play');
+    [barraTec, barraColoca, barraPesos, barraMapa, barraReglas, barraPlay].forEach(function (b) {
+      barras.appendChild(b);
+    });
+    var lectura = nodo.querySelector('.demo-read');
+    var definicion = el('p', 'demo-def');
+    var traqueo = el('p', 'demo-traza');
+    barras.parentNode.insertBefore(definicion, lectura);
+    barras.parentNode.insertBefore(traqueo, lectura);
+
+    /* ---- técnica ---- */
+    barraTec.appendChild(opciones('Decide con',
+      [['El mapa', 'mapa'], ['Una función de evaluación', 'evaluacion'], ['Reglas con prioridad', 'reglas']],
+      par.tecnica, function (v) {
+        par.tecnica = v;
+        if (v === 'reglas' && par.ver === 'total') { par.ver = 'nada'; grupoVer.pon('nada'); }
+        if (v !== 'reglas' && par.ver === 'nada') { par.ver = 'total'; grupoVer.pon('total'); }
+        cambio();
+      }));
+
+    /* ---- qué se coloca ---- */
+    barraColoca.appendChild(el('span', 'demo-tag', 'Colocas'));
+    var botHerr = {};
+    IHERR.forEach(function (h) {
+      var b = el('button', 'demo-btn demo-btn-mini', h[1]);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', String(h[0] === herramienta));
+      b.onclick = function () { herramienta = h[0]; pintaHerramientas(); };
+      botHerr[h[0]] = b;
+      barraColoca.appendChild(b);
+    });
+    var bVaciar = el('button', 'demo-btn', 'Vaciar');
+    bVaciar.type = 'button';
+    bVaciar.onclick = function () {
+      esc.fantasmas = []; esc.pildoras = []; esc.poder = [];
+      esc.turnos = 0; esc.comidas = 0; esc.cazados = 0; esc.reloj = 0; esc.fin = '';
+      guarda();
+    };
+    barraColoca.appendChild(bVaciar);
+
+    /* ---- los pesos: la función objetivo, a la vista ---- */
+    barraPesos.appendChild(el('span', 'demo-tag', 'Pesos'));
+    var desl = {};
+    ICAPAS.forEach(function (c) {
+      desl[c.id] = deslizador((c.signo < 0 ? '− ' : '+ ') + c.txt, 0, 4, 0.25, w[c.id], function (v) {
+        w[c.id] = v; cambio();
+      });
+      barraPesos.appendChild(desl[c.id].raiz);
+    });
+    var grupoPre = el('span', 'demo-grupo');
+    grupoPre.appendChild(el('span', 'demo-tag', 'A lo'));
+    IPESOS.forEach(function (p) {
+      var b = el('button', 'demo-btn demo-btn-mini', p[0]);
+      b.type = 'button';
+      b.onclick = function () {
+        Object.keys(p[1]).forEach(function (k) { w[k] = p[1][k]; desl[k].pon(p[1][k]); });
+        cambio();
+      };
+      grupoPre.appendChild(b);
+    });
+    barraPesos.appendChild(grupoPre);
+
+    /* ---- cómo se pinta el mapa ---- */
+    barraMapa.appendChild(el('span', 'demo-tag', 'Mapa'));
+    barraMapa.appendChild(deslizador('Caída', 0.4, 0.95, 0.05, par.caida, function (v) {
+      par.caida = v; cambio();
+    }).raiz);
+    var campoHor = deslizador('Horizonte', 3, 16, 1, par.horizonte, function (v) { par.horizonte = v; cambio(); });
+    barraMapa.appendChild(campoHor.raiz);
+    barraMapa.appendChild(interruptor('Por dónde viene', par.rastro, function (v) { par.rastro = v; cambio(); }));
+    var grupoVer = opciones('Ver', [['Todo el mapa', 'total'], ['Comida', 'comida'], ['Amenaza', 'amenaza'],
+                                    ['Presa', 'presa'], ['Poder', 'poder'], ['Salidas', 'salidas'], ['Nada', 'nada']],
+      par.ver, function (v) { par.ver = v; cambio(); });
+    barraMapa.appendChild(grupoVer);
+    barraMapa.appendChild(interruptor('Números', par.numeros, function (v) { par.numeros = v; pinta(); }));
+
+    /* ---- las reglas ---- */
+    barraReglas.appendChild(el('span', 'demo-tag', 'Reglas'));
+    barraReglas.appendChild(opciones('Orden', [['Primero no morir', 'seguro'], ['Primero comer', 'goloso']],
+      par.orden, function (v) { par.orden = v; cambio(); }));
+    barraReglas.appendChild(deslizador('Umbral', 2, 12, 1, par.umbral, function (v) { par.umbral = v; cambio(); }).raiz);
+
+    /* ---- jugar ---- */
+    var bPlay = el('button', 'demo-btn demo-play', '▶  Jugar');
+    bPlay.type = 'button';
+    bPlay.onclick = alternaReproduccion;
+    barraPlay.appendChild(bPlay);
+    var bPaso = el('button', 'demo-btn', '›  Un turno');
+    bPaso.type = 'button';
+    bPaso.onclick = function () { para(); unTurno(); };
+    barraPlay.appendChild(bPaso);
+    var bVolver = el('button', 'demo-btn', '⏮  Al principio');
+    bVolver.type = 'button';
+    bVolver.onclick = function () { para(); esc = icopia(inicio); cambio(); };
+    barraPlay.appendChild(bVolver);
+    var bReset = el('button', 'demo-btn', 'Escena de ejemplo');
+    bReset.type = 'button';
+    bReset.onclick = function () { para(); esc = iescena(); guarda(); };
+    barraPlay.appendChild(bReset);
+
+    /* ---- edición ---- */
+    function enPulsacion(ev) {
+      var p = enMundo(svg, ev);
+      if (!p) return;
+      ev.preventDefault();
+      para();
+      var x = Math.floor(p.x / IC), y = Math.floor(p.y / IC);
+      if (x < 0 || y < 0 || x >= IW || y >= IH) return;
+      aplica(iid(x, y));
+    }
+
+    function quita(k) {
+      var i = esc.pildoras.indexOf(k);
+      if (i >= 0) esc.pildoras.splice(i, 1);
+      i = esc.poder.indexOf(k);
+      if (i >= 0) esc.poder.splice(i, 1);
+      esc.fantasmas = esc.fantasmas.filter(function (f) { return f.c !== k; });
+    }
+
+    function aplica(k) {
+      var i;
+      aviso = '';
+      if (herramienta === 'muro') {
+        if (k === esc.pac) { aviso = 'ahí está ella'; pinta(); return; }
+        quita(k);
+        esc.libre[k] = false;
+      } else if (herramienta === 'borrar') {
+        if (!esc.libre[k]) esc.libre[k] = true; else quita(k);
+      } else {
+        if (!esc.libre[k]) esc.libre[k] = true;
+        if (herramienta === 'pac') { quita(k); esc.pac = k; esc.ult = -1; }
+        else if (herramienta === 'fantasma' || herramienta === 'comestible') {
+          for (i = 0; i < esc.fantasmas.length; i++) {
+            if (esc.fantasmas[i].c === k) { esc.fantasmas[i].comestible = herramienta === 'comestible'; guarda(); return; }
+          }
+          if (k === esc.pac) { aviso = 'ahí está ella'; pinta(); return; }
+          esc.fantasmas.push({ c: k, casa: k, comestible: herramienta === 'comestible', ult: -1 });
+        } else if (herramienta === 'pildora') {
+          if (k === esc.pac || esc.poder.indexOf(k) >= 0) quita(k);
+          if (esc.pildoras.indexOf(k) < 0 && k !== esc.pac) esc.pildoras.push(k);
+        } else if (herramienta === 'poder') {
+          if (k === esc.pac) { aviso = 'ahí está ella'; pinta(); return; }
+          quita(k);
+          if (esc.poder.indexOf(k) < 0) esc.poder.push(k);
+        }
+      }
+      guarda();
+    }
+
+    // Tocar la escena la convierte en la nueva escena de partida: lo que se
+    // edita es la situación, no la partida que estuviera en marcha.
+    function guarda() {
+      esc.turnos = 0; esc.comidas = 0; esc.cazados = 0; esc.reloj = 0; esc.fin = '';
+      esc.fantasmas.forEach(function (f) { f.casa = f.c; f.ult = -1; });
+      inicio = icopia(esc);
+      cambio();
+    }
+
+    /* ---- turnos ---- */
+    function para() {
+      if (reloj) { clearInterval(reloj); reloj = null; }
+      bPlay.textContent = '▶  Jugar';
+      bPlay.setAttribute('aria-pressed', 'false');
+    }
+    function alternaReproduccion() {
+      if (reloj) { para(); return; }
+      if (esc.fin) { esc = icopia(inicio); cambio(); }
+      bPlay.textContent = '⏸  Parar';
+      bPlay.setAttribute('aria-pressed', 'true');
+      reloj = setInterval(function () {
+        unTurno();
+        if (esc.fin) para();
+      }, 280);
+    }
+    function unTurno() {
+      if (esc.fin) return;
+      iturno(esc, par, w);
+      cambio();
+    }
+
+    /* ---- recalcular y repintar ---- */
+    function cambio() {
+      cs = icapas(esc, par);
+      u = iutilidad(cs, w);
+      dec = idecide(esc, cs, u, par, w);
+      barraPesos.hidden = par.tecnica === 'reglas';
+      barraReglas.hidden = par.tecnica !== 'reglas';
+      campoHor.raiz.hidden = par.tecnica === 'evaluacion';
+      pintaHerramientas();
+      pinta();
+      pintaLeyenda();
+      definicion.textContent = textoDefinicion();
+      traqueo.textContent = textoTraza();
+      lectura.textContent = textoLectura();
+    }
+
+    function pintaHerramientas() {
+      IHERR.forEach(function (h) {
+        botHerr[h[0]].setAttribute('aria-pressed', String(h[0] === herramienta));
+      });
+    }
+
+    /* ---- dibujo ---- */
+    function caminoPts(celdas) { return celdas.map(icentro); }
+
+    // La ruta, con un halo del color del papel debajo: a oscuras --pill-ink y
+    // --pill son casi el mismo amarillo, y sin el halo la línea desaparece justo
+    // encima de las casillas buenas, que son las que hay que mirar.
+    function trazaRuta(d) {
+      svg.appendChild(svgEl('path', { class: 'dm-inf-halo', d: d }));
+      svg.appendChild(svgEl('path', { class: 'dm-ruta', d: d }));
+    }
+
+    function pathMuros() {
+      var d = '', k;
+      for (k = 0; k < ICELDAS; k++) {
+        if (esc.libre[k]) continue;
+        d += 'M' + icx(k) * IC + ' ' + icy(k) * IC + 'h' + IC + 'v' + IC + 'h-' + IC + 'z';
+      }
+      return d;
+    }
+
+    // Con los números puestos las figuras suben un poco: la cifra va al pie de
+    // la casilla y si no se pisan.
+    function icentroFig(k) {
+      var c = icentro(k);
+      return par.numeros ? pt(c.x, c.y - 2.6) : c;
+    }
+
+    function pathFantasma(k) {
+      var c = icentroFig(k);
+      return ipathFantasma(c.x, c.y, 6.2);
+    }
+
+    // Mira a donde va, no a donde estuvo: la cuña sin girar abre la boca a la
+    // derecha. Si todavía no hay decisión, hacia donde venía.
+    function dibujaPac(g, k) {
+      var c = icentroFig(k), a = 0, hacia = dec && dec.paso >= 0 ? dec.paso : -1, dx, dy;
+      if (hacia < 0 && esc.ult >= 0 && esc.ult !== k) hacia = 2 * k - esc.ult;
+      if (hacia >= 0) {
+        dx = icx(hacia) - icx(k); dy = icy(hacia) - icy(k);
+        if (dx < 0) a = 180;
+        else if (dy < 0) a = -90;
+        else if (dy > 0) a = 90;
+      }
+      icunaPac(g, c.x, c.y, 6.8, a);
+    }
+
+    function valorPintado() {
+      if (par.ver === 'nada') return null;
+      if (par.ver === 'total') return { val: u, max: imaxAbs(u), signo: 0 };
+      var i;
+      for (i = 0; i < ICAPAS.length; i++) {
+        if (ICAPAS[i].id === par.ver) return { val: cs[par.ver], max: 1, signo: ICAPAS[i].signo };
+      }
+      return null;
+    }
+
+    function pinta() {
+      var k, g, p, v = valorPintado();
+      svg.textContent = '';
+      svg.appendChild(svgEl('rect', { x: 0, y: 0, width: W, height: H, class: 'dm-inf-suelo' }));
+
+      if (v && v.max > 0) {
+        if (v.signo > 0) ibandas(svg, v.val, v.max, esc.libre, 'dm-inf-bien');
+        else if (v.signo < 0) ibandas(svg, v.val, v.max, esc.libre, 'dm-inf-mal');
+        else {
+          ibandas(svg, v.val.map(function (x) { return x > 0 ? x : 0; }), v.max, esc.libre, 'dm-inf-bien');
+          ibandas(svg, v.val.map(function (x) { return x < 0 ? -x : 0; }), v.max, esc.libre, 'dm-inf-mal');
+        }
+      }
+      svg.appendChild(svgEl('path', { class: 'dm-inf-red', d: iredPath() }));
+      svg.appendChild(svgEl('path', { class: 'dm-inf-muro', d: pathMuros() }));
+
+      if (par.numeros && v) {
+        g = svgEl('g', { class: 'dm-inf-num' });
+        for (k = 0; k < ICELDAS; k++) {
+          if (!esc.libre[k]) continue;
+          g.appendChild(svgEl('text', {
+            x: icx(k) * IC + IC / 2, y: icy(k) * IC + IC - 1.6
+          })).textContent = Math.abs(v.val[k]) < 0.005 ? '·'
+            : icifra(v.val[k]).replace(/^(−?)0,/, '$1,');
+        }
+        svg.appendChild(g);
+      }
+
+      // el camino que sale de la decisión, por debajo de las figuras
+      if (par.tecnica === 'evaluacion' && dec.filas) {
+        dec.filas.forEach(function (f) {
+          var d = ruta(caminoPts([esc.pac].concat(f.celdas)));
+          if (f.paso === dec.paso) trazaRuta(d);
+          else svg.appendChild(svgEl('path', { class: 'dm-inf-opcion', d: d }));
+        });
+      } else if (dec.camino && dec.camino.length > 1) {
+        trazaRuta(ruta(caminoPts(dec.camino)));
+      }
+      if (dec.destino != null && dec.destino >= 0) imarcaMeta(svg, icentro(dec.destino));
+
+      esc.pildoras.forEach(function (k2) {
+        p = icentroFig(k2);
+        svg.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 1.8, class: 'dm-inf-pi' }));
+      });
+      esc.poder.forEach(function (k2) {
+        p = icentroFig(k2);
+        svg.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 4, class: 'dm-inf-po' }));
+      });
+      esc.fantasmas.forEach(function (f) {
+        svg.appendChild(svgEl('path', { class: f.comestible ? 'dm-inf-gc' : 'dm-inf-gh', d: pathFantasma(f.c) }));
+      });
+      if (esc.libre[esc.pac]) dibujaPac(svg, esc.pac);
+
+      // las puntuaciones de cada salida, encima de todo
+      if (par.tecnica === 'evaluacion' && dec.filas) {
+        dec.filas.forEach(function (f) {
+          var c = icentro(f.cruce), t = icifra(f.valor);
+          svg.appendChild(svgEl('rect', {
+            x: c.x - 11, y: c.y - 5.5, width: 22, height: 11, rx: 2, class: 'dm-plato'
+          }));
+          svg.appendChild(svgEl('text', {
+            x: c.x, y: c.y + 3.2,
+            class: 'dm-etq' + (f.paso === dec.paso ? ' dm-inf-gana' : '')
+          })).textContent = t;
+        });
+      }
+    }
+
+    /* ---- la leyenda ----
+       Sin esto el color no se puede leer: el rojo sale dos veces —el fantasma
+       que persigue y la casilla que no conviene— y el amarillo cuatro, así que
+       hay que decir cuál es cuál y, sobre todo, hacia qué lado crece. */
+    function trozo(dibuja) {
+      var sv = svgEl('svg', {
+        viewBox: '0 0 16 16', width: '16', height: '16',
+        class: 'lg-fig', 'aria-hidden': 'true'
+      });
+      dibuja(sv);
+      return sv;
+    }
+    function itemLey(sv, txt) {
+      var e = el('span', 'lg');
+      if (sv) e.appendChild(sv);
+      e.appendChild(el('span', null, txt));
+      return e;
+    }
+    function tramosLey(cls, alReves) {
+      var e = el('span', 'lg-tramos'), i, b;
+      for (i = 0; i < IOPAC.length; i++) {
+        b = el('i');
+        b.className = cls;
+        b.style.opacity = IOPAC[alReves ? IOPAC.length - 1 - i : i];
+        e.appendChild(b);
+      }
+      return e;
+    }
+    function escalaLey() {
+      var e = el('span', 'lg lg-escala'), v = valorPintado(), tope;
+      if (!v) {
+        e.appendChild(el('span', 'lg-tag', 'el mapa está apagado'));
+        return e;
+      }
+      if (par.ver === 'total') {
+        tope = v.max || 1;
+        e.appendChild(el('b', null, 'U(c)'));
+        e.appendChild(el('span', 'lg-tag', 'peor'));
+        e.appendChild(el('b', null, '−' + icifra(tope)));
+        e.appendChild(tramosLey('mal', true));
+        e.appendChild(el('b', null, '0'));
+        e.appendChild(tramosLey('bien', false));
+        e.appendChild(el('b', null, '+' + icifra(tope)));
+        e.appendChild(el('span', 'lg-tag', 'mejor'));
+        return e;
+      }
+      e.appendChild(el('b', null, 'capa ' + par.ver));
+      e.appendChild(el('span', 'lg-tag', 'lejos'));
+      e.appendChild(el('b', null, '0'));
+      e.appendChild(tramosLey(v.signo < 0 ? 'mal' : 'bien', false));
+      e.appendChild(el('b', null, '1'));
+      e.appendChild(el('span', 'lg-tag', 'en la fuente'));
+      return e;
+    }
+
+    function pintaLeyenda() {
+      leyenda.textContent = '';
+      leyenda.appendChild(escalaLey());
+      var fig = el('span', 'lg-figs');
+      fig.appendChild(itemLey(trozo(function (sv) { icunaPac(sv, 8, 8, 6.5, 0); }), 'Ms. Pac-Man'));
+      fig.appendChild(itemLey(trozo(function (sv) {
+        sv.appendChild(svgEl('path', { class: 'dm-inf-gh', d: ipathFantasma(8, 8.5, 6) }));
+      }), 'persigue'));
+      fig.appendChild(itemLey(trozo(function (sv) {
+        sv.appendChild(svgEl('path', { class: 'dm-inf-gc', d: ipathFantasma(8, 8.5, 6) }));
+      }), 'comestible'));
+      fig.appendChild(itemLey(trozo(function (sv) {
+        sv.appendChild(svgEl('circle', { cx: 8, cy: 8, r: 2, class: 'dm-inf-pi' }));
+      }), 'píldora'));
+      fig.appendChild(itemLey(trozo(function (sv) {
+        sv.appendChild(svgEl('circle', { cx: 8, cy: 8, r: 4.2, class: 'dm-inf-po' }));
+      }), 'de poder'));
+      fig.appendChild(itemLey(trozo(function (sv) {
+        sv.appendChild(svgEl('path', { class: 'dm-ruta', d: 'M1 8 H15' }));
+      }), par.tecnica === 'evaluacion' ? 'la salida que gana' : 'por dónde va'));
+      if (par.tecnica === 'evaluacion') {
+        fig.appendChild(itemLey(trozo(function (sv) {
+          sv.appendChild(svgEl('path', { class: 'dm-inf-opcion', d: 'M1 8 H15' }));
+        }), 'las descartadas'));
+      } else {
+        fig.appendChild(itemLey(trozo(function (sv) { imarcaMeta(sv, pt(8, 8)); }), 'a dónde va'));
+      }
+      leyenda.appendChild(fig);
+    }
+
+    /* ---- lo que se lee debajo ---- */
+    // Una línea por paso de la cuenta. Todo seguido no hay quien lo siga, y lo
+    // que hace falta es poder comprobar de dónde sale cada número.
+    function textoDefinicion() {
+      var l = [
+        'influencia de una fuente en la casilla c = caída ^ pasos(c, fuente)',
+        '    caída = ' + icorta(par.caida) + ', y los pasos se cuentan por el pasillo, no en línea recta',
+        '    cada capa se divide por su máximo, para que los pesos se puedan comparar entre sí'
+      ];
+      if (par.tecnica === 'reglas') {
+        l.push('la primera regla que se cumple manda, y las demás no llegan a mirarse');
+        l.push('    umbral = ' + par.umbral + ' pasos');
+        l.push('    aquí los pesos no pintan nada: lo que se toca es el orden y el umbral');
+        return l.join('\n');
+      }
+      l.push('U(c) = ' + ICAPAS.map(function (c) {
+        return (c.signo < 0 ? '− ' : '+ ') + icorta(w[c.id]) + ' × ' + c.txt + '(c)';
+      }).join('\n       ').replace(/^\+ /, '  '));
+      if (par.tecnica === 'evaluacion') {
+        l.push('valor de una salida = U del cruce al que lleva');
+        l.push('    gana la mayor');
+      } else {
+        l.push('coste de entrar en c = máx(0,2 ; 1 − U(c))');
+        l.push('    destino = la mejor U a ' + par.horizonte + ' pasos o menos');
+        l.push('    camino = el más barato hasta ella, con esos costes');
+      }
+      return l.join('\n');
+    }
+
+    function textoTraza() {
+      var i, s;
+      if (par.tecnica === 'reglas') {
+        if (!dec.lista) return 'no hay reglas que probar';
+        return dec.lista.map(function (r, j) {
+          return (j === dec.regla ? '▸ ' : '  ') + (j + 1) + '. ' + r.txt +
+                 (r.vale ? '   [se cumple]' : '');
+        }).join('\n');
+      }
+      if (par.tecnica === 'evaluacion') {
+        if (!dec.filas || !dec.filas.length) return 'no hay salidas';
+        s = col('por dónde', 12) + col('cruce', 9) + col('pasos', 7) +
+            ICAPAS.map(function (c) { return col(c.txt, 10); }).join('') + 'total';
+        dec.filas.forEach(function (f) {
+          s += '\n' + col(idireccion(esc.pac, f.paso), 12) +
+               col(inombreCelda(f.cruce), 9) + col(String(f.pasos), 7) +
+               ICAPAS.map(function (c) { return col(icifra(f.t[c.id]), 10); }).join('') +
+               icifra(f.valor) + (f.paso === dec.paso ? '   ←' : '');
+        });
+        return s;
+      }
+      if (dec.destino < 0) return 'no hay ninguna casilla mejor al alcance de la vista';
+      return 'mejor casilla a ' + par.horizonte + ' pasos o menos: ' + inombreCelda(dec.destino) +
+             ', con U = ' + icifra(dec.valor) +
+             '\ncamino más barato hasta ella: ' + (dec.camino.length - 1) + ' casillas, coste ' +
+             icifra(dec.coste) + '   ·   primer paso: ' + idireccion(esc.pac, dec.paso);
+    }
+
+    function textoLectura() {
+      var t = par.tecnica === 'mapa' ? 'el mapa'
+            : par.tecnica === 'evaluacion' ? 'la función de evaluación' : 'las reglas';
+      t = 'decide ' + t + ' · turno ' + esc.turnos +
+          ' · comidas ' + esc.comidas + ' de ' + (esc.comidas + esc.pildoras.length) +
+          ' · ' + esc.cazados + ' fantasmas cazados';
+      if (esc.reloj > 0) t += ' · queda' + (esc.reloj === 1 ? '' : 'n') + ' ' + esc.reloj +
+                                 ' turno' + (esc.reloj === 1 ? '' : 's') + ' de poder';
+      if (aviso) return t + ' — ' + aviso;
+      if (esc.fin === 'comida') return t + ' — la han comido';
+      if (esc.fin === 'limpio') return t + ' — nivel limpio';
+      return t + ' · va ' + idireccion(esc.pac, dec.paso);
+    }
+
+    cambio();
+  }
+
   function crea(nodo) {
     var tipo = nodo.getAttribute('data-demo');
     var esTodo = tipo === 'todo';
@@ -1180,6 +2176,12 @@
       traqueo.hidden = true;
       barras.parentNode.insertBefore(traqueo, lectura);
     }
+
+    // Qué está calculando el ejemplo, escrito donde se ve. En cualquier cosa
+    // con A* hay que decir cuál es la h: sin eso no se puede comprobar nada de
+    // lo que sale en pantalla.
+    var definicion = el('p', 'demo-def');
+    barras.parentNode.insertBefore(definicion, traqueo || lectura);
 
     function boton(txt, titulo, alPulsar) {
       var b = el('button', 'demo-btn', txt);
@@ -1725,6 +2727,7 @@
       lectura.textContent = textoLectura(false);
       pintaHerramientas();
       ajustaPasos();
+      definicion.textContent = textoDefinicion();
     }
 
     // El estado de la búsqueda en el paso que se esté mirando. El paso -1 es
@@ -2034,6 +3037,43 @@
     }
 
     /* ---- lectura ---- */
+    function textoDefinicion() {
+      var sep = '\n';
+      if (esAstar) {
+        return 'coste(a, b) = ⌈ dist(a, b) / 10 ⌉ × terreno   (terreno 1 = normal)' + sep +
+               'h(n) = ⌊ ' + par.peso + ' × dist(n, destino) / 10 ⌋' +
+               (par.peso === 0 ? '   →   h = 0, o sea coste uniforme'
+                : par.peso <= 1 ? '   →   admisible: nunca se pasa'
+                                : '   →   inflada: ya puede pasarse') + sep +
+               '⌈ ⌉ redondea hacia arriba y ⌊ ⌋ hacia abajo: por eso, con el peso a 1, la h nunca se pasa';
+      }
+      if (esDijkstra) {
+        return 'coste(a, b) = el número que lleva cada arista' + sep +
+               'h(n) = 0   ·   el coste uniforme es A* sin heurística';
+      }
+      if (esGrafo) {
+        return 'todas las aristas cuentan igual · sin costes y sin heurística' + sep +
+               'lo único que cambia entre los dos métodos es de qué punta sale el siguiente nodo';
+      }
+      if (esTodo) {
+        var l1 = 'coste(a, b) = dist(a, b), la distancia entre los dos nodos';
+        var l2 = par.algoritmo === 'astar' ? 'h(n) = dist(n, destino), en línea recta   ·   admisible en las tres particiones'
+               : par.algoritmo === 'coste' ? 'h(n) = 0'
+               : 'anchura y profundidad no miran el coste: cuentan aristas';
+        return l1 + sep + l2;
+      }
+      if (tipo === 'waypoints') {
+        return 'aristas por visibilidad, con coste = distancia entre los dos puntos' + sep +
+               'la ruta sale de un Dijkstra sobre ese grafo';
+      }
+      if (tipo === 'rejilla') {
+        return 'vecinas libres, todas al mismo precio' + sep +
+               'la ruta sale de una anchura: cuenta casillas, no distancias';
+      }
+      return 'sectores vecinos, con coste = distancia entre sus centros' + sep +
+             'la ruta sale de un Dijkstra sobre los sectores, y después se tensa con el embudo';
+    }
+
     function plural(n, uno, varios) { return n + ' ' + (n === 1 ? uno : varios); }
 
     function textoLectura(paraLector) {
@@ -2146,6 +3186,13 @@
       };
       raiz.appendChild(b);
     });
+    // para cambiar la opción marcada sin pulsarla, cuando la cambia otro control
+    raiz.pon = function (v) {
+      val = v;
+      Array.prototype.forEach.call(raiz.querySelectorAll('button'), function (o, i) {
+        o.setAttribute('aria-pressed', String(pares[i][1] === v));
+      });
+    };
     return raiz;
   }
 
@@ -2157,7 +3204,7 @@
 
   var nodos = document.querySelectorAll('[data-demo]');
   Array.prototype.forEach.call(nodos, function (n) {
-    try { crea(n); } catch (e) {
+    try { (n.getAttribute('data-demo') === 'influencia' ? creaInfluencia : crea)(n); } catch (e) {
       if (window.console) console.error('demo', n.getAttribute('data-demo'), e);
     }
   });
