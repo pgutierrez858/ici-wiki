@@ -203,7 +203,7 @@
               <tr><td><code>getStandardError()</code></td><td>Lo mismo pero un piso más arriba: cuánto se separarían unas <strong>medias</strong> de otras si repitierais el experimento entero. Sale de dividir la anterior por la raíz de las partidas jugadas, y es <strong>el número que decide si una mejora es real</strong>. Explicado justo debajo.</td></tr>
               <tr><td><code>getN()</code></td><td>Partidas que han contado de verdad. Si salen menos de las que pedisteis, ha habido excepciones.</td></tr>
               <tr><td><code>getMin()</code> · <code>getMax()</code></td><td>La peor y la mejor de todas las partidas. La peor dice más: si es 0, hay partidas en las que Ms.&nbsp;Pac-Man muere sin comerse una sola píldora.</td></tr>
-              <tr><td><code>getMsTaken()</code></td><td>Lo que ha tardado el experimento entero, en milisegundos. Dividido entre las partidas da lo que cuesta una, que es lo que hay que saber antes de planificar: a 300&#8239;ms por partida, las 3&#8239;900 de un controlador en el concurso son veinte minutos, y la tabla completa, horas.</td></tr>
+              <tr><td><code>getMsTaken()</code></td><td>Lo que ha tardado el experimento entero, en milisegundos. Dividido entre las partidas da lo que cuesta una, que es lo que hay que saber antes de planificar: no lo estiméis a ojo, porque depende muchísimo de lo que haga vuestro controlador y de cuánto sobreviva. Como referencia, el concurso de la Práctica&nbsp;0 jugó 44&#8239;100 partidas en menos de un minuto repartidas entre todos los núcleos, con controladores que se mueren pronto.</td></tr>
             </tbody>
           </table>
         </div>
@@ -402,8 +402,9 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
             <p>
               Con la desviación típica de 2&#8239;100 y los 130 puntos del ejemplo:
               (3&nbsp;×&nbsp;2100&nbsp;/&nbsp;130)<sup>2</sup> = 48,5<sup>2</sup> ≈ <strong>2&#8239;350
-              partidas por versión</strong>. Casi media hora de máquina, a 300&nbsp;ms por partida, sólo para
-              confirmar una mejora del 3&#8239;%.
+              partidas por versión</strong>, o sea casi cinco mil en total, sólo para confirmar una mejora
+              del 3&#8239;%. Cuánto tiempo de máquina son esas 5&#8239;000 partidas os lo dice
+              <code>getMsTaken()</code>, y cambia mucho de un controlador a otro.
             </p>
             <p>
               Conviene tener esta tabla a mano antes de ponerse a medir: dice, para cada número de
@@ -1008,9 +1009,9 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
         <div class="note mine">
           <span class="note-label">Y el calendario de todo esto</span>
           <p>
-            Medir cuesta tiempo de reloj: un experimento de 100 partidas contra cinco rivales son unos
-            minutos, y el concurso completo, horas. Eso significa que <strong>la víspera de la entrega no da
-            tiempo</strong> a hacer esto bien. Reservad la última tarde para limpiar y comprobar la lista de
+            Medir cuesta tiempo de reloj, y sobre todo cuesta <em>repetir</em>: cada vez que cambiáis algo
+            hay que volver a lanzar las dos versiones, y ninguna medida vale hasta que termina. Eso significa
+            que <strong>la víspera de la entrega no da tiempo</strong> a hacer esto bien. Reservad la última tarde para limpiar y comprobar la lista de
             la entrega, no para descubrir que el controlador falla una partida de cada treinta.
           </p>
         </div>
