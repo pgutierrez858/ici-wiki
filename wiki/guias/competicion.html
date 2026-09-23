@@ -823,16 +823,6 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
           <strong>metedle la versión del controlador y los umbrales que estáis probando</strong>: dentro de
           dos semanas es lo único que os va a permitir saber qué era cada fila.
         </p>
-        <p>
-          Y ese fichero no es sólo para mirarlo: <code>Stats</code> también sabe leer de vuelta sus propias
-          líneas. <code>fileRepresentation(";")</code> escribe
-          <code>ms;descripción;max;min;n;sumaDeCuadrados;suma</code>, y el constructor
-          <code>new Stats(linea, ";")</code> hace el camino contrario y os devuelve un <code>Stats</code>
-          igual que el original, con su media, su desviación típica y su error típico. Con eso podéis
-          comparar la medida de hoy contra la de la semana pasada <strong>sin volver a jugar las
-          partidas</strong>, y juntar dos tandas en una sola con <code>add</code>, que suma las
-          observaciones de las dos como si se hubieran jugado seguidas.
-        </p>
         <h3 class="label">Una traza por turno, sin llenar la consola</h3>
         <p>
           El <code>Executor</code> tiene un gancho para esto que casi nadie usa: <code>setPeek</code> recibe
