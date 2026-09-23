@@ -229,7 +229,8 @@
               vuestro controlador: jugar más partidas no la baja.
             </p>
             <p>
-              La segunda: <strong>lo que vais a comparar no es una partida, es una media de cien</strong>. Y
+              La segunda: <strong>lo que vais a comparar es una media de cien partidas, no una
+              partida</strong>. Y
               las medias, como cualquier otra cosa que se mide, también se separan unas de otras: si
               lanzarais el experimento entero muchas veces, cada tanda de 100 partidas os daría una media
               distinta. Se separan mucho menos que las partidas sueltas —para eso se promedia—, pero se
@@ -320,10 +321,9 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
               partidas y os sale <strong>3&#8239;980</strong>. Habéis ganado 130 puntos. ¿Os lo quedáis?
             </p>
             <p>
-              La tentación es comparar los 130 puntos con el margen de una de las dos medidas, pero eso no es
-              lo que hay que hacer, porque <strong>lo que os interesa ya no es una media: es la diferencia
-              entre dos</strong>. Y la diferencia tiene su propio margen, porque las dos medias aportan el
-              suyo.
+              La tentación es comparar los 130 puntos con el margen de una de las dos medidas. Pero el
+              margen que hay que mirar es <strong>el de la diferencia</strong>, que tiene el suyo propio:
+              las dos medias le meten cada una la suya.
             </p>
             <p>
               Lo que <em>no</em> se hace es sumar los dos márgenes. Eso sería contar con que las dos medidas
@@ -799,8 +799,8 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
           <h2 class="sec">Guardar métricas y logs</h2>
         </div>
         <p>
-          En cuanto probéis más de dos variantes vais a necesitar apuntar los resultados, porque la memoria
-          humana es muy mala comparando medias de cuatro cifras. El motor trae lo justo para no montar nada:
+          A la cuarta variante ya no vais a saber si el 2&#8239;750 era la de antes o la de ahora, así que
+          conviene apuntarlas desde la primera. El motor trae lo justo para no montar nada:
           <code>Stats</code> sabe convertirse en una línea de texto y volver de ella.
         </p>
         <div class="codigo"><pre><code><span class="c">// Una línea por cada variante que probéis, en un CSV que se abre con cualquier hoja de cálculo</span>
