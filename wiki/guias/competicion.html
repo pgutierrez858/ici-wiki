@@ -826,9 +826,8 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
         <h3 class="label">Una traza por turno, sin llenar la consola</h3>
         <p>
           El <code>Executor</code> tiene un gancho para esto que casi nadie usa: <code>setPeek</code> recibe
-          una función que se llama en <strong>cada turno</strong> con el <code>Game</code>, y lo que
-          devuelva se manda al log. Sirve para sacar una serie temporal de lo que os interese sin ensuciar
-          el controlador:
+          una función que se llama en <strong>cada turno</strong> con el <code>Game</code>. Sirve para sacar
+          una serie temporal de lo que os interese sin ensuciar el controlador:
         </p>
         <div class="codigo"><pre><code>Executor executor = <span class="k">new</span> Executor.Builder()
         .setTickLimit(<span class="n">4000</span>)
@@ -838,6 +837,25 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
                  game.getNumberOfActivePills(),
                  game.getPacmanNumberOfLivesRemaining()))
         .build();</code></pre></div>
+        <p>
+          ¿Y dónde acaba lo que devuelve esa función? En el <em>log</em> del motor, que no es ningún fichero:
+          el simulador usa SLF4J con la implementación <code>slf4j-simple</code>, y ésa, mientras no se le
+          diga otra cosa, escribe en la <strong>salida de error</strong>. O sea que sale por la consola de
+          Eclipse, en rojo, con este aspecto:
+        </p>
+        <div class="codigo"><pre><code>[main] INFO pacman.Executor - 1247;3120;41;2</code></pre></div>
+        <p>
+          Con 4&#8239;000 líneas por partida, en la consola no sirve de nada. Para llevarlo a un fichero hay
+          que decírselo a esa implementación con una propiedad de la máquina virtual, en
+          <span class="path">Run Configurations… &gt; Arguments &gt; VM arguments</span>:
+        </p>
+        <div class="codigo"><pre><code>-Dorg.slf4j.simpleLogger.logFile=medidas.log</code></pre></div>
+        <p>
+          A partir de ahí, <code>medidas.log</code> aparece en la carpeta del proyecto y se abre como
+          cualquier CSV. Dos avisos: el fichero se <strong>sobrescribe</strong> en cada ejecución, y esto es
+          para un experimento vuestro, no para el concurso —el evaluador se construye su propio
+          <code>Executor</code> y ahí no hay dónde enganchar un <code>peek</code>—.
+        </p>
         <div class="note trap">
           <span class="note-label">El <code>System.out.println</code> dentro de <code>getMove</code></span>
           <p>
