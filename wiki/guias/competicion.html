@@ -245,9 +245,69 @@
               Conviene leer esa igualdad despacio, porque es la que contesta a la pregunta obvia: el error
               típico <strong>es</strong> una desviación típica. No es una media, ni se comporta «como si»
               fuera nada: es la desviación típica de otra cosa —de las medias en vez de las partidas—, y por
-              eso se le aplican las mismas reglas que a cualquier desviación típica. Lo único que dice la
-              fórmula es que promediar cien partidas encoge la dispersión diez veces, porque √100 = 10.
+              eso se le aplican las mismas reglas que a cualquier desviación típica.
             </p>
+            <p>
+              Falta justificar el segundo igual, que es de donde sale la raíz. Llamemos <em>σ</em> a la
+              desviación típica de <strong>una</strong> partida, <em>n</em> al número de partidas y
+              <em>Var</em> a la varianza, que es la desviación típica al cuadrado. La media de las
+              <em>n</em> partidas es su suma dividida por <em>n</em>, y el camino es este:
+            </p>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">#</th><th scope="col">La cuenta</th><th scope="col">Por qué vale</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td class="num-col">1</td>
+                    <td><code>Var(X<sub>i</sub>) = σ<sup>2</sup></code></td>
+                    <td>La varianza de cada partida. Es la misma para todas porque todas se juegan igual, con el mismo controlador y el mismo rival.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">2</td>
+                    <td><code>Var(X<sub>1</sub> + … + X<sub>n</sub>) = n · σ<sup>2</sup></code></td>
+                    <td><strong>Las varianzas de cantidades independientes se suman</strong>, y aquí hay <em>n</em> sumandos iguales. Las partidas son independientes porque cada una arranca con su propia semilla.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">3</td>
+                    <td><code>Var(S / n) = Var(S) / n<sup>2</sup></code></td>
+                    <td>Al multiplicar una cantidad por una constante, su varianza queda multiplicada por <strong>el cuadrado</strong> de esa constante. Aquí la constante es 1/<em>n</em>.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">4</td>
+                    <td><code>Var(media) = n·σ<sup>2</sup> / n<sup>2</sup> = σ<sup>2</sup> / n</code></td>
+                    <td>Meter el 2 dentro del 3. La varianza de la media se divide por <em>n</em>, no por <em>n</em><sup>2</sup>, porque el numerador también llevaba una <em>n</em>.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">5</td>
+                    <td><code>error típico = √(σ<sup>2</sup>/n) = σ / √n</code></td>
+                    <td>Y la vuelta: la desviación típica es la raíz de la varianza.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              O sea que <strong>la raíz no sale de ninguna parte especial</strong>: sale de que todo el
+              camino hay que hacerlo en varianzas, porque es lo único que se puede sumar, y al final hay que
+              volver. Y de ahí la consecuencia cara: como el error típico va con √<em>n</em>,
+              <strong>partirlo por la mitad cuesta cuatro veces más partidas</strong>, y dividirlo por diez,
+              cien veces más.
+            </p>
+            <p>
+              Si la cuenta no os dice nada, la intuición es esta: al promediar <em>n</em> partidas los
+              errores de unas cancelan a los de otras. Si todos apuntaran en la misma dirección, promediar no
+              serviría de nada; si se cancelaran del todo, quedaría cero. Como son al azar, el error de la
+              suma no crece como <em>n</em> sino como √<em>n</em> —cien pasos en direcciones aleatorias te
+              dejan a diez del origen, no a cien—, y al dividir la suma entre <em>n</em> queda σ/√<em>n</em>.
+            </p>
+            <div class="note tip">
+              <span class="note-label">Y esto se vio en el concurso de la Práctica 0</span>
+              <p>
+                Se jugó dos veces, primero con 10 partidas por emparejamiento y luego con 100. Si la fórmula
+                es cierta, los errores típicos de la segunda tirada tienen que ser los de la primera
+                divididos por √10 = 3,16. Los 21 controladores dan una razón media de
+                <strong>3,17</strong>.
+              </p>
+            </div>
             <p>
               Ejemplo. Medís vuestra versión actual con 100 partidas y <code>Stats</code> os da una media de
               <strong>3&#8239;850</strong> y una desviación típica de <strong>2&#8239;100</strong>:
