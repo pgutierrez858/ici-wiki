@@ -388,16 +388,47 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
             <p>
               Lo que <em>no</em> se hace es sumar los dos márgenes. Eso sería contar con que las dos medidas
               se equivocan a la vez y en sentidos contrarios, que es el caso peor y casi nunca ocurre: lo
-              normal es que los dos errores se pisen un poco entre ellos. La regla correcta es que, cuando dos
-              cantidades son <strong>independientes</strong>, lo que se suma no son sus desviaciones típicas
-              sino sus <strong>varianzas</strong>, que son esas mismas desviaciones al cuadrado. Y aquí son
-              independientes porque cada tanda juega partidas distintas: para esto sirve que no haya semilla
-              fija. Que la diferencia sea una resta no cambia nada, porque restar dispersa tanto como sumar.
+              normal es que los dos errores se pisen un poco entre ellos. La cuenta correcta sale
+              <strong>con las dos mismas reglas de la tabla de antes</strong>, la&nbsp;2 y la&nbsp;3, sin
+              añadir nada nuevo. Llamemos <em>D</em> a la diferencia:
+            </p>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">#</th><th scope="col">La cuenta</th><th scope="col">Por qué vale</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td class="num-col">1</td>
+                    <td><code>D = A − B</code></td>
+                    <td>Con <code>A</code> la media nueva y <code>B</code> la vieja. Lo que hay que medir no es ninguna de las dos por separado: es esta resta, que es una cantidad con su propia dispersión.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">2</td>
+                    <td><code>Var(−B) = (−1)<sup>2</sup> · Var(B) = Var(B)</code></td>
+                    <td>Es la <strong>regla 3</strong> de la tabla de antes —multiplicar por una constante multiplica la varianza por su cuadrado— con la constante igual a −1. Y como (−1)<sup>2</sup> = 1, la varianza se queda igual: <strong>restar dispersa exactamente lo mismo que sumar</strong>.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">3</td>
+                    <td><code>Var(D) = Var(A) + Var(−B) = Var(A) + Var(B)</code></td>
+                    <td>Es la <strong>regla 2</strong>: las varianzas de cantidades independientes se suman. Y lo son porque cada tanda juega sus propias partidas, con sus propias semillas.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">4</td>
+                    <td><code>ET<sub>D</sub> = √( ET<sub>A</sub><sup>2</sup> + ET<sub>B</sub><sup>2</sup> )</code></td>
+                    <td>La raíz, otra vez, es sólo el viaje de vuelta de varianza a desviación típica.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">5</td>
+                    <td><code>si ET<sub>A</sub> = ET<sub>B</sub> = ET &nbsp;→&nbsp; ET<sub>D</sub> = √(2·ET<sup>2</sup>) = √2 · ET</code></td>
+                    <td>Cuando las dos tandas tienen el mismo número de partidas sus errores típicos son parecidos, así que se puede sacar factor común y queda un √2 ≈ 1,41.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Con los 210 del ejemplo:
             </p>
             <div class="formula">
-              <em>ET</em><sub>diferencia</sub><sup>2</sup> &nbsp;=&nbsp;
-              <em>ET</em><sub>vieja</sub><sup>2</sup> + <em>ET</em><sub>nueva</sub><sup>2</sup>
-              &nbsp;&nbsp;⟹&nbsp;&nbsp; <em>ET</em><sub>diferencia</sub> &nbsp;=&nbsp;
+              <em>ET</em><sub>D</sub> &nbsp;=&nbsp;
               <span class="raiz"><span>210<sup>2</sup> + 210<sup>2</sup></span></span>
               &nbsp;=&nbsp; √2 × 210 &nbsp;=&nbsp; <strong>297</strong>
             </div>
