@@ -466,26 +466,27 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
               antes de celebrarlo.
             </p>
             <div class="note tip">
-              <span class="note-label">Cuándo no vale el ×3</span>
+              <span class="note-label">¿Y si el error típico sale distinto en las dos tandas?</span>
               <p>
-                El ×3 sale de suponer <em>ET</em><sub>A</sub> ≈ <em>ET</em><sub>B</sub>, y eso es una
-                suposición, no un hecho: aunque las dos tandas tengan el mismo número de partidas, el error
-                típico de cada una es su propia desviación típica dividida por √<em>n</em>, y dos versiones
-                del controlador no tienen por qué ser igual de irregulares. Mirad los dos números que os da
-                <code>getStandardError()</code> antes de fiaros del atajo.
+                Pasa, y no es raro: el error típico de una versión depende de lo irregular que sea, y cambiar
+                un umbral cambia cómo juega. Lo que se ve en los datos es que <strong>el error típico va de
+                la mano de la media</strong>: en los 21 controladores del concurso de la
+                <a href="../practicas/practica-0.html#entregado">Práctica&nbsp;0</a> los dos números
+                correlacionan un <strong>0,98</strong>. Quien puntúa más, varía más.
               </p>
               <p>
-                Mientras se parezcan —y dos versiones que se diferencian en un umbral suelen parecerse—, da
-                igual cuál de los dos uséis para el ×3. Cuando no, no hay atajo: sacad
-                <em>ET</em><sub>D</sub> con la fila 4 y comparad la diferencia con <strong>2 ×
-                <em>ET</em><sub>D</sub></strong>, que es de donde salía el ×3 en realidad.
+                Y eso es justo lo que salva el atajo donde hace falta. Dos versiones que puntúan parecido
+                tienen errores típicos parecidos: entre los catorce primeros de aquella tabla, dos vecinos
+                nunca se separan más de un 23&#8239;%. Y cuando los errores típicos sí se separan de verdad
+                es porque las medias también lo han hecho, y entonces no hace falta ninguna prueba para ver
+                la diferencia.
               </p>
               <p>
-                Un ejemplo de los que no se parecen está en el concurso de la
-                <a href="../practicas/practica-0.html#entregado">Práctica&nbsp;0</a>: el primero tenía un
-                error típico de ±50,8 y el último, que no decidía nada, de ±5,3. Ahí
-                √(50,8² + 5,3²) = 51,1, o sea prácticamente el error típico del primero a secas, y no
-                1,41 veces nada.
+                Aun así son dos números que ya tenéis delante, así que miradlos. Y si salen distintos, la
+                regla segura es <strong>usar el mayor de los dos</strong> para el ×3: sale que
+                3&nbsp;×&nbsp;el mayor es siempre igual o más exigente que el 2&nbsp;×&nbsp;<em>ET</em><sub>D</sub>
+                de verdad, así que por ahí no os vais a creer una mejora que no existe. Si queréis el número
+                exacto, la fila 4 y comparar con 2&nbsp;×&nbsp;<em>ET</em><sub>D</sub>.
               </p>
             </div>
           </div>

@@ -960,8 +960,85 @@ open.add(start);
         </p>
       </section>
 
-      <section class="slide" id="d51">
+      <section class="slide s-figure" id="d51">
         <span class="slide-num">Parte 5 · 51</span>
+        <h2>Una capa por cada cosa que importa</h2>
+        <figure>
+          <figcaption>Tres de las cinco capas, y lo que sale de sumarlas con sus pesos</figcaption>
+          <svg class="diag dgs51" viewBox="0 0 372 268" role="img" aria-label="Cuatro veces el mismo laberinto, con Ms. Pac-Man abajo en el centro, dos fantasmas rojos en el pasillo de en medio, uno azul comestible arriba a la derecha, píldoras repartidas y dos píldoras de poder en esquinas opuestas. En el primero se tiñe de amarillo lo que está cerca de la comida; en el segundo de rojo lo que está cerca de los fantasmas rojos; en el tercero de amarillo los cruces con más salidas. El cuarto es la suma de las cinco capas con sus pesos: el pasillo central sale rojo y parte el laberinto en dos, y las dos esquinas de abajo salen amarillas.">
+          <style>
+          .dgs51 .sue{fill:var(--surface)}
+          .dgs51 .bien{fill:var(--pill)}
+          .dgs51 .mal{fill:var(--blinky)}
+          .dgs51 .mu{fill:var(--maze);fill-opacity:.16;stroke:var(--maze);stroke-opacity:.45;stroke-width:.5}
+          .dgs51 .pi{fill:var(--pill-ink)}
+          .dgs51 .po{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1}
+          .dgs51 .gh{fill:var(--blinky)}
+          .dgs51 .gc{fill:var(--maze)}
+          .dgs51 .pc{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1.4}
+          .dgs51 .ti{font-family:var(--f-mono);font-size:8px;letter-spacing:.06em;fill:var(--ink-3)}
+          </style>
+          <defs>
+          <g id="dgs51-lab">
+          <path class="mu" d="M0 0h20v20h-20zM20 0h20v20h-20zM40 0h20v20h-20zM60 0h20v20h-20zM80 0h20v20h-20zM100 0h20v20h-20zM120 0h20v20h-20zM140 0h20v20h-20zM160 0h20v20h-20zM180 0h20v20h-20zM200 0h20v20h-20zM220 0h20v20h-20zM240 0h20v20h-20zM260 0h20v20h-20zM280 0h20v20h-20zM300 0h20v20h-20zM0 20h20v20h-20zM300 20h20v20h-20zM0 40h20v20h-20zM40 40h20v20h-20zM60 40h20v20h-20zM80 40h20v20h-20zM100 40h20v20h-20zM140 40h20v20h-20zM160 40h20v20h-20zM200 40h20v20h-20zM220 40h20v20h-20zM240 40h20v20h-20zM260 40h20v20h-20zM300 40h20v20h-20zM0 60h20v20h-20zM300 60h20v20h-20zM0 80h20v20h-20zM40 80h20v20h-20zM60 80h20v20h-20zM100 80h20v20h-20zM120 80h20v20h-20zM140 80h20v20h-20zM160 80h20v20h-20zM180 80h20v20h-20zM200 80h20v20h-20zM240 80h20v20h-20zM260 80h20v20h-20zM300 80h20v20h-20zM0 100h20v20h-20zM100 100h20v20h-20zM200 100h20v20h-20zM300 100h20v20h-20zM0 120h20v20h-20zM20 120h20v20h-20zM40 120h20v20h-20zM60 120h20v20h-20zM100 120h20v20h-20zM140 120h20v20h-20zM160 120h20v20h-20zM200 120h20v20h-20zM240 120h20v20h-20zM260 120h20v20h-20zM280 120h20v20h-20zM300 120h20v20h-20zM0 140h20v20h-20zM100 140h20v20h-20zM140 140h20v20h-20zM160 140h20v20h-20zM200 140h20v20h-20zM300 140h20v20h-20zM0 160h20v20h-20zM300 160h20v20h-20zM0 180h20v20h-20zM20 180h20v20h-20zM40 180h20v20h-20zM60 180h20v20h-20zM80 180h20v20h-20zM100 180h20v20h-20zM120 180h20v20h-20zM140 180h20v20h-20zM160 180h20v20h-20zM180 180h20v20h-20zM200 180h20v20h-20zM220 180h20v20h-20zM240 180h20v20h-20zM260 180h20v20h-20zM280 180h20v20h-20zM300 180h20v20h-20z"/>
+          <path class="pi" d="M30 148a2 2 0 1 0 .1 0zM50 148a2 2 0 1 0 .1 0zM70 148a2 2 0 1 0 .1 0zM30 168a2 2 0 1 0 .1 0zM50 168a2 2 0 1 0 .1 0zM70 168a2 2 0 1 0 .1 0zM30 108a2 2 0 1 0 .1 0zM50 108a2 2 0 1 0 .1 0zM230 108a2 2 0 1 0 .1 0zM250 108a2 2 0 1 0 .1 0zM270 108a2 2 0 1 0 .1 0zM290 108a2 2 0 1 0 .1 0zM230 88a2 2 0 1 0 .1 0zM250 148a2 2 0 1 0 .1 0zM270 148a2 2 0 1 0 .1 0zM130 28a2 2 0 1 0 .1 0zM190 28a2 2 0 1 0 .1 0z"/>
+          <circle class="po" cx="30" cy="30" r="4"/><circle class="po" cx="290" cy="170" r="4"/>
+          <path class="gh" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/><path class="gh" d="M203.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/><path class="gc" d="M263.8 35.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+          <g transform="translate(157 163) scale(-0.54 0.54)"><path class="pc" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/></g>
+          </g>
+          </defs>
+          <text class="ti" x="0" y="9">+ comida · peso 1</text>
+          <g transform="translate(0 13) scale(0.55)">
+          <rect class="sue" x="0" y="0" width="320" height="200"/>
+          <path class="bien" fill-opacity="0.14" d="M140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.3" d="M20 20h20v20h-20zM40 20h20v20h-20zM60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM20 60h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM120 100h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM280 160h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.46" d="M120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM180 20h20v20h-20zM120 40h20v20h-20zM180 40h20v20h-20zM80 60h20v20h-20zM100 60h20v20h-20zM120 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM180 60h20v20h-20zM200 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM280 60h20v20h-20zM20 80h20v20h-20zM80 80h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM280 140h20v20h-20zM120 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.62" d="M220 60h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM80 100h20v20h-20zM280 100h20v20h-20zM80 120h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM80 160h20v20h-20zM100 160h20v20h-20zM220 160h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.8" d="M220 80h20v20h-20zM220 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM80 140h20v20h-20zM20 160h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20z"/>
+          <use href="#dgs51-lab"/>
+          </g>
+          <text class="ti" x="196" y="9">− amenaza · peso 2</text>
+          <g transform="translate(196 13) scale(0.55)">
+          <rect class="sue" x="0" y="0" width="320" height="200"/>
+          <path class="mal" fill-opacity="0.14" d="M20 20h20v20h-20zM40 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 100h20v20h-20zM280 100h20v20h-20zM20 140h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM280 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM80 160h20v20h-20zM100 160h20v20h-20zM120 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+          <path class="mal" fill-opacity="0.3" d="M60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM20 60h20v20h-20zM280 60h20v20h-20zM20 80h20v20h-20zM280 80h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM80 120h20v20h-20zM220 120h20v20h-20zM80 140h20v20h-20zM220 140h20v20h-20z"/>
+          <path class="mal" fill-opacity="0.46" d="M120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM180 20h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM80 80h20v20h-20zM220 80h20v20h-20zM80 100h20v20h-20zM220 100h20v20h-20z"/>
+          <path class="mal" fill-opacity="0.62" d="M120 40h20v20h-20zM180 40h20v20h-20zM80 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM220 60h20v20h-20z"/>
+          <path class="mal" fill-opacity="0.8" d="M100 60h20v20h-20zM120 60h20v20h-20zM180 60h20v20h-20zM200 60h20v20h-20z"/>
+          <use href="#dgs51-lab"/>
+          </g>
+          <text class="ti" x="0" y="154">+ salidas · peso 0,5</text>
+          <g transform="translate(0 158) scale(0.55)">
+          <rect class="sue" x="0" y="0" width="320" height="200"/>
+          <path class="bien" fill-opacity="0.3" d="M20 20h20v20h-20zM40 20h20v20h-20zM60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 40h20v20h-20zM120 40h20v20h-20zM180 40h20v20h-20zM280 40h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM100 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM200 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM20 80h20v20h-20zM80 80h20v20h-20zM220 80h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM120 100h20v20h-20zM140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM280 100h20v20h-20zM80 120h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM280 140h20v20h-20zM20 160h20v20h-20zM100 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM200 160h20v20h-20zM280 160h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.62" d="M120 20h20v20h-20zM180 20h20v20h-20zM20 60h20v20h-20zM80 60h20v20h-20zM120 60h20v20h-20zM180 60h20v20h-20zM220 60h20v20h-20zM280 60h20v20h-20zM80 100h20v20h-20zM220 100h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM80 140h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM80 160h20v20h-20zM120 160h20v20h-20zM180 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+          <use href="#dgs51-lab"/>
+          </g>
+          <text class="ti" x="196" y="154">la suma de las cinco</text>
+          <g transform="translate(196 158) scale(0.55)">
+          <rect class="sue" x="0" y="0" width="320" height="200"/>
+          <path class="bien" fill-opacity="0.14" d="M100 20h20v20h-20zM120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM220 80h20v20h-20zM80 100h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.3" d="M60 20h20v20h-20zM80 20h20v20h-20zM180 20h20v20h-20zM200 20h20v20h-20zM20 60h20v20h-20zM260 60h20v20h-20zM20 80h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM120 100h20v20h-20zM140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20zM80 120h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM100 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.46" d="M40 20h20v20h-20zM220 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM280 60h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM220 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM280 100h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM80 140h20v20h-20zM20 160h20v20h-20zM80 160h20v20h-20zM120 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.62" d="M20 20h20v20h-20zM240 20h20v20h-20zM280 20h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM280 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20z"/>
+          <path class="bien" fill-opacity="0.8" d="M260 20h20v20h-20zM260 160h20v20h-20zM280 160h20v20h-20z"/>
+          <path class="mal" fill-opacity="0.14" d="M120 40h20v20h-20zM60 60h20v20h-20zM80 80h20v20h-20z"/>
+          <path class="mal" fill-opacity="0.3" d="M80 60h20v20h-20zM120 60h20v20h-20zM160 60h20v20h-20zM180 60h20v20h-20z"/>
+          <path class="mal" fill-opacity="0.46" d="M140 60h20v20h-20zM200 60h20v20h-20z"/>
+          <path class="mal" fill-opacity="0.62" d="M100 60h20v20h-20z"/>
+          <use href="#dgs51-lab"/>
+          </g>
+          </svg>
+        </figure>
+        <p class="lede">
+          Cada fuente vale 1 en su nodo y cae con la distancia <em>por el pasillo</em>. Se normaliza cada
+          capa, se suman con pesos, y ahí está la estrategia: los mismos cinco números con otros valores
+          juegan a otra cosa. En los apuntes hay un ejemplo con los pesos a mano.
+        </p>
+      </section>
+
+      <section class="slide" id="d52">
+        <span class="slide-num">Parte 5 · 52</span>
         <h2>Predecir a quien no controlas</h2>
         <ol>
           <li><strong>Proyectar en recta</strong> hasta el siguiente cruce. Fiable al 100&#8239;%: dentro de un pasillo el otro <em>no puede</em> elegir.</li>
@@ -971,8 +1048,8 @@ open.add(start);
         <p class="lede">Más de dos cruces por delante ya no es predecir: es inventar.</p>
       </section>
 
-      <section class="slide s-figure" id="d52">
-        <span class="slide-num">Parte 5 · 52</span>
+      <section class="slide s-figure" id="d53">
+        <span class="slide-num">Parte 5 · 53</span>
         <h2>Interceptar es coincidir en el nodo <em>y</em> en el turno</h2>
         <figure>
           <figcaption>Los dos llegan al cruce en t+9, y de frente</figcaption>
@@ -1014,8 +1091,8 @@ open.add(start);
         </p>
       </section>
 
-      <section class="slide" id="d53">
-        <span class="slide-num">Parte 5 · 53</span>
+      <section class="slide" id="d54">
+        <span class="slide-num">Parte 5 · 54</span>
         <h2>Coordinación sin mensajes</h2>
         <ul>
           <li>Los cuatro fantasmas los decide el mismo método, con el mismo <code>Game</code>, en el mismo turno: <strong>ya comparten todo</strong>.</li>
@@ -1029,8 +1106,8 @@ open.add(start);
         </p>
       </section>
 
-      <section class="slide" id="d54">
-        <span class="slide-num">Parte 5 · 54</span>
+      <section class="slide" id="d55">
+        <span class="slide-num">Parte 5 · 55</span>
         <h2>El reloj del modo comestible</h2>
         <div class="table-scroll">
           <table>
@@ -1049,8 +1126,8 @@ open.add(start);
         </p>
       </section>
 
-      <section class="slide" id="d55">
-        <span class="slide-num">Parte 5 · 55</span>
+      <section class="slide" id="d56">
+        <span class="slide-num">Parte 5 · 56</span>
         <h2>El presupuesto</h2>
         <div class="table-scroll">
           <table>
@@ -1066,8 +1143,8 @@ open.add(start);
         </div>
       </section>
 
-      <section class="slide" id="d56">
-        <span class="slide-num">Parte 5 · 56</span>
+      <section class="slide" id="d57">
+        <span class="slide-num">Parte 5 · 57</span>
         <h2>Ver lo que piensa</h2>
 <pre><code><span class="c">// un color por motivo, todo detrás de un interruptor que se apaga al entregar</span>
 <span class="k">if</span> (DEBUG) {
@@ -1083,8 +1160,8 @@ open.add(start);
         </p>
       </section>
 
-      <section class="slide" id="d57">
-        <span class="slide-num">Tema 1 · 57</span>
+      <section class="slide" id="d58">
+        <span class="slide-num">Tema 1 · 58</span>
         <h2>Lo que hay que llevarse</h2>
         <ol>
           <li>El <em>pathfinding</em> son dos problemas: <strong>representar</strong> y <strong>buscar</strong>.</li>
@@ -1096,8 +1173,8 @@ open.add(start);
         </ol>
       </section>
 
-      <section class="slide s-part" id="d58">
-        <span class="slide-num">Tema 1 · 58</span>
+      <section class="slide s-part" id="d59">
+        <span class="slide-num">Tema 1 · 59</span>
         <p class="part-num">Y ahora</p>
         <h2>Práctica 1 · Controladores algorítmicos</h2>
       </section>
