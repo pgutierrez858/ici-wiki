@@ -902,16 +902,6 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
             entrega, y por eso el interruptor tiene que envolver <em>la llamada</em>, no ir por dentro.
           </p>
         </div>
-        <div class="note tip">
-          <span class="note-label">Si necesitáis dibujar algo que no son puntos ni líneas</span>
-          <p>
-            Vuestro controlador de Ms.&nbsp;Pac-Man puede implementar <code>pacman.game.Drawable</code>
-            —un <code>enabled()</code> y un <code>draw(Graphics2D)</code>— y el motor lo llamará en cada
-            repintado para que dibujéis lo que queráis: el estado en el que estáis, el valor de los umbrales
-            en ese turno, la puntuación de cada salida. El <code>enabled()</code> es vuestro interruptor.
-            Con los fantasmas no funciona: ahí sólo <code>GameView</code>.
-          </p>
-        </div>
 
         <h3 class="label">3 · Grabar la partida rara y volver a verla</h3>
         <p>
