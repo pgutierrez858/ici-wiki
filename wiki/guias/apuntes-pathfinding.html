@@ -2016,13 +2016,13 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
         </p>
         <figure>
           <figcaption>Cuenta · lo que vale un fantasma según lo lejos que estés</figcaption>
-          <pre class="pseudo">a 0 pasos   1
-a 1 paso    1    × 0,75  =  0,75
-a 2 pasos   0,75 × 0,75  =  0,56
-a 3 pasos   0,56 × 0,75  =  0,42
-a 4 pasos   0,42 × 0,75  =  0,32
-…
-a 11 pasos                  0,04</pre>
+          <pre class="cuenta">a  0 pasos                     1
+a  1 paso      1     × 0,75  =  0,75
+a  2 pasos     0,75  × 0,75  =  0,56
+a  3 pasos     0,56  × 0,75  =  0,42
+a  4 pasos     0,42  × 0,75  =  0,32
+   …
+a 11 pasos                      0,04</pre>
         </figure>
         <p>
           Y ahora fijaos en las dos casillas recuadradas de la figura. Están <strong>las dos a dos casillas
@@ -2162,48 +2162,40 @@ a 11 pasos                  0,04</pre>
           pesos desaparece de la pantalla, porque allí no pinta nada.
         </p>
         <div class="table-scroll">
-          <table class="ancha">
+          <table>
             <thead>
               <tr>
-                <th scope="col">Con el ejemplo</th>
-                <th scope="col">Qué hacer</th>
+                <th scope="col">Qué probar</th>
                 <th scope="col">Qué se ve</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Los pesos deciden la estrategia</td>
-                <td>Pulsa <em>A lo miedosa</em> y <em>Jugar</em>. Luego <em>A lo glotona</em>, <em>Al principio</em> y <em>Jugar</em> otra vez.</td>
-                <td>Los mismos cinco números, con otros valores. La miedosa se lleva el nivel entero; la glotona dura once turnos.</td>
+                <td><strong>Los pesos son la estrategia.</strong> Pulsa <em>A lo miedosa</em> y <em>Jugar</em>; después <em>A lo glotona</em>, <em>Al principio</em> y <em>Jugar</em> otra vez.</td>
+                <td>Los mismos cinco números, con otros valores. La miedosa se lleva el nivel entero en 90 turnos; a la glotona la comen en 11.</td>
               </tr>
               <tr>
-                <td>La amenaza no juega en la misma liga</td>
-                <td>Sube sólo el peso de la amenaza, de 0 a 4, mirando el pasillo de en medio.</td>
-                <td>En 0 el laberinto es todo amarillo y ella cruza por delante de los fantasmas. Subiendo, el pasillo se cierra y la ruta se va por los bordes.</td>
+                <td><strong>La amenaza no juega en la misma liga.</strong> Sube sólo su peso, de 0 a 4, mirando el pasillo de en medio.</td>
+                <td>Con 0 el laberinto es todo amarillo y ella cruza por delante de los fantasmas. Subiendo, el pasillo se cierra y la ruta se va por los bordes.</td>
               </tr>
               <tr>
-                <td>La caída manda en cuánto se ve</td>
-                <td>Baja la caída a 0,4 y súbela a 0,95.</td>
-                <td>Con 0,4 el mapa es miope: sólo sabe lo que tiene pegado. Con 0,95 todo el laberinto se entera de todo y el mapa se aplana hasta no distinguir nada.</td>
+                <td><strong>La caída decide cuánto se ve.</strong> Bájala a 0,4 y súbela a 0,95.</td>
+                <td>Con 0,4 el mapa es miope y sólo sabe lo que tiene pegado. Con 0,95 todo el laberinto se entera de todo y el mapa se aplana hasta no distinguir nada.</td>
               </tr>
               <tr>
-                <td>Por dónde viene, no sólo dónde está</td>
-                <td>Enciende <em>Por dónde viene</em> con un fantasma a media distancia.</td>
+                <td><strong>Por dónde viene, no sólo dónde está.</strong> Enciende <em>Por dónde viene</em> con un fantasma a media distancia.</td>
                 <td>Se encarece también el pasillo que le trae hasta ti, que es el sitio exacto donde no hay que meterse.</td>
               </tr>
               <tr>
-                <td>Una capa sola</td>
-                <td>En <em>Ver</em>, pasa por comida, amenaza y salidas.</td>
-                <td>Las tres manchas que se suman en el mapa entero. Es así como se depura: capa por capa, no mirando el total.</td>
+                <td><strong>Una capa sola.</strong> En <em>Ver</em>, pasa por comida, amenaza y salidas.</td>
+                <td>Las tres manchas que se suman en el mapa entero. Así es como se depura: capa por capa, no mirando el total.</td>
               </tr>
               <tr>
-                <td>La función de evaluación mira mucho menos</td>
-                <td>Cambia a <em>Una función de evaluación</em>.</td>
+                <td><strong>La función de evaluación mira mucho menos.</strong> Cambia a <em>Una función de evaluación</em>.</td>
                 <td>Sólo se puntúan los dos o tres cruces a los que se puede salir. Debajo está el desglose por términos, que es lo que hay que imprimir para depurar: los términos, nunca el total.</td>
               </tr>
               <tr>
-                <td>El orden decide a ciegas</td>
-                <td>Cambia a <em>Reglas con prioridad</em> y prueba los dos órdenes con varios umbrales.</td>
+                <td><strong>El orden decide a ciegas.</strong> Cambia a <em>Reglas con prioridad</em> y prueba los dos órdenes con varios umbrales.</td>
                 <td>Con <em>Primero comer</em> el umbral da exactamente igual, porque la primera regla siempre se cumple y las demás no llegan a mirarse.</td>
               </tr>
             </tbody>
@@ -2239,8 +2231,8 @@ a 11 pasos                  0,04</pre>
             capa de comida se calcula sumando una propagación por píldora, la cuenta por <em>tick</em> es
             ésta:
           </p>
-          <pre class="pseudo">sumando una anchura por fuente    220 × 1 293   =  284 460 nodos visitados
-una sola anchura con las 220 fuentes ya en la cola  =    1 293 nodos visitados</pre>
+          <pre class="cuenta">una anchura por cada fuente          220 × 1 293  =  284 460 nodos
+una sola anchura, con las 220 ya en la cola                1 293 nodos</pre>
           <p>
             Doscientas veinte veces menos, y lo que se pierde es poco: la anchura multifuente no da la suma
             de las influencias, da la de <strong>la fuente más cercana</strong>, que para decidir casi

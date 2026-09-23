@@ -497,14 +497,48 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
           <div class="step-body">
             <h4>Cuántas partidas harían falta para verlo</h4>
             <p>
-              Si de verdad queréis saber si esos 130 puntos existen, hay que jugar más partidas. Cuántas sale
-              de juntar las dos fórmulas anteriores: queréis que la diferencia supere 3 errores típicos, y el
-              error típico es <em>sd</em>&nbsp;/&nbsp;√<em>partidas</em>, así que basta con despejar de
-              <em>diferencia</em>&nbsp;&gt;&nbsp;3&nbsp;<em>sd</em>&nbsp;/&nbsp;√<em>partidas</em>:
+              Si de verdad queréis saber si esos 130 puntos existen, hay que jugar más partidas. Y cuántas no
+              hay que adivinarlo: sale de juntar las dos fórmulas anteriores y despejar. Aquí la incógnita es
+              <em>n</em>, y lo que se pide es que la diferencia que buscáis llegue a ser creíble:
             </p>
-            <div class="formula">
-              <em>partidas</em> &nbsp;≈&nbsp; ( 3 × <em>desviación típica</em> / <em>diferencia</em> )<sup>2</sup>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">#</th><th scope="col">La cuenta</th><th scope="col">Por qué vale</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td class="num-col">1</td>
+                    <td><code>diferencia &gt; 3 · ET</code></td>
+                    <td>Es la regla del paso 2, la que queréis que se cumpla. De momento no sabemos con qué <em>n</em> se cumple: eso es lo que vamos a despejar.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">2</td>
+                    <td><code>ET = σ / √n</code></td>
+                    <td>Es el paso 1. Y lo importante: <strong>σ no depende de <em>n</em></strong>. Es lo irregular que es vuestro controlador, así que la medís una vez con la tanda que ya tenéis y os vale para la cuenta.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">3</td>
+                    <td><code>diferencia &gt; 3σ / √n</code></td>
+                    <td>Meter el 2 dentro del 1. Ya no queda nada desconocido salvo <em>n</em>.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">4</td>
+                    <td><code>√n &gt; 3σ / diferencia</code></td>
+                    <td>Multiplicar los dos lados por √<em>n</em> y dividir por la diferencia. Se puede sin darle la vuelta a la desigualdad porque los dos son positivos.</td>
+                  </tr>
+                  <tr>
+                    <td class="num-col">5</td>
+                    <td><code>n &gt; (3σ / diferencia)<sup>2</sup></code></td>
+                    <td>Elevar al cuadrado, que entre positivos también conserva la desigualdad. Y ahí está el cuadrado que hace cara la broma.</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+            <p>
+              El cuadrado de la última fila es lo que hay que mirar: <em>n</em> no crece con lo pequeña que
+              sea la diferencia que buscáis, sino <strong>con su cuadrado</strong>. Querer detectar una mejora
+              la mitad de grande cuesta <strong>cuatro veces más partidas</strong>; una diez veces más
+              pequeña, cien veces más partidas.
+            </p>
             <p>
               Con la desviación típica de 2&#8239;100 y los 130 puntos del ejemplo:
               (3&nbsp;×&nbsp;2100&nbsp;/&nbsp;130)<sup>2</sup> = 48,5<sup>2</sup> ≈ <strong>2&#8239;350
