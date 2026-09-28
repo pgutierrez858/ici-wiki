@@ -437,7 +437,7 @@
               </tr>
               <tr>
                 <td><strong>Dejar de huir a tiempo</strong></td>
-                <td>Si el tiempo de comestible que queda es menor que la distancia a la que está Ms.&nbsp;Pac-Man, ya no te puede alcanzar: vuelve a perseguir y gana posición mientras los demás siguen huyendo.</td>
+                <td>Si vas hacia Ms.&nbsp;Pac-Man mientras aún eres comestible, os acercáis 1 + ½ = 3/2 nodos por turno (tú vas a media velocidad), así que te alcanza en 2<em>d</em>/3 turnos. Si el tiempo de comestible que queda es menor que 2/3 de la distancia a la que está, ya no te puede comer: vuelve a perseguir y gana posición mientras los demás siguen huyendo.</td>
               </tr>
               <tr>
                 <td><strong>No perseguir todos lo mismo</strong></td>
@@ -464,7 +464,7 @@
     <span class="var">seguros</span> ← <span class="fn">movimientosSeguros</span>()               <i>// árbol de dos niveles</i>
 
     <span class="var">comer</span> ← <span class="fn">buscarObjetivoSeguro</span>(<span class="fn">fantasmasComestibles</span>(), <span class="var">seguros</span>)
-    <b>if</b> <span class="var">comer</span> ≠ NULL AND <span class="var">comer</span>.pasos &lt; <span class="var">umbralComer</span> + <span class="fn">comidos</span>() × <span class="var">agresividad</span> <b>then</b>
+    <b>if</b> <span class="var">comer</span> ≠ NULL AND 2 × <span class="var">comer</span>.pasos + <span class="var">margen</span> &lt; <span class="fn">tiempoComestible</span>(<span class="var">comer</span>.objetivo) <b>then</b>   <i>// cota: 2d</i>
         <b>return</b> <span class="var">comer</span>.dirección
     <b>end if</b>
 
@@ -481,6 +481,12 @@
     <b>return</b> <span class="fn">laSalidaQueMásOpcionesDeja</span>(<span class="var">seguros</span>)   <i>// nada es seguro: la menos mala</i>
 <b>end function</b></pre>
         </figure>
+        <p>
+          La condición para ir a comer usa una cota: un fantasma comestible se mueve a media velocidad, así
+          que si está a <em>d</em> pasos lo alcanzas en <strong>2<em>d</em> turnos como mucho</strong>. La
+          cuenta está en los apuntes, en
+          <a href="../guias/apuntes-pathfinding.html#alcanzar-comestible">¿Me da tiempo a comérmelo?</a>.
+        </p>
         <p>
           Y el de los fantasmas, con papeles y con el orden de prioridades al revés:
         </p>

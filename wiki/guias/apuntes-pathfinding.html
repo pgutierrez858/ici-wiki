@@ -1849,7 +1849,8 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
     <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
         {<span class="var">n</span>, <span class="var">dir</span>} ← <span class="fn">desencolar</span>(<span class="var">cola</span>)
         <b>if</b> <span class="var">n</span> ∈ <span class="var">objetivos</span> <b>then</b>
-            <b>return</b> primera dirección del camino <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>)
+            <span class="var">camino</span> ← <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>)
+            <b>return</b> {<span class="var">dirección</span>: primera dirección de <span class="var">camino</span>, <span class="var">pasos</span>: |<span class="var">camino</span>| − 1, <span class="var">objetivo</span>: <span class="var">n</span>}
         <b>end if</b>
         <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">n</span>, <span class="var">dir</span>) <b>do</b>
             <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b>
@@ -1862,6 +1863,55 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
     <b>return</b> NULL      <i>// no hay ningún objetivo alcanzable con seguridad</i>
 <b>end function</b></pre>
         </figure>
+        <p>
+          Devuelve tres cosas, no una: la <strong>dirección</strong> que hay que tomar ahora, los
+          <strong>pasos</strong> que faltan hasta el objetivo por ese camino seguro y el
+          <strong>objetivo</strong> que ha encontrado. La dirección es lo que acabará devolviendo
+          <code>getMove</code>; los pasos sirven para decidir si el objetivo merece la pena, y el nodo
+          objetivo, para saber de qué fantasma o de qué píldora se trata. Como el camino empieza en
+          <code>miNodo</code>, los pasos son su longitud menos uno.
+        </p>
+
+        <h3 class="label" id="alcanzar-comestible">¿Me da tiempo a comérmelo?</h3>
+        <p>
+          Con una píldora los pasos son exactamente lo que tardas: la píldora no se mueve. Con un fantasma
+          comestible no, porque mientras tú recorres esos pasos él sigue huyendo. Lo que salva la cuenta es
+          que huye <strong>a media velocidad</strong>: el motor sólo mueve a un fantasma comestible en los
+          turnos en que su <code>edibleTime</code> es impar (<code>GHOST_SPEED_REDUCTION = 2</code>), y
+          Ms.&nbsp;Pac-Man avanza un nodo todos los turnos.
+        </p>
+        <p>
+          Pongamos que está a <em>d</em> pasos y que huye en línea recta por el mismo pasillo, alejándose,
+          que es lo peor que te puede hacer. Mientras recorres esos <em>d</em> pasos, él se aleja
+          <em>d</em>/2; cuando recorres ese <em>d</em>/2, se ha alejado <em>d</em>/4; y así:
+        </p>
+        <figure>
+          <figcaption>Cuenta · lo que recorres hasta alcanzar a un fantasma comestible que huye</figcaption>
+          <pre class="cuenta">tramo 1     d                  él se aleja  d/2
+tramo 2     d/2                él se aleja  d/4
+tramo 3     d/4                él se aleja  d/8
+   …
+total       d · (1 + 1/2 + 1/4 + …)
+         =  d · 1 / (1 − 1/2)
+         =  2d</pre>
+        </figure>
+        <p>
+          La serie es infinita pero la suma no: son <strong>2<em>d</em> pasos como mucho</strong>. Se llega
+          a lo mismo sin serie, mirando la distancia entre los dos: cada turno tú avanzas 1 y él ½, así que
+          la distancia baja ½ por turno y para cerrar <em>d</em> hacen falta <em>d</em> / ½ = 2<em>d</em>
+          turnos. Merece la pena ir a por él si lo alcanzas antes de que deje de ser comestible:
+        </p>
+        <div class="formula">
+          2 · <em>pasos</em> + <em>margen</em> &lt; <code>game.getGhostEdibleTime(f)</code>
+        </div>
+        <p>
+          Es una <strong>cota superior</strong>, no una predicción. Si el fantasma huye por otra rama o hacia
+          ti, lo alcanzas antes, y como no puede darse la vuelta a veces no le queda otra que acercarse.
+          Justo después de comerte una píldora de poder los fantasmas invierten la marcha, así que muchos
+          vienen de cara y la cuenta real queda muy por debajo. Y no hace falta que sea exacta: la condición
+          se vuelve a comprobar en cada cruce con la distancia nueva. El <em>margen</em> cubre los pocos
+          turnos que se pierden porque el camino más corto hasta él cambia mientras huye.
+        </p>
         <p>
           Compárala con <code>getClosestNodeIndexFromNodeIndex</code>, que hace lo mismo pero midiendo en
           línea recta por la tabla y sin enterarse de los fantasmas. La versión propia cuesta unos pocos

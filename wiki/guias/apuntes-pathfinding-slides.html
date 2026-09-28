@@ -816,11 +816,14 @@ open.add(start);
         <span class="var">v</span> ← vecino de <span class="var">miNodo</span> en <span class="var">d</span>;  <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">miNodo</span>;  añadir <span class="var">v</span> a <span class="var">visitados</span>;  <span class="fn">encolar</span>(<span class="var">cola</span>, {<span class="var">v</span>, <span class="var">d</span>})
     <b>end for</b>
     <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
-        {<span class="var">n</span>, <span class="var">dir</span>} ← <span class="fn">desencolar</span>(<span class="var">cola</span>);   <b>if</b> <span class="var">n</span> ∈ <span class="var">objetivos</span> <b>then return</b> primer paso de <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        {<span class="var">n</span>, <span class="var">dir</span>} ← <span class="fn">desencolar</span>(<span class="var">cola</span>);   <b>if</b> <span class="var">n</span> ∈ <span class="var">objetivos</span> <b>then</b>
+            <span class="var">camino</span> ← <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>);   <b>return</b> {<span class="var">dirección</span>: primera de <span class="var">camino</span>, <span class="var">pasos</span>: |<span class="var">camino</span>| − 1, <span class="var">objetivo</span>: <span class="var">n</span>}
+        <b>end if</b>
         <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">n</span>, <span class="var">dir</span>) <b>do</b>
             <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b> <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>;  añadir <span class="var">v</span> a <span class="var">visitados</span>;  <span class="fn">encolar</span>(<span class="var">cola</span>, {<span class="var">v</span>, dir. de <span class="var">n</span> a <span class="var">v</span>}) <b>end if</b>
         <b>end for</b>
     <b>end while</b>
+    <b>return</b> NULL
 <b>end function</b></pre>
 <p class="lede"><code>getClosestNodeIndexFromNodeIndex</code> hace lo mismo, pero no ve los fantasmas.</p>
       </section>
@@ -832,7 +835,7 @@ open.add(start);
     <b>if</b> NOT <span class="fn">esCruce</span>(<span class="var">miNodo</span>) <b>then return</b> NULL <b>end if</b>
     <span class="var">seguros</span> ← <span class="fn">movimientosSeguros</span>()
     <span class="var">comer</span> ← <span class="fn">buscarObjetivoSeguro</span>(<span class="fn">fantasmasComestibles</span>(), <span class="var">seguros</span>)
-    <b>if</b> <span class="var">comer</span> ≠ NULL AND <span class="var">comer</span>.pasos &lt; <span class="var">umbralComer</span> + <span class="fn">comidos</span>() × <span class="var">agresividad</span> <b>then</b>
+    <b>if</b> <span class="var">comer</span> ≠ NULL AND 2 × <span class="var">comer</span>.pasos + <span class="var">margen</span> &lt; <span class="fn">tiempoComestible</span>(<span class="var">comer</span>.objetivo) <b>then</b>   <i>// cota: 2d</i>
         <b>return</b> <span class="var">comer</span>.dirección
     <b>end if</b>
     <b>if</b> <span class="fn">fantasmasCerca</span>() ≥ <span class="var">cuántos</span> <b>then</b>
