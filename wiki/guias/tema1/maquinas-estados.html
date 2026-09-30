@@ -1,0 +1,2374 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Máquinas de estados · Tema 1 · ICI</title>
+<meta name="description" content="Por qué los if anidados no escalan, qué es una máquina de estados y cómo se programa, la histéresis, las máquinas jerárquicas, y el paquete fsm del motor pieza a pieza, con un ejemplo completo para los fantasmas y un estado compuesto para Ms. Pac-Man.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>Máquinas de estados</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 08 · Organizar el comportamiento</p>
+    <h1>
+      Máquinas de estados
+      <span class="thin">Comportamientos como estados y transiciones, de la idea al paquete <code>fsm</code> del motor.</span>
+    </h1>
+    <p class="standfirst">
+      Por qué los <code>if</code> anidados no escalan, qué es una máquina de estados y cómo se programa, la histéresis, las máquinas jerárquicas, y el paquete <code>fsm</code> del motor pieza a pieza, con un ejemplo completo para los fantasmas y un estado compuesto para Ms.&nbsp;Pac-Man.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <p>
+        En la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a> el comportamiento vive dentro de
+        <code>getMove</code>: una cadena de <code>if</code> que se recorre entera en cada turno. Funciona, y en
+        la Práctica&nbsp;2 lo vais a reescribir. No porque la cadena esté mal, sino porque mezcla dos cosas que
+        conviene tener separadas: <strong>lo que sabéis del juego</strong> —cuándo huir, cuándo cazar— y
+        <strong>el mecanismo</strong> que decide cuál de esas cosas toca ahora. Una máquina de estados pone lo
+        primero en clases pequeñas con nombre y deja lo segundo al motor.
+      </p>
+
+      <section id="espagueti">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Por qué los <code>if</code> anidados no escalan</h2>
+        </div>
+        <p>
+          Este es un controlador de fantasmas escrito a la manera «algorítmica»: para cada
+          fantasma que tiene que decidir, huye si es comestible o si Ms.&nbsp;Pac-Man está cerca de una píldora
+          de poder; si no, la persigue casi siempre, y de vez en cuando se mueve al azar para no ser previsible.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · la decisión como árbol de <code>if</code></figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>(<span class="var">game</span>)
+    <b>for each</b> <span class="var">f</span> <b>in</b> FANTASMAS <b>do</b>
+        <b>if</b> <span class="fn">necesitaDecidir</span>(<span class="var">f</span>) <b>then</b>
+            <b>if</b> <span class="fn">esComestible</span>(<span class="var">f</span>) OR <span class="fn">pacManCercaDePíldoraDePoder</span>() <b>then</b>
+                <span class="var">mov</span>[<span class="var">f</span>] ← alejarse de Ms. Pac-Man
+            <b>else if</b> <span class="fn">azar</span>() &lt; CONSISTENCIA <b>then</b>
+                <span class="var">mov</span>[<span class="var">f</span>] ← acercarse a Ms. Pac-Man
+            <b>else</b>
+                <span class="var">mov</span>[<span class="var">f</span>] ← un movimiento legal cualquiera   <i>// para no ser previsible</i>
+            <b>end if</b>
+        <b>end if</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">mov</span>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Con tres ramas se lee de un vistazo. El problema llega con la décima. Cada comportamiento nuevo
+          —cortar el paso en un cruce, proteger una píldora, esperar a que los otros cierren la pinza— es otra
+          rama, y cada rama necesita saber en qué situación se activa <em>y en qué situación deja de
+          hacerlo</em>. Como el árbol se recorre desde arriba en cada turno, esa segunda parte no se escribe en
+          ningún sitio: sale sola del orden de las ramas y de las condiciones de todas las que van delante. Para
+          saber por qué un fantasma hizo algo hay que recorrer el árbol entero con el estado del juego en la
+          cabeza.
+        </p>
+        <figure class="narrow">
+          <figcaption>«Lo que ven los demás / lo que ves tú» · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-espagueti.jpg" width="700" height="367" loading="lazy"
+               alt="Dos círculos sobre fondo negro. El de la izquierda, titulado «What others see», es una interfaz con una nube discontinua dentro rotulada «Magic». El de la derecha, «What you see», es un plato de espaguetis con tomate: el código por dentro.">
+        </figure>
+        <p>
+          Desde fuera, el fantasma parece listo; desde dentro, es un plato de espaguetis. La salida no es
+          escribir mejor los <code>if</code>, es cambiar la unidad con la que se piensa: en vez de «qué hago en
+          esta situación», <strong>«en qué modo estoy, y qué me haría cambiar de modo»</strong>.
+        </p>
+      </section>
+
+      <section id="que-es">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Estados, transiciones y un turno</h2>
+        </div>
+        <p>
+          Una máquina de estados finita (<em lang="en">finite state machine</em>, FSM) tiene cuatro piezas:
+        </p>
+        <ul>
+          <li>Un conjunto finito de <strong>estados</strong>. Cada uno es un comportamiento completo:
+            «perseguir», «huir». Mientras se está en él, se hace lo mismo.</li>
+          <li>Un conjunto de <strong>transiciones</strong>, cada una con un estado de origen, uno de destino y
+            una <strong>condición</strong> (la guarda) que dice cuándo se cruza.</li>
+          <li>Un <strong>estado inicial</strong>.</li>
+          <li>Un <strong>estado actual</strong>, que es la única memoria de la máquina.</li>
+        </ul>
+        <p>
+          Y un único paso de ejecución, que en un juego es el <strong>turno</strong>: mirar las transiciones que
+          salen del estado actual; si alguna se cumple, cambiar al destino; y hacer lo que diga el estado en el
+          que se ha quedado. Los fantasmas de arriba, con esas piezas, son dos estados y dos flechas.
+        </p>
+        <figure class="wide">
+          <figcaption>La misma decisión, como máquina de dos estados</figcaption>
+          <svg class="explica dgf1" viewBox="0 0 470 124" role="img" aria-label="Dos estados, Perseguir y Huir. Perseguir es el inicial. De Perseguir a Huir se pasa cuando el fantasma es comestible o Ms. Pac-Man está cerca de una píldora de poder. De Huir a Perseguir se vuelve cuando deja de ser comestible.">
+            <style>
+              .dgf1 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.6}
+              .dgf1 .t{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink);text-anchor:middle}
+              .dgf1 .l{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+              .dgf1 .a{fill:none;stroke:var(--ink-3);stroke-width:1.4;marker-end:url(#f1a)}
+              .dgf1 .ini{fill:var(--ink)}
+            </style>
+            <defs>
+              <marker id="f1a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+            </defs>
+            <circle cx="26" cy="73" r="5" class="ini"/>
+            <path d="M31 73 H57" class="a"/>
+            <rect x="60" y="55" width="120" height="36" rx="10" class="st"/>
+            <text x="120" y="76.5" class="t">Perseguir</text>
+            <rect x="290" y="55" width="120" height="36" rx="10" class="st"/>
+            <text x="350" y="76.5" class="t">Huir</text>
+            <path d="M180 65 H287" class="a"/>
+            <text x="235" y="36" class="l">comestible |</text>
+            <text x="235" y="48" class="l">MsPacMan cerca PPill</text>
+            <path d="M290 81 H183" class="a"/>
+            <text x="235" y="106" class="l">no comestible</text>
+          </svg>
+        </figure>
+        <p>
+          Hay dos cosas que conviene no confundir. Un <strong>grafo de estados</strong>
+          es una representación: los modos en los que puede estar el agente y cómo se pasa de uno a otro. Una
+          <strong>máquina de estados</strong> es una implementación de ese grafo: el código que, turno a turno,
+          elige el siguiente estado según las transiciones. Toda IA tiene estados y un grafo de estados, aunque
+          nadie lo dibuje; el controlador de <code>if</code> de arriba también los tiene, sólo que escondidos
+          en las condiciones. No toda IA está implementada como FSM. Pero pensar el comportamiento como
+          estados es tan natural que los diseñadores de juegos dibujan máquinas de estados para explicar cómo
+          tiene que comportarse un personaje aunque luego nadie las programe así.
+        </p>
+        <p>
+          El fantasma completo tiene cuatro estados: además de perseguir y huir, moverse al
+          azar después de que muera Ms.&nbsp;Pac-Man, y esperar en el centro después de que se lo coman.
+        </p>
+        <figure class="wide">
+          <figcaption>El fantasma completo: cuatro estados y seis transiciones</figcaption>
+          <svg class="explica dgf2" viewBox="0 0 540 262" role="img" aria-label="Cuatro estados. De Movimiento aleatorio se pasa a Perseguir cuando Ms. Pac-Man reaparece; de Perseguir se vuelve a Movimiento aleatorio cuando Ms. Pac-Man muere. De Perseguir a Huir cuando el fantasma es comestible o Ms. Pac-Man está cerca de una píldora de poder; de Huir a Perseguir cuando no es comestible o Ms. Pac-Man está lejos de la píldora. De Huir al estado En el centro, esperar a salir, cuando se lo comen; y de ahí a Perseguir cuando termina el tiempo de penalización.">
+            <style>
+              .dgf2 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.6}
+              .dgf2 .t{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink);text-anchor:middle}
+              .dgf2 .l{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+              .dgf2 .ls{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+              .dgf2 .a{fill:none;stroke:var(--ink-3);stroke-width:1.4;marker-end:url(#f2a)}
+            </style>
+            <defs>
+              <marker id="f2a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+            </defs>
+            <rect x="6" y="42" width="136" height="36" rx="10" class="st"/>
+            <text x="74" y="63.5" class="t">Movimiento aleatorio</text>
+            <rect x="222" y="42" width="96" height="36" rx="10" class="st"/>
+            <text x="270" y="63.5" class="t">Perseguir</text>
+            <rect x="420" y="42" width="96" height="36" rx="10" class="st"/>
+            <text x="468" y="63.5" class="t">Huir</text>
+            <rect x="196" y="208" width="148" height="44" rx="10" class="st"/>
+            <text x="270" y="226" class="t">En el centro</text>
+            <text x="270" y="241" class="t">esperar a salir</text>
+            <path d="M142 52 H219" class="a"/>
+            <text x="182" y="34" class="l">MsPacMan reaparece</text>
+            <path d="M222 68 H145" class="a"/>
+            <text x="182" y="95" class="l">MsPacMan muere</text>
+            <path d="M318 52 H417" class="a"/>
+            <text x="369" y="22" class="l">comestible |</text>
+            <text x="369" y="34" class="l">MsPacMan cerca PPill</text>
+            <path d="M420 68 H321" class="a"/>
+            <text x="369" y="95" class="l">no comestible |</text>
+            <text x="369" y="107" class="l">MsPacMan lejos PPill</text>
+            <path d="M476 78 C 476 170, 420 230, 347 230" class="a"/>
+            <text x="480" y="166" class="ls">comido</text>
+            <path d="M270 208 V81" class="a"/>
+            <text x="280" y="150" class="ls">tiempo de penalización</text>
+            <text x="280" y="162" class="ls">terminado</text>
+          </svg>
+        </figure>
+        <p>
+          Fijaos en lo que ha pasado con la pregunta «¿por qué hace esto?». Ahora tiene dos respuestas
+          separadas, y las dos están escritas: <em>está huyendo</em> porque es el estado actual, y <em>ha
+          empezado a huir</em> porque se cumplió la guarda de esa flecha. Y fijaos también en que las dos flechas
+          entre Perseguir y Huir no tienen por qué ser la misma condición negada: se entra en Huir por una cosa
+          y se sale por otra. Eso, en la cadena de <code>if</code>, no se puede escribir.
+        </p>
+        <h3 class="label">Qué se ejecuta, y cuándo</h3>
+        <p>
+          Hay dos sitios donde se puede colgar el comportamiento. En una máquina de <strong>Moore</strong> la
+          acción pertenece al estado: mientras estás en Huir, huyes. En una de <strong>Mealy</strong> pertenece a
+          la transición: lo que haces depende de la flecha que acabas de cruzar. El motor de la asignatura es de
+          Moore: cada estado lleva su acción y las transiciones sólo deciden. A eso se añaden dos ganchos
+          habituales, la <strong>acción de entrada</strong>, que se ejecuta una vez al llegar a un estado
+          (arrancar un temporizador, elegir un objetivo), y la <strong>de salida</strong>, que se ejecuta una vez
+          al irse (limpiar lo que el estado dejó a medias). El motor sólo trae la segunda, <code>stop()</code>;
+          en la <a href="#run">sección&nbsp;10</a> está cómo añadir la primera.
+        </p>
+      </section>
+
+      <section id="implementar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Tres formas de programarla</h2>
+        </div>
+        <p>
+          El diagrama es la parte fácil. Hay tres formas habituales de llevarlo a código, de peor a
+          mejor, y cada una arregla un problema de la anterior.
+        </p>
+        <h3 class="label">1 · La mala: <code>if</code> para cambiar, <code>switch</code> para actuar</h3>
+        <figure>
+          <figcaption>Pseudocódigo · la implementación que no hay que hacer</figcaption>
+          <pre class="pseudo"><i>// primero, un if por cada evento que puede cambiar el estado</i>
+<b>if</b> <span class="fn">jugadorMuerto</span>() AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(JUGADOR_MUERTO) <b>then return</b>
+<b>if</b> <span class="fn">jugadorInmortal</span>() AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(GHOSTBUSTER_PILL) <b>then return</b>
+<b>if</b> <span class="fn">comido</span>() AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(COMIDO) <b>then return</b>
+<b>if</b> <span class="fn">vuelveASerMortal</span>() AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(…) <b>then return</b>
+<b>if</b> <span class="var">posición</span> = <span class="var">centro</span> AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(POSICION_CENTRO) <b>then return</b>
+<b>if</b> <span class="fn">finTemporizador</span>() <b>then</b> <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(FIN_TEMPORIZADOR)
+
+<i>// y después, un switch sobre el estado actual</i>
+<b>switch</b> <span class="var">maq</span>.<span class="fn">estadoActual</span>()
+    <b>case</b> PERSEGUIR:           <span class="fn">Perseguir</span>()
+    <b>case</b> HUIR:                <span class="fn">Huir</span>()
+    <b>case</b> MOVIMIENTO_ALEATORIO: <span class="fn">MovimientoAleatorio</span>()
+    <b>case</b> MUERTO_AL_CENTRO:     <span class="fn">MuertoAlCentro</span>()
+    <b>case</b> ESPERAR_SALIR:        <span class="fn">EsperarSalir</span>()
+<b>end switch</b></pre>
+        </figure>
+        <p>
+          Hay una máquina, pero el grafo está desperdigado: las transiciones son <code>if</code> sueltos que no
+          dicen de qué estado salen, su prioridad es el orden en que alguien los escribió, y añadir un estado
+          obliga a tocar el <code>switch</code> y, probablemente, media docena de <code>if</code>. Es la cadena de
+          antes con otra forma.
+        </p>
+        <h3 class="label">2 · La sencilla: una tabla</h3>
+        <p>
+          El ejemplo de <a href="https://rosettacode.org/wiki/Finite_state_machine" lang="en">Rosetta Code</a> para
+          máquinas de estados es una máquina expendedora hecha con un <code>enum</code>: cada estado sabe a qué
+          estado lleva cada entrada. Traducido a nuestro fantasma de cuatro estados queda así:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> ejemplos;
+
+<span class="c">/** La máquina de la figura, como tabla: estado × evento → estado. */</span>
+<span class="k">public enum</span> EstadoFantasma {
+    ALEATORIO, PERSEGUIR, HUIR, EN_EL_CENTRO;
+
+    <span class="k">private static final</span> Map&lt;EstadoFantasma, Map&lt;String, EstadoFantasma&gt;&gt; TABLA =
+            <span class="k">new</span> EnumMap&lt;&gt;(EstadoFantasma.<span class="k">class</span>);
+
+    <span class="k">static</span> {
+        <span class="k">for</span> (EstadoFantasma e : values())
+            TABLA.put(e, <span class="k">new</span> HashMap&lt;&gt;());
+        TABLA.get(ALEATORIO).put(<span class="s">"MsPacMan reaparece"</span>, PERSEGUIR);
+        TABLA.get(PERSEGUIR).put(<span class="s">"MsPacMan muere"</span>, ALEATORIO);
+        TABLA.get(PERSEGUIR).put(<span class="s">"comestible"</span>, HUIR);
+        TABLA.get(PERSEGUIR).put(<span class="s">"MsPacMan cerca PPill"</span>, HUIR);
+        TABLA.get(HUIR).put(<span class="s">"no comestible"</span>, PERSEGUIR);
+        TABLA.get(HUIR).put(<span class="s">"comido"</span>, EN_EL_CENTRO);
+        TABLA.get(EN_EL_CENTRO).put(<span class="s">"penalización terminada"</span>, PERSEGUIR);
+    }
+
+    <span class="k">public</span> EstadoFantasma siguiente(String evento) {
+        <span class="k">return</span> TABLA.get(<span class="k">this</span>).getOrDefault(evento, <span class="k">this</span>);   <span class="c">// evento que no me afecta: me quedo</span>
+    }
+
+    <span class="k">public static void</span> main(String[] args) {
+        EstadoFantasma e = ALEATORIO;
+        <span class="k">for</span> (String ev : <span class="k">new</span> String[]{<span class="s">"MsPacMan reaparece"</span>, <span class="s">"comido"</span>, <span class="s">"comestible"</span>, <span class="s">"comido"</span>, <span class="s">"penalización terminada"</span>}) {
+            e = e.siguiente(ev);
+            System.out.println(ev + <span class="s">" -&gt; "</span> + e);
+        }
+    }
+}</code></pre></div>
+<pre><code>MsPacMan reaparece -&gt; PERSEGUIR
+comido -&gt; PERSEGUIR
+comestible -&gt; HUIR
+comido -&gt; EN_EL_CENTRO
+penalización terminada -&gt; PERSEGUIR</code></pre>
+        <p>
+          Ahora el grafo está en un sitio, y se lee como el dibujo. Fijaos en la segunda línea de la salida: un
+          evento que no sale del estado actual —«comido» mientras persigue— no hace nada, y eso no hay que
+          programarlo. Pero esta máquina funciona con <strong>eventos</strong>: alguien tiene que decirle
+          «comido». En un juego casi nunca hay eventos; hay un estado del mundo que cambia y que hay que
+          <strong>consultar en cada turno</strong>. Y la tabla no sabe qué hacer en cada estado: eso sigue siendo
+          un <code>switch</code> en otra parte.
+        </p>
+        <h3 class="label">3 · Con objetos: estados, guardas y acciones como clases</h3>
+        <p>
+          La tercera versión convierte cada pieza en un objeto. Una interfaz
+          <code>FSM</code> con <code>getState()</code> y <code>doIt(Input in)</code> —«haz lo que toque y pasa al
+          siguiente estado según la entrada»— y una interfaz <code>StateEngine</code> para construirla:
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · la interfaz para construir la máquina, resumida</figcaption>
+          <pre class="pseudo"><b>interface</b> StateEngine
+    <span class="fn">add</span>(<span class="var">viejo</span>, <span class="var">entrada</span>, <span class="var">guarda</span>, <span class="var">acción</span>, <span class="var">nuevo</span>)   <i>// varias con el mismo origen y entrada: la primera guarda que se cumpla</i>
+    <span class="fn">add</span>(<span class="var">viejo</span>, <span class="var">entrada</span>, <span class="var">acción</span>, <span class="var">nuevo</span>)           <i>// guarda que siempre se cumple</i>
+    <span class="fn">setDefault</span>(<span class="var">viejo</span>, <span class="var">nuevo</span>)                    <i>// qué pasa si no se cumple ninguna</i>
+    <span class="fn">done</span>()                                    <i>// ya no se añaden más</i>
+    <span class="fn">makeFSM</span>(<span class="var">estadoInicial</span>)                    <i>// sólo después de done()</i></pre>
+        </figure>
+        <p>
+          Es la idea buena: el grafo se <em>declara</em> con llamadas a <code>add</code>, la condición es un
+          objeto (la guarda), y la máquina se encarga de recorrerlo. El motor de la asignatura hace exactamente
+          esto con dos simplificaciones que le vienen bien a un juego: no hay entrada-evento, porque la guarda
+          consulta el estado del juego directamente, y la acción no va en la transición sino en el estado.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col"><code>if</code> + <code>switch</code></th>
+                <th scope="col">Tabla</th>
+                <th scope="col">Objetos (el motor)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dónde está el grafo</td>
+                <td>Repartido entre los <code>if</code>.</td>
+                <td>En una tabla, en un sitio.</td>
+                <td>En las llamadas a <code>add</code>, en un sitio.</td>
+              </tr>
+              <tr>
+                <td>Qué dispara un cambio</td>
+                <td>Un <code>if</code> cualquiera, en cualquier orden.</td>
+                <td>Un evento que alguien envía.</td>
+                <td>Una condición que se consulta cada turno.</td>
+              </tr>
+              <tr>
+                <td>Qué se hace en cada estado</td>
+                <td>Un <code>case</code> del <code>switch</code>.</td>
+                <td>Fuera de la máquina.</td>
+                <td>La acción del estado.</td>
+              </tr>
+              <tr>
+                <td>Añadir un estado cuesta</td>
+                <td>Tocar el <code>switch</code> y varios <code>if</code>.</td>
+                <td>Una fila.</td>
+                <td>Una clase de acción y unas cuantas llamadas a <code>add</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="prioridades">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">De la lista de prioridades a la máquina</h2>
+        </div>
+        <p>
+          En <a href="estrategias.html#tres-formas">Estrategias algorítmicas</a> la decisión se escribía como una
+          <strong>lista de prioridades</strong>: comprueba esto; si se cumple, haz aquello; si no, sigue bajando.
+          Es lo que vais a entregar en la Práctica&nbsp;1. Pasarla a máquina de estados es casi mecánico: cada
+          «haz aquello» es un estado, y cada condición que lleva a él es una transición.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · un fantasma de la Práctica 1, como lista de prioridades</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">decidir</span>(<span class="var">f</span>)
+    <b>if</b> <span class="fn">encerrado</span>(<span class="var">f</span>) <b>then return</b> NEUTRAL
+    <b>if</b> <span class="fn">comestible</span>(<span class="var">f</span>) OR <span class="fn">distanciaPacManAPíldora</span>() &lt; 30 <b>then return</b> <span class="fn">huir</span>(<span class="var">f</span>)
+    <b>return</b> <span class="fn">perseguir</span>(<span class="var">f</span>)
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Tres líneas, tres estados: Encerrado, Huir y Perseguir. Las condiciones se convierten en las flechas
+          de la <a href="#ejemplo-fantasmas">sección&nbsp;11</a>, y el orden de la lista se convierte en el orden en
+          que se añaden las transiciones. Hasta aquí las dos versiones hacen lo mismo. La diferencia está en lo
+          que la lista <strong>no puede</strong> hacer: la lista no tiene memoria. Cada turno decide desde cero,
+          así que la condición para dejar de huir es, por fuerza, la contraria de la condición para empezar:
+          «a 30 o más de la píldora». La máquina sí recuerda en qué estado está, y por eso puede usar dos
+          umbrales distintos.
+        </p>
+        <h3 class="label">Histéresis: entrar por un umbral, salir por otro</h3>
+        <p>
+          Si se entra en Huir a menos de 30 y se sale a partir de 30, una Ms.&nbsp;Pac-Man que ronda los 30
+          pasos de la píldora hace cambiar al fantasma de estado turno sí, turno no. Cada cambio es un giro en el
+          siguiente cruce, y un fantasma que gira a un lado y al otro no persigue ni huye. La solución es la
+          misma que la de un termostato: <strong>entrar a menos de 30, salir a 40 o más</strong>. Entre 30 y
+          40 la máquina se queda en el estado en el que esté, que es justo lo que la lista no sabe hacer.
+        </p>
+        <p>
+          Lo hemos medido con el ejemplo completo de este apunte, en 500 partidas de los fantasmas contra la
+          Ms.&nbsp;Pac-Man de la <a href="#ejemplo-compuesto">sección&nbsp;12</a>, contando cuántos cambios entre
+          Perseguir y Huir se deshacen en cinco turnos o menos:
+        </p>
+<figure>
+          <figcaption>Cuenta · 500 partidas por fila, contra la Ms.&nbsp;Pac-Man del ejemplo</figcaption>
+          <pre class="cuenta">umbrales        cambios Perseguir↔Huir   deshechos en ≤ 5 turnos
+entrar  salir
+  30     30            7 337                    830   (11 %)
+  30     40            7 270                      0</pre>
+        </figure>
+        <p>
+          Uno de cada nueve cambios con un solo umbral es un rebote. Con dos, ninguno, y el número de cambios de
+          verdad apenas se mueve: la histéresis no hace al fantasma más perezoso, sólo le quita los cambios que
+          no significan nada. Es lo que se gana con separar el conocimiento del mecanismo: el umbral de salida
+          es conocimiento sobre el juego, y ahora tiene un sitio donde escribirse.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Lo que cambia y lo que no de la Práctica 1 a la 2</span>
+          <p>
+            Las funciones que medían —la distancia a la píldora, «¿llego yo antes?», los movimientos seguros—
+            no cambian: pasan a ser el <code>Input</code> y las condiciones de las transiciones. Lo que decidía
+            con ellas, el <code>getMove</code>, desaparece: ahora lo decide el grafo. Si vuestras funciones de la
+            Práctica&nbsp;1 medían bien, la Práctica&nbsp;2 es reorganizar; si no, la máquina hereda los mismos
+            errores con mejor letra.
+          </p>
+        </div>
+      </section>
+
+      <section id="jerarquicas">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Máquinas jerárquicas</h2>
+        </div>
+        <p>
+          Una máquina plana tiene un problema de crecimiento. Las transiciones son pares de estados, así que en el
+          peor caso crecen con el cuadrado del número de estados, y en cuanto el problema se complica aparecen
+          muchas más flechas que estados. Y tampoco hay dónde poner un <strong>objetivo a largo plazo</strong>:
+          la máquina sólo sabe en qué estado está ahora, no para qué.
+        </p>
+        <p>
+          Mirad la IA de un soldado de un juego de disparos, dibujada encima del nivel. Para llegar hasta el
+          enemigo tiene que ir de cobertura en cobertura, y en cada tramo puede correr o ir agachado; en cada
+          cobertura, quedarse, asomarse, recargar o tirar humo.
+        </p>
+        <figure class="wide">
+          <figcaption>Un soldado que avanza de cobertura en cobertura · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-hfsm-juego.jpg" width="1400" height="1017" loading="lazy"
+               alt="Vista cenital de un nivel naranja con una rejilla, dos cajas que sirven de cobertura y dos soldados. Encima, recuadros azules con los estados de la IA: STAY COVER, PEEK COVER, SNEAKING, RUNNING y otra vez STAY COVER, SNEAKING y RUNNING camino del enemigo, y MELEE al llegar. Junto a la primera caja, RELOAD, SMOKE y unos puntos suspensivos. Flechas grises unen los estados siguiendo el camino.">
+        </figure>
+        <p>
+          Plano, cada cobertura repite los mismos estados y cada tramo repite «correr o agachado». Si los
+          agrupamos, cada grupo es un <strong>superestado</strong>: por fuera se comporta como un estado más, con
+          sus flechas de entrada y salida, y por dentro es otra máquina.
+        </p>
+        <figure class="wide">
+          <figcaption>Los mismos estados, agrupados en superestados camino del objetivo · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-hfsm-juego-grupos.jpg" width="1400" height="1013" loading="lazy"
+               alt="El mismo nivel. Ahora los estados están encerrados en recuadros más grandes: uno junto a la primera caja con PEEK COVER, STAY COVER, RELOAD y SMOKE; uno para el primer tramo con SNEAKING y RUNNING; STAY COVER junto a la segunda caja; otro tramo con SNEAKING y RUNNING; y al final el enemigo marcado como GOAL. Círculos amarillos señalan los puntos por donde se pasa de un grupo al siguiente.">
+        </figure>
+        <p>
+          Eso es una <strong>máquina de estados jerárquica</strong> (HFSM). Resuelve dos cosas. La primera,
+          <strong>reutilizar transiciones</strong>: los estados que comparten las mismas flechas de salida se
+          meten en un superestado y la flecha se dibuja una vez, desde el grupo. La segunda, dar sitio al
+          objetivo: el nivel de arriba dice «voy de esta cobertura a la siguiente», y el de abajo, cómo. Y los
+          niveles se pueden anidar tanto como haga falta.
+        </p>
+        <figure class="wide">
+          <figcaption>Superestados dentro de superestados · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-hfsm-esquema.jpg" width="1100" height="644" loading="lazy"
+               alt="Esquema abstracto de una máquina jerárquica. Estados como rectángulos grises unidos por flechas; varios de ellos encerrados en recuadros de colores, y algunos de esos recuadros dentro de otros mayores. Las flechas salen tanto de estados sueltos como de los bordes de los recuadros.">
+        </figure>
+        <h3 class="label">La transición «desde cualquier estado»</h3>
+        <p>
+          El caso más frecuente en Ms.&nbsp;Pac-Man es el que más flechas repite. Cuando se comen a un fantasma o
+          muere Ms.&nbsp;Pac-Man, el fantasma vuelve a la cárcel <em>esté en el estado que esté</em>. En una
+          máquina plana eso es una flecha idéntica desde cada estado del laberinto; con cuatro estados son cuatro,
+          con diez son diez, y el día que añadís el undécimo os olvidáis de ponérsela. Un superestado «En el
+          laberinto» la deja en una.
+        </p>
+        <figure class="wide">
+          <figcaption>La misma condición: cuatro flechas en plano, una en jerárquica</figcaption>
+          <svg class="explica dgf8" viewBox="0 0 470 204" role="img" aria-label="A la izquierda, una máquina plana: cuatro estados, Perseguir, Huir, Cortar y Proteger PP, cada uno con su propia flecha hacia Encerrado, cuatro flechas con la misma condición. A la derecha, los mismos cuatro estados dentro de un superestado llamado En el laberinto, y una sola flecha que sale del borde del superestado hacia Encerrado.">
+            <style>
+              .dgf8 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.4}
+              .dgf8 .on{fill:var(--pill-soft);stroke:var(--pill-ink);stroke-width:1.6}
+              .dgf8 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+              .dgf8 .t{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink);text-anchor:middle}
+              .dgf8 .h{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+              .dgf8 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+              .dgf8 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#f8a)}
+              .dgf8 .b{fill:none;stroke:var(--pill-ink);stroke-width:1.8;marker-end:url(#f8b)}
+            </style>
+            <defs>
+              <marker id="f8a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+              <marker id="f8b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker>
+            </defs>
+            <text x="110" y="14" class="h">plana</text>
+            <rect x="18" y="26" width="88" height="24" rx="8" class="st"/><text x="62" y="41.5" class="t">Perseguir</text>
+            <rect x="116" y="26" width="88" height="24" rx="8" class="st"/><text x="160" y="41.5" class="t">Huir</text>
+            <rect x="18" y="62" width="88" height="24" rx="8" class="st"/><text x="62" y="77.5" class="t">Cortar</text>
+            <rect x="116" y="62" width="88" height="24" rx="8" class="st"/><text x="160" y="77.5" class="t">Proteger PP</text>
+            <rect x="52" y="150" width="116" height="28" rx="8" class="st"/><text x="110" y="167.5" class="t">Encerrado</text>
+            <path d="M18 38 H8 V160 H49" class="a"/>
+            <path d="M204 38 H214 V160 H171" class="a"/>
+            <path d="M68 86 L94 147" class="a"/>
+            <path d="M154 86 L128 147" class="a"/>
+            <text x="110" y="196" class="h">4 flechas con la misma condición</text>
+            <text x="355" y="14" class="h">jerárquica</text>
+            <rect x="250" y="20" width="210" height="88" rx="12" class="cp"/>
+            <text x="260" y="35" class="ct">EN EL LABERINTO</text>
+            <rect x="262" y="44" width="88" height="24" rx="8" class="st"/><text x="306" y="59.5" class="t">Perseguir</text>
+            <rect x="360" y="44" width="88" height="24" rx="8" class="st"/><text x="404" y="59.5" class="t">Huir</text>
+            <rect x="262" y="76" width="88" height="24" rx="8" class="st"/><text x="306" y="91.5" class="t">Cortar</text>
+            <rect x="360" y="76" width="88" height="24" rx="8" class="st"/><text x="404" y="91.5" class="t">Proteger PP</text>
+            <rect x="297" y="150" width="116" height="28" rx="8" class="st"/><text x="355" y="167.5" class="t">Encerrado</text>
+            <path d="M355 108 V147" class="b"/>
+            <text x="355" y="196" class="h">1 flecha, desde el superestado</text>
+          </svg>
+        </figure>
+        <h3 class="label">Cuando todo depende de todo</h3>
+        <p>
+          Un solo «desde cualquier estado» todavía se dibuja. El problema llega cuando son varias las
+          condiciones que atraviesan la máquina entera. Pensad en una Ms.&nbsp;Pac-Man sencilla: sin poder,
+          alterna entre comer pills, ir a por una píldora de poder y huir; con poder, entre cazar fantasmas y
+          comer sin miedo; y si la matan, reaparece. Seis estados. En plano, «se ha comido la PPill» sale de los
+          tres estados sin poder, «se acabó el poder» de los dos con poder y «muere» de cinco.
+        </p>
+        <figure class="wide">
+          <figcaption>En plano: seis estados y diecinueve flechas; cada color es una condición repetida</figcaption>
+          <svg class="explica dgf9" viewBox="0 0 560 312" role="img" aria-label="Máquina plana de Ms. Pac-Man con seis estados: Comer pills, Ir a PPill, Huir, Cazar, Comer sin miedo y Reaparecer. Entre Comer pills, Ir a PPill y Huir hay flechas en los dos sentidos entre cada par, y otras dos entre Cazar y Comer sin miedo. Tres flechas naranjas con la condición PPill comida van desde Comer pills, Ir a PPill y Huir hasta Cazar. Dos flechas verdes con la condición poder acabado vuelven desde Cazar y Comer sin miedo hasta Comer pills. Cinco flechas rojas con la condición muere van desde todos los demás estados hasta Reaparecer, y de Reaparecer una vuelve a Comer pills. Las flechas se cruzan por todas partes.">
+            <style>
+              .dgf9 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.4}
+              .dgf9 .t{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink);text-anchor:middle}
+              .dgf9 .l{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+              .dgf9 .a{fill:none;stroke:var(--ink-3);stroke-width:1.2;marker-end:url(#f9a)}
+              .dgf9 .p{fill:none;stroke:var(--pill-ink);stroke-width:1.5;marker-end:url(#f9p)}
+              .dgf9 .q{fill:none;stroke:var(--inky);stroke-width:1.5;marker-end:url(#f9q)}
+              .dgf9 .m{fill:none;stroke:var(--blinky);stroke-width:1.5;marker-end:url(#f9m)}
+              .dgf9 .ini{fill:var(--ink)}
+            </style>
+            <defs>
+              <marker id="f9a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+              <marker id="f9p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker>
+              <marker id="f9q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--inky)"/></marker>
+              <marker id="f9m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <!-- el resto: decisiones dentro de cada modo y reaparecer -->
+            <path d="M150 39 H222" class="a"/>
+            <path d="M225 49 H153" class="a"/>
+            <path d="M335 39 H407" class="a"/>
+            <path d="M410 49 H338" class="a"/>
+            <path d="M110 30 C 150 -2, 410 -2, 450 27" class="a"/>
+            <path d="M440 30 C 400 12, 160 12, 120 27" class="a"/>
+            <path d="M240 149 H317" class="a"/>
+            <path d="M320 159 H243" class="a"/>
+            <path d="M225 258 H12 V44 H37" class="a"/>
+            <!-- PPill comida -->
+            <path d="M118 58 L162 137" class="p"/>
+            <path d="M255 58 L207 137" class="p"/>
+            <path d="M420 58 C 380 110, 280 118, 234 137" class="p"/>
+            <!-- poder acabado -->
+            <path d="M130 150 C 84 150, 76 112, 80 61" class="q"/>
+            <path d="M340 140 C 300 96, 170 88, 138 61" class="q"/>
+            <!-- muere -->
+            <path d="M60 58 C 60 150, 120 250, 222 246" class="m"/>
+            <path d="M290 58 V233" class="m"/>
+            <path d="M500 58 C 500 150, 440 250, 338 246" class="m"/>
+            <path d="M200 168 L248 233" class="m"/>
+            <path d="M360 168 L312 233" class="m"/>
+            <rect x="40" y="30" width="110" height="28" rx="8" class="st"/><text x="95" y="47.5" class="t">Comer pills</text>
+            <rect x="225" y="30" width="110" height="28" rx="8" class="st"/><text x="280" y="47.5" class="t">Ir a PPill</text>
+            <rect x="410" y="30" width="110" height="28" rx="8" class="st"/><text x="465" y="47.5" class="t">Huir</text>
+            <rect x="130" y="140" width="110" height="28" rx="8" class="st"/><text x="185" y="157.5" class="t">Cazar</text>
+            <rect x="320" y="140" width="110" height="28" rx="8" class="st"/><text x="375" y="157.5" class="t">Comer sin miedo</text>
+            <rect x="225" y="236" width="110" height="28" rx="8" class="st"/><text x="280" y="253.5" class="t">Reaparecer</text>
+            <path d="M16 296 H40" class="a"/><text x="46" y="299.5" class="l">el resto · 9</text>
+            <path d="M150 296 H174" class="p"/><text x="180" y="299.5" class="l">PPill comida · 3</text>
+            <path d="M296 296 H320" class="q"/><text x="326" y="299.5" class="l">poder acabado · 2</text>
+            <path d="M448 296 H472" class="m"/><text x="478" y="299.5" class="l">muere · 5</text>
+          </svg>
+        </figure>
+        <p>
+          Nadie la ha dibujado mal: es lo que sale. Y lo peor no es leerla, es cambiarla. Un séptimo estado,
+          ir a por la fruta pongamos, obliga a repasar cada color y decidir si le toca flecha: si puede comerse
+          la PPill estando ahí, si puede morir, a dónde se vuelve cuando se acaba. Olvidar una es un fallo que
+          no se ve hasta que una partida pasa justo por ese estado con esa condición.
+        </p>
+        <p>
+          Los colores dicen cómo agruparla. Los estados que comparten una flecha de salida van juntos: los tres
+          sin poder en un superestado, los dos con poder en otro, y los dos grupos dentro de «Viva», que es
+          desde donde se muere.
+        </p>
+        <figure class="wide">
+          <figcaption>Jerárquica: cada condición se dibuja una vez, en el borde del grupo al que afecta</figcaption>
+          <svg class="explica dgf10" viewBox="0 0 560 322" role="img" aria-label="La misma Ms. Pac-Man como máquina jerárquica. Un superestado Viva contiene otros dos. Sin poder, el inicial, contiene Comer pills, que es su inicial, Ir a PPill y Huir, con flechas en los dos sentidos entre cada par. Con poder contiene Cazar, su inicial, y Comer sin miedo, con flechas en los dos sentidos. Una sola flecha naranja, PPill comida, va del borde de Sin poder al de Con poder; una sola flecha verde, poder acabado, vuelve. Una sola flecha roja, muere, sale del borde de Viva hacia Reaparecer, y de Reaparecer una flecha vuelve al borde de Viva.">
+            <style>
+              .dgf10 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.4}
+              .dgf10 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+              .dgf10 .vp{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:5 3}
+              .dgf10 .t{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink);text-anchor:middle}
+              .dgf10 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+              .dgf10 .cv{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--ink-3)}
+              .dgf10 .l{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+              .dgf10 .lm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+              .dgf10 .a{fill:none;stroke:var(--ink-3);stroke-width:1.2;marker-end:url(#f10a)}
+              .dgf10 .p{fill:none;stroke:var(--pill-ink);stroke-width:1.6;marker-end:url(#f10p)}
+              .dgf10 .q{fill:none;stroke:var(--inky);stroke-width:1.6;marker-end:url(#f10q)}
+              .dgf10 .m{fill:none;stroke:var(--blinky);stroke-width:1.6;marker-end:url(#f10m)}
+              .dgf10 .ini{fill:var(--ink)}
+            </style>
+            <defs>
+              <marker id="f10a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+              <marker id="f10p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker>
+              <marker id="f10q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--inky)"/></marker>
+              <marker id="f10m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <rect x="10" y="20" width="540" height="200" rx="14" class="vp"/>
+            <text x="22" y="36" class="cv">VIVA</text>
+            <rect x="24" y="46" width="290" height="160" rx="12" class="cp"/>
+            <text x="36" y="62" class="ct">SIN PODER</text>
+            <rect x="372" y="46" width="164" height="160" rx="12" class="cp"/>
+            <text x="384" y="62" class="ct">CON PODER</text>
+            <!-- dentro de Sin poder -->
+            <circle cx="31" cy="89" r="3.5" class="ini"/><path d="M34 89 H37" class="a"/>
+            <rect x="40" y="76" width="100" height="26" rx="8" class="st"/><text x="90" y="92.5" class="t">Comer pills</text>
+            <rect x="196" y="76" width="100" height="26" rx="8" class="st"/><text x="246" y="92.5" class="t">Ir a PPill</text>
+            <rect x="118" y="160" width="100" height="26" rx="8" class="st"/><text x="168" y="176.5" class="t">Huir</text>
+            <path d="M140 84 H193" class="a"/>
+            <path d="M196 94 H143" class="a"/>
+            <path d="M94 102 L138 157" class="a"/>
+            <path d="M126 160 L83 106" class="a"/>
+            <path d="M242 102 L200 157" class="a"/>
+            <path d="M212 160 L255 106" class="a"/>
+            <!-- dentro de Con poder -->
+            <circle cx="381" cy="89" r="3.5" class="ini"/><path d="M384 89 H387" class="a"/>
+            <rect x="390" y="76" width="128" height="26" rx="8" class="st"/><text x="454" y="92.5" class="t">Cazar</text>
+            <rect x="390" y="160" width="128" height="26" rx="8" class="st"/><text x="454" y="176.5" class="t">Comer sin miedo</text>
+            <path d="M446 102 V157" class="a"/>
+            <path d="M462 160 V105" class="a"/>
+            <!-- entre grupos -->
+            <path d="M314 112 H369" class="p"/>
+            <text x="343" y="94" class="lm">PPill</text><text x="343" y="105" class="lm">comida</text>
+            <path d="M372 146 H317" class="q"/>
+            <text x="343" y="162" class="lm">poder</text><text x="343" y="173" class="lm">acabado</text>
+            <path d="M290 220 V247" class="m"/>
+            <text x="298" y="238" class="l">muere</text>
+            <rect x="225" y="250" width="110" height="28" rx="8" class="st"/><text x="280" y="267.5" class="t">Reaparecer</text>
+            <path d="M225 264 H110 V223" class="a"/>
+            <text x="118" y="244" class="l">reaparece</text>
+            <path d="M16 306 H40" class="a"/><text x="46" y="309.5" class="l">el resto · 9</text>
+            <path d="M150 306 H174" class="p"/><text x="180" y="309.5" class="l">PPill comida · 1</text>
+            <path d="M296 306 H320" class="q"/><text x="326" y="309.5" class="l">poder acabado · 1</text>
+            <path d="M448 306 H472" class="m"/><text x="478" y="309.5" class="l">muere · 1</text>
+          </svg>
+        </figure>
+        <p>
+          Las flechas de dentro siguen ahí, porque decidir entre comer, ir a por la PPill o huir es de verdad
+          una decisión entre tres. Lo que desaparece es la repetición: un estado nuevo se mete en su grupo y
+          hereda sin más las flechas del borde. Al entrar en un superestado se empieza por su estado inicial, el
+          del punto negro, y al salir por el borde se sale del estado en el que se estuviera dentro.
+        </p>
+        <p>
+          Con esa idea, el fantasma de cuatro estados se puede refinar sin que el nivel de arriba cambie: las
+          mismas cuatro cajas y las mismas seis flechas, pero Perseguir y Huir son ahora máquinas enteras.
+          Perseguir alterna entre ocupar un cuadrante, perseguir directamente y tapar la escapatoria; Huir, entre
+          buscar un cuadrante, buscar un túnel y evitar las píldoras.
+        </p>
+        <figure class="wide">
+          <figcaption>El fantasma, jerárquico: Perseguir y Huir son ahora máquinas enteras</figcaption>
+          <svg class="explica dgf3" viewBox="0 0 540 350" role="img" aria-label="La máquina de cuatro estados del fantasma, con Perseguir y Huir convertidos en superestados. Dentro de Perseguir hay un ciclo de tres estados: Ocupar cuadrante, Perseguir y Tapar escapatoria. Dentro de Huir, otro ciclo: Buscar cuadrante, Buscar túnel y Evitar pills. Las flechas de fuera son las mismas que en la máquina plana y salen de los bordes de los superestados: Ms. Pac-Man reaparece y Ms. Pac-Man muere con Movimiento aleatorio; comestible o cerca de la píldora hacia Huir; no comestible o lejos de vuelta a Perseguir; comido hacia En el centro; y tiempo de penalización terminado de vuelta a Perseguir.">
+            <style>
+              .dgf3 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.6}
+              .dgf3 .si{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+              .dgf3 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+              .dgf3 .t{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink);text-anchor:middle}
+              .dgf3 .ti{font-family:var(--f-mono);font-size:9px;fill:var(--ink);text-anchor:middle}
+              .dgf3 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+              .dgf3 .l{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+              .dgf3 .le{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:end}
+              .dgf3 .a{fill:none;stroke:var(--ink-3);stroke-width:1.4;marker-end:url(#f3a)}
+              .dgf3 .ai{fill:none;stroke:var(--maze);stroke-width:1.1;marker-end:url(#f3b)}
+            </style>
+            <defs>
+              <marker id="f3a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+              <marker id="f3b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+            </defs>
+            <rect x="20" y="20" width="136" height="36" rx="10" class="st"/>
+            <text x="88" y="41.5" class="t">Movimiento aleatorio</text>
+            <rect x="380" y="20" width="140" height="44" rx="10" class="st"/>
+            <text x="450" y="38" class="t">En el centro</text>
+            <text x="450" y="53" class="t">esperar a salir</text>
+            <rect x="20" y="100" width="250" height="110" rx="12" class="cp"/>
+            <text x="32" y="116" class="ct">PERSEGUIR</text>
+            <rect x="32" y="126" width="104" height="26" rx="8" class="si"/><text x="84" y="142" class="ti">Ocupar cuadrante</text>
+            <rect x="166" y="126" width="92" height="26" rx="8" class="si"/><text x="212" y="142" class="ti">Perseguir</text>
+            <rect x="92" y="172" width="120" height="26" rx="8" class="si"/><text x="152" y="188" class="ti">Tapar escapatoria</text>
+            <path d="M136 139 H163" class="ai"/>
+            <path d="M212 152 L188 169" class="ai"/>
+            <path d="M112 172 L96 155" class="ai"/>
+            <rect x="290" y="236" width="230" height="104" rx="12" class="cp"/>
+            <text x="302" y="252" class="ct">HUIR</text>
+            <rect x="302" y="262" width="104" height="26" rx="8" class="si"/><text x="354" y="278" class="ti">Buscar cuadrante</text>
+            <rect x="424" y="262" width="84" height="26" rx="8" class="si"/><text x="466" y="278" class="ti">Buscar túnel</text>
+            <rect x="362" y="304" width="88" height="26" rx="8" class="si"/><text x="406" y="320" class="ti">Evitar pills</text>
+            <path d="M406 275 H421" class="ai"/>
+            <path d="M466 288 L442 302" class="ai"/>
+            <path d="M372 304 L357 291" class="ai"/>
+            <path d="M50 56 V97" class="a"/>
+            <text x="58" y="76" class="l">MsPacMan</text>
+            <text x="58" y="88" class="l">reaparece</text>
+            <path d="M130 100 V59" class="a"/>
+            <text x="138" y="76" class="l">MsPacMan</text>
+            <text x="138" y="88" class="l">muere</text>
+            <path d="M270 185 C 330 185, 360 200, 360 233" class="a"/>
+            <text x="372" y="196" class="l">comestible |</text>
+            <text x="372" y="208" class="l">MsPacMan cerca PPill</text>
+            <path d="M290 300 C 190 300, 145 265, 145 213" class="a"/>
+            <text x="24" y="260" class="l">no comestible |</text>
+            <text x="24" y="272" class="l">MsPacMan lejos PPill</text>
+            <path d="M512 236 V67" class="a"/>
+            <text x="504" y="150" class="le">comido</text>
+            <path d="M380 48 C 320 48, 290 110, 273 127" class="a"/>
+            <text x="330" y="100" class="l">tiempo de penalización</text>
+            <text x="330" y="112" class="l">terminado</text>
+          </svg>
+        </figure>
+        <h3 class="label">Cuando la jerarquía también estorba</h3>
+        <p>
+          La jerarquía funciona mientras cada comportamiento pertenezca a un solo grupo. En el juego de verdad
+          eso falla pronto. Un fantasma al que Ms.&nbsp;Pac-Man se come vuelve a salir de la cárcel sin ser
+          comestible, aunque a ella le quede poder: con poder también hay que saber huir.
+        </p>
+        <figure class="wide">
+          <figcaption>La misma Ms.&nbsp;Pac-Man, cuando también hay que huir con poder</figcaption>
+          <svg class="explica dgf11" viewBox="0 0 560 292" role="img" aria-label="Los superestados Sin poder y Con poder de la máquina anterior. Sin poder no cambia. Dentro de Con poder hay ahora un tercer estado, Huir, copia del de Sin poder, resaltado, con flechas nuevas en rojo hacia y desde Cazar y Comer sin miedo. Del borde de Con poder sigue saliendo poder acabado hacia Sin poder, pero además una flecha roja sale del Huir copiado, atraviesa los dos bordes y llega directamente al Huir de Sin poder, con la condición poder acabado y huyendo.">
+            <style>
+              .dgf11 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.4}
+              .dgf11 .on{fill:var(--pill-soft);stroke:var(--bad);stroke-width:1.6}
+              .dgf11 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+              .dgf11 .t{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink);text-anchor:middle}
+              .dgf11 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+              .dgf11 .l{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+              .dgf11 .lm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+              .dgf11 .lb{font-family:var(--f-mono);font-size:9.5px;fill:var(--bad)}
+              .dgf11 .a{fill:none;stroke:var(--ink-3);stroke-width:1.2;marker-end:url(#f11a)}
+              .dgf11 .b{fill:none;stroke:var(--bad);stroke-width:1.6;marker-end:url(#f11b)}
+              .dgf11 .ini{fill:var(--ink)}
+            </style>
+            <defs>
+              <marker id="f11a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+              <marker id="f11b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker>
+            </defs>
+            <rect x="14" y="20" width="290" height="176" rx="12" class="cp"/>
+            <text x="26" y="36" class="ct">SIN PODER</text>
+            <rect x="362" y="20" width="184" height="252" rx="12" class="cp"/>
+            <text x="374" y="36" class="ct">CON PODER</text>
+            <!-- Sin poder, igual que antes -->
+            <circle cx="21" cy="63" r="3.5" class="ini"/><path d="M24 63 H27" class="a"/>
+            <rect x="30" y="50" width="100" height="26" rx="8" class="st"/><text x="80" y="66.5" class="t">Comer pills</text>
+            <rect x="186" y="50" width="100" height="26" rx="8" class="st"/><text x="236" y="66.5" class="t">Ir a PPill</text>
+            <rect x="108" y="146" width="100" height="26" rx="8" class="st"/><text x="158" y="162.5" class="t">Huir</text>
+            <path d="M130 58 H183" class="a"/>
+            <path d="M186 68 H133" class="a"/>
+            <path d="M84 76 L128 143" class="a"/>
+            <path d="M116 146 L73 80" class="a"/>
+            <path d="M232 76 L190 143" class="a"/>
+            <path d="M202 146 L245 80" class="a"/>
+            <!-- Con poder, con Huir copiado -->
+            <circle cx="371" cy="63" r="3.5" class="ini"/><path d="M374 63 H377" class="a"/>
+            <rect x="380" y="50" width="128" height="26" rx="8" class="st"/><text x="444" y="66.5" class="t">Cazar</text>
+            <rect x="380" y="136" width="128" height="26" rx="8" class="st"/><text x="444" y="152.5" class="t">Comer sin miedo</text>
+            <rect x="380" y="222" width="128" height="26" rx="8" class="on"/><text x="444" y="238.5" class="t">Huir (copia)</text>
+            <path d="M436 76 V133" class="a"/>
+            <path d="M452 136 V79" class="a"/>
+            <path d="M436 162 V219" class="b"/>
+            <path d="M452 222 V165" class="b"/>
+            <path d="M508 228 C 530 205, 530 95, 511 72" class="b"/>
+            <path d="M508 56 C 556 62, 556 238, 511 244" class="b"/>
+            <!-- entre grupos -->
+            <path d="M304 86 H359" class="a"/>
+            <text x="333" y="68" class="lm">PPill</text><text x="333" y="79" class="lm">comida</text>
+            <path d="M362 120 H307" class="a"/>
+            <text x="333" y="136" class="lm">poder</text><text x="333" y="147" class="lm">acabado</text>
+            <path d="M380 240 C 300 240, 236 214, 190 175" class="b"/>
+            <text x="222" y="252" class="lb">poder acabado</text>
+            <text x="222" y="264" class="lb">y huyendo: cruza</text>
+            <text x="222" y="276" class="lb">los dos bordes</text>
+          </svg>
+        </figure>
+        <p>
+          Lo rojo es lo que ha habido que añadir, y enseña tres problemas que otro nivel más no arregla:
+        </p>
+        <ul>
+          <li>
+            <strong>Un estado sólo tiene un padre.</strong> Huir ya vive en «Sin poder», así que en «Con poder»
+            hace falta otro, con sus propias flechas de entrada y de salida, que repiten condiciones que ya
+            estaban escritas. La acción se reutiliza, porque es la misma clase; lo que se copia es el cableado,
+            y las dos copias hay que mantenerlas iguales a mano.
+          </li>
+          <li>
+            <strong>Salir por el borde lleva al estado inicial.</strong> Si el poder se acaba mientras huye, la
+            flecha del borde la deja en «Comer pills», con el fantasma encima. Hace falta una flecha que
+            atraviese los dos bordes hasta el Huir de fuera y que se compruebe antes que la del borde. La
+            jerarquía servía para no tener que mirar dentro de los grupos, y aquí obliga a mirar.
+          </li>
+          <li>
+            <strong>Las secuencias siguen costando.</strong> «Ve al cruce, espera a que llegue el otro, cierra»
+            es fácil de decir y pesado de escribir como estados: cada paso necesita una transición de «acabado»
+            hacia el siguiente, y además una de salida por cada forma en que ese paso puede fallar, que casi
+            nunca son las mismas para todos los pasos y por eso no se pueden subir al borde.
+          </li>
+        </ul>
+        <p>
+          Los tres tienen la misma raíz: en una máquina, cada comportamiento está en un sitio, y para cambiar de
+          comportamiento hay que ir de un sitio a otro por una flecha. Los
+          <a href="arboles-comportamiento.html">árboles de comportamiento</a>, el siguiente apunte, quitan los
+          sitios. En cada turno se decide otra vez desde la raíz, así que «huir si hay un fantasma peligroso
+          cerca» se escribe una vez, arriba del todo, y vale con poder y sin él; y una secuencia es un nodo que
+          ejecuta sus hijos en orden y falla en cuanto falla uno, sin una flecha por paso.
+        </p>
+      </section>
+
+      <section id="motor">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">El paquete <code>fsm</code> del motor</h2>
+        </div>
+        <p>
+          El motor trae una implementación de máquinas de estados jerárquicas lista para usar, con observadores
+          que las dibujan mientras se juega. Así se ve una partida con los cuatro fantasmas y Ms.&nbsp;Pac-Man
+          controlados por máquinas de estados, cada una en su ventana, con el estado activo resaltado:
+        </p>
+        <figure class="wide">
+          <figcaption>Una partida con las máquinas a la vista · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-motor.jpg" width="1600" height="894" loading="lazy"
+               alt="Captura del simulador. En el centro, el laberinto de Ms. Pac-Man en plena partida. A la derecha, cuatro ventanas pequeñas tituladas SUE, INKY, PINKY y BLINKY, cada una con un grafo de dos nodos, chase y runAway, con el nodo activo en azul claro y la última transición cruzada resaltada con su nombre. A la izquierda, una ventana MsPacMan con un grafo de cuatro nodos, state1, state2, state3 y compound1, y debajo otra ventana Compound1 con el grafo interno del estado compuesto, cstate1 y cstate2.">
+        </figure>
+        <p>
+          Todo lo que sigue es Java normal: una clase por acción, una por transición, y objetos que se pasan al
+          constructor. Cada acción y cada transición guardan en atributos lo que las distingue (qué fantasma,
+          qué umbral) y reciben el resto como parámetro. Si hace tiempo que no escribís una clase, estas son
+          las cuatro piezas que se usan, todas en una acción de ejemplo:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.actions;
+
+<span class="k">public class</span> MoverseAction <span class="k">implements</span> Action {
+
+    <span class="c">// Un enum dentro de la clase: los valores posibles de una opción, con nombre.</span>
+    <span class="k">public enum</span> Modo { ACERCARSE, ALEJARSE }
+
+    <span class="c">// Atributos: lo que distingue a este objeto de otro de la misma clase.</span>
+    <span class="k">private final</span> GHOST ghost;
+    <span class="k">private final</span> Modo modo;
+
+    <span class="c">// Constructor: se ejecuta una vez, con new, y rellena los atributos.</span>
+    <span class="k">public</span> MoverseAction(GHOST ghost, Modo modo) {
+        <span class="k">this</span>.ghost = ghost;      <span class="c">// this.ghost es el atributo; ghost, el parámetro</span>
+        <span class="k">this</span>.modo = modo;
+    }
+
+    <span class="c">// Métodos: lo que se le puede pedir al objeto. Éste, en cada turno.</span>
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE execute(Game game) {
+        <span class="k">int</span> yo = game.getGhostCurrentNodeIndex(ghost);
+        <span class="k">int</span> pacman = game.getPacmanCurrentNodeIndex();
+        MOVE ultimo = game.getGhostLastMoveMade(ghost);
+        <span class="k">if</span> (modo == Modo.ACERCARSE)
+            <span class="k">return</span> game.getApproximateNextMoveTowardsTarget(yo, pacman, ultimo, DM.PATH);
+        <span class="k">return</span> game.getApproximateNextMoveAwayFromTarget(yo, pacman, ultimo, DM.PATH);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String getActionId() {
+        <span class="k">return</span> ghost + (modo == Modo.ACERCARSE ? <span class="s">" persigue"</span> : <span class="s">" huye"</span>);
+    }
+}</code></pre></div>
+        <p>
+          Una sola clase da tantas acciones como objetos se construyan con ella:
+          <code>new MoverseAction(GHOST.BLINKY, MoverseAction.Modo.ACERCARSE)</code> y
+          <code>new MoverseAction(GHOST.INKY, MoverseAction.Modo.ALEJARSE)</code> son dos acciones distintas,
+          cada una con sus atributos. Fuera de la clase, el <code>enum</code> se nombra con el de la clase
+          delante, <code>MoverseAction.Modo</code>. Los atributos son <code>final</code> porque no cambian
+          después de construir el objeto, y el <code>Game</code> no está entre ellos: llega como parámetro en
+          cada llamada, por lo que se explica en las <a href="#acciones">acciones</a>.
+        </p>
+        <h3 class="label">Un proceso común a todas las técnicas</h3>
+        <p>
+          El motor organiza igual todas las técnicas de la asignatura. En cada turno el juego se convierte en un
+          <code>Input</code>, una técnica decide con él, y la decisión se ejecuta como una <code>Action</code> que
+          devuelve el movimiento. Lo que cambia de un bloque a otro es sólo la caja del medio.
+        </p>
+        <figure class="wide">
+          <figcaption>El proceso de ingeniería del conocimiento, igual para las cuatro técnicas</figcaption>
+          <svg class="explica dgf4" viewBox="0 0 560 160" role="img" aria-label="Cadena de izquierda a derecha. El juego en el instante t entra en Input, que lo lee con parseInput. El Input pasa a una columna con cuatro técnicas: máquina de estados, reglas, lógica borrosa y razonamiento basado en casos; la máquina de estados está resaltada porque es la de esta práctica. La técnica elige una Action, cuyo execute devuelve un MOVE, que lleva el juego al instante t más uno.">
+            <style>
+              .dgf4 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.6}
+              .dgf4 .on{fill:var(--pill-soft);stroke:var(--pill-ink);stroke-width:1.6}
+              .dgf4 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+              .dgf4 .t{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink);text-anchor:middle}
+              .dgf4 .ts{font-family:var(--f-mono);font-size:9px;fill:var(--ink-2);text-anchor:middle}
+              .dgf4 .l{font-family:var(--f-mono);font-size:9px;fill:var(--ink-2);text-anchor:middle}
+              .dgf4 .a{fill:none;stroke:var(--ink-3);stroke-width:1.4;marker-end:url(#f4a)}
+            </style>
+            <defs>
+              <marker id="f4a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+            </defs>
+            <rect x="6" y="60" width="80" height="40" rx="8" class="st"/>
+            <text x="46" y="77" class="t">juego</text>
+            <text x="46" y="91" class="ts">en t</text>
+            <path d="M86 80 H115" class="a"/>
+            <text x="101" y="72" class="l">Game</text>
+            <rect x="118" y="60" width="90" height="40" rx="8" class="st"/>
+            <text x="163" y="77" class="t">Input</text>
+            <text x="163" y="91" class="ts">parseInput()</text>
+            <path d="M208 80 H237" class="a"/>
+            <rect x="240" y="12" width="110" height="138" rx="10" class="cp"/>
+            <rect x="250" y="22" width="90" height="26" rx="8" class="on"/><text x="295" y="38.5" class="t">FSM</text>
+            <rect x="250" y="54" width="90" height="26" rx="8" class="st"/><text x="295" y="70.5" class="t">Reglas</text>
+            <rect x="250" y="86" width="90" height="26" rx="8" class="st"/><text x="295" y="102.5" class="t">Borroso</text>
+            <rect x="250" y="118" width="90" height="26" rx="8" class="st"/><text x="295" y="134.5" class="t">CBR</text>
+            <path d="M350 80 H379" class="a"/>
+            <rect x="382" y="60" width="84" height="40" rx="8" class="st"/>
+            <text x="424" y="77" class="t">Action</text>
+            <text x="424" y="91" class="ts">execute()</text>
+            <path d="M466 80 H499" class="a"/>
+            <text x="483" y="72" class="l">MOVE</text>
+            <rect x="502" y="60" width="52" height="40" rx="8" class="st"/>
+            <text x="528" y="77" class="t">juego</text>
+            <text x="528" y="91" class="ts">en t+1</text>
+          </svg>
+        </figure>
+        <p>
+          Esto es lo que justifica el esfuerzo de ahora. El <code>Input</code> y las acciones que escribáis para
+          la máquina de estados son los mismos que usaréis con reglas y con lógica borrosa: el motor tiene los
+          paquetes <span class="path">es.ucm.fdi.ici.rules</span>, <span class="path">es.ucm.fdi.ici.fuzzy</span>
+          y <span class="path">es.ucm.fdi.ici.cbr</span> montados sobre las mismas dos clases. Un catálogo de
+          acciones bien hecho sobrevive a tres prácticas.
+        </p>
+        <h3 class="label">Las clases</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th scope="col">Clase</th><th scope="col">Qué es</th><th scope="col">Quién la escribe</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>Input</code></td><td>Lo que se lee del juego en un turno. Clase abstracta: se extiende.</td><td>Vosotros, una por controlador</td></tr>
+              <tr><td><code>Action</code></td><td>Qué hacer: de un <code>Game</code> a un <code>MOVE</code>. Interfaz.</td><td>Vosotros, muchas</td></tr>
+              <tr><td><code>Transition</code></td><td>Cuándo cambiar: de un <code>Input</code> a un <code>boolean</code>. Interfaz.</td><td>Vosotros, muchas</td></tr>
+              <tr><td><code>State</code></td><td><code>execute(Input)</code> y <code>stop()</code>. Interfaz.</td><td>El motor; vosotros si necesitáis otra</td></tr>
+              <tr><td><code>SimpleState</code></td><td>Un estado que ejecuta una <code>Action</code>.</td><td>El motor</td></tr>
+              <tr><td><code>CompoundState</code></td><td>Un estado que ejecuta otra <code>FSM</code> dentro.</td><td>El motor</td></tr>
+              <tr><td><code>FSM</code></td><td>El grafo, el estado actual y el bucle de cada turno.</td><td>El motor</td></tr>
+              <tr><td><code>FSMObserver</code></td><td>Recibe los avisos de la máquina: arco añadido, lista, cambio, reinicio.</td><td>El motor trae dos</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <code>Input</code> y <code>Action</code> están en <span class="path">es.ucm.fdi.ici</span>, porque son
+          comunes a todas las técnicas; el resto, en <span class="path">es.ucm.fdi.ici.fsm</span>, y los dos
+          observadores en <span class="path">es.ucm.fdi.ici.fsm.observers</span>. En vuestro proyecto, el
+          ejemplo de la práctica reparte las clases así, y conviene respetarlo porque cada máquina acaba con
+          decenas de ellas:
+        </p>
+<pre><code>es.ucm.fdi.ici.c2627.practica2.grupoYY
+├── Ghosts.java               <span class="c">// controlador: construye y ejecuta las máquinas</span>
+├── MsPacMan.java
+├── ghosts
+│   ├── GhostsInput.java
+│   ├── actions               <span class="c">// una clase por acción</span>
+│   └── transitions           <span class="c">// una clase por transición</span>
+└── mspacman
+    ├── MsPacManInput.java
+    ├── actions
+    └── transitions</code></pre>
+      </section>
+
+      <section id="input">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec"><code>Input</code>: leer el juego una vez por turno</h2>
+        </div>
+        <p>
+          Esta es la clase entera, tal como está en el motor:
+        </p>
+        <div class="codigo"><pre><code><span class="k">public abstract class</span> Input {
+
+    <span class="k">protected</span> Game game;
+
+    <span class="c">/**
+     * Receives the game and calls the parseInput() method
+
+     */</span>
+    <span class="k">public</span> Input(Game game)
+    {
+        <span class="k">this</span>.game = game;
+        parseInput();
+    }
+
+    <span class="k">public</span> Game getGame() {
+        <span class="k">return this</span>.game;
+    }
+
+    <span class="c">/**
+     * Obtains the required variables from the game and
+     * stores them as attributes of the implementing subclasses.
+     */</span>
+    <span class="k">public abstract void</span> parseInput();
+
+}</code></pre></div>
+        <p>
+          Es un <strong>método plantilla</strong>: el constructor guarda el juego y llama a
+          <code>parseInput()</code>, que escribís vosotros. Ahí se calcula todo lo que las transiciones van a
+          consultar, y se guarda en atributos. El <code>Input</code> se crea una vez al principio de cada turno y
+          se pasa a todas las máquinas; las transiciones sólo leen. Eso tiene dos ventajas: lo caro —una
+          distancia por camino, un recorrido de tramos— se calcula una vez aunque lo consulten diez transiciones
+          de cuatro fantasmas, y todas deciden sobre la misma foto del juego.
+        </p>
+        <p>
+          Este es el <code>Input</code> de los fantasmas del ejemplo completo. Guarda, para cada fantasma, si es
+          comestible y si está en la cárcel, y la distancia de Ms.&nbsp;Pac-Man a la píldora de poder más cercana
+          que quede:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts;
+
+<span class="k">public class</span> GhostsInput <span class="k">extends</span> Input {
+
+    <span class="c">// Sin inicializar aquí: parseInput() se ejecuta dentro de super(game),</span>
+    <span class="c">// antes que los inicializadores de esta clase, y estos lo machacarían.</span>
+    <span class="k">private</span> EnumMap&lt;GHOST, Boolean&gt; comestible;
+    <span class="k">private</span> EnumMap&lt;GHOST, Boolean&gt; encerrado;
+    <span class="k">private double</span> distanciaPacManAPildora;
+
+    <span class="k">public</span> GhostsInput(Game game) {
+        <span class="k">super</span>(game);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> parseInput() {
+        comestible = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+        encerrado = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            comestible.put(g, game.isGhostEdible(g));
+            encerrado.put(g, game.getGhostLairTime(g) &gt; <span class="n">0</span>);
+        }
+
+        <span class="k">int</span> pacman = game.getPacmanCurrentNodeIndex();
+        distanciaPacManAPildora = Double.MAX_VALUE;           <span class="c">// sin píldoras: infinitamente lejos</span>
+        <span class="k">for</span> (<span class="k">int</span> pp : game.getActivePowerPillsIndices()) {    <span class="c">// las que quedan, no todas</span>
+            <span class="k">double</span> d = game.getDistance(pacman, pp, DM.PATH);
+            distanciaPacManAPildora = Math.min(d, distanciaPacManAPildora);
+        }
+    }
+
+    <span class="k">public boolean</span> esComestible(GHOST g)       { <span class="k">return</span> comestible.get(g); }
+    <span class="k">public boolean</span> estaEncerrado(GHOST g)      { <span class="k">return</span> encerrado.get(g); }
+    <span class="k">public double</span> getDistanciaPacManAPildora() { <span class="k">return</span> distanciaPacManAPildora; }
+}</code></pre></div>
+        <div class="note trap">
+          <span class="note-label">No inicialicéis los atributos donde se declaran</span>
+          <p>
+            <code>parseInput()</code> se ejecuta dentro de <code>super(game)</code>, y en Java los inicializadores
+            de los atributos de la subclase se ejecutan <em>después</em> de que termine el constructor de la
+            superclase. Así que un <code>private int x = 0;</code> machaca el valor que acabáis de calcular, y un
+            <code>private EnumMap&lt;…&gt; m = new EnumMap&lt;&gt;(…);</code> todavía vale <code>null</code> cuando
+            <code>parseInput()</code> intenta usarlo. Lo hemos comprobado: con <code>x = 0</code> en la
+            declaración y <code>x = 5</code> en <code>parseInput()</code>, el objeto construido tiene
+            <code>x == 0</code>; con el mapa, <code>NullPointerException</code> al construirlo. Declarad sin valor
+            y cread todo dentro de <code>parseInput()</code>.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label"><code>getPowerPillIndices</code> no es lo que parece</span>
+          <p>
+            El <code>GhostsInput</code> del proyecto de ejemplo recorre
+            <code>game.getPowerPillIndices()</code>, que devuelve <strong>todas</strong> las posiciones de píldora
+            de poder del laberinto, comidas o no. Con eso, un fantasma sigue huyendo cada vez que
+            Ms.&nbsp;Pac-Man pasa cerca de una esquina donde <em>hubo</em> una píldora. Las que quedan son
+            <code>game.getActivePowerPillsIndices()</code>. Y si no queda ninguna, la distancia se queda en
+            <code>Double.MAX_VALUE</code>: «lejísimos», que es lo que tiene que decir.
+          </p>
+        </div>
+      </section>
+
+      <section id="acciones">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Acciones: qué hacer</h2>
+        </div>
+        <div class="codigo"><pre><code><span class="k">public interface</span> Action {
+
+    <span class="c">/**
+     * Returns the ID of the action
+     * @return
+     */</span>
+    <span class="k">public</span> String getActionId();
+
+    <span class="c">/**
+     * Executes the action according to the game and returns the following move.
+     */</span>
+    <span class="k">public</span> MOVE execute(Game game);
+}</code></pre></div>
+        <p>
+          Una acción recibe el juego y devuelve un movimiento. El identificador sirve para dar nombre al estado:
+          <code>new SimpleState(accion)</code> usa <code>getActionId()</code> como nombre, y ese nombre es el que
+          sale en la consola y en el grafo. La acción de perseguir del ejemplo:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.actions;
+
+<span class="k">public class</span> PerseguirAction <span class="k">implements</span> Action {
+
+    <span class="k">private final</span> GHOST ghost;      <span class="c">// qué fantasma, sí; el Game, nunca</span>
+
+    <span class="k">public</span> PerseguirAction(GHOST ghost) {
+        <span class="k">this</span>.ghost = ghost;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE execute(Game game) {
+        <span class="k">return</span> game.getApproximateNextMoveTowardsTarget(
+                game.getGhostCurrentNodeIndex(ghost),
+                game.getPacmanCurrentNodeIndex(),
+                game.getGhostLastMoveMade(ghost), DM.PATH);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String getActionId() {
+        <span class="k">return</span> ghost + <span class="s">" persigue"</span>;
+    }
+}</code></pre></div>
+        <p>
+          Dos detalles del motor que conviene tener claros al escribirlas:
+        </p>
+        <ul>
+          <li><strong>Un fantasma sólo decide en los cruces.</strong> <code>game.doesGhostRequireAction(g)</code>
+            es verdadero cuando el fantasma está en un cruce, o acaba de salir de la cárcel; y falso en los turnos
+            en que, siendo comestible, el motor no lo mueve (va a media velocidad). En el resto no hay nada que
+            decidir: un fantasma no puede darse la vuelta, así que en un pasillo sólo puede seguir. El ejemplo del
+            proyecto hace esa comprobación dentro de cada acción y devuelve <code>MOVE.NEUTRAL</code>; aquí la
+            hacemos una vez en el controlador, y un fantasma que no aparece en el <code>EnumMap</code> de la
+            respuesta sigue por donde iba.</li>
+          <li><strong>Ms.&nbsp;Pac-Man puede devolver <code>null</code>.</strong> El motor lo descarta y sigue
+            recto, igual que cuando pide un giro imposible. Es la forma honesta de decir «esta acción no tiene nada
+            que hacer ahora», por ejemplo ir a por una píldora de poder cuando ya no queda ninguna.</li>
+        </ul>
+        <div class="note trap">
+          <span class="note-label">Nunca guardéis el <code>Game</code> en un atributo</span>
+          <p>
+            En cada turno el <code>Executor</code> os pasa una <strong>copia nueva</strong> del juego. Una acción
+            que guarda la de un turno para usarla en el siguiente decide sobre un juego que ya no existe: los
+            fantasmas no se mueven, las píldoras no desaparecen. En los atributos de una acción va lo que la
+            distingue de otras —qué fantasma, qué radio—; el juego llega siempre como parámetro de
+            <code>execute</code>.
+          </p>
+        </div>
+        <h3 class="label">El catálogo de acciones</h3>
+        <p>
+          Antes de montar ninguna máquina, conviene escribir el catálogo: la lista de cosas que
+          vuestros personajes saben hacer. Este es el de un grupo de otro curso, tal como lo tenía en Eclipse:
+        </p>
+<pre><code>grupo02.ghosts.actions             grupo02.mspacman.actions
+  DefaultGhostAction                 CazarAction
+  DirectoAction                      ComerUltimasPillAction
+  HuirDeMsPacManAction               DefaultAction
+  HuirDePowerPillAction              IrAInterseccionSeguraAction
+  IrACazarAction                     KamikazeAction
+  IrAInterseccionACazarAction        MayorPuntuacionAction
+  IrAInterseccionAction1             PerseguirAction
+  IrAInterseccionAction2             PillCercanaAction
+  IrAInterseccionAction3             PowerPillAction
+  IrHaciaGhostComestibleAction
+  MantenerDistanciaAction
+  PinzaAction</code></pre>
+        <p>
+          Se lee como una lista de comportamientos, que es lo que tiene que ser: cada nombre es un verbo que un
+          compañero entiende sin abrir el fichero. Lo único que chirría son las tres
+          <code>IrAInterseccionAction</code> numeradas: casi seguro que son la misma acción con otro cruce, y
+          eso es un parámetro del constructor, no tres clases.
+        </p>
+      </section>
+
+      <section id="transiciones">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">Estados y transiciones: cuándo cambiar</h2>
+        </div>
+        <p>
+          Un estado es cualquier cosa que sepa ejecutarse con un <code>Input</code> y enterarse de que deja de
+          estar activo:
+        </p>
+        <div class="codigo"><pre><code><span class="k">public interface</span> State {
+
+    <span class="k">public</span> MOVE execute(Input input);
+
+    <span class="k">public void</span> stop();
+}</code></pre></div>
+        <p>
+          Casi siempre usaréis <code>SimpleState</code>, que se limita a ejecutar una acción con el juego que
+          lleva dentro el <code>Input</code>:
+        </p>
+        <div class="codigo"><pre><code><span class="k">public class</span> SimpleState <span class="k">implements</span> State {
+
+    <span class="k">private</span> Action action;
+    <span class="k">public</span> String id;
+
+    <span class="k">public</span> SimpleState(Action action) {
+        <span class="k">super</span>();
+        <span class="k">this</span>.action = action;
+        <span class="k">this</span>.id = action.getActionId();
+    }
+
+    <span class="k">public</span> SimpleState(String id, Action action) {
+        <span class="k">super</span>();
+        <span class="k">this</span>.action = action;
+        <span class="k">this</span>.id = id;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE execute(Input input){
+        <span class="k">return this</span>.action.execute(input.getGame());
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> id;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> stop() {
+        <span class="c">// does nothing</span>
+
+    }
+}</code></pre></div>
+        <p>
+          La transición es la otra mitad, y es aún más pequeña:
+        </p>
+        <div class="codigo"><pre><code><span class="k">public interface</span> Transition {
+
+    <span class="k">public boolean</span> evaluate(Input in);
+
+}</code></pre></div>
+        <p>
+          <code>evaluate</code> recibe el <code>Input</code> genérico, así que lo primero es convertirlo al
+          vuestro. Esta es la transición que manda a un fantasma a huir en el ejemplo completo:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.transitions;
+
+<span class="k">public class</span> PeligroTransition <span class="k">implements</span> Transition {
+
+    <span class="k">private final</span> GHOST ghost;
+    <span class="k">private final double</span> cerca;
+
+    <span class="k">public</span> PeligroTransition(GHOST ghost, <span class="k">double</span> cerca) {
+        <span class="k">this</span>.ghost = ghost;
+        <span class="k">this</span>.cerca = cerca;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public boolean</span> evaluate(Input in) {
+        GhostsInput input = (GhostsInput) in;
+        <span class="k">return</span> input.esComestible(ghost)
+            || input.getDistanciaPacManAPildora() &lt; cerca;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> <span class="s">"comestible o MsPacMan a menos de "</span> + (<span class="k">int</span>) cerca + <span class="s">" de una PP"</span>;
+    }
+}</code></pre></div>
+        <p>
+          El <code>toString()</code> no es decoración. Es el nombre de la flecha en la consola y en el grafo, y en
+          el grafo es además su <strong>identificador</strong>: dos transiciones con el mismo
+          <code>toString()</code> en la misma máquina hacen que <code>GraphFSMObserver</code> se niegue a
+          dibujarla (<a href="#errores">sección&nbsp;15</a>). Sin <code>toString()</code>, la flecha se llama
+          <code>es.ucm.fdi…transitions.PeligroTransition@1b6d3586</code>.
+        </p>
+        <h3 class="label">El catálogo de transiciones</h3>
+        <p>
+          El mismo grupo de antes, sus transiciones:
+        </p>
+<pre><code>grupo02.ghosts.transitions                     grupo02.mspacman.transitions
+  EsComestibleYCercaDeMsPacManTransition1        CaminosSegurosSinPuntosTransition
+  EsComestibleYCercaDeMsPacManTransition2        CaminosSegurosTransition
+  EsComestibleYCercaDeMsPacManTransition3        EstaEnInterseccionTransition1 … 5
+  EstaInterseccion1Transition … 3                FantasmaAlcanzableTransition
+  EstaInterseccionCazarTransition                MejorDirectoTransition
+  EstaInterseccionDirectoTransition              MejorEnInterseccionTransition
+  EstaInterseccionHuirTransition                 MsPacManComidoTransition
+  EstaInterseccionPinzaTransition                NadaComestibleTransition
+  LlegaAInterseccionAntesQueMsPacManTransition   NingunCaminoSeguroTransition
+  MsPacManCercaDeGhostComestibleTransition       SeguroPPTransition
+  MsPacManCercaPPTransition                      UltimasPillsTransition
+  MsPacManNoCercaPPTransition                    UnicoSeguroTransition
+  NadieQueSalvarTransition
+  NoComestibleONoCercaTransition
+  NoExisteInterseccion3ONoQuedaPPTransition
+  NoOcupadaInterseccion1Transition … 3
+  NoQuedaAlternativaTransition
+  PinzaPosibleTransition
+  SeAcaboCazarTransition
+  YaEnInterseccionTransition</code></pre>
+        <p>
+          Aquí se ve bien lo que funciona y lo que no. Los nombres son condiciones que se leen solas
+          —<code>LlegaAInterseccionAntesQueMsPacMan</code>, <code>NingunCaminoSeguro</code>— y por eso el
+          diagrama se entiende. Las parejas como <code>MsPacManCercaPP</code> y <code>MsPacManNoCercaPP</code>
+          son justo el sitio donde poner dos umbrales distintos. Y las familias numeradas otra vez piden un
+          parámetro: una <code>EstaEnInterseccionTransition(int cruce)</code> en lugar de cinco copias, que es
+          además la única forma de que un arreglo llegue a las cinco.
+        </p>
+      </section>
+
+      <section id="run">
+        <div class="sec-head">
+          <span class="num">10</span>
+          <h2 class="sec">Lo que hace <code>FSM.run</code> en cada turno</h2>
+        </div>
+        <p>
+          Una máquina se construye con tres métodos: <code>add(origen, transición, destino)</code> por cada
+          flecha, <code>ready(inicial)</code> al terminar, y <code>reset()</code> para volver al estado inicial.
+          Y se ejecuta con uno, que es el que hay que entender bien. Este es, entero:
+        </p>
+        <div class="codigo"><pre><code><span class="k">public</span> MOVE run(Input in)
+{
+    Vector&lt;StateTransition&gt; outTrans = stateMachine.get(<span class="k">this</span>.current);
+    <span class="k">if</span>(outTrans == <span class="k">null</span>)
+        <span class="k">return this</span>.current.execute(in);
+    <span class="k">for</span>(StateTransition st : outTrans)
+    {
+        Transition transition = st.getTransition();
+        <span class="k">if</span>(transition.evaluate(in))
+        {
+            State target = st.getTarget();
+            <span class="k">this</span>.notifyFSMtransition(<span class="k">this</span>.current.toString(), transition.toString(), target.toString());
+            <span class="k">this</span>.current.stop();
+            <span class="k">this</span>.current =  target;
+            <span class="k">return</span> target.execute(in);
+        }
+    }
+    <span class="k">return this</span>.current.execute(in);
+}</code></pre></div>
+        <figure class="wide">
+          <figcaption>Un turno de <code>FSM.run</code>: la primera transición que se cumple gana</figcaption>
+          <svg class="explica dgf5" viewBox="0 0 470 272" role="img" aria-label="Diagrama de flujo de un turno. Llega run con el Input. Mientras queden transiciones de salida del estado actual, en el orden en que se añadieron, se evalúa la siguiente. Si no se cumple, se pasa a la siguiente. Si se cumple, en el mismo turno se avisa a los observadores, se llama a stop del estado actual, el destino pasa a ser el estado actual, y se devuelve lo que diga execute del destino. Si no se cumple ninguna, se devuelve lo que diga execute del estado actual.">
+            <style>
+              .dgf5 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgf5 .on{fill:var(--pill-soft);stroke:var(--pill-ink);stroke-width:1.6}
+              .dgf5 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink);text-anchor:middle}
+              .dgf5 .ts{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .dgf5 .l{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+              .dgf5 .le{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:end}
+              .dgf5 .lm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+              .dgf5 .a{fill:none;stroke:var(--ink-3);stroke-width:1.4;marker-end:url(#f5a)}
+            </style>
+            <defs>
+              <marker id="f5a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+            </defs>
+            <rect x="150" y="8" width="170" height="28" rx="14" class="st"/>
+            <text x="235" y="25.5" class="t">run(in): llega el turno</text>
+            <path d="M235 36 V55" class="a"/>
+            <rect x="120" y="58" width="230" height="40" rx="8" class="st"/>
+            <text x="235" y="74" class="t">¿queda otra transición de</text>
+            <text x="235" y="88" class="t">current, en orden de add()?</text>
+            <path d="M350 78 H373" class="a"/>
+            <text x="362" y="71" class="lm">no</text>
+            <rect x="376" y="58" width="86" height="40" rx="8" class="st"/>
+            <text x="419" y="74" class="t">current</text>
+            <text x="419" y="88" class="t">.execute(in)</text>
+            <path d="M235 98 V121" class="a"/>
+            <text x="243" y="114" class="l">sí</text>
+            <rect x="150" y="124" width="170" height="30" rx="8" class="st"/>
+            <text x="235" y="143" class="t">¿t.evaluate(in)?</text>
+            <path d="M150 139 H100 V78 H117" class="a"/>
+            <text x="94" y="112" class="le">no: la</text>
+            <text x="94" y="124" class="le">siguiente</text>
+            <path d="M235 154 V179" class="a"/>
+            <text x="243" y="171" class="l">sí</text>
+            <rect x="110" y="182" width="250" height="80" rx="8" class="on"/>
+            <text x="124" y="201" class="ts">1  observadores: fsmTransition</text>
+            <text x="124" y="218" class="ts">2  current.stop()</text>
+            <text x="124" y="235" class="ts">3  current ← destino</text>
+            <text x="124" y="252" class="ts">4  return destino.execute(in)</text>
+            <rect x="376" y="206" width="86" height="30" rx="8" class="st"/>
+            <text x="419" y="225" class="t">MOVE</text>
+            <path d="M360 221 H373" class="a"/>
+            <path d="M419 98 V203" class="a"/>
+          </svg>
+        </figure>
+        <p>
+          De ese bucle salen todas las reglas que hay que tener en la cabeza al montar una máquina:
+        </p>
+        <ul>
+          <li><strong>El orden de <code>add()</code> es la prioridad.</strong> Las transiciones de un estado se
+            evalúan en el orden en que se añadieron, y la primera que devuelve <code>true</code> gana; las de
+            detrás ni se miran. Si dos pueden cumplirse a la vez, la más específica o la más urgente va primero.
+            En el ejemplo, «a la cárcel» se añade antes que «peligro»: un fantasma al que se acaban de comer no
+            tiene que plantearse si huye.</li>
+          <li><strong>Como mucho un cambio por turno y por máquina.</strong> Después de cambiar no se vuelven a
+            mirar las transiciones del destino hasta el turno siguiente. Si el destino es un estado compuesto, la
+            máquina de dentro sí da su propio paso en ese mismo turno.</li>
+          <li><strong>El destino actúa en el mismo turno.</strong> No se pierde un turno al cambiar: el
+            movimiento que se devuelve es ya el del estado nuevo.</li>
+          <li><strong>Sin transiciones de salida, el estado es final</strong>: se ejecuta para siempre.</li>
+          <li><strong><code>evaluate</code> no puede tener efectos.</strong> Sólo se llama mientras su estado de
+            origen está activo, y sólo si no ha ganado antes otra. Un contador que se incrementa dentro de
+            <code>evaluate</code> cuenta cosas que no son las que creéis.</li>
+          <li><strong><code>reset()</code> no llama a <code>stop()</code>.</strong> Sólo devuelve el estado
+            actual al inicial y avisa a los observadores. Importa con los estados compuestos, y lo veremos en la
+            <a href="#ejemplo-compuesto">sección&nbsp;12</a>.</li>
+        </ul>
+        <h3 class="label">Acciones de entrada y salida</h3>
+        <p>
+          <code>stop()</code> es la acción de salida: se llama justo antes de abandonar el estado. En
+          <code>SimpleState</code> no hace nada, y en <code>CompoundState</code> reinicia la máquina de dentro.
+          De entrada no hay, pero sale en pocas líneas con un estado propio que recuerda si acaba de entrar:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY;
+
+<span class="c">/** Un SimpleState con acción de entrada: el motor sólo trae la de salida, stop(). */</span>
+<span class="k">public class</span> EstadoConEntrada <span class="k">implements</span> State {
+
+    <span class="k">private final</span> String id;
+    <span class="k">private final</span> Action accion;
+    <span class="k">private boolean</span> dentro = <span class="k">false</span>;
+
+    <span class="k">public</span> EstadoConEntrada(String id, Action accion) {
+        <span class="k">this</span>.id = id;
+        <span class="k">this</span>.accion = accion;
+    }
+
+    <span class="c">/** Se ejecuta una vez, en el primer turno tras entrar. */</span>
+    <span class="k">protected void</span> alEntrar(Input in) { }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE execute(Input in) {
+        <span class="k">if</span> (!dentro) {
+            dentro = <span class="k">true</span>;
+            alEntrar(in);
+        }
+        <span class="k">return</span> accion.execute(in.getGame());
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> stop() {
+        dentro = <span class="k">false</span>;     <span class="c">// la próxima vez que se entre, vuelve a ser la primera</span>
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> id;
+    }
+}</code></pre></div>
+        <p>
+          Se usa heredando y sobrescribiendo <code>alEntrar</code>: elegir el cruce objetivo al empezar a cortar,
+          apuntar el turno en que se empezó a huir para salir por tiempo. Con una pega, la misma de la última
+          regla: como <code>reset()</code> no llama a <code>stop()</code>, el estado en el que acabó la partida
+          anterior empieza la siguiente con <code>dentro</code> a <code>true</code>. Guardad los estados de este
+          tipo en atributos y llamad a su <code>stop()</code> desde <code>preCompute</code>.
+        </p>
+      </section>
+
+      <section id="ejemplo-fantasmas">
+        <div class="sec-head">
+          <span class="num">11</span>
+          <h2 class="sec">Ejemplo completo: los cuatro fantasmas</h2>
+        </div>
+        <p>
+          La lista de prioridades de la <a href="#prioridades">sección&nbsp;4</a>, convertida en máquina. Tres
+          estados, cinco flechas, y los números delante de cada condición son el orden en que se añaden las que
+          salen del mismo estado:
+        </p>
+        <figure class="wide">
+          <figcaption>La máquina de cada fantasma · el número es la prioridad dentro de su estado de origen</figcaption>
+          <svg class="explica dgf6" viewBox="0 0 540 262" role="img" aria-label="Tres estados. Encerrado es el inicial. De Encerrado se pasa a Perseguir cuando sale de la cárcel. De Perseguir salen dos flechas: la primera, hacia Encerrado, cuando muere Ms. Pac-Man; la segunda, hacia Huir, cuando el fantasma es comestible o Ms. Pac-Man está a menos de 30 de una píldora de poder. De Huir salen otras dos: la primera, hacia Encerrado, cuando se lo comen; la segunda, hacia Perseguir, cuando no es comestible y Ms. Pac-Man está a 40 o más de una píldora de poder.">
+            <style>
+              .dgf6 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.6}
+              .dgf6 .t{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink);text-anchor:middle}
+              .dgf6 .l{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+              .dgf6 .lm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+              .dgf6 .le{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:end}
+              .dgf6 .p{font-weight:700;fill:var(--pill-ink)}
+              .dgf6 .a{fill:none;stroke:var(--ink-3);stroke-width:1.4;marker-end:url(#f6a)}
+              .dgf6 .ini{fill:var(--ink)}
+            </style>
+            <defs>
+              <marker id="f6a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+            </defs>
+            <rect x="20" y="30" width="120" height="36" rx="10" class="st"/>
+            <text x="80" y="51.5" class="t">Perseguir</text>
+            <rect x="400" y="30" width="120" height="36" rx="10" class="st"/>
+            <text x="460" y="51.5" class="t">Huir</text>
+            <rect x="205" y="190" width="130" height="36" rx="10" class="st"/>
+            <text x="270" y="211.5" class="t">Encerrado</text>
+            <circle cx="270" cy="252" r="5" class="ini"/>
+            <path d="M270 247 V229" class="a"/>
+            <path d="M140 40 H397" class="a"/>
+            <text x="270" y="22" class="lm"><tspan class="p">2</tspan> · comestible o MsPacMan a &lt; 30 de una PP</text>
+            <path d="M400 56 H143" class="a"/>
+            <text x="270" y="84" class="lm"><tspan class="p">2</tspan> · no comestible y MsPacMan a ≥ 40 de una PP</text>
+            <path d="M215 190 L82 69" class="a"/>
+            <text x="150" y="142" class="le">sale de la cárcel</text>
+            <path d="M110 66 L238 187" class="a"/>
+            <text x="180" y="120" class="l"><tspan class="p">1</tspan> · MsPacMan muere</text>
+            <path d="M445 66 L312 187" class="a"/>
+            <text x="385" y="132" class="l"><tspan class="p">1</tspan> · comido</text>
+          </svg>
+        </figure>
+        <p>
+          «MsPacMan muere» y «comido» son la misma condición —el fantasma está en la cárcel— vista desde dos
+          estados: si muere Ms.&nbsp;Pac-Man o se pasa de nivel, el motor devuelve a los cuatro fantasmas a la
+          cárcel, y si se comen a uno, sólo a ese. Por eso es una sola clase con el nombre como parámetro: cada flecha necesita el suyo.
+          El <code>Input</code> ya está en la <a href="#input">sección&nbsp;7</a>, la acción de perseguir en la
+          <a href="#acciones">8</a> y la transición de peligro en la <a href="#transiciones">9</a>; faltan las
+          otras dos acciones y las otras tres transiciones.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.actions;
+
+<span class="k">public class</span> HuirAction <span class="k">implements</span> Action {
+
+    <span class="k">private final</span> GHOST ghost;
+
+    <span class="k">public</span> HuirAction(GHOST ghost) {
+        <span class="k">this</span>.ghost = ghost;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE execute(Game game) {
+        <span class="k">return</span> game.getApproximateNextMoveAwayFromTarget(
+                game.getGhostCurrentNodeIndex(ghost),
+                game.getPacmanCurrentNodeIndex(),
+                game.getGhostLastMoveMade(ghost), DM.PATH);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String getActionId() {
+        <span class="k">return</span> ghost + <span class="s">" huye"</span>;
+    }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.actions;
+
+<span class="k">public class</span> EsperarAction <span class="k">implements</span> Action {
+
+    <span class="k">private final</span> GHOST ghost;
+
+    <span class="k">public</span> EsperarAction(GHOST ghost) {
+        <span class="k">this</span>.ghost = ghost;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE execute(Game game) {
+        <span class="k">return</span> MOVE.NEUTRAL;        <span class="c">// en la cárcel el motor no lo mueve: no hay nada que decidir</span>
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String getActionId() {
+        <span class="k">return</span> ghost + <span class="s">" encerrado"</span>;
+    }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.transitions;
+
+<span class="k">public class</span> SinPeligroTransition <span class="k">implements</span> Transition {
+
+    <span class="k">private final</span> GHOST ghost;
+    <span class="k">private final double</span> lejos;
+
+    <span class="k">public</span> SinPeligroTransition(GHOST ghost, <span class="k">double</span> lejos) {
+        <span class="k">this</span>.ghost = ghost;
+        <span class="k">this</span>.lejos = lejos;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public boolean</span> evaluate(Input in) {
+        GhostsInput input = (GhostsInput) in;
+        <span class="k">return</span> !input.esComestible(ghost)
+            &amp;&amp; input.getDistanciaPacManAPildora() &gt;= lejos;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> <span class="s">"no comestible y MsPacMan a "</span> + (<span class="k">int</span>) lejos + <span class="s">" o más de una PP"</span>;
+    }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.transitions;
+
+<span class="k">public class</span> EncerradoTransition <span class="k">implements</span> Transition {
+
+    <span class="k">private final</span> GHOST ghost;
+    <span class="k">private final</span> String motivo;    <span class="c">// la misma condición sale de dos estados, y cada arco necesita su nombre</span>
+
+    <span class="k">public</span> EncerradoTransition(GHOST ghost, String motivo) {
+        <span class="k">this</span>.ghost = ghost;
+        <span class="k">this</span>.motivo = motivo;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public boolean</span> evaluate(Input in) {
+        GhostsInput input = (GhostsInput) in;
+        <span class="k">return</span> input.estaEncerrado(ghost);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> motivo;
+    }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.transitions;
+
+<span class="k">public class</span> SaleTransition <span class="k">implements</span> Transition {
+
+    <span class="k">private final</span> GHOST ghost;
+
+    <span class="k">public</span> SaleTransition(GHOST ghost) {
+        <span class="k">this</span>.ghost = ghost;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public boolean</span> evaluate(Input in) {
+        GhostsInput input = (GhostsInput) in;
+        <span class="k">return</span> !input.estaEncerrado(ghost);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> <span class="s">"sale de la cárcel"</span>;
+    }
+}</code></pre></div>
+        <p>
+          Y el controlador, que sólo construye y ejecuta:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY;
+
+<span class="k">public class</span> Ghosts <span class="k">extends</span> GhostController {
+
+    <span class="k">private static final boolean</span> DEBUG = <span class="k">false</span>;     <span class="c">// a false antes de entregar</span>
+
+    <span class="k">private final</span> EnumMap&lt;GHOST, FSM&gt; fsms = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+
+    <span class="k">public</span> Ghosts() {
+        <span class="k">this</span>(<span class="n">30</span>, <span class="n">40</span>);
+    }
+
+    <span class="k">public</span> Ghosts(<span class="k">double</span> cerca, <span class="k">double</span> lejos) {
+        setName(<span class="s">"Ghosts YY"</span>);
+
+        <span class="k">for</span> (GHOST ghost : GHOST.values()) {        <span class="c">// una máquina por fantasma</span>
+            FSM fsm = <span class="k">new</span> FSM(ghost.name());
+
+            GraphFSMObserver grafo = <span class="k">null</span>;
+            <span class="k">if</span> (DEBUG) {                            <span class="c">// el observador, antes de añadir nada</span>
+                grafo = <span class="k">new</span> GraphFSMObserver(ghost.name());
+                fsm.addObserver(grafo);
+            }
+
+            SimpleState encerrado = <span class="k">new</span> SimpleState(<span class="k">new</span> EsperarAction(ghost));
+            SimpleState perseguir = <span class="k">new</span> SimpleState(<span class="k">new</span> PerseguirAction(ghost));
+            SimpleState huir      = <span class="k">new</span> SimpleState(<span class="k">new</span> HuirAction(ghost));
+
+            <span class="c">// el orden de add() es la prioridad: la cárcel se mira siempre la primera</span>
+            fsm.add(encerrado, <span class="k">new</span> SaleTransition(ghost), perseguir);
+            fsm.add(perseguir, <span class="k">new</span> EncerradoTransition(ghost, <span class="s">"MsPacMan muere"</span>), encerrado);
+            fsm.add(perseguir, <span class="k">new</span> PeligroTransition(ghost, cerca), huir);
+            fsm.add(huir,      <span class="k">new</span> EncerradoTransition(ghost, <span class="s">"comido"</span>), encerrado);
+            fsm.add(huir,      <span class="k">new</span> SinPeligroTransition(ghost, lejos), perseguir);
+
+            fsm.ready(encerrado);                   <span class="c">// todos empiezan en la cárcel</span>
+
+            <span class="k">if</span> (DEBUG)
+                grafo.showInFrame(<span class="k">new</span> Dimension(<span class="n">320</span>, <span class="n">240</span>));
+
+            fsms.put(ghost, fsm);
+        }
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> preCompute(String opponent) {
+        <span class="k">for</span> (FSM fsm : fsms.values())
+            fsm.reset();                            <span class="c">// cada partida empieza en el estado inicial</span>
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> EnumMap&lt;GHOST, MOVE&gt; getMove(Game game, <span class="k">long</span> timeDue) {
+        GhostsInput in = <span class="k">new</span> GhostsInput(game);     <span class="c">// una vez por turno, para los cuatro</span>
+        EnumMap&lt;GHOST, MOVE&gt; result = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+
+        <span class="k">for</span> (GHOST ghost : GHOST.values()) {
+            MOVE move = fsms.get(ghost).run(in);    <span class="c">// la máquina corre en todos los turnos...</span>
+            <span class="k">if</span> (game.doesGhostRequireAction(ghost)) <span class="c">// ...pero el movimiento sólo cuenta en un cruce</span>
+                result.put(ghost, move);
+        }
+        <span class="k">return</span> result;
+    }
+}</code></pre></div>
+        <p>
+          Los <code>import</code> se han quitado de todos los listados para que quepan; en Eclipse,
+          <kbd>Ctrl</kbd>+<kbd>Mayús</kbd>+<kbd>O</kbd> los pone. Tres cosas del controlador merecen una
+          explicación.
+        </p>
+        <p>
+          <strong>Una máquina por fantasma.</strong> El estado actual es la memoria de la máquina, y cada fantasma
+          necesita la suya: uno puede estar huyendo mientras otro sale de la cárcel. Por eso el bucle crea una
+          <code>FSM</code> nueva, con estados y transiciones nuevos, para cada uno; los objetos llevan dentro el
+          <code>GHOST</code> y no se pueden compartir. Una única máquina para los cuatro sólo tiene sentido si es
+          una decisión de equipo —«atacamos», «defendemos la píldora»— y cada fantasma deduce su papel a partir
+          de ella; ahí sí es una sola, pero no sustituye a la de cada uno.
+        </p>
+        <p>
+          <strong>La máquina corre en todos los turnos.</strong> Aunque el movimiento sólo cuente en los cruces,
+          <code>run</code> se llama siempre, para que el estado esté al día: si a un fantasma se lo comen a mitad
+          de pasillo, pasa a Encerrado en ese turno, no en el siguiente cruce, y lo que muestra el observador es
+          la verdad. Las acciones de este ejemplo son baratas; si las vuestras no lo son, comprobad
+          <code>doesGhostRequireAction</code> dentro de ellas y devolved <code>MOVE.NEUTRAL</code> sin calcular
+          nada, como hace el proyecto de ejemplo.
+        </p>
+        <p>
+          <strong>Los umbrales entran por el constructor.</strong> El constructor sin parámetros es el que usa la
+          evaluación, y el otro es el que ha servido para medir la histéresis de la
+          <a href="#prioridades">sección&nbsp;4</a> sin tocar el código: <code>new Ghosts(30, 30)</code> contra
+          <code>new Ghosts(30, 40)</code>. Todo lo que queráis ajustar después, sacadlo así.
+        </p>
+      </section>
+
+      <section id="ejemplo-compuesto">
+        <div class="sec-head">
+          <span class="num">12</span>
+          <h2 class="sec">Un estado compuesto para Ms.&nbsp;Pac-Man</h2>
+        </div>
+        <p>
+          Un <code>CompoundState</code> es un estado cuya acción es dar un paso de otra máquina. Esta es la clase
+          del motor, sin los comentarios:
+        </p>
+        <div class="codigo"><pre><code><span class="k">public class</span> CompoundState <span class="k">implements</span> State {
+
+    <span class="k">private</span> FSM stateMachine;
+    <span class="k">public</span> String id;
+    <span class="k">public</span> State initialState;
+
+    <span class="k">public</span> CompoundState(String id, FSM stateMachine) {
+        <span class="k">super</span>();
+        <span class="k">this</span>.stateMachine = stateMachine;
+        <span class="k">this</span>.id = id;
+        <span class="k">this</span>.initialState = stateMachine.getInitialState();
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE execute(Input input){
+        <span class="k">return this</span>.stateMachine.run(input);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> id;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> stop() {
+        <span class="k">this</span>.stateMachine.reset();
+
+    }
+
+}</code></pre></div>
+        <p>
+          Con esas treinta líneas la jerarquía sale sola. Por fuera, el estado compuesto es un estado más: la
+          máquina de fuera evalúa sus transiciones de salida <strong>antes</strong> de dejarle ejecutar, así que
+          una flecha que sale del superestado se comprueba en cada turno esté donde esté la máquina de dentro.
+          Es la transición «desde cualquier estado» de la <a href="#jerarquicas">sección&nbsp;5</a>, gratis. Y al
+          salir, <code>stop()</code> reinicia la de dentro: la próxima vez que se entre, empieza por su estado
+          inicial. El motor no guarda historia; si la necesitáis, es otra implementación de <code>State</code>.
+        </p>
+        <p>
+          Una Ms.&nbsp;Pac-Man mínima con esa estructura: un superestado <em>Comer</em> que dentro decide entre la
+          píldora más cercana y la píldora de poder, y un estado <em>Huir</em> fuera. La flecha que lleva a huir
+          sale de Comer, una sola vez, y vale para los dos estados de dentro.
+        </p>
+        <figure class="wide">
+          <figcaption>Ms. Pac-Man con un estado compuesto · al salir de Comer, la máquina de dentro vuelve al principio</figcaption>
+          <svg class="explica dgf7" viewBox="0 0 560 250" role="img" aria-label="Un superestado Comer, que es el inicial, con dos estados dentro: Píldora cercana, que es el inicial de dentro, y Píldora de poder. Se pasa de Píldora cercana a Píldora de poder cuando hay dos o más fantasmas a menos de 40, y se vuelve cuando no queda ninguno a menos de 40 o no quedan píldoras de poder. Fuera, el estado Huir. De Comer a Huir se pasa cuando hay un fantasma a menos de 12, y se vuelve cuando no hay ninguno a menos de 20. Una nota dice que al salir de Comer se llama a stop y la máquina de dentro vuelve a Píldora cercana.">
+            <style>
+              .dgf7 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.6}
+              .dgf7 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+              .dgf7 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink);text-anchor:middle}
+              .dgf7 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+              .dgf7 .lm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+              .dgf7 .nt{font-family:var(--f-mono);font-size:9.5px;fill:var(--pill-ink)}
+              .dgf7 .a{fill:none;stroke:var(--ink-3);stroke-width:1.4;marker-end:url(#f7a)}
+              .dgf7 .ini{fill:var(--ink)}
+            </style>
+            <defs>
+              <marker id="f7a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+            </defs>
+            <rect x="14" y="20" width="320" height="176" rx="14" class="cp"/>
+            <text x="28" y="38" class="ct">COMER · CompoundState</text>
+            <circle cx="36" cy="110" r="5" class="ini"/>
+            <path d="M41 110 H61" class="a"/>
+            <rect x="64" y="92" width="116" height="36" rx="10" class="st"/>
+            <text x="122" y="113.5" class="t">Píldora cercana</text>
+            <rect x="214" y="92" width="110" height="36" rx="10" class="st"/>
+            <text x="269" y="113.5" class="t">Píldora de poder</text>
+            <path d="M180 102 H211" class="a"/>
+            <text x="197" y="80" class="lm">2 o más a &lt; 40</text>
+            <path d="M214 118 H183" class="a"/>
+            <text x="197" y="148" class="lm">ninguno a &lt; 40</text>
+            <text x="197" y="160" class="lm">o sin PP</text>
+            <rect x="440" y="92" width="100" height="36" rx="10" class="st"/>
+            <text x="490" y="113.5" class="t">Huir</text>
+            <path d="M334 102 H437" class="a"/>
+            <text x="388" y="88" class="lm">fantasma a &lt; 12</text>
+            <path d="M440 118 H337" class="a"/>
+            <text x="388" y="142" class="lm">ninguno a &lt; 20</text>
+            <circle cx="174" cy="238" r="5" class="ini"/>
+            <path d="M174 233 V199" class="a"/>
+            <text x="352" y="182" class="nt">al salir de Comer: stop(),</text>
+            <text x="352" y="196" class="nt">y la de dentro vuelve</text>
+            <text x="352" y="210" class="nt">a Píldora cercana</text>
+          </svg>
+        </figure>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY;
+
+<span class="k">public class</span> MsPacMan <span class="k">extends</span> PacmanController {
+
+    <span class="k">private final</span> FSM fsm;      <span class="c">// la de fuera</span>
+    <span class="k">private final</span> FSM comer;    <span class="c">// la de dentro: hay que poder resetearla</span>
+
+    <span class="k">public</span> MsPacMan() {
+        setName(<span class="s">"MsPacMan YY"</span>);
+
+        <span class="c">// 1. La máquina de dentro, completa y con su estado inicial</span>
+        comer = <span class="k">new</span> FSM(<span class="s">"Comer"</span>);
+        SimpleState pildora = <span class="k">new</span> SimpleState(<span class="k">new</span> PildoraCercanaAction());
+        SimpleState poder   = <span class="k">new</span> SimpleState(<span class="k">new</span> PildoraDePoderAction());
+        comer.add(pildora, <span class="k">new</span> GrupoCercaTransition(<span class="n">40</span>, <span class="n">2</span>), poder);
+        comer.add(poder,   <span class="k">new</span> GrupoDisueltoTransition(<span class="n">40</span>), pildora);
+        comer.ready(pildora);
+
+        <span class="c">// 2. Envuelta en un estado, se usa como cualquier otro</span>
+        CompoundState comerState = <span class="k">new</span> CompoundState(<span class="s">"Comer"</span>, comer);
+        SimpleState huir = <span class="k">new</span> SimpleState(<span class="k">new</span> HuirAction());
+
+        fsm = <span class="k">new</span> FSM(<span class="s">"MsPacMan"</span>);
+        fsm.add(comerState, <span class="k">new</span> AmenazaCercaTransition(<span class="n">12</span>), huir);   <span class="c">// sale de los dos de dentro</span>
+        fsm.add(huir,       <span class="k">new</span> AmenazaLejosTransition(<span class="n">20</span>), comerState);
+        fsm.ready(comerState);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> preCompute(String opponent) {
+        fsm.reset();
+        comer.reset();      <span class="c">// reset() no llama a stop(): la de dentro no se entera sola</span>
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+        <span class="k">return</span> fsm.run(<span class="k">new</span> MsPacManInput(game));
+    }
+}</code></pre></div>
+        <p>
+          El orden importa: la máquina de dentro se construye entera, con su <code>ready()</code>, antes de
+          envolverla. Y el <code>preCompute</code> reinicia las dos, porque <code>reset()</code> sólo devuelve la
+          de fuera a su estado inicial. Lo hemos comprobado: si la partida acaba con la de dentro en Píldora de
+          poder, un <code>reset()</code> de la de fuera deja a Comer como estado actual pero a la de dentro en
+          Píldora de poder, y la partida siguiente empieza yendo a por una píldora de poder sin que se haya
+          cumplido nada.
+        </p>
+        <p>
+          El <code>Input</code> guarda, para cada fantasma que puede comérsela, cuántos pasos le faltan para
+          llegar hasta ella —medidos desde el fantasma y respetando que no puede darse la vuelta—, y ofrece dos
+          consultas sobre eso:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.mspacman;
+
+<span class="k">public class</span> MsPacManInput <span class="k">extends</span> Input {
+
+    <span class="k">private int</span>[] distanciaAmenaza;     <span class="c">// por fantasma: pasos que le faltan para llegar a mí</span>
+    <span class="k">private int</span> pildorasDePoder;
+
+    <span class="k">public</span> MsPacManInput(Game game) {
+        <span class="k">super</span>(game);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> parseInput() {
+        <span class="k">int</span> yo = game.getPacmanCurrentNodeIndex();
+        distanciaAmenaza = <span class="k">new int</span>[GHOST.values().length];
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            <span class="k">if</span> (game.isGhostEdible(g) || game.getGhostLairTime(g) &gt; <span class="n">0</span>)
+                distanciaAmenaza[g.ordinal()] = Integer.MAX_VALUE;   <span class="c">// no me puede comer</span>
+            <span class="k">else</span>
+                distanciaAmenaza[g.ordinal()] = game.getShortestPathDistance(
+                        game.getGhostCurrentNodeIndex(g), yo, game.getGhostLastMoveMade(g));
+        }
+        pildorasDePoder = game.getNumberOfActivePowerPills();
+    }
+
+    <span class="c">/** Pasos que le faltan a la amenaza más próxima para alcanzarme. */</span>
+    <span class="k">public int</span> amenazaMasCercana() {
+        <span class="k">int</span> min = Integer.MAX_VALUE;
+        <span class="k">for</span> (<span class="k">int</span> d : distanciaAmenaza)
+            min = Math.min(min, d);
+        <span class="k">return</span> min;
+    }
+
+    <span class="c">/** Cuántos fantasmas que pueden comerme están a menos de {@code radio} pasos. */</span>
+    <span class="k">public int</span> amenazasA(<span class="k">int</span> radio) {
+        <span class="k">int</span> n = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="k">int</span> d : distanciaAmenaza)
+            <span class="k">if</span> (d &lt; radio) n++;
+        <span class="k">return</span> n;
+    }
+
+    <span class="k">public int</span> getPildorasDePoder() { <span class="k">return</span> pildorasDePoder; }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.mspacman.transitions;
+
+<span class="k">public class</span> GrupoCercaTransition <span class="k">implements</span> Transition {
+
+    <span class="k">private final int</span> radio, cuantos;
+
+    <span class="k">public</span> GrupoCercaTransition(<span class="k">int</span> radio, <span class="k">int</span> cuantos) {
+        <span class="k">this</span>.radio = radio;
+        <span class="k">this</span>.cuantos = cuantos;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public boolean</span> evaluate(Input in) {
+        MsPacManInput input = (MsPacManInput) in;
+        <span class="k">return</span> input.getPildorasDePoder() &gt; <span class="n">0</span> &amp;&amp; input.amenazasA(radio) &gt;= cuantos;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> cuantos + <span class="s">" o más a menos de "</span> + radio;
+    }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.mspacman.actions;
+
+<span class="k">public class</span> HuirAction <span class="k">implements</span> Action {
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE execute(Game game) {
+        <span class="c">// La acción recibe Game, no el Input: lo que necesite lo vuelve a mirar</span>
+        <span class="k">int</span> yo = game.getPacmanCurrentNodeIndex();
+        <span class="k">int</span> peor = -<span class="n">1</span>, dMin = Integer.MAX_VALUE;
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            <span class="k">if</span> (game.isGhostEdible(g) || game.getGhostLairTime(g) &gt; <span class="n">0</span>) <span class="k">continue</span>;
+            <span class="k">int</span> nodo = game.getGhostCurrentNodeIndex(g);
+            <span class="k">int</span> d = game.getShortestPathDistance(nodo, yo, game.getGhostLastMoveMade(g));
+            <span class="k">if</span> (d &lt; dMin) { dMin = d; peor = nodo; }
+        }
+        <span class="k">if</span> (peor == -<span class="n">1</span>)
+            <span class="k">return null</span>;
+
+        <span class="k">return</span> game.getApproximateNextMoveAwayFromTarget(
+                yo, peor, game.getPacmanLastMoveMade(), DM.PATH);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String getActionId() {
+        <span class="k">return</span> <span class="s">"Huir"</span>;
+    }
+}</code></pre></div>
+        <p>
+          Fijaos en el comentario de <code>HuirAction</code>. Una acción recibe <code>Game</code>, no el
+          <code>Input</code>, así que no puede aprovechar lo que ya se calculó: vuelve a buscar la amenaza más
+          cercana. Con cuatro fantasmas no importa; con un cálculo caro, la salida es escribir vuestro propio
+          <code>State</code>, que sí recibe el <code>Input</code> y se lo puede pasar a la acción. Las otras tres transiciones y las dos acciones que faltan
+          son iguales que estas, cambiando la comparación o el objetivo.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Es un esqueleto, no un controlador</span>
+          <p>
+            Contra los fantasmas de la sección anterior, a esta Ms.&nbsp;Pac-Man la partida le dura unos mil
+            turnos de media, y se queda en unos 1&#8239;240 puntos. Está aquí para enseñar la estructura; lo que la haría buena es lo de
+            <a href="estrategias.html">Estrategias algorítmicas</a>: huir por tramos seguros en vez de alejarse
+            del más cercano, y decidir en los cruces. Todo eso cabe en esta misma máquina, en las acciones y en
+            las condiciones.
+          </p>
+        </div>
+        <p>
+          El proyecto de ejemplo de la práctica trae otra Ms.&nbsp;Pac-Man con un estado compuesto: tres estados simples y un compuesto de dos, todos con movimiento aleatorio y transiciones
+          que se disparan al azar con probabilidades fijas. No juega a nada; sirve para ver en el observador cómo
+          se mueve una máquina jerárquica, y se ve en la <a href="#depurar">sección siguiente</a>.
+        </p>
+      </section>
+
+      <section id="depurar">
+        <div class="sec-head">
+          <span class="num">13</span>
+          <h2 class="sec">Ver la máquina mientras juega</h2>
+        </div>
+        <p>
+          Una máquina que hace algo raro casi nunca tiene un error en una acción: tiene una transición que salta
+          cuando no debe, o una que no salta nunca. Para verlo hay que mirar las transiciones, y para eso están
+          los observadores. Se añaden con <code>fsm.addObserver(...)</code> <strong>justo después de crear la
+          máquina</strong>, antes del primer <code>add</code>, porque el grafo se construye con los avisos de
+          <code>add</code>.
+        </p>
+        <h3 class="label"><code>ConsoleFSMObserver</code></h3>
+        <p>
+          <code>new ConsoleFSMObserver(id)</code> escribe en la salida estándar cada arco que se añade, cuándo la
+          máquina está lista, cada cambio de estado y cada reinicio. Con un observador de consola en cada una de
+          las dos máquinas de la Ms.&nbsp;Pac-Man de antes, un trozo de partida se ve así:
+        </p>
+<pre><code>[Comer] Píldora cercana &gt;&gt; 2 o más a menos de 40 &gt;&gt; Píldora de poder
+[MsPacMan] Comer &gt;&gt; fantasma a menos de 12 &gt;&gt; Huir
+FSM reset to initial State: Píldora cercana
+[MsPacMan] Huir &gt;&gt; ninguno a menos de 20 &gt;&gt; Comer
+[Comer] Píldora cercana &gt;&gt; 2 o más a menos de 40 &gt;&gt; Píldora de poder</code></pre>
+        <p>
+          El formato es <code>[máquina] origen &gt;&gt; transición &gt;&gt; destino</code>, con los
+          <code>toString()</code> de los estados y de las transiciones: por eso tienen que decir algo. La tercera
+          línea es el <code>stop()</code> del compuesto reiniciando la máquina de dentro al salir de Comer. Los
+          avisos de reinicio y de «lista» no llevan el nombre de la máquina, así que con varias hay que
+          deducirlo por el estado.
+        </p>
+        <h3 class="label"><code>GraphFSMObserver</code></h3>
+        <p>
+          <code>new GraphFSMObserver(id)</code> dibuja la máquina como grafo con la biblioteca GraphStream: el
+          estado activo en azul, y la última transición cruzada resaltada y con su nombre. Tiene dos formas de
+          enseñarse: <code>showInFrame(Dimension)</code> abre una ventana propia, y
+          <code>getAsPanel(boolean borde, Dimension)</code> devuelve un panel de Swing para meter varios en la
+          misma ventana, que es lo que hace el <code>MsPacMan</code> del proyecto de ejemplo con la máquina de
+          fuera y la de dentro. Con <code>null</code> como dimensión, calcula un tamaño según el número de
+          estados.
+        </p>
+        <figure class="wide">
+          <figcaption>La máquina de Sue, con la transición que acaba de cruzar · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-observador-sue.jpg" width="1200" height="580" loading="lazy"
+               alt="Ventana de GraphFSMObserver con un grafo de dos nodos, SUEchases arriba a la izquierda, en azul claro porque es el activo, y SUErunsAway abajo a la derecha. Entre ellos, dos flechas grises de SUEchases a SUErunsAway y una flecha azul de vuelta, rotulada «Ghost not edible and MsPacman far PPill», que es la transición que se acaba de cruzar.">
+        </figure>
+        <div class="note trap">
+          <span class="note-label">Las ventanas, detrás de un interruptor</span>
+          <p>
+            Sin pantalla —que es como se corren las evaluaciones— crear una ventana lanza
+            <code>java.awt.HeadlessException</code>, y el controlador no llega a construirse. Por eso en el
+            ejemplo el observador gráfico está detrás de la constante <code>DEBUG</code>, igual que los dibujos
+            de <code>GameView</code> en <a href="predecir-coordinar.html#ver-lo-que-piensa">Predecir, coordinar
+            y medir</a>. Y cuidado con los nombres: el grafo usa el <code>toString()</code> de cada transición
+            como identificador de la flecha, así que dos flechas con el mismo nombre en la misma máquina lanzan
+            <code>IdAlreadyInUseException</code> al añadir la segunda; y si el observador se añade después de los
+            <code>add</code>, el grafo está vacío y la primera transición lanza
+            <code>NullPointerException</code>.
+          </p>
+        </div>
+        <h3 class="label">Un observador propio</h3>
+        <p>
+          <code>FSMObserver</code> es una interfaz de cuatro métodos, y escribir uno propio es la forma de
+          <strong>medir</strong> la máquina en vez de mirarla. Este cuenta cambios de estado por partida; una
+          variante de él es la que ha contado los rebotes de la <a href="#prioridades">sección&nbsp;4</a>:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY;
+
+<span class="c">/** Un observador propio: no pinta nada, cuenta cambios de estado por partida. */</span>
+<span class="k">public class</span> ContadorFSMObserver <span class="k">implements</span> FSMObserver {
+
+    <span class="k">private int</span> cambios = <span class="n">0</span>;
+
+    <span class="k">public int</span> getCambios() { <span class="k">return</span> cambios; }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> fsmTransition(String origen, String transicion, String destino) {
+        cambios++;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> fsmReset(String inicial) {
+        cambios = <span class="n">0</span>;        <span class="c">// preCompute() llama a reset(): una cuenta por partida</span>
+    }
+
+    <span class="c">@Override</span> <span class="k">public void</span> fsmAdd(String origen, String transicion, String destino) { }
+    <span class="c">@Override</span> <span class="k">public void</span> fsmReady(String inicial) { }
+}</code></pre></div>
+        <h3 class="label">Jugar muchas partidas sin ventana</h3>
+        <p>
+          Una partida vista sirve para entender un error; para saber si un cambio mejora hacen falta muchas. El
+          <code>Executor</code> las juega sin ventana y devuelve estadísticas:
+        </p>
+        <div class="codigo"><pre><code><span class="k">public class</span> Evaluar {
+
+    <span class="k">public static void</span> main(String[] args) {
+        Executor executor = <span class="k">new</span> Executor.Builder()
+                .setTickLimit(<span class="n">4000</span>)
+                .setVisual(<span class="k">false</span>)          <span class="c">// sin ventana: sólo cuentas</span>
+                .build();
+
+        Stats[] r = executor.runExperiment(<span class="k">new</span> MsPacMan(), <span class="k">new</span> Ghosts(), <span class="n">20</span>, <span class="s">"FSM contra FSM"</span>);
+        System.out.println(r[<span class="n">0</span>]);          <span class="c">// puntos</span>
+        System.out.println(r[<span class="n">1</span>]);          <span class="c">// turnos</span>
+    }
+}</code></pre></div>
+<pre><code>Stats{Desc=FSM contra FSM, average=1363.0, sum=27260.0, sumsq=4.51506E7, sd=648.6918009591142, n=20, min=700.0, max=3390.0, stdErr=145.05189633913426, ms=666}
+Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7, sd=1037.8694827182726, n=20, min=327.0, max=4001.0, stdErr=232.07467151306005, ms=666}</code></pre>
+        <p>
+          Veinte partidas en dos tercios de segundo. Dos cosas que saber para leerlo. La primera línea son los
+          puntos de Ms.&nbsp;Pac-Man; la segunda, los turnos del <strong>último nivel</strong> de cada partida, no
+          de la partida entera, porque <code>runExperiment</code> apunta <code>getCurrentLevelTime()</code>. Y la
+          desviación típica es la mitad de la media: con veinte partidas, una diferencia de cien puntos entre dos
+          versiones no significa nada. Para las cuentas de la sección&nbsp;4 hicieron falta quinientas.
+        </p>
+      </section>
+
+      <section id="disenar">
+        <div class="sec-head">
+          <span class="num">14</span>
+          <h2 class="sec">Lo primero: el diagrama en papel</h2>
+        </div>
+        <p>
+          Todo lo anterior es mecánico. Lo que no lo es, y lo que decide si la práctica sale bien, es el
+          diagrama: qué estados hay, qué condición exacta lleva de uno a otro, y en qué orden se miran. Se hace
+          antes de escribir una línea, en papel o en cualquier herramienta de dibujo, y se discute en grupo
+          sobre él. Estos son diseños de grupos de otros cursos, tal como los entregaron.
+        </p>
+        <figure class="wide">
+          <figcaption>Fantasmas con dos superestados y notas al pie · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-diseno-fantasmas.jpg" width="1100" height="777" loading="lazy"
+               alt="Diagrama a mano titulado «fsm ghosts». Estados en elipses: perseguir, proteger, proteger fantasma comestible y esperar a salir. Un superestado huir con sacrificio eficiente, buscar cuadrante sin power pill y huida eficiente; otro, al que se entra cuando la power pill no está activa, con movimientos aleatorios, buscar zona pills cercanas y recorrer power pills activas. Flechas rotuladas como «mspacman cerca», «comestible, mspacman se acerca», «comido», «sale» o «no comestible, power pill activa». Abajo, tres notas al pie con asteriscos que precisan qué significan algunas condiciones.">
+        </figure>
+        <p>
+          Lo mejor de este son las notas al pie. «Huida eficiente» o «haya un radio entre Ms.&nbsp;Pac-Man y los
+          fantasmas» no se pueden programar tal cual, y el grupo lo sabía: cada asterisco dice qué significa. Eso
+          es lo que hay que hacer con cada palabra vaga del diagrama, hasta que cada flecha sea una expresión que
+          se pueda calcular con el <code>Input</code>.
+        </p>
+        <figure class="wide">
+          <figcaption>Ms. Pac-Man con cuatro superestados · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-diseno-mspacman.jpg" width="1600" height="1200" loading="lazy"
+               alt="Diagrama hecho en una tableta. Cuatro superestados: ATACAR, con atacar fantasma cercano y atacar fantasma cerca de power pill; PILLS, con recoger pills cercanas, buscar power pill y recoger pills en zonas óptimas; HUIR, con huir zona segura, huir hacia power pill y huir hacia túnel; y ESQUIVAR, con ir hacia zona cercana a power pill y meterse por el túnel. Entre superestados, flechas rotuladas: «al menos 2 fantasmas comidos», «come PowerPill», «acaba PowerPill», «2 fantasmas no comestibles», «fantasma en el mismo cuadrante (máx 2 fantasmas)» y «3 o más fantasmas no comestibles». Las flechas de dentro de cada superestado no llevan rótulo.">
+        </figure>
+        <p>
+          La estructura de arriba es buena: cuatro modos, y todas las flechas entre modos con una condición
+          concreta y contable. El nivel de abajo está sin terminar: las flechas de dentro de cada superestado no
+          llevan condición, así que no dicen cuándo se pasa de recoger píldoras cercanas a buscar la de poder.
+          Un diagrama con flechas sin rótulo no se puede programar; lo que se programa entonces es lo que cada
+          uno se imagina.
+        </p>
+        <figure class="wide">
+          <figcaption>Fantasmas con un superestado Perseguir que reparte cruces · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-diseno-perseguir.jpg" width="1600" height="857" loading="lazy"
+               alt="Diagrama con cajas rectangulares, titulado GHOSTS. A la izquierda, el superestado PERSEGUIR por dentro: un estado DEFAULT en el centro con flechas de ida y vuelta a IR A INTERSECCIÓN 1, 2 y 3, IR A CAZAR, DIRECTO y HUIR, rotuladas como «si no está ocupada la intersección 1», «si está en una intersección» o «llega a la intersección de Ms. Pac-Man antes que él». A la derecha, el nivel de fuera: PERSEGUIR como estado compuesto, IR HACIA GHOST COMESTIBLE, HUIR DE MSPACMAN y HUIR DE POWER PILL, con flechas como «es comestible y Ms. Pac-Man está muy cerca» o «deja de ser comestible», y dos flechas que vuelven al mismo estado: «todavía es comestible» y «sigue cerca».">
+        </figure>
+        <p>
+          Este casa con el catálogo de acciones de la <a href="#acciones">sección&nbsp;8</a>: las mismas
+          <code>IrAInterseccion</code> 1, 2 y 3, el mismo <code>IrACazar</code>, el mismo <code>Directo</code>.
+          El estado <em>Default</em> en el centro hace de distribuidor: cada vez que un fantasma llega a un cruce
+          vuelve a él, y desde él se reparte el siguiente cruce libre. Es una forma legítima de coordinar sin
+          mensajes. Sobran las dos flechas que vuelven al mismo estado, «todavía es comestible» y «sigue cerca»:
+          quedarse es lo que pasa cuando no se cumple ninguna, y en este motor una flecha a sí mismo no es
+          gratis, porque llama a <code>stop()</code>, y en un estado compuesto eso lo reinicia en cada turno.
+        </p>
+        <figure class="wide">
+          <figcaption>Ms. Pac-Man en tres modos, Estándar, Ataque y Defensa · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/fsm-diseno-ataque-defensa.jpg" width="1600" height="880" loading="lazy"
+               alt="Diagrama con cajas redondeadas azules. Tres superestados: Estándar, con buscar camino óptimo, buscar zona mejor y comer últimas pills; Ataque, con buscar camino óptimo hacia comestibles, comestibles pero dispersos y comestibles y juntos; y Defensa, con huir, ir a por PowerPills, buscar camino sin fantasmas y buscar cuadrante vacío con PowerPill. Aparte, un estado Empezar mapa. Flechas rotuladas entre todos ellos, por ejemplo «hay al menos un fantasma comestible cercano / PPill comida», «no merece la pena comer fantasmas (lejos, poca puntuación, poco tiempo...)», «fantasmas cerca», «PowerPill bloqueada» y «cambio de nivel», que vuelve a Empezar mapa.">
+        </figure>
+        <p>
+          El más completo de los cuatro: todos los niveles tienen sus flechas rotuladas, hay un estado para el
+          principio de cada nivel y una transición «cambio de nivel» que vuelve a él. Lo que queda por hacer es lo
+          de siempre: «fantasmas cerca», «distancia media», «no merece la pena» tienen que convertirse en
+          números, y esos números en parámetros del constructor de la transición, para poder probar varios.
+        </p>
+        <h3 class="label">Antes de programar, comprobad el diagrama</h3>
+        <ul>
+          <li>Cada flecha tiene una condición que se puede calcular con lo que hay en el <code>Input</code>.</li>
+          <li>Cada palabra vaga —cerca, lejos, merece la pena— tiene un número, y las parejas de entrar y salir
+            tienen dos.</li>
+          <li>Cada estado con varias flechas de salida dice en qué orden se miran.</li>
+          <li>Las flechas que se repiten desde varios estados están agrupadas en un superestado.</li>
+          <li>No hay flechas de un estado a sí mismo.</li>
+          <li>Está marcado el estado inicial de cada máquina, también el de las de dentro.</li>
+        </ul>
+      </section>
+
+      <section id="errores">
+        <div class="sec-head">
+          <span class="num">15</span>
+          <h2 class="sec">Errores típicos</h2>
+        </div>
+        <p>
+          Todos salen de lo anterior, y los que llevan una excepción los hemos provocado a propósito para
+          comprobar qué pasa.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr><th scope="col">Error</th><th scope="col">Qué se ve</th><th scope="col">Arreglo</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Inicializar los atributos del <code>Input</code> en la declaración.</td>
+                <td>Valores a cero aunque <code>parseInput()</code> los calcule; <code>NullPointerException</code> al construir si es una colección.</td>
+                <td>Declarar sin valor y crear todo dentro de <code>parseInput()</code>.</td>
+              </tr>
+              <tr>
+                <td>Usar <code>getPowerPillIndices()</code>.</td>
+                <td>Fantasmas que huyen de píldoras que ya se comieron.</td>
+                <td><code>getActivePowerPillsIndices()</code>.</td>
+              </tr>
+              <tr>
+                <td>Un solo umbral para entrar y salir.</td>
+                <td>Cambios de estado que se deshacen a los pocos turnos: el 11&#8239;% en el ejemplo.</td>
+                <td>Dos umbrales, uno para cada flecha.</td>
+              </tr>
+              <tr>
+                <td>Añadir las transiciones en mal orden.</td>
+                <td>Una transición que no se dispara nunca, porque otra más general va delante.</td>
+                <td>La más urgente o la más específica, primero.</td>
+              </tr>
+              <tr>
+                <td>Transiciones sin <code>toString()</code>, o con el mismo en dos flechas.</td>
+                <td>Nombres ilegibles en la consola; <code>IdAlreadyInUseException</code> con el observador gráfico.</td>
+                <td>Un nombre distinto por flecha; si la clase se repite, que lo reciba en el constructor.</td>
+              </tr>
+              <tr>
+                <td>Añadir el observador después de los <code>add</code>.</td>
+                <td>Grafo vacío y <code>NullPointerException</code> en la primera transición.</td>
+                <td><code>addObserver</code> justo después de <code>new FSM</code>.</td>
+              </tr>
+              <tr>
+                <td>Olvidar <code>ready()</code>.</td>
+                <td><code>NullPointerException</code> en el primer <code>run</code>.</td>
+                <td><code>ready()</code> en todas las máquinas; las de dentro, antes de envolverlas.</td>
+              </tr>
+              <tr>
+                <td>No llamar a <code>reset()</code> en <code>preCompute</code>.</td>
+                <td>Cada partida empieza en el estado en que acabó la anterior.</td>
+                <td><code>reset()</code> de cada máquina en <code>preCompute</code>.</td>
+              </tr>
+              <tr>
+                <td>Resetear sólo la máquina de fuera.</td>
+                <td>La de dentro sigue en el estado de la partida anterior.</td>
+                <td>Guardar las de dentro en atributos y resetearlas también.</td>
+              </tr>
+              <tr>
+                <td>Una flecha de un estado compuesto a sí mismo.</td>
+                <td>La máquina de dentro vuelve a su estado inicial en cada turno: nunca pasa del primer paso.</td>
+                <td>Quitarla: si no se cumple nada, ya se queda.</td>
+              </tr>
+              <tr>
+                <td>Compartir una <code>FSM</code>, o sus estados, entre fantasmas.</td>
+                <td>Los cuatro cambian de estado a la vez, o uno decide con las condiciones de otro.</td>
+                <td>Una máquina por fantasma, con objetos nuevos para cada uno.</td>
+              </tr>
+              <tr>
+                <td>Guardar el <code>Game</code> en un atributo de una acción.</td>
+                <td>Decisiones sobre un juego de hace varios turnos.</td>
+                <td>Usar siempre el que llega a <code>execute</code>.</td>
+              </tr>
+              <tr>
+                <td>Reutilizar una transición de fantasmas en Ms.&nbsp;Pac-Man.</td>
+                <td><code>ClassCastException</code>: el <code>Input</code> que llega no es el que espera.</td>
+                <td>Un paquete de transiciones por controlador.</td>
+              </tr>
+              <tr>
+                <td>Contar o apuntar cosas dentro de <code>evaluate</code>.</td>
+                <td>Cuentas que no cuadran: sólo se evalúa si su estado está activo y no ganó antes otra.</td>
+                <td><code>evaluate</code> sin efectos; lo demás, en las acciones o en un observador.</td>
+              </tr>
+              <tr>
+                <td>Dejar <code>showInFrame</code> en la entrega.</td>
+                <td><code>HeadlessException</code> al construir el controlador en una evaluación sin pantalla.</td>
+                <td>Todo lo gráfico detrás de una constante <code>DEBUG</code> a <code>false</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="predecir-coordinar.html"><span class="pager-l">Anterior</span><span class="pager-t">Predecir, coordinar y medir</span></a>
+        <a class="pager-next" href="arboles-comportamiento.html"><span class="pager-l">Siguiente</span><span class="pager-t">Árboles de comportamiento</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#espagueti">Los <code>if</code> no escalan</a></li>
+            <li><a href="#que-es">Estados y transiciones</a></li>
+            <li><a href="#implementar">Tres implementaciones</a></li>
+            <li><a href="#prioridades">De la lista a la máquina</a></li>
+            <li><a href="#jerarquicas">Máquinas jerárquicas</a></li>
+            <li><a href="#motor">El paquete <code>fsm</code></a></li>
+            <li><a href="#input"><code>Input</code></a></li>
+            <li><a href="#acciones">Acciones</a></li>
+            <li><a href="#transiciones">Estados y transiciones</a></li>
+            <li><a href="#run">Un turno de <code>run</code></a></li>
+            <li><a href="#ejemplo-fantasmas">Ejemplo: fantasmas</a></li>
+            <li><a href="#ejemplo-compuesto">Ejemplo: estado compuesto</a></li>
+            <li><a href="#depurar">Ver la máquina</a></li>
+            <li><a href="#disenar">El diagrama en papel</a></li>
+            <li><a href="#errores">Errores típicos</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html" aria-current="page"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>

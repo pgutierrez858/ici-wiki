@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>A* en Ms. Pac-Man · Tema 1 · ICI</title>
+<meta name="description" content="Las distancias y los caminos del laberinto vienen precalculados. Aquí está qué método usar para cada cosa, por qué la versión sin lastMove miente, y cómo pasar de una distancia a un movimiento.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>A* en Ms.&nbsp;Pac-Man</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 04 · Buscar caminos</p>
+    <h1>
+      A* en Ms.&nbsp;Pac-Man
+      <span class="thin">Lo que el motor ya trae hecho, y la trampa de darse la vuelta.</span>
+    </h1>
+    <p class="standfirst">
+      Las distancias y los caminos del laberinto vienen precalculados. Aquí está qué método usar para cada cosa, por qué la versión sin <code>lastMove</code> miente, y cómo pasar de una distancia a un movimiento.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="astar-mspacman">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">A* en Ms. Pac-Man: ya está hecho</h2>
+        </div>
+        <p>
+          Esta es la parte que cambia la práctica. En el simulador, el
+          <strong>A* está precalculado</strong>. El laberinto no cambia nunca, así que al cargarlo el motor
+          computa de una vez todas las distancias entre todos los pares de nodos y las guarda en una tabla.
+          Preguntar por una distancia es leer una posición de un <em>array</em>.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// pacman.game.Game. La tabla es triangular: como d(a,b) = d(b,a), sólo se
+// guarda la mitad, y el índice se calcula con la fórmula del número triangular</span>
+<span class="k">public int</span> getShortestPathDistance(<span class="k">int</span> fromNodeIndex, <span class="k">int</span> toNodeIndex) {
+    <span class="k">if</span> (fromNodeIndex == toNodeIndex) {
+        <span class="k">return</span> <span class="n">0</span>;
+    } <span class="k">else if</span> (fromNodeIndex &lt; toNodeIndex) {
+        <span class="k">return</span> currentMaze.shortestPathDistances[((toNodeIndex * (toNodeIndex + <span class="n">1</span>)) / <span class="n">2</span>) + fromNodeIndex];
+    } <span class="k">else</span> {
+        <span class="k">return</span> currentMaze.shortestPathDistances[((fromNodeIndex * (fromNodeIndex + <span class="n">1</span>)) / <span class="n">2</span>) + toNodeIndex];
+    }
+}</code></pre></div>
+        <p>
+          Los caminos completos, no sólo las distancias, salen de <code>PathsCache</code>, que guarda las
+          rutas entre cruces y las empalma. Consultar uno también es barato:
+        </p>
+        <div class="codigo"><pre><code><span class="k">int</span>[] camino = game.getShortestPath(desde, hasta);   <span class="c">// la secuencia de nodos</span>
+<span class="k">int</span>    pasos  = game.getShortestPathDistance(desde, hasta);</code></pre></div>
+
+        <h3 class="label">La trampa: darse la vuelta</h3>
+        <p>
+          Esa distancia precalculada es la distancia óptima <em>en el grafo</em>, y el grafo no sabe que en
+          el juego <strong>no se puede dar media vuelta</strong> en mitad de un pasillo. Ni Ms.&nbsp;Pac-Man
+          ni los fantasmas pueden invertir el sentido, salvo los fantasmas en el instante en que te comes
+          una píldora de poder. Así que la tabla puede decirte «ese fantasma está a tres pasos» cuando en
+          realidad tiene que dar la vuelta a la manzana.
+        </p>
+        <p>
+          Para eso están las versiones con <code>lastMoveMade</code>, y <strong>estas sí ejecutan A* de
+          verdad</strong>, cada vez que se llaman:
+        </p>
+        <div class="codigo"><pre><code><span class="c">// Respeta la regla de no invertir el sentido. Es lo que de verdad se va a recorrer.</span>
+<span class="k">int</span>[] camino = game.getShortestPath(desde, hasta, ultimoMovimiento);
+<span class="k">int</span>    pasos  = game.getShortestPathDistance(desde, hasta, ultimoMovimiento);</code></pre></div>
+        <p>
+          Y la heurística que usa ese A* es justo la tabla precalculada, que es admisible por construcción:
+          el camino sin poder dar la vuelta nunca puede ser más corto que el camino pudiendo.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// pacman.game.internal.AStar: el corazón del algoritmo, tal cual está en el motor</span>
+start.g = <span class="n">0</span>;
+start.h = game.getShortestPathDistance(start.index, target.index);   <span class="c">// h admisible</span>
+start.reached = lastMoveMade;
+open.add(start);
+
+<span class="k">while</span> (!open.isEmpty()) {
+    N currentNode = open.poll();          <span class="c">// el de f = g + h menor</span>
+    closed.add(currentNode);
+    <span class="k">if</span> (currentNode.isEqual(target)) <span class="k">break</span>;
+
+    <span class="k">for</span> (E next : currentNode.adj) {
+        <span class="k">if</span> (next.move != currentNode.reached.opposite()) {   <span class="c">// aquí vive la regla</span>
+            <span class="k">double</span> currentDistance = next.cost;
+            <span class="k">if</span> (!open.contains(next.node) &amp;&amp; !closed.contains(next.node)) {
+                next.node.g = currentDistance + currentNode.g;
+                next.node.h = game.getShortestPathDistance(next.node.index, target.index);
+                next.node.parent = currentNode;
+                next.node.reached = next.move;
+                open.add(next.node);
+            } <span class="k">else if</span> (currentDistance + currentNode.g &lt; next.node.g) {
+                next.node.g = currentDistance + currentNode.g;   <span class="c">// camino mejor: me lo quedo</span>
+                next.node.parent = currentNode;
+                next.node.reached = next.move;
+            }
+        }
+    }
+}</code></pre></div>
+        <p>
+          Es literalmente el <a href="astar.html#astar">pseudocódigo de A*</a>, con la condición del <code>opposite()</code>
+          añadida. Merece la pena abrirlo en Eclipse y leerlo entero una vez: está en el proyecto
+          <code>MsPacManEngine</code>, bajo <span class="path">pacman.game.internal</span>.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Cuál usar</span>
+          <p>
+            Para <strong>los fantasmas</strong>, siempre la versión con <code>lastMoveMade</code>: no pueden
+            darse la vuelta y la diferencia es real. Para <strong>Ms.&nbsp;Pac-Man</strong>, la versión sin
+            él vale como estimación rápida, pero en cuanto midas «¿llego yo antes que el fantasma?» tienes
+            que comparar peras con peras.
+          </p>
+        </div>
+
+        <h3 class="label">De la distancia al movimiento</h3>
+        <p>
+          El motor no sólo te da caminos: te da directamente el siguiente movimiento. Y la implementación es
+          tan corta que conviene verla, porque explica sus dos defectos:
+        </p>
+        <div class="codigo"><pre><code><span class="c">// pacman.game.Game</span>
+<span class="k">public</span> MOVE getNextMoveTowardsTarget(<span class="k">int</span> fromNodeIndex, <span class="k">int</span> toNodeIndex, DM distanceMeasure) {
+    MOVE move = <span class="k">null</span>;
+    <span class="k">double</span> minDistance = Integer.MAX_VALUE;
+
+    <span class="k">for</span> (Entry&lt;MOVE, Integer&gt; entry : currentMaze.graph[fromNodeIndex].neighbourhood.entrySet()) {
+        <span class="k">double</span> distance = getDistance(entry.getValue(), toNodeIndex, distanceMeasure);
+        <span class="k">if</span> (distance &lt; minDistance) {
+            minDistance = distance;
+            move = entry.getKey();
+        }
+    }
+    <span class="k">return</span> move;
+}</code></pre></div>
+        <ul>
+          <li>
+            Es <strong>voraz de un solo paso</strong>: mira los vecinos, se queda con el que está más cerca
+            del objetivo, y ya. No hay búsqueda, no hay plan, no hay memoria.
+          </li>
+          <li>
+            Y en la versión <code>getApproximateNextMove…</code>, que es idéntica salvo que recorre
+            <code>allNeighbourhoods.get(lastMoveMade)</code>, se descarta además el vecino del que vienes.
+          </li>
+        </ul>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Método</th><th scope="col">Respeta el no-retroceso</th><th scope="col">Coste</th></tr></thead>
+            <tbody>
+              <tr><td><code>getNextMoveTowardsTarget(a, b, DM)</code></td><td>No</td><td>Cuatro consultas a tabla.</td></tr>
+              <tr><td><code>getApproximateNextMoveTowardsTarget(a, b, últMov, DM)</code></td><td>Sólo al elegir el vecino, no al medir</td><td>Tres consultas a tabla.</td></tr>
+              <tr><td><code>getNextMoveTowardsTarget(a, b, últMov, DM)</code></td><td>Sí, también al medir</td><td>Tres A* cortos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          El nombre engaña: hoy ninguna de las tres calcula nada «aproximado», viene de versiones viejas del
+          motor. La diferencia real está en si la distancia con la que compara sabe o no por dónde has
+          llegado. Casi siempre coinciden; se separan justo cuando el camino corto desde el vecino pasaría
+          por el nodo del que vienes, que es el que el juego no te va a dejar tomar.
+        </p>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="astar.html"><span class="pager-l">Anterior</span><span class="pager-t">Heurísticas y A*</span></a>
+        <a class="pager-next" href="estrategias.html"><span class="pager-l">Siguiente</span><span class="pager-t">Estrategias algorítmicas</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#astar-mspacman">A* en el motor</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html" aria-current="page"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>

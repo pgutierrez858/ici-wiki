@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Búsqueda en espacios de estados · Tema 1 · ICI</title>
+<meta name="description" content="El esquema general de cualquier búsqueda —abiertos, cerrados y de qué estructura se saca el siguiente nodo— y las tres búsquedas ciegas que lo concretan: anchura, profundidad y coste uniforme.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>Búsqueda en espacios de estados</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 02 · Buscar caminos</p>
+    <h1>
+      Búsqueda en espacios de estados
+      <span class="thin">Estados, transiciones y el bucle que tienen en común todas las búsquedas.</span>
+    </h1>
+    <p class="standfirst">
+      El esquema general de cualquier búsqueda —abiertos, cerrados y de qué estructura se saca el siguiente nodo— y las tres búsquedas ciegas que lo concretan: anchura, profundidad y coste uniforme.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="espacios">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Búsqueda en espacios de estados</h2>
+        </div>
+        <p>
+          Con el mapa ya convertido en grafo, la búsqueda de caminos deja de ser un problema de geometría y
+          pasa a ser el problema clásico de <strong>exploración de espacios de estados</strong>, que es una
+          de las técnicas más importantes de la IA y con diferencia la más utilizada en videojuegos. Buscar
+          un camino en un laberinto y resolver un puzle son, vistos así, exactamente el mismo problema.
+        </p>
+        <dl class="gloss">
+          <div><dt>Estado</dt><dd>Cada configuración posible del problema, representada con una estructura de datos. En el laberinto, el nodo donde estás; en el 8-puzle, la disposición de las fichas.</dd></div>
+          <div><dt>Transición</dt><dd>La lista de estados a los que se llega desde un estado previo tras aplicar una operación del dominio. También se les llama <em>sucesores</em>.</dd></div>
+          <div><dt>Coste</dt><dd>Lo que cuesta una transición. Puede ser 1 para todas, o el tiempo de cambiar de estación, o el terreno que cruzas.</dd></div>
+          <div><dt>Camino</dt><dd>Una secuencia de estados que lleva de uno a otro.</dd></div>
+          <div><dt>Camino solución</dt><dd>El que va del estado inicial al estado objetivo.</dd></div>
+          <div><dt>Camino parcial</dt><dd>El que va del inicial a un estado que todavía no es solución: el estado actual de la búsqueda.</dd></div>
+          <div><dt>Función objetivo</dt><dd>La que decide si un estado es o no el estado solución. A veces es una comparación; a veces es una condición.</dd></div>
+        </dl>
+        <figure class="wide">
+          <figcaption>Un camino solución del 8-puzle: cuatro transiciones del estado inicial al objetivo</figcaption>
+          <img class="shot" src="../../assets/img/pf-8puzzle.png" width="1500" height="246" loading="lazy"
+               alt="Cinco tableros de 3 por 3 en fila. El primero, marcado como inicial, tiene el hueco arriba a la izquierda. Entre cada par de tableros una flecha con el movimiento: 1 izquierda, 2 arriba, 5 izquierda, 6 arriba. El último, marcado como objetivo, tiene las fichas del 1 al 8 en orden y el hueco abajo a la derecha.">
+        </figure>
+        <p>
+          Fíjate en que la figura no muestra el espacio de estados: muestra <strong>un camino dentro de
+          él</strong>. El espacio entero son todas las configuraciones alcanzables, que en el 8-puzle son
+          181&#8239;440, y en el laberinto de Ms.&nbsp;Pac-Man son 1&#8239;293 nodos. Buscar es recorrer
+          ese espacio sin tener que verlo todo.
+        </p>
+        <figure class="wide">
+          <figcaption>El mismo mapa, dos veces: como rejilla y como grafo con costes en las aristas</figcaption>
+          <img class="shot" src="../../assets/img/pf-grafo-costes.png" width="468" height="233" loading="lazy"
+               alt="A la izquierda, una rejilla con muros negros, una casilla de salida marcada S y una de meta marcada G. A la derecha, el mismo mapa reducido a un grafo de puntos rojos unidos por aristas, cada una con un número que es su coste.">
+        </figure>
+
+        <h3 class="label">El esquema general</h3>
+        <p>
+          Todos los algoritmos de búsqueda que vienen después son el mismo bucle. Cambia una sola cosa:
+          <strong>de qué estructura se saca el siguiente nodo a expandir</strong>. Ese detalle es el que
+          convierte el esquema en anchura, en profundidad o en A*.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · esquema general de búsqueda</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">buscar</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">frontera</span> ← estructura con {<span class="var">inicio</span>}       <i>// abiertos</i>
+    <span class="var">visitados</span> ← conjunto vacío            <i>// cerrados</i>
+    <span class="var">padre</span>[<span class="var">inicio</span>] ← NULL
+
+    <b>while</b> <span class="var">frontera</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← <span class="fn">sacar</span>(<span class="var">frontera</span>)
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then</b>
+            <b>return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>)
+        <b>end if</b>
+        añadir <span class="var">n</span> a <span class="var">visitados</span>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> AND <span class="var">v</span> ∉ <span class="var">frontera</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>
+                añadir <span class="var">v</span> a <span class="var">frontera</span>
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;SOLUCIÓN
+<b>end function</b>
+
+<b>function</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>)
+    <span class="var">camino</span> ← lista vacía
+    <b>while</b> <span class="var">n</span> ≠ NULL <b>do</b>
+        insertar <span class="var">n</span> al principio de <span class="var">camino</span>
+        <span class="var">n</span> ← <span class="var">padre</span>[<span class="var">n</span>]
+    <b>end while</b>
+    <b>return</b> <span class="var">camino</span>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Las dos estructuras tienen nombre propio y los vas a ver en todas partes: la frontera son los
+          <strong>nodos abiertos</strong>, los candidatos a seguir; y los visitados son los <strong>nodos
+          cerrados</strong>, los ya expandidos. El diccionario <code>padre</code> es lo que permite
+          devolver el camino y no sólo la distancia.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Las preguntas que hay que contestar</span>
+          <p>
+            ¿Qué vecino visito primero? ¿Se controlan los ciclos? ¿Cuándo cambio de camino? ¿Cuándo termino
+            la búsqueda? ¿Cuánto cuesta la solución, y es óptima? Cada algoritmo es un juego de respuestas
+            distinto a esas cinco preguntas, y ninguna respuesta es gratis.
+          </p>
+        </div>
+
+        <h3 class="label">El repertorio</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Métodos no informados o ciegos</th><th scope="col">Métodos informados o heurísticos</th></tr></thead>
+            <tbody>
+              <tr><td>Primero en anchura</td><td>Búsqueda primero el mejor</td></tr>
+              <tr><td>Coste uniforme</td><td>Búsqueda voraz (<span lang="en">greedy</span>)</td></tr>
+              <tr><td>Primero en profundidad</td><td><strong>Búsqueda óptima: algoritmo A*</strong></td></tr>
+              <tr><td>Profundidad limitada</td><td>Búsqueda local: escalada, enfriamiento simulado, genéticos</td></tr>
+              <tr><td>Profundización iterativa</td><td>Búsqueda con adversario: minimax, poda alfa-beta</td></tr>
+              <tr><td>Bidireccional</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          La diferencia entre las dos columnas es una sola: si el algoritmo tiene o no una
+          <strong>heurística</strong>, o sea una pista sobre hacia dónde puede estar la solución. Tenerla
+          mejora muchísimo el tiempo de búsqueda, y no cambia nada más. Las dos últimas filas de la derecha
+          no buscan caminos, y salen en los temas 5 y 6; aquí interesan las tres primeras.
+        </p>
+      </section>
+
+      <section id="ciegas">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Búsquedas ciegas</h2>
+        </div>
+        <p>
+          Sin heurística, lo único que se puede hacer es fijar un orden de expansión y ser sistemático. Las
+          tres que importan salen de cambiar una línea del esquema general.
+        </p>
+
+        <h3 class="label">Primero en anchura</h3>
+        <p>
+          La frontera es una <strong>cola FIFO</strong>: se expande siempre el nodo que lleva más tiempo
+          esperando. Como consecuencia, se exploran todos los nodos a distancia 1, luego todos a distancia 2,
+          y así. Cuando encuentra el objetivo, lo encuentra por un camino de longitud mínima.
+        </p>
+        <figure class="wide">
+          <figcaption>Anchura desde el nodo de salida: el frente avanza a la vez en todas direcciones</figcaption>
+          <svg class="explica dga1" viewBox="0 0 470 200" role="img" aria-label="Un grafo con el nodo de salida a la izquierda. Los nodos se agrupan en cuatro capas según su distancia al inicio: la capa 1 tiene dos nodos, la 2 tiene tres, la 3 tiene cuatro y en la 4 está el objetivo. La búsqueda en anchura visita una capa completa antes de pasar a la siguiente.">
+            <style>
+              .dga1 .ar{stroke:var(--line);stroke-width:1.4;fill:none}
+              .dga1 .nd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.4}
+              .dga1 .n0{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.8}
+              .dga1 .ng{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.8}
+              .dga1 .cap{fill:var(--surface-2)}
+              .dga1 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-3)}
+              .dga1 .tb{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+            </style>
+            <rect x="72" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="180" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="288" y="16" width="70" height="146" rx="4" class="cap"/>
+            <rect x="396" y="16" width="62" height="146" rx="4" class="cap"/>
+            <path d="M40 89 L107 55 M40 89 L107 123 M107 55 L215 40 M107 55 L215 89 M107 123 L215 89 M107 123 L215 138 M215 40 L323 40 M215 89 L323 76 M215 89 L323 112 M215 138 L323 148 M323 40 L427 89 M323 76 L427 89 M323 112 L427 89" class="ar"/>
+            <circle cx="40" cy="89" r="10" class="n0"/>
+            <circle cx="107" cy="55" r="9" class="nd"/><circle cx="107" cy="123" r="9" class="nd"/>
+            <circle cx="215" cy="40" r="9" class="nd"/><circle cx="215" cy="89" r="9" class="nd"/><circle cx="215" cy="138" r="9" class="nd"/>
+            <circle cx="323" cy="40" r="9" class="nd"/><circle cx="323" cy="76" r="9" class="nd"/><circle cx="323" cy="112" r="9" class="nd"/><circle cx="323" cy="148" r="9" class="nd"/>
+            <circle cx="427" cy="89" r="10" class="ng"/>
+            <text x="40" y="180" class="tb">salida</text>
+            <text x="107" y="180" class="t">capa 1</text>
+            <text x="215" y="180" class="t">capa 2</text>
+            <text x="323" y="180" class="t">capa 3</text>
+            <text x="427" y="180" class="tb">objetivo</text>
+          </svg>
+        </figure>
+        <figure>
+          <figcaption>Pseudocódigo · primero en anchura</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">anchura</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">cola</span> ← cola FIFO con {<span class="var">inicio</span>}
+    <span class="var">visitados</span> ← {<span class="var">inicio</span>}
+    <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← <span class="fn">desencolar</span>(<span class="var">cola</span>)
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>
+                añadir <span class="var">v</span> a <span class="var">visitados</span>
+                <span class="fn">encolar</span>(<span class="var">cola</span>, <span class="var">v</span>)
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+<b>end function</b></pre>
+        </figure>
+        <div class="note tip">
+          <span class="note-label">Por qué esta es la que vas a escribir</span>
+          <p>
+            Todas las aristas del laberinto cuestan lo mismo, un turno, y en ese caso la anchura ya es
+            <strong>óptima</strong>: el primer camino que encuentra es el más corto. Y además responde a la
+            pregunta que de verdad te interesa, que no es «¿cuánto hay hasta ese nodo?» sino <strong>«¿cuál
+            de todos estos nodos me pilla más cerca, y por dónde se va?»</strong>. Una sola anchura desde tu
+            posición contesta eso para todos los objetivos a la vez.
+          </p>
+        </div>
+
+        <h3 class="label">Primero en profundidad</h3>
+        <p>
+          La frontera es una <strong>pila LIFO</strong>: se expande el último añadido, así que la búsqueda
+          se lanza por una rama hasta el fondo y sólo retrocede cuando se queda sin salidas. Gasta poquísima
+          memoria y encuentra soluciones rápido, pero <strong>no son las más cortas</strong>, y en un grafo
+          con ciclos se pierde si no se controlan los visitados.
+        </p>
+        <figure class="wide">
+          <figcaption>Profundidad: se agota una rama entera, y el objetivo aparece por un camino de cinco pasos habiendo uno de tres</figcaption>
+          <svg class="explica dga2" viewBox="0 0 470 200" role="img" aria-label="Un grafo con dos ramas entre la salida y el objetivo: una por arriba de cinco pasos y otra por abajo de tres. La búsqueda en profundidad se lanza por la de arriba, la agota entera y llega al objetivo por ella, sin haber mirado nunca la corta.">
+            <style>
+              .dga2 .ar{stroke:var(--line);stroke-width:1.4;fill:none}
+              .dga2 .arc{stroke:var(--ok);stroke-width:1.8;fill:none}
+              .dga2 .arv{stroke:var(--maze);stroke-width:2.6;fill:none}
+              .dga2 .nd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.4}
+              .dga2 .nv{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.7}
+              .dga2 .ng{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.9}
+              .dga2 .o{font-family:var(--f-mono);font-size:9px;text-anchor:middle;fill:var(--maze);dominant-baseline:middle}
+              .dga2 .tb{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dga2 .tm{font-family:var(--f-mono);font-size:10px;fill:var(--maze)}
+              .dga2 .tk{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+            </style>
+            <path d="M30 96 L112 140 M112 140 L258 144 M258 144 L424 96" class="arc"/>
+            <path d="M30 96 L96 44 M96 44 L168 30 M168 30 L244 34 M244 34 L322 60 M322 60 L424 96" class="arv"/>
+            <circle cx="112" cy="140" r="9" class="nd"/><circle cx="258" cy="144" r="9" class="nd"/>
+            <circle cx="30" cy="96" r="10" class="nv"/><text x="30" y="96" class="o">1</text>
+            <circle cx="96" cy="44" r="9" class="nv"/><text x="96" y="44" class="o">2</text>
+            <circle cx="168" cy="30" r="9" class="nv"/><text x="168" y="30" class="o">3</text>
+            <circle cx="244" cy="34" r="9" class="nv"/><text x="244" y="34" class="o">4</text>
+            <circle cx="322" cy="60" r="9" class="nv"/><text x="322" y="60" class="o">5</text>
+            <circle cx="424" cy="96" r="10" class="ng"/><text x="424" y="96" class="o">6</text>
+            <text x="110" y="14" class="tm">se lanza por aquí y la agota: 5 pasos</text>
+            <text x="110" y="180" class="tk">y había un camino de 3 pasos</text>
+            <text x="30" y="122" class="tb">salida</text>
+            <text x="424" y="122" class="tb">objetivo</text>
+          </svg>
+        </figure>
+
+        <h3 class="label">Las dos, sobre el mismo grafo</h3>
+        <p>
+          Aquí se ven a la vez, y sobre todo se ven <strong>las estructuras</strong>, que es lo que de
+          verdad las distingue. Elige el método, pulsa <strong>Calcular la ruta</strong> y después recorre
+          el bucle vuelta a vuelta: cada paso es una sola llamada a <code>sacar(frontera)</code>.
+        </p>
+        <div class="demo" data-demo="grafo">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Saca de una cola o saca de una pila</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí al lado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          El grafo también se edita: con <em>Nodo</em> se ponen vértices nuevos, con <em>Arista</em> se
+          pincha en dos nodos para unirlos (o para separarlos si ya estaban unidos), y con
+          <em>Salida&nbsp;A</em> y <em>Destino&nbsp;B</em> se elige entre qué dos se busca. La tira de
+          abajo enseña la frontera con el elemento que va a salir <strong>entre corchetes</strong>, el
+          conjunto <code>visitados</code> y el diccionario <code>padre</code>, que es el que guarda el
+          camino.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · las dos, con una sola línea de diferencia</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">buscar</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>, <span class="var">modo</span>)
+    <span class="var">frontera</span> ← {(<span class="var">inicio</span>, NULL)}    <i>// cola FIFO si anchura, pila LIFO si profundidad</i>
+    <span class="var">visitados</span> ← ∅
+    <b>if</b> <span class="var">modo</span> = anchura <b>then</b> añadir <span class="var">inicio</span> a <span class="var">visitados</span> <b>end if</b>
+
+    <b>while</b> <span class="var">frontera</span> no esté vacía <b>do</b>
+        (<span class="var">n</span>, <span class="var">desde</span>) ← <span class="fn">sacar</span>(<span class="var">frontera</span>)   <i>// ← LA ÚNICA DIFERENCIA</i>
+                                     <i>//   anchura: el primero que entró</i>
+                                     <i>//   profundidad: el último que entró</i>
+        <b>if</b> <span class="var">modo</span> = profundidad AND <span class="var">n</span> ∈ <span class="var">visitados</span> <b>then continue end if</b>
+        añadir <span class="var">n</span> a <span class="var">visitados</span>;   <span class="var">padre</span>[<span class="var">n</span>] ← <span class="var">desde</span>
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">vecinos</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∈ <span class="var">visitados</span> <b>then continue end if</b>
+            <b>if</b> <span class="var">modo</span> = anchura <b>then</b> añadir <span class="var">v</span> a <span class="var">visitados</span> <b>end if</b>
+            añadir (<span class="var">v</span>, <span class="var">n</span>) a <span class="var">frontera</span>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;CAMINO
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Hay una segunda diferencia, más pequeña y más fácil de pasar por alto: <strong>cuándo se
+          marca</strong>. La anchura marca al <em>encolar</em>, y por eso ningún nodo entra dos veces en la
+          cola y el primer camino con el que llega a cada uno es el más corto. La profundidad marca al
+          <em>sacar</em>, así que su pila <strong>sí lleva repetidos</strong>: un mismo nodo puede entrar
+          por dos ramas y, cuando sale la segunda vez, se descarta. En el ejemplo se ve en la tira de
+          abajo, y es la razón de esa línea de <code>continue</code>.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <p>
+            Con <strong>anchura</strong>, la frontera es siempre la capa de fuera y el árbol azul crece a la
+            par en todas direcciones; el camino que sale tiene el mínimo número de aristas. Con
+            <strong>profundidad</strong>, la pila se hace honda y estrecha, el árbol azul se lanza por una
+            rama hasta el fondo, y el camino que sale suele ser bastante más largo. Compara las dos cifras
+            que da la lectura: vueltas del bucle y aristas del camino.
+          </p>
+          <p>
+            Y prueba a alargar una rama con la herramienta <em>Nodo</em>: la anchura ni se entera, porque
+            no baja por ahí hasta el final; la profundidad se mete entera.
+          </p>
+        </div>
+
+        <h3 class="label">Coste uniforme, o Dijkstra</h3>
+        <p>
+          La frontera es una <strong>cola de prioridad</strong> ordenada por <em>g</em>(n), el coste real
+          acumulado desde la salida. Es la anchura generalizada a aristas con coste distinto, y es
+          exactamente el algoritmo de Dijkstra. Con todos los costes a 1 la cola de prioridad se comporta
+          como una FIFO y sale la anchura, tal cual; por eso en el laberinto de Ms.&nbsp;Pac-Man no aporta
+          nada, y sólo se gana algo si decides que unos pasillos «cuestan» más que otros, por ejemplo por
+          ser peligrosos.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Cambiar la FIFO por una cola de prioridad no basta</span>
+          <p>
+            La idea es esa, pero con el contenedor solo no sale: hay que cambiar además <strong>cuándo se
+            marca</strong> y <strong>qué se hace con un nodo que ya estaba en la frontera</strong>.
+          </p>
+          <ul>
+            <li>
+              <strong>Ya no se puede marcar al encolar.</strong> La anchura puede porque, con todas las
+              aristas iguales, la primera vez que llegas a un nodo es por un camino de longitud mínima. Con
+              costes distintos eso es falso: se puede llegar pronto por un camino caro y más tarde por uno
+              barato. Así que Dijkstra marca <strong>al sacar</strong>, como la profundidad, y un nodo que
+              sale y ya estaba marcado se descarta.
+            </li>
+            <li>
+              <strong>Un nodo de la frontera puede mejorar.</strong> Si aparece un camino más barato hasta
+              él, hay que bajarle la <em>g</em> y <strong>cambiarle el padre</strong>. Dos formas de
+              hacerlo: reordenar la cola (<em lang="en">decrease-key</em>), o meterlo otra vez y descartar
+              la copia vieja cuando salga.
+            </li>
+          </ul>
+          <p>
+            Sin lo segundo el camino que devuelves puede no ser el barato aunque la distancia sí lo sea,
+            que es un error incómodo de encontrar porque el número que imprimes es correcto.
+          </p>
+        </div>
+        <figure>
+          <figcaption>Pseudocódigo · coste uniforme, con lo que cambia marcado</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">costeUniforme</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">frontera</span> ← cola de <b>prioridad por g</b>, con <span class="var">inicio</span>
+    <span class="var">g</span>[<span class="var">inicio</span>] ← 0;   <span class="var">cerrados</span> ← ∅
+
+    <b>while</b> <span class="var">frontera</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← el de <span class="var">g</span> menor          <i>// ← aquí estaba la FIFO</i>
+        <b>if</b> <span class="var">n</span> ∈ <span class="var">cerrados</span> <b>then continue end if</b>   <i>// ← se marca al SACAR, no al meter</i>
+        añadir <span class="var">n</span> a <span class="var">cerrados</span>
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">vecinos</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∈ <span class="var">cerrados</span> <b>then continue end if</b>
+            <span class="var">gNuevo</span> ← <span class="var">g</span>[<span class="var">n</span>] + <span class="fn">coste</span>(<span class="var">n</span>, <span class="var">v</span>)
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">frontera</span> OR <span class="var">gNuevo</span> &lt; <span class="var">g</span>[<span class="var">v</span>] <b>then</b>
+                <span class="var">g</span>[<span class="var">v</span>] ← <span class="var">gNuevo</span>;   <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>   <i>// ← el nodo puede mejorar</i>
+                insertar o reordenar <span class="var">v</span> en <span class="var">frontera</span>
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;CAMINO
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Compáralo con <a href="astar.html#astar">A*</a> y verás que <strong>son el mismo código</strong>: lo único
+          que le falta aquí es sumarle la heurística al ordenar. Dicho al revés, y es la forma corta de
+          recordarlo: <strong>A* con <em>h</em>&nbsp;=&nbsp;0 es Dijkstra, y Dijkstra con todos los costes
+          iguales es la anchura</strong>. Los tres son el bucle del <a href="busqueda.html#espacios">esquema general</a> con otra cosa dentro de la
+          frontera.
+        </p>
+        <div class="demo" data-demo="dijkstra">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Mira cómo se mueven las g</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí arriba.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Cada arista lleva su coste y cada nodo, debajo, su <code>g</code> de ahora mismo, que empieza en
+          ∞ para todos menos la salida. Pulsa <strong>Calcular la ruta</strong> y ve vuelta a vuelta: en
+          cada una se cierra el nodo de <code>g</code> menor y se relajan sus vecinos, en
+          <span class="swatch sw-mejora"></span>&nbsp;verde los que mejoran y en
+          <span class="swatch sw-peor"></span>&nbsp;rojo discontinuo los que no. La <code>g</code> que
+          acaba de bajar se pone en verde y en negrita.
+        </p>
+        <p>
+          Hay tres momentos que merece la pena cazar, y el grafo de ejemplo está hecho para que salgan los
+          tres:
+        </p>
+        <ul>
+          <li>
+            <strong>Una <code>g</code> que baja después de estar puesta.</strong> A <code>D</code> se llega
+            primero por <code>B</code> con 9, y al cerrar <code>C</code> resulta que por ahí son 5. Baja la
+            <code>g</code> y <strong>le cambia el padre</strong>: si sólo bajaras el número, la distancia
+            sería correcta y el camino no.
+          </li>
+          <li>
+            <strong>Una relajación rechazada.</strong> Al cerrar <code>F</code>, el camino que ofrece a
+            <code>H</code> es peor que el que ya tenía. Se mira y se descarta, y ese «se mira» también
+            cuesta.
+          </li>
+          <li>
+            <strong>Una entrada vieja en la cola.</strong> <code>D</code> entró dos veces, con 9 y con 5.
+            Cuando sale la de 9 ya estaba cerrado, así que se tira. Es la otra forma de hacer lo del
+            <em lang="en">decrease-key</em>: no tocar la cola y descartar la copia rancia al salir.
+          </li>
+        </ul>
+        <div class="note tip">
+          <span class="note-label">Y la comprobación que cierra el círculo</span>
+          <p>
+            Pon los <em>Costes</em> a <strong>todos a 1</strong> y vuelve a calcular. La cola de prioridad
+            deja de reordenar nada, los nodos salen en el orden en que entraron, y lo que recorre la
+            pantalla es <strong>exactamente la anchura</strong> de dos secciones más arriba: el camino que
+            sale es el de menos aristas. Con la herramienta <em>Coste</em> y el deslizador de al lado puedes
+            volver a poner los costes que quieras y ver cómo cambia la decisión.
+          </p>
+        </div>
+
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="representacion.html"><span class="pager-l">Anterior</span><span class="pager-t">Representar el espacio</span></a>
+        <a class="pager-next" href="astar.html"><span class="pager-l">Siguiente</span><span class="pager-t">Heurísticas y A*</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#espacios">Espacios de estados</a></li>
+            <li><a href="#ciegas">Búsquedas ciegas</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html" aria-current="page"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>

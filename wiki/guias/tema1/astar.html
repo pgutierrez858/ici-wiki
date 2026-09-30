@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Heurísticas y A* · Tema 1 · ICI</title>
+<meta name="description" content="Qué es una heurística, cuándo es admisible y cuándo consistente, las tres métricas del motor, y A* entero: las dos listas, la función f y un ejemplo para seguirlo paso a paso.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>Heurísticas y A*</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 03 · Buscar caminos</p>
+    <h1>
+      Heurísticas y A*
+      <span class="thin">Cómo estimar lo que falta, y el algoritmo que lo aprovecha.</span>
+    </h1>
+    <p class="standfirst">
+      Qué es una heurística, cuándo es admisible y cuándo consistente, las tres métricas del motor, y A* entero: las dos listas, la función <em>f</em> y un ejemplo para seguirlo paso a paso.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="heuristicas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Heurísticas</h2>
+        </div>
+        <p>
+          Una <strong>función heurística</strong> <em>h(n)</em> es una función matemática que devuelve un
+          valor numérico menor cuanto más cerca está un estado cualquiera del estado objetivo. Es una
+          estimación, no una medida: si supiéramos la distancia real ya no haría falta buscar.
+        </p>
+        <figure class="wide">
+          <figcaption>Cuatro caminos entre los mismos dos puntos · Taxicab geometry, Wikimedia Commons, dominio público</figcaption>
+          <img class="shot" src="../../assets/img/pf-metricas.png" width="900" height="900" loading="lazy"
+               alt="Una cuadrícula con dos puntos negros en esquinas opuestas. Tres caminos escalonados, en rojo, azul y amarillo, los unen siguiendo las calles: los tres miden lo mismo. Una línea verde en diagonal los une en línea recta, y es más corta.">
+        </figure>
+        <p>
+          En la figura, los tres caminos escalonados miden lo mismo, doce tramos, porque la
+          <strong>distancia Manhattan</strong> sólo cuenta cuánto hay que moverse en cada eje:
+          |x₁ − x₂| + |y₁ − y₂|. La diagonal verde es la <strong>distancia euclídea</strong>, la línea
+          recta, que siempre es menor o igual. Y ninguna de las dos es el camino que de verdad se recorre si
+          hay paredes por medio.
+        </p>
+        <div class="formulas">
+          <div class="formula">
+            <span class="formula-et">Euclídea</span>
+            <em>d</em><sub>E</sub> =
+            <span class="raiz"><span>(<em>x</em><sub>1</sub> − <em>x</em><sub>2</sub>)<sup>2</sup> + (<em>y</em><sub>1</sub> − <em>y</em><sub>2</sub>)<sup>2</sup></span></span>
+          </div>
+          <div class="formula">
+            <span class="formula-et">Manhattan</span>
+            <em>d</em><sub>M</sub> =
+            |<em>x</em><sub>1</sub> − <em>x</em><sub>2</sub>| + |<em>y</em><sub>1</sub> − <em>y</em><sub>2</sub>|
+          </div>
+        </div>
+
+        <h3 class="label">Admisible y consistente</h3>
+        <p>
+          Para que la heurística sirva sin estropear la solución tiene que cumplir dos propiedades, y la
+          primera es la que de verdad importa:
+        </p>
+        <dl class="gloss">
+          <div><dt>Admisible</dt><dd>Nunca sobreestima el coste real de alcanzar el objetivo desde ese nodo: <em>h(n) ≤ h*(n)</em>. Una heurística optimista no descarta el camino bueno; una pesimista sí puede.</dd></div>
+          <div><dt>Consistente o monótona</dt><dd>Dar un paso no puede hacer que la estimación baje más de lo que cuesta ese paso: <em>h(n) ≤ c(n, n′) + h(n′)</em> para toda arista. Con eso, un nodo cerrado ya tiene su mejor camino y no hay que volver a mirarlo.</dd></div>
+        </dl>
+
+        <h3 class="label">Consistente, dicho de otra forma</h3>
+        <p>
+          La definición con la desigualdad puesta así no dice gran cosa, pero basta con pasar un término al
+          otro lado para que se entienda:
+        </p>
+        <div class="formulas">
+          <div class="formula">
+            <span class="formula-et">Como se suele escribir</span>
+            <em>h</em>(n) ≤ <em>c</em>(n, n′) + <em>h</em>(n′)
+          </div>
+          <div class="formula">
+            <span class="formula-et">Lo mismo, despejado</span>
+            <em>h</em>(n) − <em>h</em>(n′) ≤ <em>c</em>(n, n′)
+          </div>
+        </div>
+        <p>
+          Y eso ya se lee solo: <strong>la estimación puede bajar como mucho lo que cuesta el paso que
+          das</strong>. Si un paso cuesta 4, la <em>h</em> puede bajar 4, o 3, o nada, o incluso subir. Lo
+          que no puede es bajar 8, porque entonces la <em>h</em> del nodo de partida estaría diciendo que
+          quedan muchos más de los que de verdad quedan, y eso es información falsa aunque el número siga
+          siendo menor que el coste real.
+        </p>
+        <figure class="wide">
+          <figcaption>La regla entera, en un paso</figcaption>
+          <svg class="explica dgh1" viewBox="0 0 470 176" role="img" aria-label="Dos nodos unidos por una arista de coste 4. El primero tiene heurística 10. Si el segundo tiene 7, la estimación baja 3 y vale; si tiene 6, baja 4, justo lo que cuesta el paso, y es el límite; si tiene 2, baja 8, más de lo que cuesta el paso, y entonces la heurística es inconsistente.">
+            <style>
+              .dgh1 .ar{stroke:var(--ink-3);stroke-width:2;fill:none}
+              .dgh1 .nd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.6}
+              .dgh1 .nm{font-family:var(--f-display);font-weight:700;font-size:13px;text-anchor:middle;fill:var(--ink);dominant-baseline:middle}
+              .dgh1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgh1 .tc{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dgh1 .ok{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dgh1 .no{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgh1 .gu{stroke:var(--line);stroke-width:1;stroke-dasharray:2 2;fill:none}
+            </style>
+            <path d="M84 84 H196" class="ar"/>
+            <text x="140" y="76" class="tc">coste 4</text>
+            <circle cx="66" cy="84" r="17" class="nd"/><text x="66" y="84" class="nm">n</text>
+            <circle cx="214" cy="84" r="17" class="nd"/><text x="214" y="84" class="nm">n′</text>
+            <text x="66" y="118" class="tc">h = 10</text>
+            <path d="M232 84 H246 M246 84 V36 M246 84 V132" class="gu"/>
+            <text x="256" y="40" class="ok" xml:space="preserve">h′ = 7   baja 3   ✓</text>
+            <text x="256" y="88" class="ok" xml:space="preserve">h′ = 6   baja 4   ✓ el tope</text>
+            <text x="256" y="136" class="no" xml:space="preserve">h′ = 2   baja 8   ✗ inconsistente</text>
+            <text x="20" y="164" class="t">La h puede bajar como mucho lo que cuesta el paso. Subir, lo que quiera.</text>
+          </svg>
+        </figure>
+        <h3 class="label">Y por eso se llama monótona</h3>
+        <p>
+          Aquí está la consecuencia, que es lo que de verdad hace falta. Si la <em>h</em> no puede bajar más
+          de lo que cuesta el paso, entonces la <em>f</em> <strong>no puede bajar nunca</strong> al avanzar
+          por un camino. Sale en una línea:
+        </p>
+        <div class="formula">
+          <em>f</em>(n′) = <em>g</em>(n′) + <em>h</em>(n′) = <em>g</em>(n) + <em>c</em> + <em>h</em>(n′)
+          ≥ <em>g</em>(n) + <em>h</em>(n) = <em>f</em>(n)
+        </div>
+        <p>
+          Lo que la <em>g</em> sube al dar el paso, la <em>h</em> no alcanza a bajarlo. De ahí el nombre:
+          la <em>f</em> es <strong>monótona no decreciente</strong> a lo largo de cualquier camino.
+        </p>
+        <figure class="wide">
+          <figcaption>La f a lo largo de un camino, con la misma g y dos heurísticas distintas</figcaption>
+          <svg class="explica dgh2" viewBox="0 0 470 210" role="img" aria-label="Un camino de cinco nodos con los costes de sus aristas. Encima, el valor de f en cada uno. Con una heurística consistente la línea de f sube o se queda igual, nunca baja. Con una inconsistente, la f se desploma en el segundo nodo y luego vuelve a subir.">
+            <style>
+              .dgh2 .eje{stroke:var(--line);stroke-width:1;fill:none}
+              .dgh2 .ar{stroke:var(--ink-3);stroke-width:1.8;fill:none}
+              .dgh2 .nd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.4}
+              .dgh2 .lc{stroke:var(--maze);stroke-width:2.4;fill:none}
+              .dgh2 .li{stroke:var(--bad);stroke-width:2;fill:none;stroke-dasharray:5 3}
+              .dgh2 .pc{fill:var(--maze)}
+              .dgh2 .pi{fill:var(--bad)}
+              .dgh2 .t{font-family:var(--f-mono);font-size:9px;text-anchor:middle;fill:var(--ink-2)}
+              .dgh2 .tm{font-family:var(--f-mono);font-size:10px;fill:var(--maze)}
+              .dgh2 .tb{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgh2 .tl{font-family:var(--f-mono);font-size:9px;fill:var(--ink-3)}
+            </style>
+            <path d="M40 24 V140 H440" class="eje"/>
+            <text x="22" y="28" class="tl">f</text>
+            <path d="M52 98 L152 92 L252 74 L352 56 L432 35" class="lc"/>
+            <circle cx="52" cy="98" r="3.4" class="pc"/><circle cx="152" cy="92" r="3.4" class="pc"/>
+            <circle cx="252" cy="74" r="3.4" class="pc"/><circle cx="352" cy="56" r="3.4" class="pc"/>
+            <circle cx="432" cy="35" r="3.4" class="pc"/>
+            <text x="52" y="90" class="t">8</text><text x="152" y="84" class="t">9</text>
+            <text x="252" y="66" class="t">11</text><text x="352" y="48" class="t">14</text>
+            <text x="432" y="27" class="t">18</text>
+            <path d="M52 98 L152 119 L252 74 L352 56 L432 35" class="li"/>
+            <circle cx="152" cy="119" r="3.4" class="pi"/>
+            <text x="152" y="133" class="t">4</text>
+            <path d="M52 158 H432" class="ar"/>
+            <circle cx="52" cy="158" r="7" class="nd"/><circle cx="152" cy="158" r="7" class="nd"/>
+            <circle cx="252" cy="158" r="7" class="nd"/><circle cx="352" cy="158" r="7" class="nd"/>
+            <circle cx="432" cy="158" r="7" class="nd"/>
+            <text x="102" y="174" class="t">3</text><text x="202" y="174" class="t">3</text>
+            <text x="302" y="174" class="t">6</text><text x="392" y="174" class="t">6</text>
+            <text x="40" y="196" class="tm">h consistente: la f no baja nunca</text>
+            <text x="250" y="196" class="tb">h inconsistente: aquí se desploma</text>
+          </svg>
+        </figure>
+        <div class="note tip">
+          <span class="note-label">Y esto para qué sirve</span>
+          <p>
+            Para poder <strong>cerrar un nodo y no volver a mirarlo</strong>. Si la <em>f</em> nunca baja,
+            A* saca los nodos de la cola en orden de <em>f</em> no decreciente, y cuando saca uno ya no
+            puede aparecer después un camino mejor hasta él: ese camino habría tenido una <em>f</em> más
+            pequeña y habría salido antes. Por eso el pseudocódigo puede permitirse esa línea de
+            <code>if v ∈ cerrados then continue</code> sin pensárselo.
+          </p>
+          <p>
+            Con una <em>h</em> sólo admisible pero no consistente, A* <strong>sigue encontrando el camino
+            óptimo</strong>, pero deja de poder hacer eso: hay que estar dispuesto a
+            <strong>reabrir</strong> un nodo ya cerrado cuando aparece un camino más barato. Si no se
+            reabre —que es lo que hace el pseudocódigo de estos apuntes— se puede devolver un camino peor.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Un ejemplo mínimo de admisible pero no consistente</span>
+          <p>
+            Cuatro nodos. <code>S→A</code> cuesta 3, <code>S→B</code> cuesta 1, <code>B→A</code> cuesta 1 y
+            <code>A→objetivo</code> cuesta 10. Y esta heurística:
+            <code>h(S)=0</code>, <code>h(A)=0</code>, <code>h(B)=11</code>.
+          </p>
+          <ul>
+            <li>
+              <strong>Es admisible:</strong> desde <code>A</code> quedan de verdad 10 y decimos 0; desde
+              <code>B</code> quedan 11 y decimos 11, clavado. Ninguna se pasa.
+            </li>
+            <li>
+              <strong>No es consistente:</strong> en la arista <code>B→A</code>, la <em>h</em> baja de 11 a
+              0, o sea 11, cuando el paso cuesta 1.
+            </li>
+            <li>
+              <strong>Y se nota:</strong> <code>A</code> sale de la cola con <em>f</em> = 3 antes que
+              <code>B</code>, que tiene <em>f</em> = 12. Se cierra con <em>g</em> = 3. Después sale
+              <code>B</code> y descubre un camino hasta <code>A</code> que cuesta 2, pero <code>A</code> ya
+              está cerrado. Resultado: 13 en vez de los 12 que costaba el bueno.
+            </li>
+          </ul>
+        </div>
+        <div class="note tip">
+          <span class="note-label">En la práctica no hay que sufrir mucho</span>
+          <p>
+            Casi todas las heurísticas geométricas razonables son consistentes de regalo: si el coste de
+            moverte entre dos sitios es al menos la distancia que los separa, entonces la distancia en línea
+            recta al destino cumple la desigualdad sin que nadie haga nada, porque la propia distancia ya la
+            cumple. Es el caso de la euclídea y de la Manhattan en una rejilla, y es el caso del
+            <a href="astar.html#astar-demo">ejemplo de A* de más abajo</a>.
+          </p>
+          <p>
+            Donde sí se rompe es al <strong>multiplicar la heurística por un peso mayor que 1</strong>. Si
+            la <em>h</em> era consistente y la multiplicas por 1,5, cada bajada se multiplica también por
+            1,5 y ya puede pasarse del coste del paso. Eso es exactamente lo que hace el deslizador de ese
+            ejemplo, y lo que explica que a partir de cierto peso devuelva un camino peor.
+          </p>
+        </div>
+        <p>
+          Tanto la euclídea como la Manhattan son admisibles en una rejilla sin paredes, porque cualquier
+          camino real tiene que recorrer al menos esa separación. En cuanto hay paredes siguen siendo
+          admisibles, porque el camino real sólo puede ser más largo, pero se vuelven <strong>malas</strong>: el
+          número que dan se parece cada vez menos al real, y la búsqueda vuelve a explorar de más.
+        </p>
+
+        <h3 class="label">Las tres métricas del motor</h3>
+        <p>
+          El simulador tiene las tres, en un enumerado que le pasas a casi cualquier método que hable de
+          distancias:
+        </p>
+        <div class="codigo"><pre><code><span class="c">/**
+ * DM stands for Distance Metric, a simple enumeration for use with methods that
+ * require a distance metric. The metric available are as follows:
+ * PATH: the actual path distance (i.e., number of step required to reach target)
+ * EUCLID: Euclidean distance using the nodes' x and y coordinates
+ * MANHATTAN: Manhattan distance (absolute distance between x and y coordinates)
+ */</span>
+<span class="k">public enum</span> DM {
+    PATH, EUCLID, MANHATTAN
+}</code></pre></div>
+        <div class="note trap">
+          <span class="note-label">En el laberinto, <code>EUCLID</code> y <code>MANHATTAN</code> mienten</span>
+          <p>
+            Las dos miden sobre las coordenadas de pantalla, y por tanto <strong>atraviesan las
+            paredes</strong>. Dos nodos separados por un muro salen pegadísimos, y un fantasma que está al
+            otro lado del túnel sale lejísimos. Para decidir, usa siempre <code>DM.PATH</code>, que cuenta
+            los pasos de verdad por los pasillos y además está precalculada, así que no es más cara. Las
+            otras dos existen porque en el motor original hacían falta como heurística: aquí ya no.
+          </p>
+        </div>
+      </section>
+
+      <section id="astar">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">A*</h2>
+        </div>
+        <p>
+          El algoritmo más usado, por sus buenas propiedades: es <strong>completo</strong> (si existe
+          solución siempre la encuentra), es <strong>óptimo</strong> (si hay varias, encuentra la mejor) y
+          es <strong>eficiente</strong> en el caso medio, aunque eso último depende enteramente de lo buena
+          que sea la heurística.
+        </p>
+        <p>
+          La idea cabe en una fórmula. Cada nodo abierto se ordena por
+        </p>
+        <div class="formula">
+          <em>f</em>(n) = <em>g</em>(n) + <em>h′</em>(n)
+        </div>
+        <ul>
+          <li><em>g</em>(n): el <strong>coste real</strong> del camino recorrido para llegar a ese nodo desde el inicial.</li>
+          <li><em>h′</em>(n): el <strong>valor heurístico</strong>, lo que estimamos que queda desde él hasta el final.</li>
+        </ul>
+        <p>
+          Y la combinación es lo que lo hace funcionar: <em>g</em> por sí solo tiende a primero en anchura,
+          <em>h′</em> por sí solo tiende a primero en profundidad, que es la búsqueda voraz, y sumados dan una
+          búsqueda que se lanza hacia el objetivo pero <strong>cambia de camino</strong> en cuanto aparecen
+          nodos más prometedores.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Si...</th><th scope="col">A* se convierte en</th><th scope="col">Y entonces</th></tr></thead>
+            <tbody>
+              <tr><td><em>h</em> = 0</td><td>Coste uniforme (Dijkstra)</td><td>Sigue siendo óptimo, pero explora muchísimo más.</td></tr>
+              <tr><td><em>g</em> = 0</td><td>Búsqueda voraz</td><td>Muy rápido y ya no es óptimo: se traga el primer camino que apunte bien.</td></tr>
+              <tr><td><em>h</em> = coste real</td><td>El camino, directamente</td><td>No expande ni un nodo de más. Es el límite teórico.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Las dos listas</h3>
+        <ul>
+          <li>
+            <strong>Nodos abiertos.</strong> El último nodo, de momento, de un posible camino. El camino
+            entero se puede reconstruir porque cada nodo guarda un puntero a su padre.
+          </li>
+          <li>
+            <strong>Nodos cerrados.</strong> Los ya expandidos: todos los nodos intermedios de algún camino.
+          </li>
+        </ul>
+        <p>
+          Las dos listas están ahí para gestionar la <strong>repetición de estados</strong>, que es la
+          pregunta difícil: ¿qué hago si llego al mismo estado por otro camino? Respuesta: quedarme con el
+          mejor. Si el hijo aparece por primera vez, calculo su coste previsto y lo guardo en abiertos; si
+          ya había aparecido y el camino nuevo es mejor que el que tenía, sustituyo su padre y su
+          <em>g</em>, y descarto el otro.
+        </p>
+        <figure class="wide">
+          <figcaption>A* terminado: en azul los nodos cerrados, en verde los que quedaron abiertos, y el camino en amarillo</figcaption>
+          <img class="shot" src="../../assets/img/pf-astar-listas.png" width="700" height="437" loading="lazy"
+               alt="Una rejilla con un muro gris en forma de U. Desde la casilla verde de salida se extiende una mancha de casillas azul claro, los nodos cerrados, bordeada por una franja de casillas verdes, los abiertos. Una línea amarilla rodea el muro y llega a la casilla roja del destino.">
+        </figure>
+        <p>
+          La forma de esa mancha es el resumen de todo el tema. No es un círculo, que sería lo que dibujaría el coste
+          uniforme, sino un óvalo estirado hacia el destino: la heurística está tirando de la búsqueda. Y
+          se abre en abanico al chocar con el muro, porque ahí la heurística deja de acertar y el algoritmo
+          tiene que mirar a los lados.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · A*</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">aEstrella</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">abiertos</span> ← cola de prioridad, ordenada por <span class="var">f</span>
+    <span class="var">cerrados</span> ← conjunto vacío
+    <span class="var">g</span>[<span class="var">inicio</span>] ← 0
+    <span class="var">f</span>[<span class="var">inicio</span>] ← <span class="fn">h</span>(<span class="var">inicio</span>, <span class="var">objetivo</span>)
+    <span class="var">padre</span>[<span class="var">inicio</span>] ← NULL
+    insertar <span class="var">inicio</span> en <span class="var">abiertos</span>
+
+    <b>while</b> <span class="var">abiertos</span> no esté vacía <b>do</b>
+        <span class="var">n</span> ← el de <span class="var">f</span> menor en <span class="var">abiertos</span>       <i>// el más prometedor</i>
+        <b>if</b> <span class="var">n</span> = <span class="var">objetivo</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>) <b>end if</b>
+        sacar <span class="var">n</span> de <span class="var">abiertos</span>; añadir <span class="var">n</span> a <span class="var">cerrados</span>
+
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">sucesores</span>(<span class="var">n</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∈ <span class="var">cerrados</span> <b>then continue end if</b>
+            <span class="var">gNuevo</span> ← <span class="var">g</span>[<span class="var">n</span>] + <span class="fn">coste</span>(<span class="var">n</span>, <span class="var">v</span>)
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">abiertos</span> OR <span class="var">gNuevo</span> &lt; <span class="var">g</span>[<span class="var">v</span>] <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>              <i>// me quedo con el mejor camino</i>
+                <span class="var">g</span>[<span class="var">v</span>] ← <span class="var">gNuevo</span>
+                <span class="var">f</span>[<span class="var">v</span>] ← <span class="var">gNuevo</span> + <span class="fn">h</span>(<span class="var">v</span>, <span class="var">objetivo</span>)
+                insertar o reordenar <span class="var">v</span> en <span class="var">abiertos</span>
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;SOLUCIÓN
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Compáralo con el <a href="busqueda.html#espacios">esquema general</a>: son el mismo bucle. Lo único que ha cambiado es
+          que la frontera está ordenada por <em>f</em> y que un nodo ya visto puede mejorar.
+        </p>
+        <div class="demo" data-demo="astar" id="astar-demo">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Sube y baja el peso de la heurística</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí arriba.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Una retícula de la esquina de abajo a la izquierda a la de abajo a la derecha. El coste de cada
+          arista es su longitud, salvo las pintadas <strong>más gruesas</strong>, que son terreno lento: la
+          fila de abajo, que cuesta el cuádruple, y sobre todo el <strong>atajo</strong> que une las dos
+          esquinas de un tirón, dibujado combado por debajo para que no se confunda con la fila. Cuesta 39,
+          y dando el rodeo por arriba son 36: lo que <em>parece</em> el camino bueno es el malo, por poco.
+          Encima de cada nodo va su <code>g</code>, su <code>h</code> y la suma; mientras no se haya
+          llegado a él sólo se enseña la <code>h</code>, porque es lo único que se sabe.
+          La <em>h</em> es la distancia en línea recta al destino, así que encima de cada
+          uno puedes leer <strong><code>g</code>+<code>h</code>=<code>f</code></strong> y ver de qué se
+          compone el número por el que se ordena la cola.
+        </p>
+        <p>
+          El grafo se edita entero. Con <em>Mover</em> se arrastra un nodo —pincha en él y vuelve a pinchar
+          donde lo quieras— y los costes y las <em>h</em> se recalculan solos, porque salen de la geometría.
+          Con <em>Terreno</em> y el deslizador de al lado se encarece o se abarata la arista que pinches:
+          es un multiplicador sobre su longitud, así que 1 es terreno normal y 4, cuatro veces más lento.
+          Y las aristas nuevas que pongas con <em>Arista</em> salen con el terreno que tenga puesto el
+          deslizador.
+        </p>
+        <div class="note tip">
+          <span class="note-label">El multiplicador nunca baja de 1, y no es por capricho</span>
+          <p>
+            Es lo que mantiene la heurística admisible: mientras ninguna arista cueste menos que su
+            longitud, la distancia en línea recta al destino no puede pasarse. Si se pudiera poner terreno
+            <em>rápido</em>, con un multiplicador por debajo de 1, la <em>h</em> dejaría de ser una cota
+            inferior y A* perdería la garantía aunque el peso estuviera a 1.
+          </p>
+        </div>
+        <p>
+          El deslizador multiplica la heurística, y con él se recorren los tres regímenes de la tabla de
+          arriba sin tocar una línea de código. Calcula con cada uno y compara las dos cifras de la lectura:
+          <strong>coste del camino</strong> y <strong>nodos cerrados</strong>.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Peso</th><th scope="col">Qué es</th><th scope="col">Qué le pasa</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="num-col">0</td>
+                <td><em>h</em> = 0, o sea coste uniforme</td>
+                <td>La <em>f</em> es la <em>g</em>: la mancha crece a la redonda y cierra <strong>22</strong> de los 25 nodos. Camino de coste <strong>36</strong>, el mejor.</td>
+              </tr>
+              <tr>
+                <td class="num-col">1</td>
+                <td>A* con la heurística tal cual, <strong>admisible</strong></td>
+                <td>La búsqueda se estira hacia el destino: <strong>13</strong> nodos cerrados en vez de 22, y el mismo camino de <strong>36</strong>. Gratis.</td>
+              </tr>
+              <tr>
+                <td class="num-col">1,25</td>
+                <td>Inflada, pero poco</td>
+                <td><strong>8</strong> nodos, y todavía acierta con el 36. La garantía ya no existe, pero aquí aún no se nota.</td>
+              </tr>
+              <tr>
+                <td class="num-col">1,5 o más</td>
+                <td>Inflada: <strong>ya no es admisible</strong></td>
+                <td>Cierra <strong>2</strong> nodos y se acabó: se traga el atajo y devuelve <strong>39</strong>. Tres unidades peor, veinte nodos menos de trabajo.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Por qué con peso 1 la heurística de aquí es admisible pase lo que pase</span>
+          <p>
+            Porque está construida para serlo: el coste de una arista es su longitud redondeada
+            <strong>hacia arriba</strong> (y multiplicada, en el terreno lento) y la <em>h</em> es la
+            distancia en línea recta redondeada <strong>hacia abajo</strong>. Como la recta es el camino
+            más corto entre dos puntos y ninguna arista cuesta menos que su longitud, la <em>h</em> no
+            puede pasarse por mucho que muevas los nodos.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Dónde exactamente se rompe</span>
+          <p>
+            Sube el deslizador despacio mirando el coste. Con 1 y con 1,25 sigue saliendo 36; en 1,5 salta a
+            39 y el dibujo cambia de golpe: la ruta deja de rodear por arriba y se va por el atajo. Eso es
+            que A* ha <strong>cerrado el destino</strong> con la <em>g</em> del atajo antes de que el rodeo
+            tuviera tiempo de llegar, y un nodo cerrado ya no se vuelve a mirar.
+          </p>
+          <p>
+            Con peso <em>w</em> lo único que se puede prometer es que el camino no costará más de <em>w</em>
+            veces el mejor. Aquí, con <em>w</em> = 1,5, sale un 8&#8239;% peor a cambio de mirar veinte
+            nodos menos. <strong>Ese es el trato</strong>, y se hace a sabiendas cuando no hay tiempo, que
+            es exactamente la situación de un personaje con 40&nbsp;ms por turno.
+          </p>
+          <p>
+            Con la herramienta <em>Mover</em> puedes cambiar la geometría y buscar el punto en el que se
+            rompe con otra disposición.
+          </p>
+        </div>
+        <p>
+          Y fíjate en dónde se le atraganta a la heurística: apunta al destino en línea recta, que es justo
+          por donde está lo caro. Así que A* mira esa zona antes de decidirse a subir. Es la misma forma que
+          tiene la mancha de la figura de arriba al abrirse en abanico contra el muro. Una heurística es una
+          pista, no una respuesta: donde se equivoca, se paga en nodos mirados de más, y si la fuerzas, en
+          calidad del camino.
+        </p>
+      </section>
+
+      <section id="todo-junto">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Todo junto</h2>
+        </div>
+        <p>
+          Este es el remate de las tres primeras páginas del tema —<a href="representacion.html">representar el espacio</a>, <a href="busqueda.html">buscar en él</a> y A*—, y conviene jugar con él un rato. A la izquierda se
+          elige <strong>cómo se parte el espacio</strong> —puntos de ruta, rejilla o triangulación— y debajo
+          <strong>qué algoritmo busca</strong> en el grafo que sale. Las dos decisiones son independientes:
+          <strong>doce combinaciones</strong>, la misma escena, y se pueden cambiar por separado.
+        </p>
+        <div class="demo" data-demo="todo">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Elige la partición y elige el algoritmo</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto: representar el espacio y buscar en él son dos problemas distintos, y se eligen por separado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Pon obstáculos, mueve la salida y el destino, y calcula. La lectura da las tres cifras con las que
+          se compara: <strong>nodos de la partición</strong>, <strong>nodos explorados</strong> y
+          <strong>longitud de la ruta</strong>. El paso a paso funciona igual que en los ejemplos
+          de <a href="representacion.html#representacion">la rejilla</a> y de
+          <a href="busqueda.html#ciegas">las búsquedas ciegas</a>, con los mismos colores: azul lo cerrado, amarillo la frontera, rojo el nodo de esta
+          vuelta.
+        </p>
+        <p>
+          Para que los cuatro algoritmos puedan correr sobre las tres particiones sin cambiar una línea,
+          todas producen lo mismo: un grafo con posiciones. El coste de una arista es la distancia entre sus
+          dos nodos, así que la distancia en línea recta al destino vale de heurística admisible en las tres.
+          En la rejilla los nodos son las casillas libres; en los puntos de ruta, los puntos; en la
+          triangulación, el centro de cada sector.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Tres cosas que se ven mejor aquí que en ningún sitio</span>
+          <ul>
+            <li>
+              <strong>La partición manda sobre el coste.</strong> Cambia de triangulación a rejilla de 10 sin
+              tocar el algoritmo: el número de nodos se multiplica por veinte y el de explorados también.
+              Elegir bien la representación ahorra más que elegir bien el algoritmo.
+            </li>
+            <li>
+              <strong>El algoritmo manda sobre la calidad.</strong> Con la misma partición, pon profundidad y
+              luego anchura: la ruta se alarga o se acorta sin que el mapa haya cambiado.
+            </li>
+            <li>
+              <strong>A* no siempre gana por mucho.</strong> En un grafo pequeño, como el de la
+              triangulación, la heurística casi no tiene nada que podar y A* y coste uniforme exploran
+              parecido. Cuanto más grande es el grafo, más se separa.
+            </li>
+          </ul>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Y una cosa que el widget deja a medias a propósito</span>
+          <p>
+            Con la triangulación, la ruta va del centro de un sector al del siguiente y sale con más
+            esquinas de las que necesita. Es lo que pasa cuando se busca sobre la malla y no se tira de la
+            cuerda después: compárala con la del
+            <a href="representacion.html#representacion">ejemplo de la malla de navegación</a>, que sí la tensa. El grafo te dice
+            <em>por qué sectores</em> pasar; convertir eso en una ruta bonita es un paso aparte.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="busqueda.html"><span class="pager-l">Anterior</span><span class="pager-t">Búsqueda en espacios de estados</span></a>
+        <a class="pager-next" href="astar-mspacman.html"><span class="pager-l">Siguiente</span><span class="pager-t">A* en Ms.&nbsp;Pac-Man</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#heuristicas">Heurísticas</a></li>
+            <li><a href="#astar">A*</a></li>
+            <li><a href="#todo-junto">Todo junto</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html" aria-current="page"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>

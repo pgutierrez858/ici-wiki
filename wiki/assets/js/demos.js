@@ -1045,17 +1045,40 @@
     return { d: d, p: p };
   }
 
+  // Distancias desde una casilla, como ibfs, pero sin salir hacia 'atras' en
+  // el primer paso: un fantasma no puede darse la vuelta, así que su influencia
+  // sale hacia donde va. A la casilla de detrás se llega igual, pero dando la
+  // vuelta a la manzana. Si no hay otra salida, vale volver, como en el juego.
+  function ibfsSentido(libre, ini, atras) {
+    var d = [], k, cola, i, n, vs, j;
+    for (k = 0; k < ICELDAS; k++) d.push(-1);
+    if (!libre[ini]) return d;
+    d[ini] = 0;
+    vs = ivecinas(libre, ini);
+    if (atras >= 0 && vs.length > 1) vs = vs.filter(function (v) { return v !== atras; });
+    cola = [ini];
+    for (j = 0; j < vs.length; j++) { d[vs[j]] = 1; cola.push(vs[j]); }
+    i = 1;
+    while (i < cola.length) {
+      n = cola[i++]; vs = ivecinas(libre, n);
+      for (j = 0; j < vs.length; j++) if (d[vs[j]] < 0) { d[vs[j]] = d[n] + 1; cola.push(vs[j]); }
+    }
+    return d;
+  }
+
   // Una capa: cada fuente vale 1 en su casilla y va perdiendo fuerza a razón
-  // de un factor por paso. Varias fuentes se suman.
+  // de un factor por paso. Varias fuentes se suman. Una fuente es {c, atras}:
+  // su casilla y la casilla de la que viene, o -1 si no tiene sentido.
   function icapaDesde(libre, fuentes, caida) {
     var cap = [], k, i, d;
     for (k = 0; k < ICELDAS; k++) cap.push(0);
     for (i = 0; i < fuentes.length; i++) {
-      d = ibfs(libre, fuentes[i]).d;
+      d = ibfsSentido(libre, fuentes[i].c, fuentes[i].atras);
       for (k = 0; k < ICELDAS; k++) if (d[k] >= 0) cap[k] += Math.pow(caida, d[k]);
     }
     return cap;
   }
+  function isinSentido(cs) { return cs.map(function (c) { return { c: c, atras: -1 }; }); }
 
   // Sin normalizar no se pueden comparar los pesos entre sí: una capa con diez
   // fuentes llegaría a 10 y otra con una se quedaría en 1, y el peso de la
@@ -1077,30 +1100,19 @@
   }
 
   function icapas(esc, par) {
-    var libre = esc.libre, k, i, r, n, extra, mx;
+    var libre = esc.libre, i, f;
     var cazan = [], presa = [];
     for (i = 0; i < esc.fantasmas.length; i++) {
-      (esc.fantasmas[i].comestible ? presa : cazan).push(esc.fantasmas[i].c);
-    }
-    var am = inormaliza(icapaDesde(libre, cazan, par.caida), libre);
-    if (par.rastro && cazan.length) {
-      // No sólo dónde está: por dónde viene. Se encarece el camino que le trae
-      // hasta mí, que es justo el sitio donde no hay que estar.
-      extra = [];
-      for (k = 0; k < ICELDAS; k++) extra.push(0);
-      for (i = 0; i < cazan.length; i++) {
-        r = ibfs(libre, cazan[i]); n = esc.pac; k = 0;
-        while (n >= 0 && n !== cazan[i] && k++ < ICELDAS) { extra[n] += 1; n = r.p[n]; }
-      }
-      mx = 0;
-      for (k = 0; k < ICELDAS; k++) if (extra[k] > mx) mx = extra[k];
-      if (mx > 0) for (k = 0; k < ICELDAS; k++) am[k] = Math.min(1, am[k] + 0.45 * extra[k] / mx);
+      f = esc.fantasmas[i];
+      // el perseguidor lleva su sentido; el comestible, no (huye a donde puede)
+      if (f.comestible) presa.push({ c: f.c, atras: -1 });
+      else cazan.push({ c: f.c, atras: par.sentido && f.ult >= 0 ? f.ult : -1 });
     }
     return {
-      comida: inormaliza(icapaDesde(libre, esc.pildoras, par.caida), libre),
-      amenaza: am,
+      comida: inormaliza(icapaDesde(libre, isinSentido(esc.pildoras), par.caida), libre),
+      amenaza: inormaliza(icapaDesde(libre, cazan, par.caida), libre),
       presa: inormaliza(icapaDesde(libre, presa, par.caida), libre),
-      poder: inormaliza(icapaDesde(libre, esc.poder, par.caida), libre),
+      poder: inormaliza(icapaDesde(libre, isinSentido(esc.poder), par.caida), libre),
       salidas: icapaSalidas(libre)
     };
   }
@@ -1471,7 +1483,7 @@
   function creaInfluencia(nodo) {
     var esc = iescena(), inicio = icopia(esc);
     var par = {
-      tecnica: 'mapa', caida: 0.75, horizonte: 8, base: 1, rastro: false,
+      tecnica: 'mapa', caida: 0.75, horizonte: 8, base: 1, sentido: false,
       ver: 'total', numeros: false, umbral: 5, orden: 'seguro'
     };
     var w = {}, herramienta = 'pac', cs = null, u = null, dec = null, reloj = null, aviso = '';
@@ -1566,7 +1578,7 @@
     }).raiz);
     var campoHor = deslizador('Horizonte', 3, 16, 1, par.horizonte, function (v) { par.horizonte = v; cambio(); });
     barraMapa.appendChild(campoHor.raiz);
-    barraMapa.appendChild(interruptor('Por dónde viene', par.rastro, function (v) { par.rastro = v; cambio(); }));
+    barraMapa.appendChild(interruptor('Sentido', par.sentido, function (v) { par.sentido = v; cambio(); }));
     var grupoVer = opciones('Ver', [['Todo el mapa', 'total'], ['Comida', 'comida'], ['Amenaza', 'amenaza'],
                                     ['Presa', 'presa'], ['Poder', 'poder'], ['Salidas', 'salidas'], ['Nada', 'nada']],
       par.ver, function (v) { par.ver = v; cambio(); });

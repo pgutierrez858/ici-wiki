@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Tema 1 · IA para videojuegos · ICI</title>
+<meta name="description" content="Tema 1 de ICI: buscar caminos en un mapa, decidir con ellos y organizar la decisión en máquinas de estados y árboles de comportamiento, con el simulador de Ms. Pac-Man como referencia.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Tema 1</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      IA para videojuegos
+      <span class="thin">Buscar un camino, decidir con él y organizar la decisión.</span>
+    </h1>
+    <p class="standfirst">
+      Los apuntes del primer tema, partidos en nueve páginas cortas para que cada una se pueda leer
+      de una sentada. Van en orden: cada página usa lo de las anteriores. Las siete primeras son el
+      material de la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>; las dos últimas
+      preparan la Práctica&nbsp;2.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Tema</dt>
+      <dd>01<small>IA para videojuegos</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Prácticas asociadas</dt>
+      <dd><a href="../../practicas/practica-1.html">Práctica 1</a><small>y la Práctica 2</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Antes de leer</dt>
+      <dd><a href="../clase-game.html">La clase <code>Game</code></a><small>De ahí sale todo el estado</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="buscar">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Buscar caminos</h2>
+        </div>
+        <p>
+          La primera mitad del tema es el problema general, tal como se plantea en cualquier videojuego: representar el espacio, buscar en él y pagar por la búsqueda. Termina en lo que de todo eso viene ya resuelto en el simulador, que es bastante.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="representacion.html">
+              <span class="lt">01 · Representar el espacio<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 2 secciones</span>
+              <span class="ld">El problema de partida, y las tres formas de convertir un mapa en un grafo: puntos de ruta, rejillas y mallas de navegación. Y cómo es el grafo del laberinto.</span>
+            </a>
+          </li>
+          <li>
+            <a href="busqueda.html">
+              <span class="lt">02 · Búsqueda en espacios de estados<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 2 secciones</span>
+              <span class="ld">El bucle común a todas las búsquedas, y las búsquedas ciegas: anchura, profundidad y coste uniforme, con ejemplos para seguir paso a paso.</span>
+            </a>
+          </li>
+          <li>
+            <a href="astar.html">
+              <span class="lt">03 · Heurísticas y A*<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 3 secciones</span>
+              <span class="ld">Admisible y consistente, las tres métricas del motor, las dos listas de A* y un ejemplo que junta todo.</span>
+            </a>
+          </li>
+          <li>
+            <a href="astar-mspacman.html">
+              <span class="lt">04 · A* en Ms.&nbsp;Pac-Man<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 1 sección</span>
+              <span class="ld">Lo que el motor ya trae precalculado, la trampa de darse la vuelta y cómo pasar de una distancia a un movimiento.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="decidir">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Decidir</h2>
+        </div>
+        <p>
+          Con el camino resuelto por el motor queda la pregunta que se evalúa en la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>: hacia dónde ir. Aquí están las estrategias que sí son vuestras.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="estrategias.html">
+              <span class="lt">05 · Estrategias algorítmicas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 7 secciones</span>
+              <span class="ld">La regla voraz y por qué falla, razonar por cruces, ¿llego yo antes?, movimientos seguros, cuánto se tarda en alcanzar a un fantasma y tres formas de escribir la decisión.</span>
+            </a>
+          </li>
+          <li>
+            <a href="mapas-influencia.html">
+              <span class="lt">06 · Mapas de influencia<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con implementación</span>
+              <span class="ld">Capas que se propagan por el laberinto, una función objetivo con pesos, y un controlador de Ms.&nbsp;Pac-Man escrito de principio a fin que sólo decide con el mapa.</span>
+            </a>
+          </li>
+          <li>
+            <a href="predecir-coordinar.html">
+              <span class="lt">07 · Predecir, coordinar y medir<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 5 secciones</span>
+              <span class="ld">Adivinar a quien no controlas, repartirse el trabajo entre cuatro fantasmas, el reloj del modo comestible, el presupuesto de cada turno y cómo ver lo que piensa el controlador.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="organizar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Organizar el comportamiento</h2>
+        </div>
+        <p>
+          Las mismas decisiones, escritas de otra forma: en vez de una función que lo decide todo cada turno, estados con transiciones o un árbol de tareas pequeñas. Es lo que separa el conocimiento del mecanismo, y es el argumento del curso entero.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="maquinas-estados.html">
+              <span class="lt">08 · Máquinas de estados<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · Práctica 2</span>
+              <span class="ld">Estados y transiciones, por qué los <code>if</code> anidados no escalan, máquinas jerárquicas y el paquete <code>fsm</code> del motor: <code>Input</code>, acciones, transiciones y estados compuestos.</span>
+            </a>
+          </li>
+          <li>
+            <a href="arboles-comportamiento.html">
+              <span class="lt">09 · Árboles de comportamiento<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes</span>
+              <span class="ld">Acciones, condiciones, secuencias, selectores y decoradores; cómo se recorre el árbol en cada turno, cómo se compara con una máquina de estados y una implementación mínima para el motor.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="resumen">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Lo que hay que llevarse</h2>
+        </div>
+        <ol>
+          <li>El <em>pathfinding</em> son dos problemas: <strong>representar</strong> el espacio como grafo y <strong>buscar</strong> en ese grafo. Se resuelven por separado.</li>
+          <li>Waypoints, rejillas y mallas de navegación son tres formas de hacer lo primero, con tres compromisos distintos entre memoria, esfuerzo manual y calidad de las rutas.</li>
+          <li>Todo algoritmo de búsqueda es el mismo bucle sobre <strong>abiertos</strong> y <strong>cerrados</strong>. Lo que cambia es de qué estructura se saca el siguiente nodo.</li>
+          <li>Anchura con costes unitarios ya es óptima. En el laberinto, es la herramienta correcta.</li>
+          <li>Una heurística <strong>admisible</strong>, o sea que nunca sobreestime, hace a A* óptimo. En Ms.&nbsp;Pac-Man, la tabla precalculada sirve de heurística admisible para el A* de los fantasmas.</li>
+          <li>En el laberinto, <code>DM.PATH</code> siempre: las otras dos métricas atraviesan paredes.</li>
+          <li>El camino te lo da el motor. La decisión, el <strong>hacia dónde</strong>, no: y ahí está la nota.</li>
+          <li>Decide en los cruces, razona por tramos, compara distancias <strong>al mismo punto</strong>, y mira dos cruces por delante.</li>
+          <li>Esa decisión se puede escribir de tres formas —reglas con prioridad, función de evaluación con pesos, o mapa de costes sobre el grafo—, y las tres dependen de lo mismo: que las funciones que las alimentan midan bien.</li>
+          <li>Predecir al otro sale gratis dentro de un pasillo, donde no puede elegir; a partir de dos cruces, ya no vale nada. Interceptar es coincidir en el nodo <strong>y</strong> en el turno.</li>
+          <li>Cuatro agentes que ven el mismo estado ya están coordinados: sólo falta <strong>repartirse</strong> los objetivos y no recalcular el reparto en cada turno.</li>
+          <li>Un mapa de influencia saca el conocimiento del código que decide: unas pocas <strong>capas</strong> que se propagan por el laberinto, normalizadas y sumadas con pesos, y una decisión que sólo compara salidas.</li>
+          <li>Una <strong>máquina de estados</strong> separa qué hacer (el estado) de cuándo cambiar (las transiciones). En el motor, <code>Input</code> lee el juego una vez por turno, <code>Action</code> devuelve el movimiento y <code>FSM.run</code> prueba las transiciones en el orden en que se añadieron.</li>
+          <li>Cuando las transiciones se repiten entre estados, se agrupan en un <strong>estado compuesto</strong>: una máquina dentro de otra, que vuelve a su estado inicial al salir.</li>
+          <li>Un <strong>árbol de comportamiento</strong> se recorre entero desde la raíz en cada turno: la secuencia es un AND, el selector un OR, y el orden de los hijos es la prioridad. Reacciona siempre, a cambio de no recordar nada si no se le da una pizarra.</li>
+        </ol>
+        <div class="note mine">
+          <span class="note-label">Y a continuación</span>
+          <p>
+            Todo esto se aplica en la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>, escribiendo
+            los dos controladores a mano. En la Práctica&nbsp;2 el mismo comportamiento se reescribe como
+            máquina de estados, y la comparación entre las dos versiones es el argumento del curso entero.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#buscar">Buscar caminos</a></li>
+            <li><a href="#decidir">Decidir</a></li>
+            <li><a href="#organizar">Organizar el comportamiento</a></li>
+            <li><a href="#resumen">Lo que hay que llevarse</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

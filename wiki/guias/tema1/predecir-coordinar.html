@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Predecir, coordinar y medir · Tema 1 · ICI</title>
+<meta name="description" content="Cómo adivinar lo suficiente de quien no controlas, cómo se reparten el trabajo cuatro fantasmas que no se hablan, el reloj del modo comestible, el presupuesto de tiempo de cada turno y cómo ver lo que piensa tu controlador.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>Predecir, coordinar y medir</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 07 · Decidir</p>
+    <h1>
+      Predecir, coordinar y medir
+      <span class="thin">Lo que hay alrededor de la decisión: el otro, los tuyos y el reloj.</span>
+    </h1>
+    <p class="standfirst">
+      Cómo adivinar lo suficiente de quien no controlas, cómo se reparten el trabajo cuatro fantasmas que no se hablan, el reloj del modo comestible, el presupuesto de tiempo de cada turno y cómo ver lo que piensa tu controlador.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="predecir">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Predecir a quien no controlas</h2>
+        </div>
+        <p>
+          El controlador de los fantasmas no decide a dónde va Ms.&nbsp;Pac-Man, y el de Ms.&nbsp;Pac-Man no
+          decide a dónde van los fantasmas. Los dos tienen el mismo problema: <strong>adivinar lo suficiente
+          como para llegar antes</strong>. Y hay tres niveles de respuesta, cada uno más caro que el anterior.
+        </p>
+        <ol>
+          <li>
+            <strong>Proyectar en línea recta.</strong> Desde el nodo del otro, avanzar en su último
+            movimiento hasta el siguiente cruce. Es el bucle de <code>siguienteCruce</code> de <a href="estrategias.html#cruces">estrategias algorítmicas</a>, el que anda por el pasillo hasta el primer nodo con más de dos salidas, y no falla
+            nunca mientras el otro no cambie de idea: dentro de un pasillo <em>no puede</em>.
+          </li>
+          <li>
+            <strong>El abanico de cruces.</strong> Desde ese primer cruce, todas las salidas llevan a un
+            segundo cruce; ahí ya no hay un destino sino un conjunto. Sirve para repartirse el trabajo entre
+            varios fantasmas: si no sabes por cuál va a salir, cubre todas.
+          </li>
+          <li>
+            <strong>Coincidir en el tiempo.</strong> Expandir dos anchuras a la vez —la de Ms.&nbsp;Pac-Man y
+            la del fantasma— anotando no sólo <em>qué</em> nodos alcanza cada uno sino <strong>en qué
+            turno</strong>. Un nodo al que los dos llegan en el mismo turno, y de frente, es una
+            interceptación. Uno al que llega antes el fantasma pero por detrás, no: se lo come por la espalda
+            y no pasa nada.
+          </li>
+        </ol>
+        <figure class="wide">
+          <figcaption>Interceptar es coincidir en el nodo <em>y</em> en el turno</figcaption>
+          <svg class="explica dge3" viewBox="0 0 470 190" role="img" aria-label="Un cruce en el centro. Ms. Pac-Man avanza por el pasillo de la izquierda y alcanza el cruce en el turno nueve. Un fantasma baja por el pasillo vertical y alcanza el mismo cruce también en el turno nueve, viniendo de frente. Como coinciden en el nodo y en el instante, el cruce es un punto de interceptación.">
+            <style>
+              .dge3 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
+              .dge3 .pc{fill:var(--pill)}
+              .dge3 .gh{fill:var(--blinky)}
+              .dge3 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dge3 .tk{font-family:var(--f-mono);font-size:9px;text-anchor:middle;fill:var(--ink-3)}
+              .dge3 .tj{font-family:var(--f-display);font-weight:700;font-size:11px;text-anchor:middle;fill:var(--ok)}
+              .dge3 .fy{fill:none;stroke:var(--maze);stroke-width:2;marker-end:url(#e3y)}
+              .dge3 .fr{fill:none;stroke:var(--blinky);stroke-width:2;marker-end:url(#e3r)}
+              .dge3 .cr{fill:none;stroke:var(--ok);stroke-width:2}
+              .dge3 .nd{fill:var(--ink-3);opacity:.45}
+            </style>
+            <defs>
+              <marker id="e3y" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+              <marker id="e3r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <path d="M40 120 H430 M235 24 V120" class="pas"/>
+            <circle cx="235" cy="120" r="14" class="cr"/>
+            <circle cx="118" cy="120" r="3" class="nd"/><circle cx="176" cy="120" r="3" class="nd"/>
+            <circle cx="235" cy="56" r="3" class="nd"/><circle cx="235" cy="88" r="3" class="nd"/>
+            <g transform="translate(73 107) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M224 24 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M86 120 H214" class="fy"/>
+            <path d="M235 48 V98" class="fr"/>
+            <text x="118" y="110" class="tk">t+3</text>
+            <text x="176" y="110" class="tk">t+6</text>
+            <text x="268" y="60" class="tk">t+3</text>
+            <text x="268" y="92" class="tk">t+6</text>
+            <text x="235" y="150" class="tj">los dos, en t+9</text>
+            <text x="235" y="168" class="t">mismo nodo, mismo turno, de frente: interceptación</text>
+            <text x="404" y="112" class="t">…</text>
+          </svg>
+        </figure>
+        <p>
+          El coste de lo tercero es el de dos anchuras, o sea nada comparado con los 40&nbsp;ms. Lo que hay
+          que cuidar es la indexación: los nodos visitados no se marcan por nodo, se marcan por
+          <strong>par (nodo, turno)</strong>, porque llegar a un sitio en el turno 6 y llegar en el 14 son
+          cosas distintas. Y conviene admitir una holgura de un turno arriba o abajo, porque los fantasmas
+          comestibles van a media velocidad y el laberinto no está hecho a escala.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Hasta dónde predecir</span>
+          <p>
+            Lo mismo que con los <a href="estrategias.html#dos-cruces">movimientos seguros</a>: <strong>dos cruces</strong>. Una predicción a cuatro
+            cruces es una rama de un árbol con 2⁴ hojas cuya probabilidad se reparte entre dieciséis
+            posibilidades, y os va a costar más recalcularla cada turno que lo que aporta. El sitio donde la
+            predicción sí es fiable al 100&#8239;% es el pasillo, porque ahí el otro <em>no puede</em> elegir.
+          </p>
+        </div>
+      </section>
+
+      <section id="coordinacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Coordinación sin mensajes</h2>
+        </div>
+        <p>
+          En esta práctica los fantasmas no pueden hablar entre ellos: el <code>Executor</code> se configura
+          con <code>setGhostsMessage(false)</code>. Da igual. Los cuatro los decide <strong>el mismo
+          método</strong>, con <strong>el mismo <code>Game</code></strong>, en <strong>el mismo
+          turno</strong>: comparten toda la información que podrían haberse mandado. Coordinarse aquí no es
+          comunicar, es <em>repartir</em>.
+        </p>
+        <p>
+          El reparto más directo es una asignación: se calculan los sitios que hay que cubrir —los cruces por
+          los que Ms.&nbsp;Pac-Man puede pasar— y se le da uno distinto a cada fantasma, el más cercano que
+          quede libre. Es el algoritmo voraz de asignación, y con cuatro agentes y cuatro objetivos no hace
+          falta nada mejor.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · un objetivo distinto para cada uno</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">repartirObjetivos</span>()
+    <span class="var">objetivos</span> ← <span class="fn">crucesAlcanzablesPorMsPacMan</span>(profundidad 2)
+    <span class="var">libres</span> ← <span class="var">objetivos</span>
+    <span class="var">asignación</span> ← mapa vacío
+
+    <b>for each</b> <span class="var">f</span> <b>in</b> <span class="fn">fantasmasQuePersiguen</span>() <b>do</b>      <i>// ni comestibles ni en la cárcel</i>
+        <span class="var">o</span> ← el de <span class="var">libres</span> más cercano a <span class="var">f</span>
+        <b>if</b> <span class="var">o</span> ≠ NULL <b>then</b>
+            <span class="var">asignación</span>[<span class="var">f</span>] ← <span class="var">o</span>
+            quitar <span class="var">o</span> de <span class="var">libres</span>        <i>// nadie repite objetivo</i>
+        <b>end if</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">asignación</span>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Sobre esa base hay tres variantes que merece la pena conocer, porque cuestan poco y cambian mucho
+          la sensación de estar rodeado:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Variante</th><th scope="col">Cómo funciona</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Papeles como puestos</strong></td>
+                <td>El papel de perseguidor no es de un fantasma concreto: se lo lleva el que esté más cerca ahora, con un cupo máximo por papel. Los fantasmas cambian de trabajo; la formación se mantiene.</td>
+              </tr>
+              <tr>
+                <td><strong>Anillos</strong></td>
+                <td>En vez de repartir cruces del mismo nivel, repartir <em>profundidades</em>: uno al primer cruce que Ms. Pac-Man tiene por delante, otro al segundo, otro al tercero. Se cierran círculos concéntricos.</td>
+              </tr>
+              <tr>
+                <td><strong>Memoria en los cruces</strong></td>
+                <td>Guardar, por cada cruce, la última dirección que tomó allí un fantasma; el siguiente que pase elige otra. Con un borrado cada pocas decenas de turnos, la dispersión aparece sola y nadie ha tenido que decidirla.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Recalcular el reparto en cada turno sale caro y sale peor</span>
+          <p>
+            Si los objetivos se vuelven a repartir en todos los turnos, un cambio mínimo de distancias
+            intercambia los papeles de dos fantasmas y los dos se dan la vuelta: la coordinación oscila y no
+            se mueve nadie. El arreglo es recalcular <strong>sólo cuando ha pasado algo</strong>: cuando
+            Ms.&nbsp;Pac-Man cambia de dirección, cuando entra en un cruce, o cuando se acerca a una píldora
+            de poder. Entre medias, cada fantasma sigue con lo suyo.
+          </p>
+        </div>
+      </section>
+
+      <section id="reloj">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El reloj del modo comestible</h2>
+        </div>
+        <p>
+          La mitad de las decisiones interesantes de los dos controladores dependen de un solo número:
+          <code>getGhostEdibleTime</code>. Estos son los datos del motor con los que hay que contar, y están
+          todos en <code>Constants</code>:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Dato</th><th scope="col">Valor</th><th scope="col">Consecuencia</th></tr></thead>
+            <tbody>
+              <tr><td><code>EDIBLE_TIME</code></td><td class="num-col">200</td><td>Turnos de comestible en el primer nivel.</td></tr>
+              <tr><td><code>EDIBLE_TIME_REDUCTION</code></td><td class="num-col">0,9</td><td>Cada nivel dura un 10&#8239;% menos. En el nivel 5 son 131 turnos, no 200: los umbrales fijos envejecen.</td></tr>
+              <tr><td><code>GHOST_SPEED_REDUCTION</code></td><td class="num-col">2</td><td>El fantasma comestible se queda quieto uno de cada dos turnos: va a <strong>media velocidad</strong>.</td></tr>
+              <tr><td><code>GHOST_EAT_SCORE</code></td><td class="num-col">200</td><td>Y se dobla con cada fantasma de la misma píldora: 200, 400, 800, 1&#8239;600. La cadena entera son 3&#8239;000.</td></tr>
+              <tr><td><code>POWER_PILL</code> · <code>PILL</code></td><td class="num-col">50 · 10</td><td>La píldora de poder, sola, vale cinco píldoras. Con la cadena, trescientas.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          De la media velocidad salen las dos reglas que hay que escribir, y ninguna de las dos es
+          «persíguelo si está cerca»:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Quién decide</th><th scope="col">La pregunta</th><th scope="col">La cuenta</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Ms. Pac-Man</td>
+                <td>¿Me da tiempo a alcanzarlo?</td>
+                <td>Si huye, se aleja medio nodo por turno mientras yo avanzo uno: le gano a <strong>medio nodo por turno</strong>. Hacen falta ≈&nbsp;2 × distancia turnos, y tengo <code>getGhostEdibleTime</code>. Si viene hacia mí o está acorralado, mucho menos.</td>
+              </tr>
+              <tr>
+                <td>Los fantasmas</td>
+                <td>¿Sigo huyendo?</td>
+                <td>Si el tiempo comestible que me queda es <strong>menor</strong> que lo que tardaríamos en encontrarnos, cuando nos crucemos ya no seré comestible: dejo de huir y gano posición mientras los otros tres siguen corriendo.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Y de la cadena de 3&#8239;000 puntos sale la tercera decisión, que es la que más separa una
+          Ms.&nbsp;Pac-Man buena de una normal: <strong>la píldora de poder es un recurso, no una píldora
+          más</strong>. Comérsela de pasada con los fantasmas lejos son 50 puntos y una oportunidad menos.
+          La forma más simple de escribirlo no es ir a buscarla: es <em>mantenerse lejos</em> de ella mientras
+          no haya tres fantasmas fuera y cerca, y dejar que la persecución te lleve hasta ella cuando toque.
+        </p>
+        <div class="note tip">
+          <span class="note-label">El parpadeo</span>
+          <p>
+            <code>EDIBLE_ALERT</code> vale 30: es el momento en que los fantasmas empiezan a parpadear en
+            pantalla. No es una constante de juego, es de dibujo, pero marca bien el umbral a partir del cual
+            perseguir a un fantasma comestible ya suele ser mal negocio. Si lo usáis como umbral, ponedle
+            nombre propio y no el de la constante del motor.
+          </p>
+        </div>
+      </section>
+
+      <section id="presupuesto">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">El presupuesto</h2>
+        </div>
+        <p>
+          Cada llamada a <code>getMove</code> tiene 40&nbsp;ms <em>anunciados</em> en el parámetro
+          <code>timeDue</code>, pero conviene saber qué significa eso exactamente. En
+          <code>runGame</code> y <code>runExperiment</code>, que son el modo de clase y el de corrección, el
+          motor llama a tu método y <strong>se queda esperando</strong>: nadie lo corta, y un cálculo de
+          200&nbsp;ms se usa entero. Lo único que pagas es reloj. Y como además <strong>no hace falta
+          devolver un movimiento en cada turno</strong> —si devuelves <code>null</code> el motor sigue
+          recto—, lo sensato es no repartir el presupuesto a partes iguales: gastar en los cruces, que son
+          uno de cada diez turnos, y no gastar nada en los pasillos.
+        </p>
+        <p>
+          El detalle completo, con lo que cambia en los modos que sí llevan reloj, está en las
+          <a href="../../practicas/practica-1.html#reglas-simulacion">reglas de simulación de la
+          Práctica&nbsp;1</a>. Órdenes de magnitud con los que contar:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Operación</th><th scope="col">Cuesta</th></tr></thead>
+            <tbody>
+              <tr><td><code>getShortestPathDistance(a, b)</code></td><td>Una lectura de <em>array</em>. Gratis.</td></tr>
+              <tr><td><code>getShortestPath(a, b)</code></td><td>Empalmar tramos ya guardados. Barato.</td></tr>
+              <tr><td><code>getShortestPath(a, b, últMov)</code></td><td>Un A* de verdad. Barato, pero no gratis: no lo llames cuatro veces con los mismos argumentos.</td></tr>
+              <tr><td>Una anchura sobre el laberinto entero</td><td>1&#8239;293 nodos. Perfectamente asumible una vez por cruce.</td></tr>
+              <tr><td>Lo mismo, en cada uno de los 4000 turnos</td><td>Empieza a notarse. Por eso se decide en los cruces.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="ver-lo-que-piensa">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Ver lo que piensa</h2>
+        </div>
+        <p>
+          Nada de esto se depura leyendo el código: se depura mirándolo. <code>GameView</code> pinta encima
+          del laberinto, y siempre detrás de un interruptor: no se puede dejar encendido al entregar, por el
+          motivo que hay debajo del código.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// un color por motivo, y todo detrás de un interruptor que se apaga al entregar</span>
+<span class="k">if</span> (DEBUG) {
+    GameView.addPoints(game, Color.ORANGE, caminoAlaPildora);   <span class="c">// a dónde voy</span>
+    GameView.addPoints(game, Color.RED,    tramosDescartados);  <span class="c">// qué he descartado</span>
+    GameView.addLines (game, Color.CYAN,   miNodo, nodoDelFantasmaQueMePreocupa);
+}</code></pre></div>
+        <p>
+          Cuando veas en pantalla los tramos que tu controlador considera cerrados, los errores de la
+          función <a href="estrategias.html#llego-antes">«¿llego yo antes?»</a> se hacen obvios en dos partidas. Sin eso, no.
+        </p>
+        <div class="note trap">
+          <span class="note-label">El interruptor es obligatorio, no una costumbre</span>
+          <p>
+            <code>addPoints</code> y <code>addLines</code> no dibujan: apuntan lo que habría que dibujar en
+            dos listas <code>static</code> que sólo se vacían cuando se repinta la ventana. Sin ventana no se
+            vacían nunca, y el interruptor del motor que debería evitarlo
+            —<code>GameView.isVisible</code>— nace a <code>true</code> y no lo cambia nadie. En una partida
+            da igual; en las miles de partidas de una corrección, la memoria se acaba y se cae todo.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="mapas-influencia.html"><span class="pager-l">Anterior</span><span class="pager-t">Mapas de influencia</span></a>
+        <a class="pager-next" href="maquinas-estados.html"><span class="pager-l">Siguiente</span><span class="pager-t">Máquinas de estados</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#predecir">Predecir al otro</a></li>
+            <li><a href="#coordinacion">Coordinación</a></li>
+            <li><a href="#reloj">El reloj comestible</a></li>
+            <li><a href="#presupuesto">El presupuesto</a></li>
+            <li><a href="#ver-lo-que-piensa">Ver lo que piensa</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html" aria-current="page"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>

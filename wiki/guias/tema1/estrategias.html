@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Estrategias algorítmicas · Tema 1 · ICI</title>
+<meta name="description" content="Por qué la regla voraz no basta, cómo razonar por cruces y tramos, la pregunta de si llegas antes, los movimientos seguros con dos cruces de profundidad, y las tres formas de escribir la decisión.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>Estrategias algorítmicas</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 05 · Decidir</p>
+    <h1>
+      Estrategias algorítmicas
+      <span class="thin">Con el camino resuelto, lo que queda es decidir hacia dónde.</span>
+    </h1>
+    <p class="standfirst">
+      Por qué la regla voraz no basta, cómo razonar por cruces y tramos, la pregunta de si llegas antes, los movimientos seguros con dos cruces de profundidad, y las tres formas de escribir la decisión.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+        <p>
+          Con el camino resuelto por el motor, lo que queda es la pregunta de verdad: <strong>¿hacia dónde?</strong>
+          Un controlador es una función que, cada turno, mira el estado y devuelve una de cuatro
+          direcciones. Todo el diseño está en cómo se elige.
+        </p>
+
+      <section id="voraz">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Por qué la regla voraz no basta</h2>
+        </div>
+        <p>
+          «Huye del fantasma más cercano» es la primera idea de todo el mundo, y es la que se escribe en el
+          ejercicio 2 de la <a href="../../practicas/practica-0.html">Práctica&nbsp;0</a>. Falla siempre, pero
+          conviene ver <em>por qué</em> falla, porque el motivo no es el que suele contarse.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Aquí no hay callejones, y aun así te encierran</span>
+          <p>
+            Merece la pena comprobarlo en los datos del propio motor, porque cambia el problema: en los
+            cuatro laberintos <strong>no hay un solo nodo con una única salida</strong>. El primero tiene
+            1&#8239;293 nodos: uno es la cárcel, 1&#8239;254 son pasillo —dos salidas—, 32 son cruces de tres
+            y 6 son cruces de cuatro. El laberinto entero es una malla de bucles, y el callejón sin salida
+            del dibujo de toda la vida <strong>no existe</strong>.
+          </p>
+          <p>
+            Lo que sí existe es la regla de no darse la vuelta: <code>Game.correctPacManDir</code> descarta
+            el giro de 180° y te deja siguiendo recto. Así que meterse en un pasillo es un
+            <strong>compromiso</strong>: se sale por el otro extremo o no se sale. El callejón de este juego
+            no lo dibuja el laberinto, lo ponen los fantasmas, y dura lo que tarden en moverse.
+          </p>
+        </div>
+        <figure class="wide">
+          <figcaption>Las dos salidas ganan exactamente un nodo: la regla no las distingue</figcaption>
+          <svg class="explica dge1" viewBox="0 0 470 210" role="img" aria-label="Un trozo de laberinto. Ms. Pac-Man está en un cruce con un fantasma rojo acercándose por el pasillo de la izquierda, a seis nodos. Del cruce salen dos caminos que se alejan de él: hacia arriba, por donde baja un segundo fantasma, y hacia la derecha, que está despejado. Los dos ganan exactamente un nodo de distancia respecto al fantasma rojo, así que la regla de huir del más cercano no puede distinguirlos.">
+            <style>
+              .dge1 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
+              .dge1 .pc{fill:var(--pill)}
+              .dge1 .gh{fill:var(--blinky)}
+              .dge1 .gh2{fill:var(--pinky)}
+              .dge1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dge1 .tc{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dge1 .tb{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dge1 .tg{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dge1 .fb{fill:none;stroke:var(--bad);stroke-width:2;stroke-dasharray:5 4;marker-end:url(#e1b)}
+              .dge1 .fg{fill:none;stroke:var(--ok);stroke-width:2;marker-end:url(#e1g)}
+              .dge1 .nd{fill:var(--ink-3);opacity:.5}
+            </style>
+            <defs>
+              <marker id="e1b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker>
+              <marker id="e1g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ok)"/></marker>
+            </defs>
+            <path d="M40 140 H430 M190 140 V40 M190 40 H330" class="pas"/>
+            <circle cx="120" cy="140" r="3" class="nd"/><circle cx="155" cy="140" r="3" class="nd"/>
+            <circle cx="260" cy="140" r="3" class="nd"/><circle cx="300" cy="140" r="3" class="nd"/>
+            <circle cx="190" cy="115" r="3" class="nd"/>
+            <g transform="translate(203 127) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M52 131 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M179 58 a11 11 0 0 1 22 0 v11 h-22 z" class="gh2"/>
+            <path d="M206 122 V88" class="fb"/>
+            <path d="M212 140 H320" class="fg"/>
+            <text x="63" y="118" class="tc">a 6 nodos</text>
+            <text x="63" y="170" class="t">viene por aquí</text>
+            <text x="215" y="96" class="tb">+1 nodo… y por aquí baja el otro</text>
+            <text x="216" y="168" class="tg">+1 nodo, exactamente lo mismo,</text>
+            <text x="216" y="182" class="tg">y está despejado</text>
+            <text x="345" y="44" class="t">…</text>
+            <text x="444" y="144" class="t">…</text>
+          </svg>
+        </figure>
+        <p>
+          Mirad lo que ve la regla. Desde el cruce, subir y seguir a la derecha ganan <strong>un nodo cada
+          una</strong>, y no es casualidad: aquí ningún movimiento aleja más de un nodo, así que las salidas
+          de huida no se pueden ordenar entre ellas. Recorriendo los 38 cruces del primer laberinto contra
+          todas las posiciones posibles del fantasma, en el <strong>99&#8239;% de los casos empatan
+          todas</strong>. La regla no es que elija mal: es que <strong>no distingue</strong>.
+        </p>
+        <p>
+          Y el desempate no es inocente. <code>getApproximateNextMoveAwayFromTarget</code> recorre las
+          salidas y se queda con la primera que mejore <em>estrictamente</em> a la anterior; el recorrido va
+          en el orden del <code>enum MOVE</code>, que es <code>UP</code>, <code>RIGHT</code>,
+          <code>DOWN</code>, <code>LEFT</code>. Con todo empatado gana siempre la de arriba. Vuestra
+          Ms.&nbsp;Pac-Man tiene una preferencia sistemática por el norte que no tiene nada que ver con
+          sobrevivir, y el fantasma que le espera arriba no entra en la cuenta.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Lo mismo, del otro lado</span>
+          <p>
+            El problema es simétrico, y el ejercicio 2 de la Práctica&nbsp;0 lo tiene igual: unos fantasmas
+            que persiguen con <code>getApproximateNextMoveTowardsTarget</code> van los cuatro al mismo nodo
+            por el camino más corto, así que acaban en fila por el mismo pasillo. Y cuatro fantasmas en fila
+            no cierran ningún bucle: por el otro lado se sale igual de bien que si sólo hubiera uno.
+          </p>
+        </div>
+        <p>
+          De aquí salen los dos arreglos, y ninguno de los dos es cambiar la fórmula de la distancia:
+          <strong>mirar a todas las amenazas</strong> en vez de sólo a la más cercana, y <strong>mirar más
+          lejos de un paso</strong>. Lo segundo no es una preferencia: si al entrar en un pasillo te
+          comprometes a salir por el otro extremo, la pregunta no puede ser «¿qué nodo me aleja más?», tiene
+          que ser «¿qué hay al final de ese pasillo, y quién llega antes?». Y eso, en este laberinto, tiene
+          una unidad natural.
+        </p>
+      </section>
+
+      <section id="cruces">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Pensar en cruces, no en nodos</h2>
+        </div>
+        <p>
+          En un pasillo no hay nada que decidir: sólo se puede seguir. Los únicos sitios donde una decisión
+          cambia algo son los <strong>38 cruces</strong> del primer laberinto. Eso sugiere dos cosas a la
+          vez: que puedes <strong>decidir sólo cuando estás en un cruce</strong>, y que el grafo sobre el
+          que conviene razonar no es el de 1&#8239;293 nodos sino el de cruces y los tramos que los unen.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · recorrer un tramo hasta el siguiente cruce, anotando lo que hay</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">siguienteCruce</span>(<span class="var">nodo</span>, <span class="var">dirección</span>)
+    <span class="var">pasos</span> ← 0
+    <b>repeat</b>
+        <span class="var">dirección</span> ← la única salida de <span class="var">nodo</span> que no sea volver atrás
+        <span class="var">nodo</span> ← vecino de <span class="var">nodo</span> en <span class="var">dirección</span>
+        <span class="var">pasos</span> ← <span class="var">pasos</span> + 1
+        anotar lo que haya en <span class="var">nodo</span>: píldora, píldora de poder, fantasma
+    <b>until</b> <span class="fn">esCruce</span>(<span class="var">nodo</span>) OR <span class="var">nodo</span> es objetivo
+    <b>return</b> {<span class="var">nodo</span>, <span class="var">dirección</span>, <span class="var">pasos</span>, lo anotado}
+<b>end function</b></pre>
+        </figure>
+        <div class="codigo"><pre><code><span class="c">// Los métodos del motor con los que se escribe ese bucle</span>
+game.isJunction(nodo)                       <span class="c">// ¿es un cruce?</span>
+game.getPossibleMoves(nodo, ultimoMov)      <span class="c">// salidas legales, ya sin la de volver atrás</span>
+game.getNeighbour(nodo, movimiento)         <span class="c">// el nodo que hay en esa dirección</span>
+game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección que lleva de a a b</span></code></pre></div>
+        <div class="note tip">
+          <span class="note-label">Devolver <code>null</code> es legítimo</span>
+          <p>
+            Si tu <code>getMove</code> devuelve <code>null</code>, el motor lo descarta y el personaje sigue
+            recto. Eso convierte «decidir sólo en los cruces» en una línea:
+          </p>
+<pre><code><span class="k">if</span> (!game.isJunction(game.getPacmanCurrentNodeIndex())) <span class="k">return null</span>;</code></pre>
+          <p>
+            Y de paso te ahorra el 90&#8239;% de las llamadas, con lo que el presupuesto de 40&nbsp;ms deja
+            de ser un problema aunque hagas una búsqueda de verdad en cada cruce.
+          </p>
+        </div>
+      </section>
+
+      <section id="llego-antes">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">La pregunta que ordena todo: ¿llego yo antes?</h2>
+        </div>
+        <p>
+          Un tramo es transitable si llegas al cruce del final antes que cualquier fantasma que pueda
+          comerte. Eso no se mide con la distancia al fantasma: se mide comparando <strong>la distancia de
+          cada uno al mismo punto</strong>.
+        </p>
+        <figure class="wide">
+          <figcaption>La comparación correcta: los dos al cruce, no uno al otro</figcaption>
+          <svg class="explica dge2" viewBox="0 0 470 176" role="img" aria-label="Un cruce en el centro. Ms. Pac-Man está a nueve pasos por la izquierda y un fantasma a seis por arriba. Aunque el fantasma esté lejos de Ms. Pac-Man en línea de pasillo, llega antes al cruce, así que ese tramo no es seguro.">
+            <style>
+              .dge2 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
+              .dge2 .pc{fill:var(--pill)}
+              .dge2 .gh{fill:var(--blinky)}
+              .dge2 .t{font-family:var(--f-mono);font-size:10px;text-anchor:middle;fill:var(--ink-2)}
+              .dge2 .tj{font-family:var(--f-display);font-weight:700;font-size:11px;text-anchor:middle;fill:var(--ink)}
+              .dge2 .fy{fill:none;stroke:var(--maze);stroke-width:2;marker-end:url(#e2y)}
+              .dge2 .fr{fill:none;stroke:var(--blinky);stroke-width:2;marker-end:url(#e2r)}
+              .dge2 .cr{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.6}
+            </style>
+            <defs>
+              <marker id="e2y" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+              <marker id="e2r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <path d="M40 112 H430 M235 30 V112" class="pas"/>
+            <circle cx="235" cy="112" r="13" class="cr"/>
+            <g transform="translate(73 99) scale(-1 1)"><path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z" class="pc"/></g>
+            <path d="M224 30 a11 11 0 0 1 22 0 v11 h-22 z" class="gh"/>
+            <path d="M86 112 H214" class="fy"/>
+            <path d="M235 58 V92" class="fr"/>
+            <text x="150" y="102" class="t">9 pasos</text>
+            <text x="278" y="72" class="t">6 pasos</text>
+            <text x="235" y="146" class="tj">el cruce</text>
+            <text x="235" y="164" class="t">llega él antes: el tramo no es seguro</text>
+          </svg>
+        </figure>
+        <figure>
+          <figcaption>Pseudocódigo · ¿es seguro este tramo?</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">llegoAntes</span>(<span class="var">cruce</span>, <span class="var">misPasos</span>)
+    <b>for each</b> <span class="var">f</span> <b>in</b> FANTASMAS <b>do</b>
+        <b>if</b> <span class="fn">esComestible</span>(<span class="var">f</span>) <b>then continue end if</b>       <i>// no me puede comer</i>
+        <b>if</b> <span class="fn">estáEnLaCárcel</span>(<span class="var">f</span>) <b>then continue end if</b>     <i>// no está en el laberinto</i>
+        <span class="var">susPasos</span> ← <span class="fn">distanciaSinDarLaVuelta</span>(<span class="var">f</span>, <span class="var">cruce</span>)
+        <b>if</b> <span class="var">susPasos</span> &lt; <span class="var">misPasos</span> + <span class="var">holgura</span> <b>then return</b> False <b>end if</b>
+    <b>end for</b>
+    <b>return</b> True
+<b>end function</b></pre>
+        </figure>
+        <div class="codigo"><pre><code><span class="c">// Y en código, con las dos exclusiones y la distancia que respeta el no-retroceso</span>
+<span class="k">private boolean</span> llegoAntes(Game game, <span class="k">int</span> cruce, <span class="k">int</span> misPasos) {
+    <span class="k">for</span> (GHOST f : GHOST.values()) {
+        <span class="k">if</span> (game.isGhostEdible(f))       <span class="k">continue</span>;   <span class="c">// comestible: no es amenaza</span>
+        <span class="k">if</span> (game.getGhostLairTime(f) &gt; <span class="n">0</span>) <span class="k">continue</span>;   <span class="c">// encerrado: no está en el mapa</span>
+
+        <span class="k">int</span>  nodo = game.getGhostCurrentNodeIndex(f);
+        MOVE ult  = game.getGhostLastMoveMade(f);
+        <span class="k">int</span>  susPasos = game.getShortestPathDistance(nodo, cruce, ult);
+
+        <span class="k">if</span> (susPasos &lt; misPasos + HOLGURA) <span class="k">return false</span>;
+    }
+    <span class="k">return true</span>;
+}</code></pre></div>
+        <p>
+          Las dos exclusiones del principio no son detalles: sin ellas el controlador huye de fantasmas
+          comestibles, que son puntos gratis, y de fantasmas encerrados, cuyo nodo ni siquiera está
+          conectado con el laberinto. Y la <code>HOLGURA</code> está ahí porque empatar es perder: si
+          llegáis a la vez, te come.
+        </p>
+      </section>
+
+      <section id="dos-cruces">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Mirar dos cruces por delante</h2>
+        </div>
+        <p>
+          Con eso ya no te metes en un tramo donde te alcanzan antes de llegar al final. Falta el otro
+          medio error: meterte en uno seguro que desemboca en un cruce del que <strong>no sale nada
+          seguro</strong>. Ese es el callejón de verdad de este juego: no lo pone el laberinto, lo ponen los
+          fantasmas, y aparece y desaparece cada pocos turnos.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · movimientos seguros con dos niveles de profundidad</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">movimientosSeguros</span>()
+    <span class="var">árbol</span> ← mapa vacío
+    <b>for each</b> <span class="var">d</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">miNodo</span>, <span class="var">miÚltimoMov</span>) <b>do</b>
+        <span class="var">c1</span> ← <span class="fn">siguienteCruce</span>(<span class="var">miNodo</span>, <span class="var">d</span>)
+        <b>if</b> <span class="fn">hayFantasmaEnElTramo</span>(<span class="var">c1</span>) <b>then continue end if</b>
+        <b>if</b> NOT <span class="fn">llegoAntes</span>(<span class="var">c1</span>.nodo, <span class="var">c1</span>.pasos) <b>then continue end if</b>
+
+        <span class="var">árbol</span>[<span class="var">d</span>] ← conjunto vacío
+        <b>for each</b> <span class="var">d2</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">c1</span>.nodo, <span class="var">c1</span>.dirección) <b>do</b>
+            <span class="var">c2</span> ← <span class="fn">siguienteCruce</span>(<span class="var">c1</span>.nodo, <span class="var">d2</span>)
+            <b>if</b> <span class="fn">llegoAntes</span>(<span class="var">c2</span>.nodo, <span class="var">c1</span>.pasos + <span class="var">c2</span>.pasos) <b>then</b>
+                añadir <span class="var">d2</span> a <span class="var">árbol</span>[<span class="var">d</span>]
+            <b>end if</b>
+        <b>end for</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">árbol</span>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Lo que sale es un arbolito de dos niveles: por cada dirección inmediata, cuántas salidas seguras
+          hay después. Una dirección cuyo conjunto está vacío es una trampa aunque el primer tramo sea
+          seguro; y cuando no hay más remedio que arriesgar, la que <strong>más salidas conserva</strong> es
+          la menos mala. Profundidad 2 basta: a partir de ahí la predicción del movimiento de los fantasmas
+          ya no vale nada.
+        </p>
+      </section>
+
+      <section id="objetivo-seguro">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Buscar el objetivo dentro de lo seguro</h2>
+        </div>
+        <p>
+          Y aquí es donde vuelve la <a href="busqueda.html#ciegas">búsqueda en anchura</a>, con una sola modificación: no
+          expande cualquier vecino, sino sólo los que caen dentro del árbol de movimientos seguros. Con eso,
+          una sola pasada contesta «¿cuál es la píldora alcanzable más cercana <em>sin morir por el
+          camino</em>, y qué dirección me lleva a ella?».
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · anchura restringida al espacio seguro</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">buscarObjetivoSeguro</span>(<span class="var">objetivos</span>, <span class="var">árbol</span>)
+    <span class="var">cola</span> ← cola FIFO
+    <span class="var">visitados</span> ← {<span class="var">miNodo</span>}
+    <b>for each</b> <span class="var">d</span> <b>in</b> claves de <span class="var">árbol</span> <b>do</b>        <i>// sólo arranco por lo seguro</i>
+        <span class="var">v</span> ← vecino de <span class="var">miNodo</span> en <span class="var">d</span>
+        <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">miNodo</span>
+        <span class="fn">encolar</span>(<span class="var">cola</span>, {<span class="var">v</span>, <span class="var">d</span>})
+        añadir <span class="var">v</span> a <span class="var">visitados</span>
+    <b>end for</b>
+
+    <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
+        {<span class="var">n</span>, <span class="var">dir</span>} ← <span class="fn">desencolar</span>(<span class="var">cola</span>)
+        <b>if</b> <span class="var">n</span> ∈ <span class="var">objetivos</span> <b>then</b>
+            <span class="var">camino</span> ← <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">n</span>)
+            <b>return</b> {<span class="var">dirección</span>: primera dirección de <span class="var">camino</span>, <span class="var">pasos</span>: |<span class="var">camino</span>| − 1, <span class="var">objetivo</span>: <span class="var">n</span>}
+        <b>end if</b>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">n</span>, <span class="var">dir</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">n</span>
+                añadir <span class="var">v</span> a <span class="var">visitados</span>
+                <span class="fn">encolar</span>(<span class="var">cola</span>, {<span class="var">v</span>, dirección de <span class="var">n</span> a <span class="var">v</span>})
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> NULL      <i>// no hay ningún objetivo alcanzable con seguridad</i>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Devuelve tres cosas, no una: la <strong>dirección</strong> que hay que tomar ahora, los
+          <strong>pasos</strong> que faltan hasta el objetivo por ese camino seguro y el
+          <strong>objetivo</strong> que ha encontrado. La dirección es lo que acabará devolviendo
+          <code>getMove</code>; los pasos sirven para decidir si el objetivo merece la pena, y el nodo
+          objetivo, para saber de qué fantasma o de qué píldora se trata. Como el camino empieza en
+          <code>miNodo</code>, los pasos son su longitud menos uno.
+        </p>
+      </section>
+
+      <section id="alcanzar-comestible">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">¿Me da tiempo a comérmelo?</h2>
+        </div>
+        <p>
+          Con una píldora los pasos son exactamente lo que tardas: la píldora no se mueve. Con un fantasma
+          comestible no, porque mientras tú recorres esos pasos él sigue huyendo. Lo que salva la cuenta es
+          que huye <strong>a media velocidad</strong>: el motor sólo mueve a un fantasma comestible en los
+          turnos en que su <code>edibleTime</code> es impar (<code>GHOST_SPEED_REDUCTION = 2</code>), y
+          Ms.&nbsp;Pac-Man avanza un nodo todos los turnos.
+        </p>
+        <p>
+          Pongamos que está a <em>d</em> pasos y que huye en línea recta por el mismo pasillo, alejándose,
+          que es lo peor que te puede hacer. Mientras recorres esos <em>d</em> pasos, él se aleja
+          <em>d</em>/2; cuando recorres ese <em>d</em>/2, se ha alejado <em>d</em>/4; y así:
+        </p>
+        <figure>
+          <figcaption>Cuenta · lo que recorres hasta alcanzar a un fantasma comestible que huye</figcaption>
+          <pre class="cuenta">tramo 1     d                  él se aleja  d/2
+tramo 2     d/2                él se aleja  d/4
+tramo 3     d/4                él se aleja  d/8
+   …
+total       d · (1 + 1/2 + 1/4 + …)
+         =  d · 1 / (1 − 1/2)
+         =  2d</pre>
+        </figure>
+        <p>
+          La serie es infinita pero la suma no: son <strong>2<em>d</em> pasos como mucho</strong>. Se llega
+          a lo mismo sin serie, mirando la distancia entre los dos: cada turno tú avanzas 1 y él ½, así que
+          la distancia baja ½ por turno y para cerrar <em>d</em> hacen falta <em>d</em> / ½ = 2<em>d</em>
+          turnos. Merece la pena ir a por él si lo alcanzas antes de que deje de ser comestible:
+        </p>
+        <div class="formula">
+          2 · <em>pasos</em> + <em>margen</em> &lt; <code>game.getGhostEdibleTime(f)</code>
+        </div>
+        <p>
+          Es una <strong>cota superior</strong>, no una predicción. Si el fantasma huye por otra rama o hacia
+          ti, lo alcanzas antes, y como no puede darse la vuelta a veces no le queda otra que acercarse.
+          Justo después de comerte una píldora de poder los fantasmas invierten la marcha, así que muchos
+          vienen de cara y la cuenta real queda muy por debajo. Y no hace falta que sea exacta: la condición
+          se vuelve a comprobar en cada cruce con la distancia nueva. El <em>margen</em> cubre los pocos
+          turnos que se pierden porque el camino más corto hasta él cambia mientras huye.
+        </p>
+        <p>
+          Compárala con <code>getClosestNodeIndexFromNodeIndex</code>, que hace lo mismo pero midiendo en
+          línea recta por la tabla y sin enterarse de los fantasmas. La versión propia cuesta unos pocos
+          miles de operaciones en el peor caso, se ejecuta sólo en los cruces, y es la diferencia entre un
+          controlador que come y uno que come <em>y sobrevive</em>.
+        </p>
+      </section>
+
+      <section id="tres-formas">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Tres formas de escribir la decisión</h2>
+        </div>
+        <p>
+          Con las piezas de esta página, la forma natural de escribir la decisión es una <strong>lista de
+          prioridades</strong> —el <code>getMove</code> de la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>
+          está escrito así—: comprueba esto, si se cumple haz aquello, y si no sigue bajando. Es la forma más fácil de leer y de defender, y es la que
+          se supone en esta asignatura. Pero no es la única, y conviene conocer las otras dos porque resuelven
+          bien lo que la lista resuelve mal.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Reglas con prioridad</th>
+                <th scope="col">Función de evaluación</th>
+                <th scope="col">Mapa de costes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>La decisión es</td>
+                <td>El primer <code>if</code> que se cumple.</td>
+                <td>La opción con mejor puntuación.</td>
+                <td>Lo que salga de buscar sobre un grafo con pesos.</td>
+              </tr>
+              <tr>
+                <td>Se afina tocando</td>
+                <td>El <strong>orden</strong> y los umbrales.</td>
+                <td>Los <strong>pesos</strong> de cada término.</td>
+                <td>El <strong>coste</strong> que se pinta alrededor de cada cosa.</td>
+              </tr>
+              <tr>
+                <td>Va bien cuando</td>
+                <td>Hay un criterio que manda sobre los demás: no morir.</td>
+                <td>Hay que sopesar cosas incomparables: comida contra riesgo.</td>
+                <td>El riesgo es continuo y depende del sitio, no de una condición.</td>
+              </tr>
+              <tr>
+                <td>Falla cuando</td>
+                <td>Dos criterios empatan: el orden decide a ciegas.</td>
+                <td>Los pesos se pisan y ya nadie sabe por qué eligió eso.</td>
+                <td>Se convierte en magia negra: mismo problema, un nivel más abajo.</td>
+              </tr>
+              <tr>
+                <td>Se depura</td>
+                <td>Escribiendo qué regla disparó.</td>
+                <td>Escribiendo los términos por separado, no el total.</td>
+                <td>Pintando el mapa, con un color por tramo de coste.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          La <strong>función de evaluación</strong> puntúa cada salida del cruce sumando términos con signo, y
+          se queda con la mejor. La ventaja es que no hay que decidir a priori qué manda: lo decide el peso.
+          El precio es que hay que afinar todos los pesos a la vez, y que una puntuación de 1&#8239;830 no
+          explica nada.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · elegir por puntuación en vez de por reglas</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">mejorSalida</span>()
+    <span class="var">mejor</span> ← NULL; <span class="var">mejorValor</span> ← −∞
+    <b>for each</b> <span class="var">d</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">miNodo</span>, <span class="var">miÚltimoMov</span>) <b>do</b>
+        <span class="var">c</span> ← <span class="fn">siguienteCruce</span>(<span class="var">miNodo</span>, <span class="var">d</span>)
+
+        <span class="var">valor</span> ← <span class="var">wPíldoras</span>  × <span class="fn">píldorasEnElTramo</span>(<span class="var">c</span>)
+               − <span class="var">wAmenaza</span>   × <span class="fn">amenaza</span>(<span class="var">c</span>)              <i>// cuánto me gana el fantasma a llegar</i>
+               + <span class="var">wSalidas</span>   × <span class="fn">salidasDe</span>(<span class="var">c</span>.nodo)         <i>// un cruce con más salidas es refugio</i>
+               + <span class="var">wComible</span>   × <span class="fn">premioPorFantasmaComestible</span>(<span class="var">c</span>)
+               + <span class="var">wPoder</span>     × <span class="fn">valorDeLaPíldoraDePoder</span>(<span class="var">c</span>)  <i>// premio o castigo, según cuántos haya cerca</i>
+
+        <b>if</b> <span class="var">valor</span> &gt; <span class="var">mejorValor</span> <b>then</b> <span class="var">mejor</span> ← <span class="var">d</span>; <span class="var">mejorValor</span> ← <span class="var">valor</span> <b>end if</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">mejor</span>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Fijaos en el término de la píldora de poder: es el mismo peso con el signo cambiado según la
+          situación. Premio si hay dos o más fantasmas cerca —es el momento de gastarla—, castigo si no lo
+          hay —pasar por encima sin necesidad son 3&#8239;000 puntos tirados—. Un solo término bien pensado
+          sustituye a media docena de <code>if</code>.
+        </p>
+        <p>
+          El <strong>mapa de costes</strong> da un paso más y saca la decisión de la función: en vez de
+          puntuar las salidas, pinta un coste sobre cada nodo del laberinto —caro cerca de un perseguidor,
+          barato cerca de la comida— y deja que una búsqueda de coste mínimo, la de <a href="busqueda.html#ciegas">coste uniforme</a>, conteste
+          sola. Es la misma idea que los <em lang="en">influence maps</em> de los juegos de estrategia.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · decidir con el laberinto como mapa de costes</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">decidirConMapa</span>()
+    <span class="fn">pintarCapas</span>()                  <i>// una capa por tipo de cosa, cada una de 0 a 1</i>
+    <span class="var">coste</span>[<span class="var">n</span>] ← máx(<span class="var">costeMínimo</span>, <span class="var">base</span> − <span class="fn">U</span>(<span class="var">n</span>)) para todo nodo <span class="var">n</span>
+                                    <i>// U alto, coste bajo; nunca por debajo del suelo</i>
+    <span class="var">destino</span> ← el nodo de mayor <span class="fn">U</span> a como mucho <span class="var">horizonte</span> pasos
+    <b>return</b> el primer paso de <span class="fn">costeUniforme</span>(<span class="var">miNodo</span>, <span class="var">destino</span>, <span class="var">coste</span>)
+<b>end function</b></pre>
+        </figure>
+        <p>
+          <em>U</em> es una suma con pesos de varias <strong>capas</strong>, una por cada cosa que importa
+          —comida, perseguidores, fantasmas comestibles, píldoras de poder, cuántas salidas tiene cada
+          nodo—, y cada capa dice lo cerca que se está de esa cosa, contando por los pasillos.
+        </p>
+        <p>
+          Cómo se pinta cada capa —cuánto pesa, hasta dónde llega cada fuente y cómo se juntan
+          varias— es una técnica con nombre propio, los <strong>mapas de influencia</strong>, y tiene su
+          página: <a href="mapas-influencia.html">Mapas de influencia</a>, con un controlador completo de
+          Ms.&nbsp;Pac-Man que decide sólo así.
+        </p>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="astar-mspacman.html"><span class="pager-l">Anterior</span><span class="pager-t">A* en Ms.&nbsp;Pac-Man</span></a>
+        <a class="pager-next" href="mapas-influencia.html"><span class="pager-l">Siguiente</span><span class="pager-t">Mapas de influencia</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#voraz">La regla voraz</a></li>
+            <li><a href="#cruces">Cruces, no nodos</a></li>
+            <li><a href="#llego-antes">¿Llego yo antes?</a></li>
+            <li><a href="#dos-cruces">Dos cruces por delante</a></li>
+            <li><a href="#objetivo-seguro">Objetivo seguro</a></li>
+            <li><a href="#alcanzar-comestible">¿Me da tiempo?</a></li>
+            <li><a href="#tres-formas">Tres formas de decidir</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html" aria-current="page"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Representar el espacio · Tema 1 · ICI</title>
+<meta name="description" content="El primer paso de toda búsqueda de caminos: qué problema se resuelve y las tres formas habituales de representar un mapa —puntos de ruta, rejillas y mallas de navegación—, con lo que cuesta cada una y cómo es el grafo del laberinto de Ms. Pac-Man.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>Representar el espacio</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 01 · Buscar caminos</p>
+    <h1>
+      Representar el espacio
+      <span class="thin">Antes de buscar un camino hay que convertir el mapa en un grafo.</span>
+    </h1>
+    <p class="standfirst">
+      El primer paso de toda búsqueda de caminos: qué problema se resuelve y las tres formas habituales de representar un mapa —puntos de ruta, rejillas y mallas de navegación—, con lo que cuesta cada una y cómo es el grafo del laberinto de Ms.&nbsp;Pac-Man.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="problema">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El problema</h2>
+        </div>
+        <p>
+          Un personaje está en un sitio y quiere ir a otro. Dicho así parece trivial, y lo es mientras el
+          mapa esté vacío: apuntas y andas. Deja de serlo en cuanto hay paredes, porque entonces la línea
+          recta ya no es un camino y hace falta <em>buscar</em> uno.
+        </p>
+        <figure class="wide">
+          <figcaption>Un interior cualquiera de un juego en 3D: pasillos, puertas y trastos por medio</figcaption>
+          <img class="shot" src="../../assets/img/pf-escena.jpg" width="1020" height="742" loading="lazy"
+               alt="Interior de una nave espacial en un videojuego en 3D: pasillos, puertas, cajas, barandillas y tuberías. Un personaje que quisiera cruzarlo no puede ir en línea recta.">
+        </figure>
+        <p>
+          Esa escena tiene cientos de miles de triángulos, y ninguno de ellos le sirve al personaje para
+          decidir por dónde ir. El problema de la búsqueda de caminos, o <em><span lang="en">pathfinding</span></em>,
+          se parte siempre en dos mitades que conviene no mezclar:
+        </p>
+        <ol>
+          <li>
+            <strong>Representar el espacio.</strong> Convertir el mundo, que es continuo y complicado, en un
+            <strong>grafo</strong>: un conjunto finito de sitios donde se puede estar, y qué sitios están
+            conectados con cuáles.
+          </li>
+          <li>
+            <strong>Buscar en el grafo.</strong> Dado ese grafo, encontrar una secuencia de pasos que lleve
+            del nodo de salida al de destino, idealmente la más corta, idealmente sin mirarlo entero.
+          </li>
+        </ol>
+        <div class="note tip">
+          <span class="note-label">Por qué se separan</span>
+          <p>
+            Porque el algoritmo de búsqueda es el mismo sea cual sea la representación. Cambiar de rejilla a
+            malla de navegación no obliga a reescribir A*; cambiar de A* a búsqueda en anchura no obliga a
+            recalcular el mapa. En Ms.&nbsp;Pac-Man la primera mitad viene <strong>hecha y precalculada</strong>,
+            así que este tema se concentra en la segunda y en qué hacer con el resultado.
+          </p>
+        </div>
+      </section>
+
+      <section id="representacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Representar el espacio</h2>
+        </div>
+        <p>
+          Tres familias de soluciones, por orden histórico. Las tres producen un grafo; se diferencian en
+          quién lo construye, cuánta memoria cuesta y qué tal se ven las rutas que salen.
+        </p>
+
+        <h3 class="label">Puntos de ruta (<span lang="en">waypoints</span>)</h3>
+        <figure class="wide">
+          <figcaption>Una lista de puntos interconectados sobre la misma escena</figcaption>
+          <img class="shot" src="../../assets/img/pf-waypoints.jpg" width="1020" height="742" loading="lazy"
+               alt="La misma escena de la nave, con esferas blancas colocadas en los sitios de paso y líneas que las unen formando un grafo por el que los personajes pueden moverse.">
+        </figure>
+        <p>
+          Se marcan a mano, o se sacan analizando el terreno y quedándose con los puntos de interés, unos
+          cuantos puntos del mapa, y se anota cuáles se ven entre sí. El NPC busca el punto más cercano a
+          su posición, el más cercano a su destino, y calcula la ruta entre esos dos por el grafo.
+        </p>
+        <p>
+          Los puntos de interés son casi siempre las <strong>esquinas convexas</strong> de los obstáculos.
+          Una esquina es convexa cuando el obstáculo <em>sobresale</em> hacia el suelo libre: el ángulo
+          medido por dentro del obstáculo es menor de 180°, y por fuera queda más de media vuelta de
+          espacio despejado. Es cóncava cuando pasa lo contrario, o sea cuando la esquina es el rincón de
+          un entrante y lo que sobra es obstáculo.
+        </p>
+        <figure class="wide">
+          <figcaption>Un obstáculo en L: cinco esquinas convexas y una cóncava</figcaption>
+          <svg class="explica dgc1" viewBox="0 0 470 200" role="img" aria-label="Un obstáculo con forma de L. En cinco de sus seis esquinas, las que sobresalen hacia el suelo libre, hay un punto de ruta colocado un poco por fuera. La sexta, el rincón de dentro de la L, está marcada como cóncava y no lleva punto porque ninguna ruta dobla por ahí.">
+            <style>
+              .dgc1 .obs{fill:var(--ink-3);fill-opacity:.34;stroke:var(--ink-3);stroke-width:1.4}
+              .dgc1 .cx{fill:none;stroke:var(--maze);stroke-width:1.8}
+              .dgc1 .cc{fill:none;stroke:var(--bad);stroke-width:1.8}
+              .dgc1 .wp{fill:var(--maze)}
+              .dgc1 .gu{fill:none;stroke:var(--maze);stroke-width:1;stroke-dasharray:2 2;opacity:.7}
+              .dgc1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgc1 .tm{font-family:var(--f-mono);font-size:10px;fill:var(--maze)}
+              .dgc1 .tb{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgc1 .fl{fill:none;stroke:var(--bad);stroke-width:1.4;marker-end:url(#c1a)}
+            </style>
+            <defs><marker id="c1a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--bad)"/></marker></defs>
+            <path d="M60 35 H140 V75 H180 V155 H60 Z" class="obs"/>
+            <path d="M60 35 L50 25 M140 35 L150 25 M180 75 L190 65 M180 155 L190 165 M60 155 L50 165" class="gu"/>
+            <circle cx="60" cy="35" r="4.5" class="cx"/><circle cx="140" cy="35" r="4.5" class="cx"/>
+            <circle cx="180" cy="75" r="4.5" class="cx"/><circle cx="180" cy="155" r="4.5" class="cx"/>
+            <circle cx="60" cy="155" r="4.5" class="cx"/>
+            <circle cx="140" cy="75" r="4.5" class="cc"/>
+            <circle cx="50" cy="25" r="3.4" class="wp"/><circle cx="150" cy="25" r="3.4" class="wp"/>
+            <circle cx="190" cy="65" r="3.4" class="wp"/><circle cx="190" cy="165" r="3.4" class="wp"/>
+            <circle cx="50" cy="165" r="3.4" class="wp"/>
+            <path d="M204 56 L150 72" class="fl"/>
+            <text x="208" y="52" class="tb">cóncava: el rincón de dentro</text>
+            <text x="208" y="68" class="t">ninguna ruta dobla por ahí,</text>
+            <text x="208" y="82" class="t">así que no lleva punto</text>
+            <text x="208" y="118" class="tm">convexas: sobresalen al suelo</text>
+            <text x="208" y="134" class="t">el punto va un poco por fuera,</text>
+            <text x="208" y="148" class="t">para que quepa el personaje</text>
+            <text x="16" y="192" class="t">Círculo: la esquina.  Punto relleno: su punto de ruta.</text>
+          </svg>
+        </figure>
+        <p>
+          El motivo de quedarse sólo con las convexas es que son las únicas por las que una ruta tiene que
+          <em>doblar</em>: el camino más corto entre dos puntos separados por un obstáculo se pega a sus
+          salientes. Un punto en una esquina cóncava estaría metido en el rincón, no lo vería casi nadie y
+          no acortaría ningún camino.
+        </p>
+        <ul>
+          <li>Es el sistema más sencillo de todos: no guarda información del terreno ni delimita zonas transitables.</li>
+          <li>Una arista significa exactamente una cosa: «desde aquí se puede llegar hasta ahí», esquivando los obstáculos locales por el camino.</li>
+          <li>Se adapta muy bien a interiores con pasillos, funciona en 3D y aguanta cualquier tipo de movimiento.</li>
+          <li>Es lo que se usa para rutas prefijadas, como las patrullas.</li>
+          <li>Y su defecto salta a la vista: las rutas salen <strong>poco naturales</strong>, como si los personajes fueran por raíles, porque literalmente van por raíles.</li>
+        </ul>
+        <div class="demo" data-demo="waypoints">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Pon obstáculos y mira qué grafo sale</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí al lado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Coloca obstáculos con las formas de la barra, mueve la salida y el destino, toca los parámetros
+          del método, y pulsa <strong>Calcular la ruta</strong>. La descomposición se rehace sola cada vez
+          que cambias algo: lo que ves dibujado es lo que el algoritmo tiene para buscar.
+        </p>
+        <p>
+          Prueba a apagar <em>Puntos en las esquinas</em> y ponerlos tú, uno a uno, con la herramienta
+          <em>Punto de ruta</em>: verás enseguida por qué esto se hacía a mano y por qué se hacía mal. Sube
+          el <em>margen</em> y fíjate en que los puntos se despegan de las paredes, que es lo que necesita
+          un personaje con volumen; súbelo demasiado y empiezan a desaparecer, porque ya no caben.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · puntos de ruta</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">construirGrafo</span>(<span class="var">obstáculos</span>, <span class="var">margen</span>)
+    <span class="var">puntos</span> ← lista vacía
+    <b>for each</b> <span class="var">o</span> <b>in</b> <span class="var">obstáculos</span> <b>do</b>
+        <b>for each</b> esquina convexa <span class="var">e</span> de <span class="var">o</span> <b>do</b>
+            <span class="var">p</span> ← <span class="var">e</span> desplazada <span class="var">margen</span> hacia fuera
+            <b>if</b> <span class="var">p</span> cae en suelo libre <b>then</b> añadir <span class="var">p</span> a <span class="var">puntos</span> <b>end if</b>
+        <b>end for</b>
+    <b>end for</b>
+    añadir a <span class="var">puntos</span> los que se hayan puesto a mano
+
+    <span class="var">aristas</span> ← lista vacía
+    <b>for each</b> par (<span class="var">p</span>, <span class="var">q</span>) de <span class="var">puntos</span> <b>do</b>
+        <b>if</b> el segmento <span class="var">p</span>–<span class="var">q</span> no corta ningún obstáculo <b>then</b>
+            añadir (<span class="var">p</span>, <span class="var">q</span>, <span class="fn">distancia</span>(<span class="var">p</span>, <span class="var">q</span>)) a <span class="var">aristas</span>
+        <b>end if</b>
+    <b>end for</b>
+    <b>return</b> {<span class="var">puntos</span>, <span class="var">aristas</span>}
+<b>end function</b>
+
+<b>function</b> <span class="fn">ruta</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">grafo</span>)
+    enganchar <span class="var">A</span> y <span class="var">B</span> a todos los puntos que vean
+    <b>return</b> <span class="fn">dijkstra</span>(<span class="var">grafo</span>, <span class="var">A</span>, <span class="var">B</span>)
+<b>end function</b></pre>
+        </figure>
+        <p>
+          «Desplazada hacia fuera» quiere decir en la dirección que bisecta la esquina por el lado del
+          suelo libre. Y la comprobación de que el punto cae en suelo libre no sobra: en un pasillo
+          estrecho, el punto de una esquina convexa se sale por el otro lado y hay que descartarlo.
+        </p>
+        <p>
+          Queda por decir cómo se comprueba que «el segmento <em>p</em>–<em>q</em> no corta ningún
+          obstáculo», que es donde este método se pasa todo el tiempo: con <em>n</em> puntos hay
+          <em>n</em>(<em>n</em>&nbsp;−&nbsp;1)/2 parejas, y cada una se mide contra todos los lados de
+          todos los obstáculos. Son tres pasos, y el primero es el que lo hace barato.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · ¿corta el segmento a este obstáculo?</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">corta</span>(<span class="var">p</span>, <span class="var">q</span>, <span class="var">obstáculo</span>)
+    <i>// 1. descarte rápido: si las cajas no se tocan, no hay nada que mirar</i>
+    <b>if</b> la caja de <span class="var">obstáculo</span> no solapa con la caja de <span class="var">p</span>–<span class="var">q</span> <b>then return</b> False <b>end if</b>
+
+    <i>// 2. ¿cruza alguno de sus lados?</i>
+    <b>for each</b> lado (<span class="var">u</span>, <span class="var">v</span>) de <span class="var">obstáculo</span> <b>do</b>
+        <b>if</b> <span class="fn">cruzan</span>(<span class="var">p</span>, <span class="var">q</span>, <span class="var">u</span>, <span class="var">v</span>) <b>then return</b> True <b>end if</b>
+    <b>end for</b>
+
+    <i>// 3. sin cruzar ningún lado sólo queda estar entero dentro</i>
+    <b>return</b> <span class="fn">dentro</span>(punto medio de <span class="var">p</span>–<span class="var">q</span>, <span class="var">obstáculo</span>)
+<b>end function</b>
+
+<b>function</b> <span class="fn">cruzan</span>(<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span>, <span class="var">d</span>)
+    <i>// lado(a, b, x) = (b.x − a.x)(x.y − a.y) − (x.x − a.x)(b.y − a.y)</i>
+    <i>// sale positivo si x queda a un lado de la recta a–b, negativo si al otro</i>
+    <i>// y cero si está justo encima</i>
+    <b>return</b> <span class="fn">lado</span>(<span class="var">c</span>, <span class="var">d</span>, <span class="var">a</span>) y <span class="fn">lado</span>(<span class="var">c</span>, <span class="var">d</span>, <span class="var">b</span>) tienen signos <b>opuestos y no nulos</b>
+       AND <span class="fn">lado</span>(<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span>) y <span class="fn">lado</span>(<span class="var">a</span>, <span class="var">b</span>, <span class="var">d</span>) tienen signos <b>opuestos y no nulos</b>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Las tres cosas que hay que mirar con lupa:
+        </p>
+        <ul>
+          <li>
+            <strong>Rozar no es cortar.</strong> Si alguno de los cuatro <code>lado</code> sale cero, los
+            segmentos se tocan en un extremo o son colineales, y eso tiene que dar <em>False</em>. Aquí no
+            es una sutileza teórica: los puntos de ruta viven pegados a las esquinas, y con el signo cero
+            contando como cruce el grafo se quedaría prácticamente sin aristas.
+          </li>
+          <li>
+            <strong>El paso 3 no sobra.</strong> Un segmento enteramente dentro de un obstáculo no cruza
+            ninguno de sus lados, así que los dos primeros pasos lo darían por bueno. Basta con mirar si su
+            punto medio cae dentro, con la regla de la paridad: se lanza un rayo desde el punto y se cuenta
+            cuántos lados atraviesa; impar significa dentro.
+          </li>
+          <li>
+            <strong>El descarte por cajas es lo que lo salva.</strong> La comprobación completa es
+            <em>O</em>(<em>n</em>²&nbsp;·&nbsp;lados), y en la escena de arriba eso son más de cien mil
+            pruebas de signo cada vez que mueves un obstáculo. Comparando primero los dos rectángulos
+            envolventes, la inmensa mayoría de las parejas se resuelve en cuatro comparaciones.
+          </li>
+        </ul>
+
+        <h3 class="label">Rejillas</h3>
+        <figure class="wide">
+          <figcaption>Una rejilla sobre el terreno: cada casilla lleva su tipo y si se puede pisar</figcaption>
+          <img class="shot" src="../../assets/img/pf-rejilla-terreno.jpg" width="928" height="704" loading="lazy"
+               alt="Vista aérea de un mapa de estrategia con una rejilla blanca dibujada encima. Se distinguen zonas de agua en azul, hierba en verde, bosque y roca, y unidades repartidas por el mapa.">
+        </figure>
+        <p>
+          El mapa se guarda en un <em>array</em> bidimensional y una posición son dos coordenadas enteras.
+          Viene de los juegos 2D y sigue siendo la representación por defecto en estrategia; también las hay
+          hexagonales.
+        </p>
+        <ul>
+          <li>Cada casilla lleva información del terreno: el <strong>tipo</strong> (tierra, hierba, parquet, cemento) y la <strong>transitabilidad</strong>, o sea si se puede pasar o no.</li>
+          <li>El personaje tiene una posición real, con decimales, que se trunca para saber en qué casilla está.</li>
+          <li>Se genera a mano o muestreando el mapa 3D, y pide bastante homogeneidad: si el mapa tiene detalles más finos que la casilla, la rejilla no los ve.</li>
+        </ul>
+        <figure class="wide">
+          <figcaption>La misma idea en tres dimensiones: la cuadrícula, proyectada sobre el suelo de la escena</figcaption>
+          <img class="shot" src="../../assets/img/pf-rejilla.jpg" width="1020" height="742" loading="lazy"
+               alt="La escena de la nave con una cuadrícula regular proyectada sobre el suelo, dividiéndolo en casillas cuadradas del mismo tamaño.">
+        </figure>
+        <div class="demo" data-demo="rejilla">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Baja el lado de la celda hasta que quepa el paso</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí al lado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Coloca obstáculos con las formas de la barra, mueve la salida y el destino, toca los parámetros
+          del método, y pulsa <strong>Calcular la ruta</strong>. La descomposición se rehace sola cada vez
+          que cambias algo: lo que ves dibujado es lo que el algoritmo tiene para buscar.
+        </p>
+        <p>
+          Aquí está el compromiso de la rejilla, entero y en una pantalla. Con celdas grandes hay pocas
+          casillas y la búsqueda vuela, pero la rejilla <strong>engorda los obstáculos</strong> hasta el
+          borde de su casilla: un pasillo estrecho se cierra y el algoritmo dice, con toda la razón del
+          mundo, que no hay camino. Bájala y el paso aparece, a cambio de multiplicar por cuatro el número
+          de celdas cada vez que la partes por la mitad. Cambia también la vecindad de 4 a 8 y mira lo que
+          le pasa a la forma de la ruta.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · rejilla</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">construirRejilla</span>(<span class="var">obstáculos</span>, <span class="var">lado</span>)
+    <b>for each</b> casilla (<span class="var">c</span>, <span class="var">f</span>) de la rejilla <b>do</b>
+        <span class="var">r</span> ← el rectángulo que ocupa esa casilla
+        <span class="var">bloqueada</span>[<span class="var">c</span>, <span class="var">f</span>] ← algún obstáculo se solapa con <span class="var">r</span>
+    <b>end for</b>
+    <b>return</b> <span class="var">bloqueada</span>
+<b>end function</b>
+
+<b>function</b> <span class="fn">ruta</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">bloqueada</span>, <span class="var">vecindad</span>)
+    <span class="var">ini</span> ← casilla que contiene <span class="var">A</span>;   <span class="var">fin</span> ← casilla que contiene <span class="var">B</span>
+    <b>if</b> <span class="var">bloqueada</span>[<span class="var">ini</span>] OR <span class="var">bloqueada</span>[<span class="var">fin</span>] <b>then return</b> SIN&nbsp;CAMINO <b>end if</b>
+    <span class="var">cola</span> ← cola FIFO con {<span class="var">ini</span>};   <span class="var">visitados</span> ← {<span class="var">ini</span>}
+    <b>while</b> <span class="var">cola</span> no esté vacía <b>do</b>
+        <span class="var">k</span> ← <span class="fn">desencolar</span>(<span class="var">cola</span>)
+        <b>if</b> <span class="var">k</span> = <span class="var">fin</span> <b>then return</b> <span class="fn">reconstruir</span>(<span class="var">padre</span>, <span class="var">k</span>) <b>end if</b>
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">vecinas</span>(<span class="var">k</span>, <span class="var">vecindad</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> está dentro AND NOT <span class="var">bloqueada</span>[<span class="var">v</span>] AND <span class="var">v</span> ∉ <span class="var">visitados</span> <b>then</b>
+                <span class="var">padre</span>[<span class="var">v</span>] ← <span class="var">k</span>;  añadir <span class="var">v</span> a <span class="var">visitados</span>;  <span class="fn">encolar</span>(<span class="var">cola</span>, <span class="var">v</span>)
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+    <b>return</b> SIN&nbsp;CAMINO
+<b>end function</b></pre>
+        </figure>
+        <p>
+          La <code>ruta</code> de la rejilla es una <strong>búsqueda en anchura</strong>: parte de la casilla
+          de salida, visita primero todas las vecinas, luego las vecinas de esas, y así hasta dar con el
+          destino. Cada casilla apunta en <code>padre</code> a la casilla desde la que se llegó a ella, y
+          <code>reconstruir</code> sólo sigue esos punteros hacia atrás, del destino a la salida. El
+          algoritmo, con sus variantes, se explica despacio en
+          <a href="busqueda.html#ciegas">Búsqueda en espacios de estados</a>; aquí basta con la idea.
+          Ese bucle es el que se puede ver correr. En el ejemplo, después de calcular la ruta se abre la
+          fila <em>Paso a paso</em>: cada paso es una vuelta del <code>while</code>, o sea
+          <strong>una sola llamada a <code>desencolar</code></strong> más el examen de sus vecinas. La tira
+          de abajo enseña las dos estructuras del pseudocódigo con sus nombres, y el laberinto se colorea
+          así:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">En la escena</th><th scope="col">En el pseudocódigo</th></tr></thead>
+            <tbody>
+              <tr><td><span class="swatch sw-vista"></span> Azul flojo</td><td>Está en <code>visitados</code>: ya se ha encolado alguna vez y no se volverá a mirar.</td></tr>
+              <tr><td><span class="swatch sw-cola"></span> Amarillo</td><td>Sigue en la <code>cola</code>, esperando turno. Es la frontera de la búsqueda.</td></tr>
+              <tr><td><span class="swatch sw-ahora"></span> Rojo</td><td>La <code>k</code> de esta vuelta, la que acaba de salir de la cola.</td></tr>
+              <tr><td><span class="swatch sw-nueva"></span> Filo dorado</td><td>Las <code>v</code> que se han encolado en esta misma vuelta.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Lo que se ve es el rasgo que define la anchura: <strong>la mancha azul crece en anillos</strong>,
+          y el amarillo es siempre la capa de fuera. Por eso, cuando el destino aparece, aparece por el
+          camino más corto. Merece la pena pararse en dos momentos: cuando la frontera se parte en dos al
+          chocar con un obstáculo y rodearlo por los dos lados a la vez, y cuando las dos mitades se
+          vuelven a juntar por detrás y una de ellas ya no encola nada, porque la otra había pasado antes
+          por ahí.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Cómo mirarlo</span>
+          <p>
+            Con celdas de 20 salen unos cien pasos, que es un tamaño cómodo para ir de uno en uno.
+            Bajando el lado a 5 son varios miles: ahí conviene usar <em>Reproducir</em> o arrastrar el
+            deslizador, y sirve para ver de golpe cuántas casillas de más visita una rejilla fina. Y con
+            <em>Vecindad&nbsp;8</em> los anillos dejan de ser rombos y pasan a ser cuadrados.
+          </p>
+        </div>
+
+        <h3 class="label">Malla de navegación (<span lang="en">navigation mesh</span>)</h3>
+        <figure class="wide">
+          <figcaption>El suelo transitable de la escena, cubierto de polígonos convexos</figcaption>
+          <img class="shot" src="../../assets/img/pf-navmesh.jpg" width="1020" height="742" loading="lazy"
+               alt="La escena de la nave con el suelo dividido en polígonos irregulares grandes que se adaptan a la forma de la zona por la que se puede caminar.">
+        </figure>
+        <p>
+          Se cubre el suelo con polígonos, llamados <strong>sectores</strong>, calculados automáticamente a
+          partir de la geometría de la escena: de las posiciones donde el agente puede pararse sale una
+          triangulación (<em lang="en">Constrained Delaunay Triangulation</em>) que funciona como una
+          alfombra sobre la zona que los NPC pueden recorrer, y da una representación pseudo-2D del mapa.
+        </p>
+        <p>
+          Los sectores se conectan entre sí por sus aristas, que se llaman <strong>portales</strong>, y son
+          <strong>convexos</strong>, que es la propiedad que lo hace funcionar: dentro de un sector puedo ir
+          en línea recta de cualquier punto a cualquier otro sin salirme.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">A favor</th><th scope="col">En contra</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Los polígonos se adaptan a lo que sea y se ajustan muy bien a la zona transitable.</td>
+                <td>Cuesta memoria: un mapa grande necesita muchos sectores.</td>
+              </tr>
+              <tr>
+                <td>Las rutas que salen son de calidad, y no parecen de raíles.</td>
+                <td>Sufre con ciertos movimientos 3D: saltos, vuelo, movimiento libre. Se basa mucho en mantener al personaje pegado al suelo.</td>
+              </tr>
+              <tr>
+                <td>Se construye sola desde la escena, sin marcar puntos a mano.</td>
+                <td><em>Quake III</em> y <em>Doom III</em> usan una variante con volúmenes en vez de polígonos, los AAS, precisamente por eso.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="demo" data-demo="malla">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Triangula el suelo y tira de la cuerda</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en el texto y en el pseudocódigo de aquí al lado.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Coloca obstáculos con las formas de la barra, mueve la salida y el destino, toca los parámetros
+          del método, y pulsa <strong>Calcular la ruta</strong>. La descomposición se rehace sola cada vez
+          que cambias algo: lo que ves dibujado es lo que el algoritmo tiene para buscar.
+        </p>
+        <p>
+          Fíjate en el orden de las cosas. Primero se <strong>cose</strong> el suelo: el rectángulo del mapa
+          con un agujero por obstáculo no se puede triangular de golpe, así que a cada agujero se le abre un
+          puente hasta el contorno. Después se recortan orejas hasta dejarlo todo en triángulos. Y sólo
+          entonces, con <em>Fundir en sectores</em>, se juntan los triángulos vecinos mientras el resultado
+          siga siendo convexo: de ahí salen los polígonos grandes de una malla de verdad, y el número de
+          sectores cae a la mitad o menos.
+        </p>
+        <p>
+          Con <em>Tirar de la cuerda</em> apagado, la ruta pasa por el centro de cada portal y se nota el
+          zigzag. Enciéndelo y la ruta se tensa contra las esquinas: eso es lo que quiere decir
+          <em>rutas de calidad</em>, y es justo lo que un grafo de puntos de ruta no puede dar.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · malla de navegación</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">construirMalla</span>(<span class="var">obstáculos</span>)
+    <span class="var">contorno</span> ← el rectángulo del mapa
+    <b>for each</b> <span class="var">o</span> <b>in</b> <span class="var">obstáculos</span> <b>do</b>        <i>// cada obstáculo es un agujero</i>
+        <span class="var">contorno</span> ← <span class="fn">coserAgujero</span>(<span class="var">contorno</span>, <span class="var">o</span>)   <i>// un puente hasta el borde</i>
+    <b>end for</b>
+    <span class="var">triángulos</span> ← <span class="fn">recortarOrejas</span>(<span class="var">contorno</span>)
+    <span class="var">sectores</span> ← <span class="var">triángulos</span>
+    <b>while</b> queden dos sectores vecinos cuya unión sea convexa <b>do</b>
+        fundirlos en uno                    <i>// Hertel-Mehlhorn</i>
+    <b>end while</b>
+    <span class="var">portales</span> ← los lados que comparten dos sectores
+    <b>return</b> {<span class="var">sectores</span>, <span class="var">portales</span>}
+<b>end function</b>
+
+<b>function</b> <span class="fn">ruta</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">sectores</span>, <span class="var">portales</span>)
+    <span class="var">sA</span> ← sector que contiene <span class="var">A</span>;   <span class="var">sB</span> ← sector que contiene <span class="var">B</span>
+    <span class="var">cadena</span> ← <span class="fn">aEstrella</span>(grafo de sectores, <span class="var">sA</span>, <span class="var">sB</span>)
+    <span class="var">p</span> ← los portales que cruza <span class="var">cadena</span>, cada uno con su izquierda y su derecha
+    <b>return</b> <span class="fn">tirarDeLaCuerda</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">p</span>)   <i>// el hilo más corto que pasa por todos</i>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          <code>aEstrella</code> es A*, que busca en el grafo de sectores igual que la anchura busca en la
+          rejilla, pero guiado por una estimación de lo que falta hasta el destino. Está en
+          <a href="astar.html#astar">Heurísticas y A*</a>; lo que importa aquí es que da la
+          <em>cadena de sectores</em>, no la ruta: la ruta sale después, al tirar de la cuerda.
+        </p>
+
+        <h3 class="label">Y en Ms. Pac-Man</h3>
+        <p>
+          Aquí no hay que elegir: el laberinto <strong>ya es un grafo</strong>, y de los sencillos. Cada
+          nodo es un sitio donde se puede estar, cada arista une dos nodos pegados, y el grado del nodo
+          nunca pasa de cuatro porque sólo hay cuatro direcciones. Un cruce es un nodo con tres vecinos o
+          más.
+        </p>
+        <figure class="lab-uno">
+          <figcaption>Cruces en amarillo: los 38 sitios donde una decisión cambia algo</figcaption>
+          <img class="lab pixel" src="../../assets/img/laberinto-a-anotado.png" width="684" height="780" loading="lazy"
+               alt="El primer laberinto del simulador con círculos amarillos sobre los nodos que son cruce, círculos azules en los extremos de los túneles y marcas en la cárcel y su puerta.">
+        </figure>
+        <p>
+          Eso es una suerte pedagógica: como la representación no estorba, se ve con toda claridad lo que
+          hace el algoritmo. Y es también la razón de que en esta práctica el mérito no esté en encontrar el
+          camino, que te lo da el motor, sino en <strong>decidir hacia dónde</strong>.
+        </p>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="index.html"><span class="pager-l">Anterior</span><span class="pager-t">Índice del tema</span></a>
+        <a class="pager-next" href="busqueda.html"><span class="pager-l">Siguiente</span><span class="pager-t">Búsqueda en espacios de estados</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#problema">El problema</a></li>
+            <li><a href="#representacion">Representar el espacio</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html" aria-current="page"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>

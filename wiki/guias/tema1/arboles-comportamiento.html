@@ -1,0 +1,1993 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Árboles de comportamiento · Tema 1 · ICI</title>
+<meta name="description" content="Qué es un árbol de comportamiento, cómo se recorre desde la raíz en cada turno, secuencia, selector, decoradores y pizarra, cómo pasar a árbol la máquina de estados de los fantasmas, y un árbol mínimo en Java que funciona con el motor de Ms. Pac-Man.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>Árboles de comportamiento</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 09 · Organizar el comportamiento</p>
+    <h1>
+      Árboles de comportamiento
+      <span class="thin">Tareas pequeñas que se combinan en un árbol que se recorre en cada turno.</span>
+    </h1>
+    <p class="standfirst">
+      Qué es un árbol de comportamiento, cómo se recorre desde la raíz en cada turno, secuencia, selector, decoradores y pizarra, cómo pasar a árbol la máquina de estados de los fantasmas, y un árbol mínimo en Java que funciona con el motor de Ms.&nbsp;Pac-Man.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+        <p>
+          En la <a href="maquinas-estados.html">página anterior</a> el comportamiento era un conjunto de
+          estados unidos por transiciones: el fantasma <em>está</em> persiguiendo hasta que algo le hace
+          pasar a huir. Funciona muy bien con cuatro estados, y se vuelve inmanejable con veinte, porque cada
+          estado nuevo obliga a pensar sus transiciones con todos los demás. Un <strong>árbol de
+          comportamiento</strong> organiza lo mismo de otra manera: tareas pequeñas que se combinan en un
+          árbol, y un recorrido del árbol en cada turno que decide qué tarea toca ahora.
+        </p>
+
+      <section id="por-que">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Por qué árboles</h2>
+        </div>
+        <p>
+          Son la forma dominante de escribir la inteligencia de los personajes en los motores comerciales, y
+          casi siempre se editan de forma visual: el diseñador arrastra nodos, los conecta y ve el árbol
+          ejecutándose mientras juega.
+        </p>
+        <figure class="wide">
+          <figcaption>Un editor visual de árboles para Unity, junto al juego que controla · imagen de Juan A. Recio-García; captura de un producto comercial</figcaption>
+          <img class="shot" src="../../assets/img/bt-juego.jpg" width="757" height="480" loading="lazy"
+               alt="A la izquierda, un editor con decenas de nodos conectados en forma de árbol sobre fondo oscuro, con iconos de secuencia, selector y acciones. A la derecha, una escena en 3D con cuatro soldados con armadura verde avanzando por un pasillo de una nave. Encima, el lema publicitario: crear una IA creíble con un editor visual.">
+        </figure>
+        <p>Lo que se gana respecto a una máquina de estados, y por qué:</p>
+        <ul>
+          <li>
+            <strong>Prototipado e iteraciones rápidas.</strong> Cambiar qué va antes que qué es mover una
+            rama de sitio. En una máquina de estados es reescribir las condiciones de varias transiciones.
+          </li>
+          <li>
+            <strong>Más escalables, mantenibles y versátiles.</strong> Añadir un comportamiento es añadir
+            una rama en la posición que marca su prioridad; no hay que decidir cómo se sale de ella hacia
+            cada uno de los demás, porque no se «sale»: en el turno siguiente se vuelve a decidir.
+          </li>
+          <li>
+            <strong>Tareas sencillas, más reutilizables.</strong> Cada hoja hace una sola cosa —«¿soy
+            comestible?», «huir»— y la complejidad sale de <strong>combinarlas</strong>, no de hacerlas
+            listas.
+          </li>
+          <li>
+            <strong>Sub-árboles reutilizables</strong> entre comportamientos y personajes: la rama de huir
+            es la misma para los cuatro fantasmas, y la de «comer la píldora más cercana» puede colgar de
+            varios sitios del árbol de Ms.&nbsp;Pac-Man.
+          </li>
+          <li>
+            <strong>Facilidad para añadir tipos de nodo.</strong> Un nodo es una clase con un método. El
+            recorrido no cambia por añadir un decorador nuevo.
+          </li>
+        </ul>
+        <div class="note tip">
+          <span class="note-label">Lo que se paga</span>
+          <p>
+            Una máquina de estados <strong>se acuerda</strong>: el estado actual es memoria. Un árbol que se
+            recorre desde la raíz en cada turno no se acuerda de nada, así que lo que la máquina sabía por
+            estar en un estado concreto el árbol lo tiene que <strong>volver a deducir</strong> del juego o
+            tenerlo <strong>apuntado</strong> en algún sitio. Esa diferencia vuelve en casi todas las
+            secciones de esta página.
+          </p>
+        </div>
+      </section>
+
+      <section id="nodos">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Los nodos: hojas, compuestos y decoradores</h2>
+        </div>
+        <p>
+          Todos los nodos, sean del tipo que sean, hacen lo mismo cuando su padre los ejecuta: algo, y
+          después devuelven un <strong>estado</strong>. Esa es toda la interfaz, y es lo que permite
+          combinarlos sin que ninguno sepa qué tiene debajo.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col">Clase</th>
+                <th scope="col">Nodos</th>
+                <th scope="col">Qué hacen</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tareas (hojas)</td>
+                <td>Acción, condición</td>
+                <td>El trabajo de verdad: cambiar algo del juego o preguntar por él.</td>
+              </tr>
+              <tr>
+                <td>Nodos de decisión (internos)</td>
+                <td>Secuencia, selector, paralelo, <em>if</em></td>
+                <td>Dan el poder expresivo: deciden a qué hijos se ejecuta, en qué orden, y qué se devuelve con lo que devuelven ellos.</td>
+              </tr>
+              <tr>
+                <td>Decorador</td>
+                <td>No, repetir, siempre éxito…</td>
+                <td>Un nodo interno con un solo hijo, que cambia cuándo se ejecuta o qué devuelve.</td>
+              </tr>
+              <tr>
+                <td>Sub-árbol</td>
+                <td>Cualquier árbol</td>
+                <td>Un árbol entero usado como si fuera un nodo más de otro.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="narrow">
+          <figcaption>Una acción, una condición y una secuencia que las une · imagen de Juan A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/bt-nodos.jpg" width="662" height="746" loading="lazy"
+               alt="Arriba, dos hojas sueltas: una acción, Disparar, en rojo, y una condición, ¿Tengo munición?, en naranja. Debajo, una secuencia, una caja amarilla con una flecha, con esas dos hojas como hijos. La condición lleva una marca verde de éxito y la acción un aspa roja de fallo, y la secuencia, un aspa roja.">
+        </figure>
+        <p>
+          Los estados son tres. <code>SUCCESS</code> y <code>FAILURE</code> son lo esperable: la tarea ha
+          salido bien o no. <code>RUNNING</code> es «todavía no he terminado», y la sección siguiente explica
+          por qué hace falta. En los diagramas de esta página los nodos y los estados se dibujan así:
+        </p>
+        <figure>
+          <figcaption>Cómo se dibuja cada tipo de nodo y cada estado en esta página</figcaption>
+          <svg class="explica dgb1" viewBox="0 0 480 225" role="img" aria-label="Leyenda de los diagramas de esta página. Nodos compuestos como cajas azules con un símbolo: flecha para la secuencia, interrogación para el selector, doble flecha para el paralelo. El decorador es un hexágono con su nombre, por ejemplo no. La condición es una píldora con la pregunta, por ejemplo ¿comestible?, y la acción un rectángulo relleno, por ejemplo huir. Debajo, los tres estados que puede devolver un nodo: una marca verde para SUCCESS, un aspa roja para FAILURE y una flecha circular ámbar para RUNNING.">
+            <style>
+              .dgb1 .cmp{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgb1 .gl{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--maze)}
+              .dgb1 .dec{fill:var(--surface);stroke:var(--inky);stroke-width:1.5}
+              .dgb1 .cnd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgb1 .act{fill:var(--surface-2);stroke:var(--ink-2);stroke-width:1.2}
+              .dgb1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .dgb1 .s{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgb1 .h{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink-2);letter-spacing:.08em}
+              .dgb1 .e{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+              .dgb1 .eo{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3;opacity:.5}
+              .dgb1 .off{opacity:.5}
+              .dgb1 .off rect,.dgb1 .off polygon{stroke-dasharray:4 3}
+              .dgb1 .ok{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--ok)}
+              .dgb1 .bad{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--bad)}
+              .dgb1 .run{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink)}
+              .dgb1 .okt{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dgb1 .badt{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgb1 .nc{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+              .dgb1 .nt{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--maze);text-anchor:middle}
+              .dgb1 .sep{stroke:var(--line);stroke-width:1}
+            </style>
+            <rect x="67.0" y="19.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="80.0" y="34.5" class="gl" text-anchor="middle">→</text>
+            <text x="80.0" y="60" class="t" text-anchor="middle">secuencia</text>
+            <text x="80.0" y="74" class="s" text-anchor="middle">uno tras otro</text>
+            <rect x="227.0" y="19.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="240.0" y="34.5" class="gl" text-anchor="middle">?</text>
+            <text x="240.0" y="60" class="t" text-anchor="middle">selector</text>
+            <text x="240.0" y="74" class="s" text-anchor="middle">el primero que salga</text>
+            <rect x="387.0" y="19.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="400.0" y="34.5" class="gl" text-anchor="middle">⇉</text>
+            <text x="400.0" y="60" class="t" text-anchor="middle">paralelo</text>
+            <text x="400.0" y="74" class="s" text-anchor="middle">todos a la vez</text>
+            <polygon points="61.0,122.0 70.0,111.0 90.0,111.0 99.0,122.0 90.0,133.0 70.0,133.0" class="dec"/>
+<text x="80.0" y="125.5" class="t" text-anchor="middle">no</text>
+            <text x="80.0" y="152" class="t" text-anchor="middle">decorador</text>
+            <text x="80.0" y="166" class="s" text-anchor="middle">cambia a su hijo</text>
+            <rect x="194.9" y="111.0" width="90.2" height="22" rx="11.0" class="cnd"/>
+<text x="240.0" y="125.5" class="t" text-anchor="middle">¿comestible?</text>
+            <text x="240.0" y="152" class="t" text-anchor="middle">condición</text>
+            <text x="240.0" y="166" class="s" text-anchor="middle">sólo mira</text>
+            <rect x="379.0" y="111.0" width="42.1" height="22" rx="5" class="act"/>
+<text x="400.0" y="125.5" class="t" text-anchor="middle">huir</text>
+            <text x="400.0" y="152" class="t" text-anchor="middle">acción</text>
+            <text x="400.0" y="166" class="s" text-anchor="middle">decide el movimiento</text>
+            <line x1="0" y1="185" x2="480" y2="185" class="sep"/>
+            <text x="24.0" y="209.0" class="ok" text-anchor="middle">✓</text>
+            <text x="36" y="208" class="t">SUCCESS</text>
+            <text x="184.0" y="209.0" class="bad" text-anchor="middle">✗</text>
+            <text x="196" y="208" class="t">FAILURE</text>
+            <text x="344.0" y="209.0" class="run" text-anchor="middle">↻</text>
+            <text x="356" y="208" class="t">RUNNING</text>
+          </svg>
+        </figure>
+      </section>
+
+      <section id="tick">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El tick: se recorre desde la raíz</h2>
+        </div>
+        <p>
+          Un árbol no se ejecuta una vez: se ejecuta en cada <strong><em lang="en">tick</em></strong>, que
+          es el nombre que recibe cada paso del bucle del juego. En cada tick se llama a la raíz; la raíz
+          llama a los hijos que le toque según su tipo, estos a los suyos, y el estado sube de vuelta hasta
+          arriba. Lo que hayan hecho las acciones visitadas por el camino es la decisión de ese turno.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · el árbol dentro del bucle del juego</figcaption>
+          <pre class="pseudo"><b>repeat</b>                                       <i>// un turno del juego</i>
+    <span class="var">percepción</span> ← <span class="fn">leerElJuego</span>()
+    <span class="var">estado</span> ← <span class="fn">tick</span>(<span class="var">raíz</span>, <span class="var">percepción</span>)      <i>// el árbol entero, desde arriba</i>
+    aplicar lo que hayan decidido las acciones visitadas
+<b>until</b> fin de la partida</pre>
+        </figure>
+        <p>
+          <code>RUNNING</code> existe porque hay acciones que no caben en un tick: una animación, andar hasta
+          un punto con A*, recargar. Sin él, una acción que acaba de empezar tendría que contestar ya si ha
+          salido bien, y no lo sabe. Con él contesta «sigo», el padre deja de mirar a los hermanos que
+          vienen detrás, y en el tick siguiente se vuelve a entrar <strong>desde la raíz</strong>: si nada
+          por encima ha cambiado, el camino vuelve a llegar a la misma acción, que continúa.
+        </p>
+        <figure>
+          <figcaption>Una acción que tarda tres turnos: RUNNING hasta que termina</figcaption>
+          <svg class="explica dgb4" viewBox="0 0 510 196" role="img" aria-label="La misma secuencia en tres turnos seguidos: la condición ¿sin balas? y la acción recargar, que tarda tres turnos. En el turno 1 la condición se cumple, recargar devuelve RUNNING y la secuencia también. En el turno 2 se vuelve a entrar desde la raíz, la condición se vuelve a comprobar y recargar sigue en RUNNING. En el turno 3 recargar termina con éxito y la secuencia también.">
+            <style>
+              .dgb4 .cmp{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgb4 .gl{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--maze)}
+              .dgb4 .dec{fill:var(--surface);stroke:var(--inky);stroke-width:1.5}
+              .dgb4 .cnd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgb4 .act{fill:var(--surface-2);stroke:var(--ink-2);stroke-width:1.2}
+              .dgb4 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .dgb4 .s{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgb4 .h{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink-2);letter-spacing:.08em}
+              .dgb4 .e{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+              .dgb4 .eo{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3;opacity:.5}
+              .dgb4 .off{opacity:.5}
+              .dgb4 .off rect,.dgb4 .off polygon{stroke-dasharray:4 3}
+              .dgb4 .ok{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--ok)}
+              .dgb4 .bad{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--bad)}
+              .dgb4 .run{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink)}
+              .dgb4 .okt{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dgb4 .badt{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgb4 .nc{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+              .dgb4 .nt{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--maze);text-anchor:middle}
+              .dgb4 .sep{stroke:var(--line);stroke-width:1}
+            </style>
+            <text x="85.0" y="16" class="h" text-anchor="middle">TURNO 1</text>
+            <path d="M85.0 63.0 C85.0 87.0 46.0 87.0 46.0 111.0" class="e"/>
+            <path d="M85.0 63.0 C85.0 87.0 126.0 87.0 126.0 111.0" class="e"/>
+            <rect x="72.0" y="41.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="85.0" y="56.5" class="gl" text-anchor="middle">→</text>
+            <text x="110.0" y="57.0" class="run" text-anchor="middle">↻</text>
+            <rect x="3.9" y="111.0" width="84.2" height="22" rx="11.0" class="cnd"/>
+<text x="46.0" y="125.5" class="t" text-anchor="middle">¿sin balas?</text>
+            <text x="46.0" y="152.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="92.9" y="111.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="126.0" y="125.5" class="t" text-anchor="middle">recargar</text>
+            <text x="126.0" y="152.0" class="run" text-anchor="middle">↻</text>
+            <text x="85.0" y="178" class="s" text-anchor="middle">aún no ha terminado:</text>
+            <text x="85.0" y="191" class="s" text-anchor="middle">RUNNING hacia arriba</text>
+            <line x1="170" y1="8" x2="170" y2="188" class="sep"/>
+            <text x="255.0" y="16" class="h" text-anchor="middle">TURNO 2</text>
+            <path d="M255.0 63.0 C255.0 87.0 216.0 87.0 216.0 111.0" class="e"/>
+            <path d="M255.0 63.0 C255.0 87.0 296.0 87.0 296.0 111.0" class="e"/>
+            <rect x="242.0" y="41.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="255.0" y="56.5" class="gl" text-anchor="middle">→</text>
+            <text x="280.0" y="57.0" class="run" text-anchor="middle">↻</text>
+            <rect x="173.9" y="111.0" width="84.2" height="22" rx="11.0" class="cnd"/>
+<text x="216.0" y="125.5" class="t" text-anchor="middle">¿sin balas?</text>
+            <text x="216.0" y="152.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="262.9" y="111.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="296.0" y="125.5" class="t" text-anchor="middle">recargar</text>
+            <text x="296.0" y="152.0" class="run" text-anchor="middle">↻</text>
+            <text x="255.0" y="178" class="s" text-anchor="middle">se entra otra vez</text>
+            <text x="255.0" y="191" class="s" text-anchor="middle">desde la raíz</text>
+            <line x1="340" y1="8" x2="340" y2="188" class="sep"/>
+            <text x="425.0" y="16" class="h" text-anchor="middle">TURNO 3</text>
+            <path d="M425.0 63.0 C425.0 87.0 386.0 87.0 386.0 111.0" class="e"/>
+            <path d="M425.0 63.0 C425.0 87.0 466.0 87.0 466.0 111.0" class="e"/>
+            <rect x="412.0" y="41.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="425.0" y="56.5" class="gl" text-anchor="middle">→</text>
+            <text x="450.0" y="57.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="343.9" y="111.0" width="84.2" height="22" rx="11.0" class="cnd"/>
+<text x="386.0" y="125.5" class="t" text-anchor="middle">¿sin balas?</text>
+            <text x="386.0" y="152.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="432.9" y="111.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="466.0" y="125.5" class="t" text-anchor="middle">recargar</text>
+            <text x="466.0" y="152.0" class="ok" text-anchor="middle">✓</text>
+            <text x="425.0" y="178" class="s" text-anchor="middle">termina:</text>
+            <text x="425.0" y="191" class="s" text-anchor="middle">éxito</text>
+          </svg>
+        </figure>
+        <h3 class="label">Qué significa en Ms.&nbsp;Pac-Man</h3>
+        <p>
+          Aquí el tick es cada llamada a <code>getMove</code>: una por turno, con 40&nbsp;ms de plazo. Y casi
+          todas las hojas terminan en un solo tick, porque una acción no mueve al personaje: <strong>elige
+          una dirección</strong> y la devuelve, y moverlo es cosa del motor. Así que en la práctica
+          <code>RUNNING</code> casi no aparece, y lo que queda es un árbol que se <strong>vuelve a evaluar
+          entero en cada turno</strong>.
+        </p>
+        <p>
+          Eso tiene una consecuencia que conviene tener muy clara, porque es la diferencia de fondo con la
+          máquina de estados. La máquina, en cada turno, sólo mira <strong>las transiciones que salen del
+          estado actual</strong>: <code>FSM.run</code> recorre las salidas de <code>current</code> y, si
+          ninguna se cumple, sigue ejecutando el mismo estado. Un fantasma en <em>Huir</em> sigue huyendo
+          hasta que se cumple una transición que alguien escribió. El árbol, en cambio, <strong>vuelve a
+          comprobar todas las prioridades</strong> cada turno: si la condición de huir deja de cumplirse,
+          simplemente deja de elegirse, y la rama siguiente toma el relevo sin que nadie haya tenido que
+          escribir esa transición. A esto se le llama comportamiento <strong>reactivo</strong>.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Reactivo también quiere decir que parpadea</span>
+          <p>
+            Con el árbol de Ms.&nbsp;Pac-Man que hay más abajo, en una de las partidas de prueba la rama
+            ganadora fue alternando entre <em>cazar</em> y <em>comer píldoras</em> <strong>en cada turno
+            durante 91 turnos seguidos</strong>. La causa es la cuenta de <a
+            href="estrategias.html#alcanzar-comestible">¿me da tiempo a comérmelo?</a>, que estaba justo en
+            el borde. Registrando los valores en otra partida en la que pasó lo mismo:
+          </p>
+          <pre class="cuenta">turno   d    tiempo   2d + 10   ¿cazar?
+602     75   160      160       no
+603     74   159      158       sí
+604     74   158      158       no
+605     73   157      156       sí</pre>
+          <p>
+            El tiempo de comestible baja 1 cada turno; la distancia <em>d</em> baja 1 sólo en turnos
+            alternos, porque el fantasma huye a media velocidad; así que <em>2d</em> baja 2 cada dos turnos,
+            igual que el tiempo. Van en paralelo, y el <code>&lt;</code> estricto se cumple un turno sí y
+            otro no. En estos turnos no hizo daño porque las dos ramas iban hacia arriba, pero una máquina
+            de estados no habría cambiado nunca: se habría quedado en <em>Cazar</em> hasta una transición
+            de salida. La cura es la misma que en electrónica, <strong>histéresis</strong>: una condición
+            más exigente para entrar que para seguir, y eso necesita saber qué se hizo el turno anterior.
+          </p>
+        </div>
+      </section>
+
+      <section id="hojas">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Acciones y condiciones</h2>
+        </div>
+        <h3 class="label">Acción</h3>
+        <p>
+          Las acciones <strong>modifican el estado del juego</strong>: ejecutan una animación, cambian el
+          estado del personaje —salud, nivel de alerta—, lo desplazan, con o sin A*, o reproducen un sonido.
+          Hacen falta <strong>relativamente muchas</strong>, así que interesa que sean
+          <strong>parametrizables</strong>: no «ir a la cocina» e «ir al salón», sino «ir a» con el destino
+          como parámetro. El <code>ChaseAction</code> del proyecto de ejemplo ya lo es: recibe el fantasma
+          en el constructor y sirve para los cuatro.
+        </p>
+        <p>
+          Normalmente una acción tiene éxito, pero algunas <strong>pueden fallar</strong>, y es importante
+          que lo digan: «ir a un lugar» no falla nunca… salvo que no se encuentre camino. En Ms.&nbsp;Pac-Man
+          el fallo típico es no tener objetivo: «ir a la píldora más cercana» cuando ya no queda ninguna. Si
+          esa acción devuelve éxito igualmente, el selector que la contiene no probará la alternativa.
+        </p>
+        <h3 class="label">Condición</h3>
+        <p>
+          Las condiciones <strong>comprueban alguna propiedad del juego</strong>: ¿tengo munición? ¿está
+          cerca el jugador? Aquí, ¿soy comestible? ¿está Ms.&nbsp;Pac-Man cerca de una píldora de poder?
+          Devuelven <code>SUCCESS</code> si se cumple y <code>FAILURE</code> si no, y <strong>no cambian
+          nada</strong>: sólo miran. Colocadas delante de una acción dentro de una secuencia, hacen de
+          guarda: la acción sólo se ejecuta si la condición se cumple.
+        </p>
+        <p>
+          También se puede hacer que una condición <strong>se quede ejecutando</strong>, devolviendo
+          <code>RUNNING</code> mientras falle —«espera a que»— o mientras se cumpla —«mientras». Con eso, y
+          con los compuestos de la sección siguiente, salen todas las estructuras de control de siempre:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Estructura</th>
+                <th scope="col">Como árbol</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>if c then a</code></td><td>Secuencia(c, a)</td></tr>
+              <tr><td><code>if c then a else b</code></td><td>Selector(Secuencia(c, a), b), con un matiz que se ve en el nodo <a href="#decoradores"><em>if</em></a></td></tr>
+              <tr><td><code>not c</code></td><td>Decorador no(c)</td></tr>
+              <tr><td><code>while c do a</code></td><td>Repetir(Secuencia(c, a)): sale cuando falla <code>c</code></td></tr>
+              <tr><td>esperar hasta <code>c</code></td><td>Una condición que devuelve <code>RUNNING</code> mientras no se cumpla</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="secuencia-selector">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Secuencia y selector: un AND y un OR</h2>
+        </div>
+        <h3 class="label">Secuencia</h3>
+        <p>
+          Ejecuta cada uno de sus hijos <strong>en orden</strong>. Si uno falla, la secuencia falla ahí
+          mismo, sin ejecutar los que quedan; si todos salen bien, la secuencia también.
+        </p>
+        <figure class="wide">
+          <figcaption>Los tres casos de una secuencia · imagen de Juan A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/bt-secuencia.jpg" width="1400" height="261" loading="lazy"
+               alt="Tres veces la misma secuencia, con la condición ¿Tengo munición? y la acción Disparar. En la primera la condición tiene un aspa roja y la secuencia también. En la segunda la condición tiene una marca verde, Disparar un aspa roja y la secuencia un aspa roja. En la tercera las tres llevan marca verde.">
+        </figure>
+        <p>
+          ¿A qué puerta lógica se parece? A un <strong>AND</strong>, y en concreto al <code>&amp;&amp;</code>
+          de Java, que tampoco evalúa el segundo operando si el primero es falso. En el primer caso de la
+          imagen, <em>Disparar</em> ni se intenta. Por eso las condiciones se ponen delante: una secuencia
+          es una lista de requisitos seguida de lo que se hace si se cumplen.
+        </p>
+        <figure>
+          <figcaption>La secuencia con cortocircuito: lo que no se mira, no se ejecuta</figcaption>
+          <svg class="explica dgb2" viewBox="0 0 510 178" role="img" aria-label="Tres ejecuciones de una secuencia con dos hijos: la condición ¿munición? y la acción disparar. Primera: la condición falla, la secuencia falla y disparar ni se ejecuta. Segunda: la condición se cumple, disparar falla y la secuencia falla. Tercera: las dos salen bien y la secuencia tiene éxito.">
+            <style>
+              .dgb2 .cmp{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgb2 .gl{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--maze)}
+              .dgb2 .dec{fill:var(--surface);stroke:var(--inky);stroke-width:1.5}
+              .dgb2 .cnd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgb2 .act{fill:var(--surface-2);stroke:var(--ink-2);stroke-width:1.2}
+              .dgb2 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .dgb2 .s{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgb2 .h{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink-2);letter-spacing:.08em}
+              .dgb2 .e{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+              .dgb2 .eo{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3;opacity:.5}
+              .dgb2 .off{opacity:.5}
+              .dgb2 .off rect,.dgb2 .off polygon{stroke-dasharray:4 3}
+              .dgb2 .ok{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--ok)}
+              .dgb2 .bad{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--bad)}
+              .dgb2 .run{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink)}
+              .dgb2 .okt{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dgb2 .badt{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgb2 .nc{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+              .dgb2 .nt{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--maze);text-anchor:middle}
+              .dgb2 .sep{stroke:var(--line);stroke-width:1}
+            </style>
+            <path d="M85.0 45.0 C85.0 69.0 46.0 69.0 46.0 93.0" class="e"/>
+            <path d="M85.0 45.0 C85.0 69.0 126.0 69.0 126.0 93.0" class="eo"/>
+            <rect x="72.0" y="23.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="85.0" y="38.5" class="gl" text-anchor="middle">→</text>
+            <text x="110.0" y="39.0" class="bad" text-anchor="middle">✗</text>
+            <rect x="6.9" y="93.0" width="78.2" height="22" rx="11.0" class="cnd"/>
+<text x="46.0" y="107.5" class="t" text-anchor="middle">¿munición?</text>
+            <text x="46.0" y="134.0" class="bad" text-anchor="middle">✗</text>
+            <g class="off"><rect x="92.9" y="93.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="126.0" y="107.5" class="t" text-anchor="middle">disparar</text></g>
+            <text x="126.0" y="131" class="s" text-anchor="middle">no se mira</text>
+            <text x="85.0" y="160" class="s" text-anchor="middle">la 1.ª falla:</text>
+            <text x="85.0" y="173" class="s" text-anchor="middle">se corta ahí</text>
+            <line x1="170" y1="8" x2="170" y2="170" class="sep"/>
+            <path d="M255.0 45.0 C255.0 69.0 216.0 69.0 216.0 93.0" class="e"/>
+            <path d="M255.0 45.0 C255.0 69.0 296.0 69.0 296.0 93.0" class="e"/>
+            <rect x="242.0" y="23.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="255.0" y="38.5" class="gl" text-anchor="middle">→</text>
+            <text x="280.0" y="39.0" class="bad" text-anchor="middle">✗</text>
+            <rect x="176.9" y="93.0" width="78.2" height="22" rx="11.0" class="cnd"/>
+<text x="216.0" y="107.5" class="t" text-anchor="middle">¿munición?</text>
+            <text x="216.0" y="134.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="262.9" y="93.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="296.0" y="107.5" class="t" text-anchor="middle">disparar</text>
+            <text x="296.0" y="134.0" class="bad" text-anchor="middle">✗</text>
+            <text x="255.0" y="160" class="s" text-anchor="middle">la 2.ª falla:</text>
+            <text x="255.0" y="173" class="s" text-anchor="middle">falla la secuencia</text>
+            <line x1="340" y1="8" x2="340" y2="170" class="sep"/>
+            <path d="M425.0 45.0 C425.0 69.0 386.0 69.0 386.0 93.0" class="e"/>
+            <path d="M425.0 45.0 C425.0 69.0 466.0 69.0 466.0 93.0" class="e"/>
+            <rect x="412.0" y="23.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="425.0" y="38.5" class="gl" text-anchor="middle">→</text>
+            <text x="450.0" y="39.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="346.9" y="93.0" width="78.2" height="22" rx="11.0" class="cnd"/>
+<text x="386.0" y="107.5" class="t" text-anchor="middle">¿munición?</text>
+            <text x="386.0" y="134.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="432.9" y="93.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="466.0" y="107.5" class="t" text-anchor="middle">disparar</text>
+            <text x="466.0" y="134.0" class="ok" text-anchor="middle">✓</text>
+            <text x="425.0" y="160" class="s" text-anchor="middle">salen bien todas:</text>
+            <text x="425.0" y="173" class="s" text-anchor="middle">éxito</text>
+          </svg>
+        </figure>
+        <h3 class="label">Selector</h3>
+        <p>
+          También ejecuta sus hijos en orden, pero al revés: si uno <strong>tiene éxito</strong>, el
+          selector tiene éxito ahí mismo; si falla, prueba el siguiente; y sólo si han fallado todos, falla.
+          Sirve para dar <strong>varias maneras de conseguir el mismo objetivo</strong>, y el orden de los
+          hijos es la <strong>prioridad</strong>: el primero que puede, gana.
+        </p>
+        <figure class="wide">
+          <figcaption>Los tres casos de un selector · imagen de Juan A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/bt-selector.jpg" width="1400" height="416" loading="lazy"
+               alt="Tres veces el mismo selector, una caja amarilla con una interrogación, con dos hijos: una secuencia con ¿Tengo munición? y Disparar, y la acción Recargar. En el primero la secuencia tiene marca verde y el selector también. En el segundo la secuencia tiene un aspa, Recargar marca verde y el selector marca verde. En el tercero la secuencia y Recargar tienen aspa, y el selector también.">
+        </figure>
+        <p>
+          La puerta lógica es un <strong>OR</strong>, el <code>||</code> de Java: si el primero es cierto,
+          el segundo no se evalúa. Con munición se dispara y no se recarga; sin munición se recarga; y si
+          tampoco se puede recargar, el selector falla y le toca decidir a su padre.
+        </p>
+        <figure>
+          <figcaption>El selector con cortocircuito: el primero que sale bien, gana</figcaption>
+          <svg class="explica dgb3" viewBox="0 0 510 178" role="img" aria-label="Tres ejecuciones de un selector con dos hijos: la secuencia atacar y la acción recargar. Primera: atacar tiene éxito, el selector tiene éxito y recargar ni se mira. Segunda: atacar falla, se prueba recargar, que sale bien, y el selector tiene éxito. Tercera: fallan las dos y el selector falla.">
+            <style>
+              .dgb3 .cmp{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgb3 .gl{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--maze)}
+              .dgb3 .dec{fill:var(--surface);stroke:var(--inky);stroke-width:1.5}
+              .dgb3 .cnd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgb3 .act{fill:var(--surface-2);stroke:var(--ink-2);stroke-width:1.2}
+              .dgb3 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .dgb3 .s{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgb3 .h{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink-2);letter-spacing:.08em}
+              .dgb3 .e{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+              .dgb3 .eo{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3;opacity:.5}
+              .dgb3 .off{opacity:.5}
+              .dgb3 .off rect,.dgb3 .off polygon{stroke-dasharray:4 3}
+              .dgb3 .ok{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--ok)}
+              .dgb3 .bad{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--bad)}
+              .dgb3 .run{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink)}
+              .dgb3 .okt{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dgb3 .badt{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgb3 .nc{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+              .dgb3 .nt{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--maze);text-anchor:middle}
+              .dgb3 .sep{stroke:var(--line);stroke-width:1}
+            </style>
+            <path d="M85.0 45.0 C85.0 69.0 46.0 69.0 46.0 93.0" class="e"/>
+            <path d="M85.0 45.0 C85.0 69.0 126.0 69.0 126.0 93.0" class="eo"/>
+            <rect x="72.0" y="23.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="85.0" y="38.5" class="gl" text-anchor="middle">?</text>
+            <text x="110.0" y="39.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="11.9" y="93.0" width="68.1" height="22" rx="3" class="cmp"/>
+<text x="19.9" y="108.5" class="gl">→</text>
+<text x="35.9" y="107.5" class="t">atacar</text>
+            <text x="46.0" y="134.0" class="ok" text-anchor="middle">✓</text>
+            <g class="off"><rect x="92.9" y="93.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="126.0" y="107.5" class="t" text-anchor="middle">recargar</text></g>
+            <text x="126.0" y="131" class="s" text-anchor="middle">no se mira</text>
+            <text x="85.0" y="160" class="s" text-anchor="middle">la 1.ª sale bien:</text>
+            <text x="85.0" y="173" class="s" text-anchor="middle">se corta ahí</text>
+            <line x1="170" y1="8" x2="170" y2="170" class="sep"/>
+            <path d="M255.0 45.0 C255.0 69.0 216.0 69.0 216.0 93.0" class="e"/>
+            <path d="M255.0 45.0 C255.0 69.0 296.0 69.0 296.0 93.0" class="e"/>
+            <rect x="242.0" y="23.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="255.0" y="38.5" class="gl" text-anchor="middle">?</text>
+            <text x="280.0" y="39.0" class="ok" text-anchor="middle">✓</text>
+            <rect x="181.9" y="93.0" width="68.1" height="22" rx="3" class="cmp"/>
+<text x="189.9" y="108.5" class="gl">→</text>
+<text x="205.9" y="107.5" class="t">atacar</text>
+            <text x="216.0" y="134.0" class="bad" text-anchor="middle">✗</text>
+            <rect x="262.9" y="93.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="296.0" y="107.5" class="t" text-anchor="middle">recargar</text>
+            <text x="296.0" y="134.0" class="ok" text-anchor="middle">✓</text>
+            <text x="255.0" y="160" class="s" text-anchor="middle">la 1.ª falla:</text>
+            <text x="255.0" y="173" class="s" text-anchor="middle">se prueba la 2.ª</text>
+            <line x1="340" y1="8" x2="340" y2="170" class="sep"/>
+            <path d="M425.0 45.0 C425.0 69.0 386.0 69.0 386.0 93.0" class="e"/>
+            <path d="M425.0 45.0 C425.0 69.0 466.0 69.0 466.0 93.0" class="e"/>
+            <rect x="412.0" y="23.0" width="26.0" height="22" rx="3" class="cmp"/>
+<text x="425.0" y="38.5" class="gl" text-anchor="middle">?</text>
+            <text x="450.0" y="39.0" class="bad" text-anchor="middle">✗</text>
+            <rect x="351.9" y="93.0" width="68.1" height="22" rx="3" class="cmp"/>
+<text x="359.9" y="108.5" class="gl">→</text>
+<text x="375.9" y="107.5" class="t">atacar</text>
+            <text x="386.0" y="134.0" class="bad" text-anchor="middle">✗</text>
+            <rect x="432.9" y="93.0" width="66.2" height="22" rx="5" class="act"/>
+<text x="466.0" y="107.5" class="t" text-anchor="middle">recargar</text>
+            <text x="466.0" y="134.0" class="bad" text-anchor="middle">✗</text>
+            <text x="425.0" y="160" class="s" text-anchor="middle">fallan todas:</text>
+            <text x="425.0" y="173" class="s" text-anchor="middle">falla el selector</text>
+          </svg>
+        </figure>
+        <p>
+          Juntando los dos, con un hijo <code>A</code> y otro <code>B</code>. La raya quiere decir que
+          <code>B</code> no llega a ejecutarse:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">A</th>
+                <th scope="col">B</th>
+                <th scope="col">Secuencia(A, B)</th>
+                <th scope="col">Selector(A, B)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>SUCCESS</td><td>SUCCESS</td><td>SUCCESS</td><td>SUCCESS · B: —</td></tr>
+              <tr><td>SUCCESS</td><td>FAILURE</td><td>FAILURE</td><td>SUCCESS · B: —</td></tr>
+              <tr><td>FAILURE</td><td>SUCCESS</td><td>FAILURE · B: —</td><td>SUCCESS</td></tr>
+              <tr><td>FAILURE</td><td>FAILURE</td><td>FAILURE · B: —</td><td>FAILURE</td></tr>
+              <tr><td>RUNNING</td><td>cualquiera</td><td>RUNNING · B: —</td><td>RUNNING · B: —</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          La última fila es la que hay que recordar: <code>RUNNING</code> corta en los dos. Un hijo que no
+          ha terminado no ha fallado ni ha salido bien, así que no tiene sentido seguir con sus hermanos. En
+          pseudocódigo, los dos nodos son el mismo bucle con la condición de corte cambiada:
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · secuencia y selector</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">tickSecuencia</span>(<span class="var">hijos</span>)
+    <b>for each</b> <span class="var">h</span> <b>in</b> <span class="var">hijos</span> <b>do</b>
+        <span class="var">s</span> ← <span class="fn">tick</span>(<span class="var">h</span>)
+        <b>if</b> <span class="var">s</span> ≠ SUCCESS <b>then return</b> <span class="var">s</span> <b>end if</b>      <i>// FAILURE o RUNNING: se corta</i>
+    <b>end for</b>
+    <b>return</b> SUCCESS
+<b>end function</b>
+
+<b>function</b> <span class="fn">tickSelector</span>(<span class="var">hijos</span>)
+    <b>for each</b> <span class="var">h</span> <b>in</b> <span class="var">hijos</span> <b>do</b>
+        <span class="var">s</span> ← <span class="fn">tick</span>(<span class="var">h</span>)
+        <b>if</b> <span class="var">s</span> ≠ FAILURE <b>then return</b> <span class="var">s</span> <b>end if</b>      <i>// SUCCESS o RUNNING: se corta</i>
+    <b>end for</b>
+    <b>return</b> FAILURE
+<b>end function</b></pre>
+        </figure>
+        <div class="note mine">
+          <span class="note-label">Con memoria o sin ella</span>
+          <p>
+            Esta secuencia empieza siempre por el primer hijo, también si en el tick anterior se quedó en
+            <code>RUNNING</code> el tercero. Así, las condiciones de delante <strong>se vuelven a
+            comprobar</strong> en cada tick, y si dejan de cumplirse la acción en marcha se abandona. Es lo
+            que se quiere casi siempre, y es lo que se usa en esta página. Muchas bibliotecas ofrecen además
+            la secuencia <strong>con memoria</strong>, que retoma desde el hijo que estaba en marcha. Es más
+            barata, pero ya no reacciona: si el fantasma deja de ser comestible a mitad de la persecución,
+            nadie lo vuelve a mirar.
+          </p>
+        </div>
+      </section>
+
+      <section id="decoradores">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Decoradores, paralelo, <em>if</em> y sub-árboles</h2>
+        </div>
+        <h3 class="label">Decoradores</h3>
+        <p>
+          Son nodos internos con <strong>un solo hijo</strong>, y cambian cuándo se ejecuta ese hijo o qué
+          se devuelve con lo que devuelve él. Los dos más comunes son el <strong>inversor</strong>,
+          que devuelve lo contrario que su hijo, un «not», y el <strong>supresor</strong>, que devuelve el
+          valor deseado venga lo que venga del hijo.
+        </p>
+        <figure class="narrow">
+          <figcaption>Un decorador de repetición en un árbol de combate · imagen de Juan A. Recio-García</figcaption>
+          <img class="shot" src="../../assets/img/bt-decorador.jpg" width="706" height="642" loading="lazy"
+               alt="Un árbol sobre fondo oscuro. La raíz es una secuencia con dos hijos: un decorador verde, Repeat, y la acción Esconderse. Debajo del decorador hay un selector con dos hijos: una secuencia con la condición ¿Tengo munición? y la acción Disparar, y la acción Recargar.">
+        </figure>
+        <p>
+          El árbol de la imagen se lee de arriba abajo: primero, repetir el combate —disparar mientras haya
+          munición y, si no, recargar— y, después, esconderse. Cuándo acaba de repetir depende del decorador:
+          un número de veces, o hasta que el hijo falle. Los habituales:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col">Decorador</th>
+                <th scope="col">Devuelve</th>
+                <th scope="col">Para qué, aquí</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Inversor (<em lang="en">Inverter</em>, no)</td>
+                <td>Lo contrario del hijo; <code>RUNNING</code> se queda como está.</td>
+                <td>«Si <em>no</em> hay ya fantasmas comestibles», sin escribir una condición nueva.</td>
+              </tr>
+              <tr>
+                <td>Siempre éxito (<em lang="en">Succeeder</em>, <em lang="en">Supress</em>)</td>
+                <td><code>SUCCESS</code>, o el valor fijado, venga lo que venga.</td>
+                <td>Una tarea opcional dentro de una secuencia: que su fallo no tumbe la secuencia.</td>
+              </tr>
+              <tr>
+                <td>Siempre fallo (<em lang="en">Failer</em>)</td>
+                <td><code>FAILURE</code>, venga lo que venga.</td>
+                <td>Ejecutar algo dentro de un selector y seguir probando los hermanos.</td>
+              </tr>
+              <tr>
+                <td>Repetir <em>n</em> (<em lang="en">Repeat</em>)</td>
+                <td><code>RUNNING</code> hasta completar <em>n</em> ejecuciones.</td>
+                <td>Acciones de varios pasos; aquí se usa poco, porque cada acción acaba en un turno.</td>
+              </tr>
+              <tr>
+                <td>Hasta que falle (<em lang="en">UntilFail</em>)</td>
+                <td><code>RUNNING</code> mientras el hijo salga bien.</td>
+                <td>El «while» de la sección anterior.</td>
+              </tr>
+              <tr>
+                <td>Enfriamiento (<em lang="en">Cooldown</em>)</td>
+                <td><code>FAILURE</code> sin ejecutar al hijo durante <em>n</em> turnos tras un éxito.</td>
+                <td>Que un fantasma no cambie de objetivo más de una vez cada tantos turnos.</td>
+              </tr>
+              <tr>
+                <td>Límite (<em lang="en">Limit</em>)</td>
+                <td><code>FAILURE</code> cuando el hijo ya se ha ejecutado <em>n</em> veces.</td>
+                <td>Algo que sólo se hace una vez por vida o por nivel.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Los tres últimos tienen algo que los demás no: <strong>memoria</strong>. Un enfriamiento tiene que
+          acordarse de cuándo tuvo éxito su hijo. Eso vive dentro del propio nodo, y es el motivo por el que
+          más abajo cada fantasma tiene su propio árbol y no comparten uno.
+        </p>
+        <h3 class="label">Paralelo</h3>
+        <p>
+          Ejecuta <strong>todos</strong> sus hijos en el mismo tick, y lo que devuelve lo fija su
+          <strong>política</strong>: con éxito cuando tienen éxito todos o cuando lo tiene uno, y con fallo
+          cuando falla uno o cuando fallan todos. Mientras no se decida, devuelve <code>RUNNING</code>. Su uso
+          clásico es una acción larga junto a una condición que la vigila: «ir a por el fantasma» en paralelo
+          con «¿sigue siendo comestible?», con la política de fallar en cuanto falle uno.
+        </p>
+        <p>
+          En Ms.&nbsp;Pac-Man hay que usarlo con cuidado por una razón muy concreta: cada turno se devuelve
+          <strong>un solo movimiento</strong>. Dos acciones en paralelo escriben las dos su dirección y gana la
+          última. Y como aquí las acciones duran un turno, la vigilancia sale gratis: una secuencia con la
+          condición delante ya se comprueba en cada tick.
+        </p>
+        <h3 class="label">If</h3>
+        <p>
+          <em>If</em>(<code>c</code>, <code>entonces</code>, <code>si no</code>) parece lo mismo que
+          Selector(Secuencia(<code>c</code>, <code>entonces</code>), <code>si no</code>), y casi lo es. La
+          diferencia está en qué pasa cuando <code>c</code> se cumple pero <code>entonces</code> falla: el
+          selector lo toma como un fallo de la primera opción y <strong>prueba <code>si no</code></strong>; el
+          <em>if</em> devuelve ese fallo y no prueba nada más. Si huir falla porque no hay adónde, ¿queréis
+          que el fantasma pase a perseguir? Esa pregunta decide cuál de los dos se usa.
+        </p>
+        <h3 class="label">Sub-árboles</h3>
+        <p>
+          Un sub-árbol es un árbol usado como un nodo más de otro. Es la forma de reutilizar: la rama de huir
+          se escribe una vez y cuelga de los cuatro fantasmas. En Java no necesita clase propia: un método que
+          construye y devuelve un <code>Node</code> ya es un sub-árbol.
+        </p>
+      </section>
+
+      <section id="traza">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Un tick, paso a paso</h2>
+        </div>
+        <p>
+          Con eso ya se puede leer un árbol de verdad. Este es el de la Ms.&nbsp;Pac-Man que se programa
+          <a href="#controladores">más abajo</a>, en un turno real de una partida de prueba: hay un
+          perseguidor cerca y no hay ningún fantasma comestible. Los números son el orden de visita, y a la
+          derecha, lo que devolvió cada nodo.
+        </p>
+        <figure>
+          <figcaption>Un tick del árbol de Ms.&nbsp;Pac-Man: once nodos visitados de catorce</figcaption>
+          <svg class="explica dgb5" viewBox="0 0 480 434" role="img" aria-label="El árbol de Ms. Pac-Man en un turno concreto, dibujado con sangría y con el orden de visita numerado. 1, el selector raíz. 2, la secuencia cazar, cuya condición 3, ¿comestible al alcance?, falla; la acción ir a por él no se visita y cazar falla. 4, la secuencia escapar: 5, ¿perseguidor cerca?, se cumple; 6, el selector ¿cómo? prueba 7, la secuencia a la píldora de poder: 8, el decorador no, invierte 9, ¿ya hay comestibles?, que falla, así que no tiene éxito; 10, ¿PPill antes que él?, falla, y la secuencia falla sin visitar ir a la PPill. 11, huir, tiene éxito, así que ¿cómo? y escapar tienen éxito, y la raíz también. Comer píldoras no se visita.">
+            <style>
+              .dgb5 .cmp{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgb5 .gl{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--maze)}
+              .dgb5 .dec{fill:var(--surface);stroke:var(--inky);stroke-width:1.5}
+              .dgb5 .cnd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgb5 .act{fill:var(--surface-2);stroke:var(--ink-2);stroke-width:1.2}
+              .dgb5 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .dgb5 .s{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgb5 .h{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink-2);letter-spacing:.08em}
+              .dgb5 .e{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+              .dgb5 .eo{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3;opacity:.5}
+              .dgb5 .off{opacity:.5}
+              .dgb5 .off rect,.dgb5 .off polygon{stroke-dasharray:4 3}
+              .dgb5 .ok{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--ok)}
+              .dgb5 .bad{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--bad)}
+              .dgb5 .run{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink)}
+              .dgb5 .okt{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dgb5 .badt{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgb5 .nc{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+              .dgb5 .nt{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--maze);text-anchor:middle}
+              .dgb5 .sep{stroke:var(--line);stroke-width:1}
+            </style>
+            <path d="M50 31.0 V50 H64" class="e"/>
+            <path d="M74 61.0 V80 H88" class="e"/>
+            <path d="M74 61.0 V110 H88" class="eo"/>
+            <path d="M50 31.0 V140 H64" class="e"/>
+            <path d="M74 151.0 V170 H88" class="e"/>
+            <path d="M74 151.0 V200 H88" class="e"/>
+            <path d="M98 211.0 V230 H112" class="e"/>
+            <path d="M122 241.0 V260 H136" class="e"/>
+            <path d="M146 271.0 V290 H160" class="e"/>
+            <path d="M122 241.0 V320 H136" class="e"/>
+            <path d="M122 241.0 V350 H136" class="eo"/>
+            <path d="M98 211.0 V380 H112" class="e"/>
+            <path d="M50 31.0 V410 H64" class="eo"/>
+            <rect x="40.0" y="9.0" width="98.2" height="22" rx="3" class="cmp"/>
+<text x="48.0" y="24.5" class="gl">?</text>
+<text x="64.0" y="23.5" class="t">ms. pac-man</text>
+            <circle cx="14" cy="20" r="9" class="nc"/>
+            <text x="14" y="23" class="nt">1</text>
+            <text x="148.2" y="24.5" class="ok">✓</text>
+            <text x="162.2" y="23.5" class="okt">SUCCESS</text>
+            <rect x="64.0" y="39.0" width="62.1" height="22" rx="3" class="cmp"/>
+<text x="72.0" y="54.5" class="gl">→</text>
+<text x="88.0" y="53.5" class="t">cazar</text>
+            <circle cx="14" cy="50" r="9" class="nc"/>
+            <text x="14" y="53" class="nt">2</text>
+            <text x="136.1" y="54.5" class="bad">✗</text>
+            <text x="150.1" y="53.5" class="badt">FAILURE</text>
+            <rect x="88.0" y="69.0" width="156.5" height="22" rx="11.0" class="cnd"/>
+<text x="166.2" y="83.5" class="t" text-anchor="middle">¿comestible al alcance?</text>
+            <circle cx="14" cy="80" r="9" class="nc"/>
+            <text x="14" y="83" class="nt">3</text>
+            <text x="254.5" y="84.5" class="bad">✗</text>
+            <text x="268.5" y="83.5" class="badt">FAILURE</text>
+            <g class="off"><rect x="88.0" y="99.0" width="84.2" height="22" rx="5" class="act"/>
+<text x="130.1" y="113.5" class="t" text-anchor="middle">ir a por él</text></g>
+            <text x="182.2" y="113.5" class="s">no se visita</text>
+            <rect x="64.0" y="129.0" width="74.1" height="22" rx="3" class="cmp"/>
+<text x="72.0" y="144.5" class="gl">→</text>
+<text x="88.0" y="143.5" class="t">escapar</text>
+            <circle cx="14" cy="140" r="9" class="nc"/>
+            <text x="14" y="143" class="nt">4</text>
+            <text x="148.1" y="144.5" class="ok">✓</text>
+            <text x="162.1" y="143.5" class="okt">SUCCESS</text>
+            <rect x="88.0" y="159.0" width="132.4" height="22" rx="11.0" class="cnd"/>
+<text x="154.2" y="173.5" class="t" text-anchor="middle">¿perseguidor cerca?</text>
+            <circle cx="14" cy="170" r="9" class="nc"/>
+            <text x="14" y="173" class="nt">5</text>
+            <text x="230.4" y="174.5" class="ok">✓</text>
+            <text x="244.4" y="173.5" class="okt">SUCCESS</text>
+            <rect x="88.0" y="189.0" width="68.1" height="22" rx="3" class="cmp"/>
+<text x="96.0" y="204.5" class="gl">?</text>
+<text x="112.0" y="203.5" class="t">¿cómo?</text>
+            <circle cx="14" cy="200" r="9" class="nc"/>
+            <text x="14" y="203" class="nt">6</text>
+            <text x="166.1" y="204.5" class="ok">✓</text>
+            <text x="180.1" y="203.5" class="okt">SUCCESS</text>
+            <rect x="112.0" y="219.0" width="158.4" height="22" rx="3" class="cmp"/>
+<text x="120.0" y="234.5" class="gl">→</text>
+<text x="136.0" y="233.5" class="t">a la píldora de poder</text>
+            <circle cx="14" cy="230" r="9" class="nc"/>
+            <text x="14" y="233" class="nt">7</text>
+            <text x="280.4" y="234.5" class="bad">✗</text>
+            <text x="294.4" y="233.5" class="badt">FAILURE</text>
+            <polygon points="136.0,260.0 145.0,249.0 165.0,249.0 174.0,260.0 165.0,271.0 145.0,271.0" class="dec"/>
+<text x="155.0" y="263.5" class="t" text-anchor="middle">no</text>
+            <circle cx="14" cy="260" r="9" class="nc"/>
+            <text x="14" y="263" class="nt">8</text>
+            <text x="184.0" y="264.5" class="ok">✓</text>
+            <text x="198.0" y="263.5" class="okt">SUCCESS</text>
+            <rect x="160.0" y="279.0" width="138.4" height="22" rx="11.0" class="cnd"/>
+<text x="229.2" y="293.5" class="t" text-anchor="middle">¿ya hay comestibles?</text>
+            <circle cx="14" cy="290" r="9" class="nc"/>
+            <text x="14" y="293" class="nt">9</text>
+            <text x="308.4" y="294.5" class="bad">✗</text>
+            <text x="322.4" y="293.5" class="badt">FAILURE</text>
+            <rect x="136.0" y="309.0" width="138.4" height="22" rx="11.0" class="cnd"/>
+<text x="205.2" y="323.5" class="t" text-anchor="middle">¿PPill antes que él?</text>
+            <circle cx="14" cy="320" r="9" class="nc"/>
+            <text x="14" y="323" class="nt">10</text>
+            <text x="284.4" y="324.5" class="bad">✗</text>
+            <text x="298.4" y="323.5" class="badt">FAILURE</text>
+            <g class="off"><rect x="136.0" y="339.0" width="96.3" height="22" rx="5" class="act"/>
+<text x="184.1" y="353.5" class="t" text-anchor="middle">ir a la PPill</text></g>
+            <text x="242.3" y="353.5" class="s">no se visita</text>
+            <rect x="112.0" y="369.0" width="42.1" height="22" rx="5" class="act"/>
+<text x="133.0" y="383.5" class="t" text-anchor="middle">huir</text>
+            <circle cx="14" cy="380" r="9" class="nc"/>
+            <text x="14" y="383" class="nt">11</text>
+            <text x="164.1" y="384.5" class="ok">✓</text>
+            <text x="178.1" y="383.5" class="okt">SUCCESS</text>
+            <g class="off"><rect x="64.0" y="399.0" width="102.3" height="22" rx="5" class="act"/>
+<text x="115.1" y="413.5" class="t" text-anchor="middle">comer píldoras</text></g>
+            <text x="176.3" y="413.5" class="s">no se visita</text>
+          </svg>
+        </figure>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nodo</th>
+                <th scope="col">Devuelve</th>
+                <th scope="col">Por qué</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>? ms. pac-man</td><td>—</td><td>La raíz: prueba sus tres hijos en orden de prioridad.</td></tr>
+              <tr><td>2</td><td>→ cazar</td><td>—</td><td>Primera prioridad; empieza por su guarda.</td></tr>
+              <tr><td>3</td><td>¿comestible al alcance?</td><td>FAILURE</td><td>No hay ningún comestible. <em>Cazar</em> falla sin visitar <em>ir a por él</em>.</td></tr>
+              <tr><td>4</td><td>→ escapar</td><td>—</td><td>El selector raíz prueba el siguiente hijo.</td></tr>
+              <tr><td>5</td><td>¿perseguidor cerca?</td><td>SUCCESS</td><td>Hay uno a menos de 20 pasos: se sigue dentro de <em>escapar</em>.</td></tr>
+              <tr><td>6</td><td>? ¿cómo?</td><td>—</td><td>Dos maneras de escapar, en orden.</td></tr>
+              <tr><td>7</td><td>→ a la píldora de poder</td><td>—</td><td>La mejor manera, si se puede.</td></tr>
+              <tr><td>8–9</td><td>no (¿ya hay comestibles?)</td><td>SUCCESS</td><td>La condición falla, el inversor lo convierte en éxito: no se está malgastando una píldora.</td></tr>
+              <tr><td>10</td><td>¿PPill antes que él?</td><td>FAILURE</td><td>La píldora está más lejos que el fantasma. La secuencia 7 falla sin visitar <em>ir a la PPill</em>.</td></tr>
+              <tr><td>11</td><td>huir</td><td>SUCCESS</td><td>Escribe la dirección que se aleja del fantasma. Sube el éxito: ¿cómo?, escapar y la raíz.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Tres cosas que se ven en la traza y que vale la pena fijar. <em>Ir a por él</em> no se visita por
+          el cortocircuito de la <strong>secuencia</strong>: su guarda falló. <em>Comer píldoras</em> no se
+          visita por el cortocircuito del <strong>selector</strong>: una rama anterior tuvo éxito, y el orden
+          de los hijos de la raíz es la prioridad. Y la única acción que se ha ejecutado es <em>huir</em>, que
+          es la decisión de este turno; si en el siguiente el perseguidor se ha alejado, el mismo recorrido
+          llegará hasta <em>comer píldoras</em> sin que haya que escribir ninguna transición.
+        </p>
+      </section>
+
+      <section id="pizarra">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">La pizarra, y cómo lo hacen Unity y Unreal</h2>
+        </div>
+        <p>
+          Los dos motores comerciales grandes traen árboles de comportamiento, y cada uno enseña una idea que
+          conviene llevarse.
+        </p>
+        <figure class="wide">
+          <figcaption>Un editor de árboles dentro de Unity · imagen de Juan A. Recio-García; captura de un producto de terceros</figcaption>
+          <img class="shot" src="../../assets/img/bt-unity.jpg" width="1600" height="971" loading="lazy"
+               alt="El editor de Unity con una pestaña de editor de árboles. El árbol tiene como raíz un Priority Selector con cuatro condiciones naranjas debajo, IsNight, IsTargetClose, IsTargetClose y AlwaysTrue, cada una con una acción: SleepForever, Shoot, MoveToGameObject y DoneWander. Abajo, una paleta de nodos: Parallel, Sequence, Selector, Priority, Rand. Sel., Rand. Seq., Not y Repeat. A la derecha, el inspector de la acción Shoot, con sus parámetros de entrada marcados como CONSTANT o BLACKBOARD.">
+        </figure>
+        <p>
+          En Unity, según la ruta de carpetas de la captura, el editor es Behavior Bricks. La raíz es un
+          <strong>selector de prioridad</strong> cuyos hijos van guardados por una condición: de noche,
+          dormir; con el objetivo cerca, disparar o acercarse; y si no, <code>AlwaysTrue</code> y deambular,
+          que es la rama por defecto. En la paleta de abajo están los compuestos y decoradores de esta página
+          —paralelo, secuencia, selector, versiones aleatorias, <em>Not</em>, <em>Repeat</em>—, y el
+          inspector de la derecha enseña dos cosas: la descripción de <code>Shoot</code> dice que
+          <strong>no termina nunca</strong> (un <code>RUNNING</code> perpetuo, que sólo interrumpe una rama de
+          más prioridad), y cada parámetro de entrada se marca como <code>CONSTANT</code> o como
+          <code>BLACKBOARD</code>.
+        </p>
+        <figure class="wide">
+          <figcaption>Un árbol de Unreal Engine con decoradores sobre la pizarra · imagen de Juan A. Recio-García; captura de un producto de terceros</figcaption>
+          <img class="shot" src="../../assets/img/bt-unreal.jpg" width="1600" height="762" loading="lazy"
+               alt="Un árbol de Unreal Engine. Arriba, ROOT con la pizarra FollowerBlackBoard. Debajo, un Selector con un servicio verde, AgroCheck, que se ejecuta cada medio segundo. Del selector cuelgan cuatro secuencias, cada una con decoradores azules encima: isTargetSet y Within Attack Range; isTargetSet y WithinBounds; isTargetSet; y TargetNotSet, Reached move goal invertido y TargetLocationSet. Las hojas moradas son tareas: PlaySound, Attack, Wait, RapidMoveTo, AbortMoveTo, MoveTo, SetTargetNull.">
+        </figure>
+        <p>
+          Unreal lo lleva más lejos. El árbol está atado a una <strong>pizarra</strong>
+          (<em lang="en">blackboard</em>), <code>FollowerBlackBoard</code>: una memoria compartida con claves
+          como <code>TargetToFollow</code> o <code>HomeLocation</code>. Los decoradores azules son
+          condiciones sobre esas claves —<code>isTargetSet</code>: «TargetToFollow is Set»—; las tareas moradas
+          las leen o las escriben —<code>SetTargetNull</code> borra el objetivo—; y el
+          <strong>servicio</strong> verde, <code>AgroCheck</code>, se ejecuta cada 0,5&nbsp;s y es el que
+          mira el mundo y apunta en la pizarra a quién seguir. Además, Unreal no recorre el árbol desde la
+          raíz en cada fotograma: es dirigido por eventos, y un decorador con <em lang="en">aborts</em>
+          vigila su clave y corta la rama en marcha cuando cambia. El efecto es el de nuestra secuencia sin
+          memoria, más barato cuando hay muchos personajes.
+        </p>
+        <p>
+          La pizarra resuelve un problema de diseño: una condición no tiene por qué saber quién escribió el
+          dato que mira. En el motor de Ms.&nbsp;Pac-Man no hay pizarra, pero tenemos las piezas, y
+          <code>es.ucm.fdi.ici.Input</code> es la principal. Es una clase abstracta del motor cuyo
+          constructor guarda el <code>Game</code> y llama a <code>parseInput()</code>, donde vuestra subclase
+          saca del juego lo que necesiten las condiciones, <strong>una vez por turno</strong>:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col">En Unreal</th>
+                <th scope="col">Aquí</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Servicio que mira el mundo y rellena claves</td>
+                <td><code>parseInput()</code> de vuestra subclase de <code>Input</code>: se ejecuta al principio de cada <code>getMove</code>.</td>
+              </tr>
+              <tr>
+                <td>Claves que leen los decoradores</td>
+                <td>Los campos de esa subclase, <code>GhostsInput</code> o <code>MsPacManInput</code>: las condiciones sólo leen de ahí.</td>
+              </tr>
+              <tr>
+                <td>Claves que escriben las tareas</td>
+                <td>El movimiento elegido, <code>bb.move</code> en la clase <code>Blackboard</code> de más abajo: es la salida del árbol.</td>
+              </tr>
+              <tr>
+                <td>Claves que duran más de un turno</td>
+                <td>Campos del controlador, que se le pasan al <code>Input</code> al construirlo: el turno en que murió Ms.&nbsp;Pac-Man.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">parseInput() va antes que vuestros inicializadores</span>
+          <p>
+            <code>Input</code> llama a <code>parseInput()</code> desde su constructor, y en Java los
+            inicializadores de campo de la subclase se ejecutan <strong>después</strong> de que vuelva
+            <code>super(game)</code>. Si escribís <code>private int distancia = 0;</code>,
+            <code>parseInput()</code> rellena el campo y el inicializador lo vuelve a poner a cero justo
+            después. Los campos de un <code>Input</code> se declaran sin valor y se crean dentro de
+            <code>parseInput()</code>.
+          </p>
+        </div>
+      </section>
+
+      <section id="de-fsm">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">De la máquina de estados al árbol</h2>
+        </div>
+        <p>
+          Esta es la máquina de estados de los fantasmas, la misma que se trabaja
+          en <a href="maquinas-estados.html">la página anterior</a>:
+        </p>
+        <figure>
+          <figcaption>La máquina de estados de los fantasmas: cuatro estados y seis transiciones</figcaption>
+          <svg class="explica dgb6" viewBox="0 0 480 285" role="img" aria-label="La máquina de estados de los fantasmas, con cuatro estados. De Perseguir se pasa a Huir si el fantasma es comestible o Ms. Pac-Man está cerca de una píldora de poder, y se vuelve de Huir a Perseguir cuando deja de ser comestible y Ms. Pac-Man se aleja de la píldora. De Huir, si se lo comen, se pasa a Encerrado, y de ahí a Perseguir cuando se cumple el tiempo de cárcel. De Perseguir se pasa a Aleatorio si muere Ms. Pac-Man, y de Aleatorio a Perseguir cuando reaparece.">
+            <style>
+              .dgb6 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgb6 .sn{font-family:var(--f-mono);font-size:11px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgb6 .tr{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#b6a)}
+              .dgb6 .tl{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+              .dgb6 .tlm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+            </style>
+            <defs><marker id="b6a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <rect x="30" y="20" width="110" height="34" rx="17" class="st"/><text x="85" y="41" class="sn">Aleatorio</text>
+            <rect x="185" y="118" width="110" height="34" rx="17" class="st"/><text x="240" y="139" class="sn">Perseguir</text>
+            <rect x="185" y="238" width="110" height="34" rx="17" class="st"/><text x="240" y="259" class="sn">Huir</text>
+            <rect x="345" y="20" width="110" height="34" rx="17" class="st"/><text x="400" y="41" class="sn">Encerrado</text>
+            <path d="M70 54 C70 110 130 135 183 135" class="tr"/>
+            <text x="2" y="100" class="tl">Ms. Pac-Man</text><text x="2" y="112" class="tl">reaparece</text>
+            <path d="M225 118 C220 70 180 40 142 37" class="tr"/>
+            <text x="200" y="66" class="tl">Ms. Pac-Man muere</text>
+            <path d="M255 152 C262 185 262 205 255 236" class="tr"/>
+            <text x="268" y="186" class="tl">comestible, o Ms. Pac-Man</text><text x="268" y="198" class="tl">cerca de una PPill</text>
+            <path d="M215 238 C200 205 200 185 215 154" class="tr"/>
+            <text x="84" y="186" class="tl">no comestible y</text><text x="84" y="198" class="tl">Ms. Pac-Man lejos</text><text x="84" y="210" class="tl">de una PPill</text>
+            <path d="M297 255 C420 255 440 150 420 56" class="tr"/>
+            <text x="400" y="232" class="tl">comido</text>
+            <path d="M375 54 C360 110 330 135 297 135" class="tr"/>
+            <text x="374" y="98" class="tl">tiempo de</text><text x="374" y="110" class="tl">cárcel cumplido</text>
+          </svg>
+        </figure>
+        <p>
+          Para pasarla a árbol hay una receta que funciona casi siempre. Cada estado se convierte en una
+          <strong>rama</strong>: una secuencia con una condición de guarda y la acción del estado. La guarda
+          contesta «¿cuándo debería estar en este estado?», y se saca de las transiciones que <em>entran</em>
+          en él. Las ramas cuelgan de un selector raíz <strong>por orden de prioridad</strong>, y la última,
+          el comportamiento por defecto, va sin condición.
+        </p>
+        <figure>
+          <figcaption>El mismo comportamiento como árbol: un selector de ramas guardadas</figcaption>
+          <svg class="explica dgb7" viewBox="0 0 480 280" role="img" aria-label="El comportamiento de los fantasmas como árbol. La raíz es un selector con cuatro hijos, numerados por prioridad. 1, la secuencia encerrado: la condición ¿en la cárcel? y la acción esperar. 2, la secuencia huir: un selector ¿peligro? con las condiciones ¿comestible? y ¿PPill cerca?, y la acción huir. 3, la secuencia aleatorio: la condición ¿acaba de morir? y la acción al azar. 4, la acción perseguir, sin condición, que se ejecuta cuando no sale ninguna de las anteriores.">
+            <style>
+              .dgb7 .cmp{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgb7 .gl{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--maze)}
+              .dgb7 .dec{fill:var(--surface);stroke:var(--inky);stroke-width:1.5}
+              .dgb7 .cnd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgb7 .act{fill:var(--surface-2);stroke:var(--ink-2);stroke-width:1.2}
+              .dgb7 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .dgb7 .s{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+              .dgb7 .h{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink-2);letter-spacing:.08em}
+              .dgb7 .e{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+              .dgb7 .eo{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3;opacity:.5}
+              .dgb7 .off{opacity:.5}
+              .dgb7 .off rect,.dgb7 .off polygon{stroke-dasharray:4 3}
+              .dgb7 .ok{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--ok)}
+              .dgb7 .bad{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--bad)}
+              .dgb7 .run{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink)}
+              .dgb7 .okt{font-family:var(--f-mono);font-size:10px;fill:var(--ok)}
+              .dgb7 .badt{font-family:var(--f-mono);font-size:10px;fill:var(--bad)}
+              .dgb7 .nc{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+              .dgb7 .nt{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--maze);text-anchor:middle}
+              .dgb7 .sep{stroke:var(--line);stroke-width:1}
+            </style>
+            <path d="M240.0 31.0 C240.0 54.0 49.1 54.0 49.1 77.0" class="e"/>
+            <circle cx="49.1" cy="64" r="8" class="nc"/>
+            <text x="49.1" y="67" class="nt">1</text>
+            <path d="M14 99.0 V122 H22" class="e"/>
+            <path d="M14 99.0 V156 H22" class="e"/>
+            <rect x="6.0" y="77.0" width="86.2" height="22" rx="3" class="cmp"/>
+<text x="14.0" y="92.5" class="gl">→</text>
+<text x="30.0" y="91.5" class="t">encerrado</text>
+            <rect x="22.0" y="111.0" width="102.3" height="22" rx="11.0" class="cnd"/>
+<text x="73.1" y="125.5" class="t" text-anchor="middle">¿en la cárcel?</text>
+            <rect x="22.0" y="145.0" width="60.1" height="22" rx="5" class="act"/>
+<text x="52.1" y="159.5" class="t" text-anchor="middle">esperar</text>
+            <path d="M240.0 31.0 C240.0 54.0 152.0 54.0 152.0 77.0" class="e"/>
+            <circle cx="152.0" cy="64" r="8" class="nc"/>
+            <text x="152.0" y="67" class="nt">2</text>
+            <path d="M132 99.0 V122 H140" class="e"/>
+            <path d="M148 133.0 V156 H156" class="e"/>
+            <path d="M148 133.0 V190 H156" class="e"/>
+            <path d="M132 99.0 V224 H140" class="e"/>
+            <rect x="124.0" y="77.0" width="56.1" height="22" rx="3" class="cmp"/>
+<text x="132.0" y="92.5" class="gl">→</text>
+<text x="148.0" y="91.5" class="t">huir</text>
+            <rect x="140.0" y="111.0" width="86.2" height="22" rx="3" class="cmp"/>
+<text x="148.0" y="126.5" class="gl">?</text>
+<text x="164.0" y="125.5" class="t">¿peligro?</text>
+            <rect x="156.0" y="145.0" width="90.2" height="22" rx="11.0" class="cnd"/>
+<text x="201.1" y="159.5" class="t" text-anchor="middle">¿comestible?</text>
+            <rect x="156.0" y="179.0" width="96.3" height="22" rx="11.0" class="cnd"/>
+<text x="204.1" y="193.5" class="t" text-anchor="middle">¿PPill cerca?</text>
+            <rect x="140.0" y="213.0" width="42.1" height="22" rx="5" class="act"/>
+<text x="161.0" y="227.5" class="t" text-anchor="middle">huir</text>
+            <path d="M240.0 31.0 C240.0 54.0 293.1 54.0 293.1 77.0" class="e"/>
+            <circle cx="293.1" cy="64" r="8" class="nc"/>
+            <text x="293.1" y="67" class="nt">3</text>
+            <path d="M258 99.0 V122 H266" class="e"/>
+            <path d="M258 99.0 V156 H266" class="e"/>
+            <rect x="250.0" y="77.0" width="86.2" height="22" rx="3" class="cmp"/>
+<text x="258.0" y="92.5" class="gl">→</text>
+<text x="274.0" y="91.5" class="t">aleatorio</text>
+            <rect x="266.0" y="111.0" width="114.3" height="22" rx="11.0" class="cnd"/>
+<text x="323.2" y="125.5" class="t" text-anchor="middle">¿acaba de morir?</text>
+            <rect x="266.0" y="145.0" width="60.1" height="22" rx="5" class="act"/>
+<text x="296.1" y="159.5" class="t" text-anchor="middle">al azar</text>
+            <path d="M240.0 31.0 C240.0 54.0 414.1 54.0 414.1 77.0" class="e"/>
+            <circle cx="414.1" cy="64" r="8" class="nc"/>
+            <text x="414.1" y="67" class="nt">4</text>
+            <rect x="378.0" y="77.0" width="72.2" height="22" rx="5" class="act"/>
+<text x="414.1" y="91.5" class="t" text-anchor="middle">perseguir</text>
+            <rect x="199.9" y="9.0" width="80.2" height="22" rx="3" class="cmp"/>
+<text x="207.9" y="24.5" class="gl">?</text>
+<text x="223.9" y="23.5" class="t">fantasma</text>
+            <text x="240" y="268" class="s" text-anchor="middle">de izquierda a derecha, de más a menos prioridad: la última no tiene condición</text>
+          </svg>
+        </figure>
+        <p>
+          El orden no es arbitrario. <em>Encerrado</em> va primero porque en la cárcel no se decide nada.
+          <em>Huir</em> va antes que <em>aleatorio</em> porque un fantasma comestible huye aunque
+          Ms.&nbsp;Pac-Man acabe de morir. Y <em>perseguir</em> va al final, sin guarda, porque es lo que se
+          hace cuando no pasa nada de lo anterior. Las transiciones de vuelta desaparecen: «no comestible y
+          Ms.&nbsp;Pac-Man lejos de una PPill» ya no hace falta escribirla, porque es justo lo que pasa
+          cuando la guarda de <em>huir</em> falla.
+        </p>
+        <p>
+          Lo que no se traduce solo es <em>aleatorio</em>. Se entra en él por un <strong>suceso</strong>, la
+          muerte de Ms.&nbsp;Pac-Man, y un suceso no es algo que se pueda comprobar en el turno siguiente:
+          <code>game.wasPacManEaten()</code> sólo es cierto en el turno en que ocurre. La máquina se acordaba
+          porque estaba en ese estado; el árbol necesita memoria. Se apunta el turno de la muerte en un campo
+          del controlador, y la guarda pregunta si han pasado menos de 150 turnos. Y hay otro detalle del
+          motor: tras una muerte, Ms.&nbsp;Pac-Man reaparece en el acto y los fantasmas vuelven a la cárcel,
+          de la que salen a los 40, 60, 80 y 100 turnos en el primer nivel. La transición «reaparece» del
+          diagrama no tiene equivalente directo, así que la ventana de 150 es una decisión nuestra: da a cada
+          fantasma entre 50 y 110 turnos de despiste al salir.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Máquina de estados</th>
+                <th scope="col">Jerárquica</th>
+                <th scope="col">Árbol de comportamiento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cada turno se mira</td>
+                <td>Las transiciones que salen del estado actual.</td>
+                <td>Las del estado actual y las de los estados que lo contienen.</td>
+                <td>El árbol entero desde la raíz, con cortocircuito.</td>
+              </tr>
+              <tr>
+                <td>Memoria</td>
+                <td>El estado actual.</td>
+                <td>El estado actual en cada nivel.</td>
+                <td>Ninguna por defecto: la pizarra y los nodos que la llevan.</td>
+              </tr>
+              <tr>
+                <td>Prioridades</td>
+                <td>Repartidas por las transiciones.</td>
+                <td>Mejor agrupadas: las del nivel de fuera mandan.</td>
+                <td>Explícitas: el orden de los hijos.</td>
+              </tr>
+              <tr>
+                <td>Añadir un comportamiento</td>
+                <td>Un estado y sus transiciones con los demás.</td>
+                <td>Un estado dentro del grupo que toca.</td>
+                <td>Una rama en su posición.</td>
+              </tr>
+              <tr>
+                <td>Reutilizar</td>
+                <td>Difícil: los estados están atados por sus transiciones.</td>
+                <td>Sub-máquinas enteras.</td>
+                <td>Cualquier sub-árbol.</td>
+              </tr>
+              <tr>
+                <td>Va bien cuando</td>
+                <td>Pocos modos claros, que duran y cambian por sucesos.</td>
+                <td>Modos agrupables en niveles.</td>
+                <td>Muchas reglas con prioridad que hay que revisar cada turno.</td>
+              </tr>
+              <tr>
+                <td>Falla cuando</td>
+                <td>Crece: espagueti de transiciones.</td>
+                <td>Las transiciones cruzan de un grupo a otro.</td>
+                <td>Hace falta historia: parpadea o hay que llenarlo de memoria.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          No son excluyentes, y en los juegos se mezclan: un estado de una máquina puede ejecutar un árbol, y
+          una hoja de un árbol puede ser una pequeña máquina de estados que se acuerda de en qué fase está.
+        </p>
+      </section>
+
+      <section id="java">
+        <div class="sec-head">
+          <span class="num">10</span>
+          <h2 class="sec">Un árbol mínimo en Java</h2>
+        </div>
+        <p>
+          El motor trae un paquete para máquinas de estados, <code>es.ucm.fdi.ici.fsm</code>, pero ninguno
+          para árboles. No hace falta una biblioteca: lo esencial cabe en nueve clases cortas. Van en un
+          paquete <code>bt</code> dentro de vuestro paquete de grupo, con el mismo esqueleto que el proyecto
+          de ejemplo de la Práctica&nbsp;2, y reutilizan las dos interfaces del motor que ya conocéis:
+          <code>es.ucm.fdi.ici.Input</code> y <code>es.ucm.fdi.ici.Action</code>. Todo el código de esta
+          sección y la siguiente está compilado contra el motor y probado en partidas sin ventana.
+        </p>
+        <pre>grupoYY/
+├── Ghosts.java            <span class="c">controlador de los fantasmas</span>
+├── MsPacMan.java          <span class="c">controlador de Ms. Pac-Man</span>
+├── bt/                    <span class="c">el árbol: no sabe nada de Ms. Pac-Man</span>
+│   ├── Status.java  Node.java  Blackboard.java
+│   ├── Sequence.java  Selector.java  Inverter.java  Cooldown.java
+│   └── Condition.java  ActionLeaf.java
+├── ghosts/
+│   ├── GhostsInput.java
+│   └── actions/  ChaseAction.java  RunAwayAction.java   <span class="c">las del ejemplo, sin tocar</span>
+└── mspacman/
+    └── MsPacManInput.java</pre>
+        <h3 class="label">Status y Node</h3>
+        <p>
+          Los tres estados, y la clase de la que heredan todos los nodos. <code>tick</code> es lo que llaman
+          los padres y es <code>final</code>: apunta el nodo en la traza, lo ejecuta y apunta lo que devolvió.
+          Cada tipo de nodo sólo escribe <code>run</code>. Separarlos así da la traza gratis a todos los nodos,
+          también a los que escribáis vosotros.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">public</span> <span class="k">enum</span> Status { SUCCESS, FAILURE, RUNNING }</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> Node {
+
+    <span class="k">private</span> <span class="k">final</span> String name;
+
+    <span class="k">protected</span> Node(String name) {
+        <span class="k">this</span>.name = name;
+    }
+
+    <span class="c">// Lo que llaman los padres: apunta el nodo en la traza, lo ejecuta y apunta lo que devolvió</span>
+    <span class="k">public</span> <span class="k">final</span> Status tick(Blackboard bb) {
+        <span class="k">int</span> line = bb.open(name);
+        Status status = run(bb);
+        bb.close(line, status);
+        <span class="k">return</span> status;
+    }
+
+    <span class="c">// Lo que hace cada tipo de nodo</span>
+    <span class="k">protected</span> <span class="k">abstract</span> Status run(Blackboard bb);
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> String toString() {
+        <span class="k">return</span> name;
+    }
+}</code></pre></div>
+        <h3 class="label">Blackboard</h3>
+        <p>
+          Lo que viaja por el árbol durante un tick: el <code>Input</code> de este turno, que se lee, y
+          <code>move</code>, donde escribe la acción que llegue a ejecutarse. Se crea uno nuevo en cada
+          <code>getMove</code>, así que <code>move</code> empieza a <code>null</code> y, si no se ejecuta
+          ninguna acción, se queda así. El resto es la traza: con <code>traced</code> a
+          <code>false</code> no se apunta nada y no cuesta nada.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">import</span> java.util.ArrayList;
+<span class="k">import</span> java.util.List;
+
+<span class="k">import</span> es.ucm.fdi.ici.Input;
+<span class="k">import</span> pacman.game.Constants.MOVE;
+
+<span class="k">public</span> <span class="k">class</span> Blackboard {
+
+    <span class="k">public</span> <span class="k">final</span> Input in;      <span class="c">// lo que se ha leído del juego este turno</span>
+    <span class="k">public</span> MOVE move;           <span class="c">// lo que escribe la acción que llegue a ejecutarse</span>
+
+    <span class="k">private</span> <span class="k">final</span> List&lt;String&gt; trace;   <span class="c">// null: sin traza</span>
+    <span class="k">private</span> <span class="k">int</span> depth;
+
+    <span class="k">public</span> Blackboard(Input in, <span class="k">boolean</span> traced) {
+        <span class="k">this</span>.in = in;
+        <span class="k">this</span>.trace = traced ? <span class="k">new</span> ArrayList&lt;&gt;() : <span class="k">null</span>;
+    }
+
+    <span class="k">int</span> open(String name) {
+        <span class="k">if</span> (trace == <span class="k">null</span>) <span class="k">return</span> -<span class="n">1</span>;
+        trace.add(<span class="s">"  "</span>.repeat(depth++) + name);
+        <span class="k">return</span> trace.size() - <span class="n">1</span>;
+    }
+
+    <span class="k">void</span> close(<span class="k">int</span> line, Status status) {
+        <span class="k">if</span> (line &lt; <span class="n">0</span>) <span class="k">return</span>;
+        depth--;
+        trace.set(line, trace.get(line) + <span class="s">"  "</span> + status);
+    }
+
+    <span class="k">public</span> String trace() {
+        <span class="k">return</span> trace == <span class="k">null</span> ? <span class="s">""</span> : String.join(<span class="s">"\n"</span>, trace);
+    }
+}</code></pre></div>
+        <h3 class="label">Sequence y Selector</h3>
+        <p>
+          El pseudocódigo de la sección&nbsp;05, casi línea a línea. Los hijos se pasan en el constructor,
+          así que el árbol se escribe como una expresión anidada que se lee igual que el dibujo.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">public</span> <span class="k">class</span> Sequence <span class="k">extends</span> Node {
+
+    <span class="k">private</span> <span class="k">final</span> Node[] children;
+
+    <span class="k">public</span> Sequence(String name, Node... children) {
+        <span class="k">super</span>(name);
+        <span class="k">this</span>.children = children;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">protected</span> Status run(Blackboard bb) {
+        <span class="k">for</span> (Node child : children) {
+            Status s = child.tick(bb);
+            <span class="k">if</span> (s != Status.SUCCESS) <span class="k">return</span> s;     <span class="c">// FAILURE o RUNNING: aquí se corta</span>
+        }
+        <span class="k">return</span> Status.SUCCESS;                     <span class="c">// han salido bien todos</span>
+    }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">public</span> <span class="k">class</span> Selector <span class="k">extends</span> Node {
+
+    <span class="k">private</span> <span class="k">final</span> Node[] children;
+
+    <span class="k">public</span> Selector(String name, Node... children) {
+        <span class="k">super</span>(name);
+        <span class="k">this</span>.children = children;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">protected</span> Status run(Blackboard bb) {
+        <span class="k">for</span> (Node child : children) {
+            Status s = child.tick(bb);
+            <span class="k">if</span> (s != Status.FAILURE) <span class="k">return</span> s;     <span class="c">// SUCCESS o RUNNING: aquí se corta</span>
+        }
+        <span class="k">return</span> Status.FAILURE;                     <span class="c">// han fallado todos</span>
+    }
+}</code></pre></div>
+        <h3 class="label">Inverter y Cooldown</h3>
+        <p>
+          Dos decoradores. El inversor no tiene estado. El enfriamiento sí: <code>readyAt</code> es el turno
+          a partir del cual vuelve a dejar pasar, y por eso una instancia de un árbol con enfriamientos no se
+          puede compartir entre fantasmas. Mide el tiempo con <code>getTotalTime()</code> del juego, no con el
+          reloj, para que no dependa de lo rápido que vaya la partida.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">public</span> <span class="k">class</span> Inverter <span class="k">extends</span> Node {
+
+    <span class="k">private</span> <span class="k">final</span> Node child;
+
+    <span class="k">public</span> Inverter(Node child) {
+        <span class="k">super</span>(<span class="s">"no"</span>);
+        <span class="k">this</span>.child = child;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">protected</span> Status run(Blackboard bb) {
+        <span class="k">switch</span> (child.tick(bb)) {
+            <span class="k">case</span> SUCCESS: <span class="k">return</span> Status.FAILURE;
+            <span class="k">case</span> FAILURE: <span class="k">return</span> Status.SUCCESS;
+            <span class="k">default</span>:      <span class="k">return</span> Status.RUNNING;   <span class="c">// lo que aún no ha terminado no se invierte</span>
+        }
+    }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">public</span> <span class="k">class</span> Cooldown <span class="k">extends</span> Node {
+
+    <span class="k">private</span> <span class="k">final</span> Node child;
+    <span class="k">private</span> <span class="k">final</span> <span class="k">int</span> ticks;
+    <span class="k">private</span> <span class="k">int</span> readyAt = <span class="n">0</span>;            <span class="c">// memoria del nodo: por eso cada fantasma lleva su árbol</span>
+
+    <span class="k">public</span> Cooldown(<span class="k">int</span> ticks, Node child) {
+        <span class="k">super</span>(<span class="s">"enfriamiento "</span> + ticks);
+        <span class="k">this</span>.child = child;
+        <span class="k">this</span>.ticks = ticks;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">protected</span> Status run(Blackboard bb) {
+        <span class="k">int</span> now = bb.in.getGame().getTotalTime();
+        <span class="k">if</span> (now &lt; readyAt) <span class="k">return</span> Status.FAILURE;         <span class="c">// aún en espera: ni se mira al hijo</span>
+        Status s = child.tick(bb);
+        <span class="k">if</span> (s == Status.SUCCESS) readyAt = now + ticks;
+        <span class="k">return</span> s;
+    }
+}</code></pre></div>
+        <h3 class="label">Condition y ActionLeaf</h3>
+        <p>
+          Las dos hojas son genéricas en el tipo de vuestro <code>Input</code>, para que las lambdas lo
+          reciban ya como <code>GhostsInput</code> o <code>MsPacManInput</code> y no haya que convertirlo en
+          cada una. La condición es un <code>Predicate</code>: se puede escribir en línea al construir el
+          árbol, sin una clase por condición como las <code>Transition</code> de la máquina de estados.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">import</span> java.util.function.Predicate;
+
+<span class="k">import</span> es.ucm.fdi.ici.Input;
+
+<span class="k">public</span> <span class="k">class</span> Condition&lt;I <span class="k">extends</span> Input&gt; <span class="k">extends</span> Node {
+
+    <span class="k">private</span> <span class="k">final</span> Predicate&lt;I&gt; test;
+
+    <span class="k">public</span> Condition(String name, Predicate&lt;I&gt; test) {
+        <span class="k">super</span>(name);
+        <span class="k">this</span>.test = test;
+    }
+
+    <span class="c">@Override</span>
+    <span class="c">@SuppressWarnings</span>(<span class="s">"unchecked"</span>)
+    <span class="k">protected</span> Status run(Blackboard bb) {
+        <span class="k">return</span> test.test((I) bb.in) ? Status.SUCCESS : Status.FAILURE;
+    }
+}</code></pre></div>
+        <p>
+          La hoja de acción tiene dos constructores. El primero envuelve una <code>es.ucm.fdi.ici.Action</code>
+          del motor, la misma que pondríais en un <code>SimpleState</code>, así que <code>ChaseAction</code> y
+          <code>RunAwayAction</code> del ejemplo se usan sin tocarlas. El segundo recibe una lambda que lee
+          directamente vuestro <code>Input</code>. Y si la acción devuelve <code>null</code>, la hoja
+          <strong>falla</strong>: es la forma de decir «no he sabido decidir» y dejar que el selector de
+          encima pruebe otra cosa.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">import</span> java.util.function.Function;
+
+<span class="k">import</span> es.ucm.fdi.ici.Action;
+<span class="k">import</span> es.ucm.fdi.ici.Input;
+<span class="k">import</span> pacman.game.Constants.MOVE;
+
+<span class="k">public</span> <span class="k">class</span> ActionLeaf&lt;I <span class="k">extends</span> Input&gt; <span class="k">extends</span> Node {
+
+    <span class="k">private</span> <span class="k">final</span> Function&lt;I, MOVE&gt; action;
+
+    <span class="c">// Una acción del motor, la misma que usaríais en un estado de la FSM</span>
+    <span class="k">public</span> ActionLeaf(Action a) {
+        <span class="k">this</span>(a.getActionId(), in -&gt; a.execute(in.getGame()));
+    }
+
+    <span class="c">// O una lambda que lee directamente vuestro Input</span>
+    <span class="k">public</span> ActionLeaf(String name, Function&lt;I, MOVE&gt; action) {
+        <span class="k">super</span>(name);
+        <span class="k">this</span>.action = action;
+    }
+
+    <span class="c">@Override</span>
+    <span class="c">@SuppressWarnings</span>(<span class="s">"unchecked"</span>)
+    <span class="k">protected</span> Status run(Blackboard bb) {
+        MOVE m = action.apply((I) bb.in);
+        <span class="k">if</span> (m == <span class="k">null</span>) <span class="k">return</span> Status.FAILURE;      <span class="c">// no ha sabido decidir: que pruebe otro</span>
+        bb.move = m;
+        <span class="k">return</span> Status.SUCCESS;
+    }
+}</code></pre></div>
+      </section>
+
+      <section id="controladores">
+        <div class="sec-head">
+          <span class="num">11</span>
+          <h2 class="sec">Los fantasmas y Ms.&nbsp;Pac-Man con árboles</h2>
+        </div>
+        <h3 class="label">GhostsInput</h3>
+        <p>
+          Todo lo que preguntan las condiciones de los fantasmas, calculado una vez por turno y para los
+          cuatro: si cada uno es comestible o está en la cárcel, lo que le falta a Ms.&nbsp;Pac-Man para la
+          píldora de poder activa más cercana y cuántos turnos han pasado desde que murió. Este último es el
+          dato con memoria, y por eso llega por el constructor y se asigna después de <code>super</code>, no
+          en <code>parseInput()</code>.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts;
+
+<span class="k">import</span> java.util.EnumMap;
+
+<span class="k">import</span> es.ucm.fdi.ici.Input;
+<span class="k">import</span> pacman.game.Constants.GHOST;
+<span class="k">import</span> pacman.game.Game;
+
+<span class="k">public</span> <span class="k">class</span> GhostsInput <span class="k">extends</span> Input {
+
+    <span class="c">// Sin inicializar aquí: parseInput() se ejecuta dentro de super(game),</span>
+    <span class="c">// antes que los inicializadores de campo, que lo machacarían después</span>
+    <span class="k">private</span> EnumMap&lt;GHOST, Boolean&gt; edible;
+    <span class="k">private</span> EnumMap&lt;GHOST, Integer&gt; lairTime;
+    <span class="k">private</span> <span class="k">int</span> pacmanToPPill;
+    <span class="k">private</span> <span class="k">int</span> ticksSinceDeath;
+
+    <span class="k">public</span> GhostsInput(Game game, <span class="k">int</span> lastDeath) {
+        <span class="k">super</span>(game);                                   <span class="c">// llama a parseInput()</span>
+        <span class="k">this</span>.ticksSinceDeath = game.getTotalTime() - lastDeath;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> parseInput() {
+        edible = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+        lairTime = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            edible.put(g, game.isGhostEdible(g));
+            lairTime.put(g, game.getGhostLairTime(g));
+        }
+        <span class="k">int</span> pacman = game.getPacmanCurrentNodeIndex();
+        pacmanToPPill = Integer.MAX_VALUE;
+        <span class="k">for</span> (<span class="k">int</span> pp : game.getActivePowerPillsIndices())
+            pacmanToPPill = Math.min(pacmanToPPill, game.getShortestPathDistance(pacman, pp));
+    }
+
+    <span class="k">public</span> <span class="k">boolean</span> isEdible(GHOST g)   { <span class="k">return</span> edible.get(g); }
+    <span class="k">public</span> <span class="k">boolean</span> inLair(GHOST g)     { <span class="k">return</span> lairTime.get(g) &gt; <span class="n">0</span>; }
+    <span class="k">public</span> <span class="k">int</span> getPacmanToPPill()      { <span class="k">return</span> pacmanToPPill; }
+    <span class="k">public</span> <span class="k">int</span> getTicksSinceDeath()    { <span class="k">return</span> ticksSinceDeath; }
+}</code></pre></div>
+        <h3 class="label">Ghosts</h3>
+        <p>
+          <code>buildTree(g)</code> es el diagrama de la sección&nbsp;09 escrito en Java, y se llama una vez
+          por fantasma: cuatro árboles iguales pero independientes. <code>getMove</code> hace tres cosas:
+          apuntar la muerte si ha ocurrido, leer el juego una vez con <code>GhostsInput</code>, y dar un tick
+          a cada árbol con su propia pizarra para recoger su movimiento.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY;
+
+<span class="k">import</span> java.util.EnumMap;
+<span class="k">import</span> java.util.Random;
+
+<span class="k">import</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt.*;
+<span class="k">import</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.GhostsInput;
+<span class="k">import</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.actions.ChaseAction;
+<span class="k">import</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.ghosts.actions.RunAwayAction;
+<span class="k">import</span> pacman.controllers.GhostController;
+<span class="k">import</span> pacman.game.Constants.GHOST;
+<span class="k">import</span> pacman.game.Constants.MOVE;
+<span class="k">import</span> pacman.game.Game;
+
+<span class="k">public</span> <span class="k">class</span> Ghosts <span class="k">extends</span> GhostController {
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> PPILL_NEAR = <span class="n">30</span>;       <span class="c">// el mismo umbral que PacManNearPPillTransition</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> AFTER_DEATH = <span class="n">150</span>;     <span class="c">// turnos de despiste tras comerse a Ms. Pac-Man</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">boolean</span> TRACE = <span class="k">false</span>;    <span class="c">// traza de BLINKY cuando le toca decidir</span>
+
+    <span class="k">private</span> <span class="k">final</span> EnumMap&lt;GHOST, Node&gt; trees = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+    <span class="k">private</span> <span class="k">final</span> Random rnd = <span class="k">new</span> Random();
+    <span class="k">private</span> <span class="k">int</span> lastDeath = -<span class="n">1_000</span>;         <span class="c">// memoria que dura más de un turno</span>
+
+    <span class="k">public</span> Ghosts() {
+        setName(<span class="s">"Ghosts BT"</span>);
+        <span class="k">for</span> (GHOST g : GHOST.values())
+            trees.put(g, buildTree(g));
+    }
+
+    <span class="k">private</span> Node buildTree(GHOST g) {
+        <span class="k">return</span> <span class="k">new</span> Selector(<span class="s">"fantasma "</span> + g,
+            <span class="k">new</span> Sequence(<span class="s">"encerrado"</span>,
+                <span class="k">new</span> Condition&lt;GhostsInput&gt;(<span class="s">"¿en la cárcel?"</span>, in -&gt; in.inLair(g)),
+                <span class="k">new</span> ActionLeaf&lt;GhostsInput&gt;(<span class="s">"esperar"</span>, in -&gt; MOVE.NEUTRAL)),
+            <span class="k">new</span> Sequence(<span class="s">"huir"</span>,
+                <span class="k">new</span> Selector(<span class="s">"¿peligro?"</span>,
+                    <span class="k">new</span> Condition&lt;GhostsInput&gt;(<span class="s">"¿comestible?"</span>, in -&gt; in.isEdible(g)),
+                    <span class="k">new</span> Condition&lt;GhostsInput&gt;(<span class="s">"¿Ms. Pac-Man junto a una PPill?"</span>,
+                        in -&gt; in.getPacmanToPPill() &lt; PPILL_NEAR)),
+                <span class="k">new</span> ActionLeaf&lt;GhostsInput&gt;(<span class="k">new</span> RunAwayAction(g))),
+            <span class="k">new</span> Sequence(<span class="s">"aleatorio"</span>,
+                <span class="k">new</span> Condition&lt;GhostsInput&gt;(<span class="s">"¿acaba de morir Ms. Pac-Man?"</span>,
+                    in -&gt; in.getTicksSinceDeath() &lt; AFTER_DEATH),
+                <span class="k">new</span> ActionLeaf&lt;GhostsInput&gt;(<span class="s">"moverse al azar"</span>, in -&gt; randomMove(in.getGame(), g))),
+            <span class="k">new</span> ActionLeaf&lt;GhostsInput&gt;(<span class="k">new</span> ChaseAction(g)));
+    }
+
+    <span class="k">private</span> MOVE randomMove(Game game, GHOST g) {
+        <span class="k">if</span> (!game.doesGhostRequireAction(g)) <span class="k">return</span> MOVE.NEUTRAL;
+        MOVE[] moves = game.getPossibleMoves(game.getGhostCurrentNodeIndex(g),
+                                             game.getGhostLastMoveMade(g));
+        <span class="k">return</span> moves[rnd.nextInt(moves.length)];
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> preCompute(String opponent) {
+        lastDeath = -<span class="n">1_000</span>;
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> EnumMap&lt;GHOST, MOVE&gt; getMove(Game game, <span class="k">long</span> timeDue) {
+        <span class="k">if</span> (game.wasPacManEaten()) lastDeath = game.getTotalTime();
+
+        GhostsInput in = <span class="k">new</span> GhostsInput(game, lastDeath);    <span class="c">// se lee el juego una vez</span>
+        EnumMap&lt;GHOST, MOVE&gt; result = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            <span class="k">boolean</span> traced = TRACE &amp;&amp; g == GHOST.BLINKY &amp;&amp; game.doesGhostRequireAction(g);
+            Blackboard bb = <span class="k">new</span> Blackboard(in, traced);
+            trees.get(g).tick(bb);                            <span class="c">// un tick, desde la raíz</span>
+            result.put(g, bb.move);
+            <span class="k">if</span> (traced) System.out.println(<span class="s">"t="</span> + game.getTotalTime() + <span class="s">"\n"</span> + bb.trace());
+        }
+        <span class="k">return</span> result;
+    }
+}</code></pre></div>
+        <p>
+          Se tickean los cuatro árboles todos los turnos, también cuando el fantasma no puede decidir, para que
+          el árbol sea el mismo que el diagrama: las acciones del ejemplo ya devuelven <code>NEUTRAL</code>
+          cuando <code>doesGhostRequireAction</code> es falso. Si el tiempo apretara, lo primero sería
+          saltarse el tick de los que no deciden.
+        </p>
+        <h3 class="label">MsPacManInput y MsPacMan</h3>
+        <p>
+          El árbol de la <a href="#traza">traza</a>. El <code>Input</code> busca de una vez la píldora y la
+          píldora de poder más cercanas, el perseguidor más cercano —midiendo lo que tarda <em>él</em> en
+          llegar, sin darse la vuelta— y el comestible más cercano. Los campos son públicos para que las lambdas
+          del árbol se lean sin una línea de <em>getters</em>.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.mspacman;
+
+<span class="k">import</span> es.ucm.fdi.ici.Input;
+<span class="k">import</span> pacman.game.Constants.DM;
+<span class="k">import</span> pacman.game.Constants.GHOST;
+<span class="k">import</span> pacman.game.Game;
+
+<span class="k">public</span> <span class="k">class</span> MsPacManInput <span class="k">extends</span> Input {
+
+    <span class="k">public</span> <span class="k">int</span> pacman;
+    <span class="k">public</span> <span class="k">int</span> nearestPill;                  <span class="c">// -1 si no queda ninguna</span>
+    <span class="k">public</span> <span class="k">int</span> nearestPPill, ppillDistance;  <span class="c">// -1 y MAX_VALUE si no queda ninguna</span>
+    <span class="k">public</span> GHOST danger;  <span class="k">public</span> <span class="k">int</span> dangerDistance;   <span class="c">// el perseguidor más cercano</span>
+    <span class="k">public</span> GHOST prey;    <span class="k">public</span> <span class="k">int</span> preyDistance;     <span class="c">// el comestible más cercano</span>
+    <span class="k">public</span> <span class="k">boolean</span> anyEdible;
+
+    <span class="k">public</span> MsPacManInput(Game game) {
+        <span class="k">super</span>(game);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> parseInput() {
+        pacman = game.getPacmanCurrentNodeIndex();
+        nearestPill = game.getClosestNodeIndexFromNodeIndex(pacman, game.getActivePillsIndices(), DM.PATH);
+        nearestPPill = game.getClosestNodeIndexFromNodeIndex(pacman, game.getActivePowerPillsIndices(), DM.PATH);
+        ppillDistance = nearestPPill &lt; <span class="n">0</span> ? Integer.MAX_VALUE
+                                         : game.getShortestPathDistance(pacman, nearestPPill);
+
+        danger = prey = <span class="k">null</span>;
+        dangerDistance = preyDistance = Integer.MAX_VALUE;
+        anyEdible = <span class="k">false</span>;
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            <span class="k">if</span> (game.getGhostLairTime(g) &gt; <span class="n">0</span>) <span class="k">continue</span>;
+            <span class="k">int</span> node = game.getGhostCurrentNodeIndex(g);
+            <span class="k">if</span> (game.isGhostEdible(g)) {
+                anyEdible = <span class="k">true</span>;
+                <span class="k">int</span> d = game.getShortestPathDistance(pacman, node);
+                <span class="k">if</span> (d &lt; preyDistance) { prey = g; preyDistance = d; }
+            } <span class="k">else</span> {
+                <span class="c">// lo que tarda él en llegar a mí, sin darse la vuelta</span>
+                <span class="k">int</span> d = game.getShortestPathDistance(node, pacman, game.getGhostLastMoveMade(g));
+                <span class="k">if</span> (d &lt; dangerDistance) { danger = g; dangerDistance = d; }
+            }
+        }
+    }
+}</code></pre></div>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY;
+
+<span class="k">import</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt.*;
+<span class="k">import</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.mspacman.MsPacManInput;
+<span class="k">import</span> pacman.controllers.PacmanController;
+<span class="k">import</span> pacman.game.Constants.DM;
+<span class="k">import</span> pacman.game.Constants.MOVE;
+<span class="k">import</span> pacman.game.Game;
+
+<span class="k">public</span> <span class="k">class</span> MsPacMan <span class="k">extends</span> PacmanController {
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> DANGER = <span class="n">20</span>;       <span class="c">// a menos de esto, un perseguidor es un problema</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> MARGIN = <span class="n">10</span>;       <span class="c">// el margen de la cuenta 2·pasos + margen &lt; tiempo</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">boolean</span> TRACE = <span class="k">false</span>;
+
+    <span class="k">private</span> <span class="k">final</span> Node tree;
+
+    <span class="k">public</span> MsPacMan() {
+        setName(<span class="s">"MsPacMan BT"</span>);
+        tree = <span class="k">new</span> Selector(<span class="s">"ms. pac-man"</span>,
+            <span class="k">new</span> Sequence(<span class="s">"cazar"</span>,
+                <span class="k">new</span> Condition&lt;MsPacManInput&gt;(<span class="s">"¿comestible al alcance?"</span>, in -&gt; in.prey != <span class="k">null</span>
+                    &amp;&amp; <span class="n">2</span> * in.preyDistance + MARGIN &lt; in.getGame().getGhostEdibleTime(in.prey)),
+                <span class="k">new</span> ActionLeaf&lt;MsPacManInput&gt;(<span class="s">"ir a por él"</span>, in -&gt; towards(in,
+                    in.getGame().getGhostCurrentNodeIndex(in.prey)))),
+            <span class="k">new</span> Sequence(<span class="s">"escapar"</span>,
+                <span class="k">new</span> Condition&lt;MsPacManInput&gt;(<span class="s">"¿perseguidor cerca?"</span>, in -&gt; in.dangerDistance &lt; DANGER),
+                <span class="k">new</span> Selector(<span class="s">"¿cómo?"</span>,
+                    <span class="k">new</span> Sequence(<span class="s">"a la píldora de poder"</span>,
+                        <span class="k">new</span> Inverter(<span class="k">new</span> Condition&lt;MsPacManInput&gt;(<span class="s">"¿ya hay comestibles?"</span>, in -&gt; in.anyEdible)),
+                        <span class="k">new</span> Condition&lt;MsPacManInput&gt;(<span class="s">"¿PPill antes que él?"</span>,
+                            in -&gt; in.ppillDistance &lt; in.dangerDistance),
+                        <span class="k">new</span> ActionLeaf&lt;MsPacManInput&gt;(<span class="s">"ir a la PPill"</span>, in -&gt; towards(in, in.nearestPPill))),
+                    <span class="k">new</span> ActionLeaf&lt;MsPacManInput&gt;(<span class="s">"huir"</span>, in -&gt; in.getGame().getNextMoveAwayFromTarget(
+                        in.pacman, in.getGame().getGhostCurrentNodeIndex(in.danger), DM.PATH)))),
+            <span class="k">new</span> ActionLeaf&lt;MsPacManInput&gt;(<span class="s">"comer píldoras"</span>, in -&gt; towards(in, in.nearestPill)));
+    }
+
+    <span class="k">private</span> <span class="k">static</span> MOVE towards(MsPacManInput in, <span class="k">int</span> target) {
+        <span class="k">if</span> (target &lt; <span class="n">0</span>) <span class="k">return</span> <span class="k">null</span>;                       <span class="c">// no hay adónde ir: la hoja falla</span>
+        <span class="k">return</span> in.getGame().getNextMoveTowardsTarget(in.pacman, target, DM.PATH);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+        Blackboard bb = <span class="k">new</span> Blackboard(<span class="k">new</span> MsPacManInput(game), TRACE);
+        tree.tick(bb);
+        <span class="k">if</span> (TRACE) System.out.println(<span class="s">"t="</span> + game.getTotalTime() + <span class="s">"\n"</span> + bb.trace());
+        <span class="k">return</span> bb.move;                                    <span class="c">// null: el motor sigue recto</span>
+    }
+}</code></pre></div>
+        <p>
+          La condición de <em>cazar</em> es la cota de <a href="estrategias.html#alcanzar-comestible">¿me da
+          tiempo a comérmelo?</a> con un margen de 10 turnos, y <em>comer píldoras</em> va al final sin
+          condición. Si ya no quedan píldoras, <code>towards</code> devuelve <code>null</code>, la hoja falla, la
+          raíz falla, <code>bb.move</code> se queda en <code>null</code> y el motor hace seguir recto a
+          Ms.&nbsp;Pac-Man. No es un controlador para competir: le falta todo lo de las <a
+          href="estrategias.html">estrategias algorítmicas</a>. Es el esqueleto donde se cuelga.
+        </p>
+        <p>Y para jugar sin ventana varias partidas seguidas, lo que se ha usado para probarlo:</p>
+        <div class="codigo"><pre><code><span class="k">import</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.Ghosts;
+<span class="k">import</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.MsPacMan;
+<span class="k">import</span> pacman.Executor;
+
+<span class="k">public</span> <span class="k">class</span> RunBT {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(String[] args) {
+        <span class="k">int</span> n = Integer.parseInt(args[<span class="n">0</span>]);
+        Executor ex = <span class="k">new</span> Executor.Builder().setTickLimit(<span class="n">4000</span>).setVisual(<span class="k">false</span>).build();
+        <span class="k">long</span> sum = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; n; i++) sum += ex.runGame(<span class="k">new</span> MsPacMan(), <span class="k">new</span> Ghosts(), <span class="n">0</span>);
+        System.out.println(<span class="s">"media "</span> + (sum / n));
+    }
+}</code></pre></div>
+      </section>
+
+      <section id="depurar">
+        <div class="sec-head">
+          <span class="num">12</span>
+          <h2 class="sec">Depurar: el camino de cada tick</h2>
+        </div>
+        <p>
+          Para la máquina de estados, el motor trae observadores que dibujan el grafo y marcan el estado
+          actual. Para el árbol no hay nada, y por eso <code>Node.tick</code> apunta cada visita: al entrar,
+          el nombre con una sangría de dos espacios por nivel; al salir, lo que devolvió. Se activa poniendo
+          <code>Ghosts.TRACE</code> a <code>true</code>, y sólo se imprime a <code>BLINKY</code> en los turnos
+          en que tiene que decidir, que son los cruces; por eso los números de turno van a saltos. Esto es lo
+          que sale en tres cruces seguidos de una partida:
+        </p>
+        <pre>t=129
+fantasma BLINKY  SUCCESS
+  encerrado  FAILURE
+    ¿en la cárcel?  FAILURE
+  huir  FAILURE
+    ¿peligro?  FAILURE
+      ¿comestible?  FAILURE
+      ¿Ms. Pac-Man junto a una PPill?  FAILURE
+  aleatorio  SUCCESS
+    ¿acaba de morir Ms. Pac-Man?  SUCCESS
+    moverse al azar  SUCCESS
+t=147
+fantasma BLINKY  SUCCESS
+  encerrado  FAILURE
+    ¿en la cárcel?  FAILURE
+  huir  FAILURE
+    ¿peligro?  FAILURE
+      ¿comestible?  FAILURE
+      ¿Ms. Pac-Man junto a una PPill?  FAILURE
+  aleatorio  SUCCESS
+    ¿acaba de morir Ms. Pac-Man?  SUCCESS
+    moverse al azar  SUCCESS
+t=159
+fantasma BLINKY  SUCCESS
+  encerrado  FAILURE
+    ¿en la cárcel?  FAILURE
+  huir  SUCCESS
+    ¿peligro?  SUCCESS
+      ¿comestible?  FAILURE
+      ¿Ms. Pac-Man junto a una PPill?  SUCCESS
+    BLINKYrunsAway  SUCCESS</pre>
+        <p>
+          Se lee de arriba abajo, y lo que <em>no</em> aparece es tan informativo como lo que sí. En los
+          turnos 129 y 147 <code>BLINKY</code> está en la ventana de después de una muerte y se mueve al azar,
+          y la rama de perseguir no llega a mirarse. En el 159, Ms.&nbsp;Pac-Man se ha acercado a una píldora
+          de poder: la rama de huir, que tiene más prioridad, gana, y la de aleatorio desaparece de la traza
+          aunque su condición seguiría cumpliéndose. Eso es la reactividad vista desde dentro.
+        </p>
+        <p>
+          Imprimir cada tick de una partida entera son miles de líneas. Para verla de lejos, lo útil es
+          quedarse con la <strong>rama de primer nivel que tuvo éxito</strong> en cada turno y agrupar los
+          turnos seguidos. Así se encontró el parpadeo de la <a href="#tick">sección&nbsp;03</a>: un
+          controlador sano da tramos largos —52 turnos comiendo, 83 escapando, 53 comiendo, 156 cazando…— y
+          uno que parpadea da una ristra de tramos de un turno.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Nombres que se entiendan en la traza</span>
+          <p>
+            La hoja de <code>ChaseAction</code> sale como <code>BLINKYchases</code> porque toma el nombre de
+            <code>getActionId()</code>. Las condiciones y las acciones en lambda llevan el que les deis al
+            construirlas: escribidlo como la pregunta que hace, con signos de interrogación, y la traza se
+            leerá sola.
+          </p>
+        </div>
+      </section>
+
+      <section id="errores">
+        <div class="sec-head">
+          <span class="num">13</span>
+          <h2 class="sec">Errores típicos</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col">Error</th>
+                <th scope="col">Síntoma</th>
+                <th scope="col">Arreglo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>La rama sin condición no va la última del selector.</td>
+                <td>Las ramas de detrás no se ejecutan nunca: el fantasma no huye jamás.</td>
+                <td>El comportamiento por defecto, al final. Revisad el orden como una lista de prioridades.</td>
+              </tr>
+              <tr>
+                <td>Condiciones con efectos: apuntan un objetivo, cuentan, calculan un camino y lo guardan.</td>
+                <td>El comportamiento cambia según si el cortocircuito llegó a visitarlas o no.</td>
+                <td>Las condiciones sólo leen. Lo que se escribe, en acciones o en <code>parseInput()</code>.</td>
+              </tr>
+              <tr>
+                <td>Una acción que devuelve éxito aunque no haya podido hacer nada.</td>
+                <td>El selector no prueba la alternativa; el personaje se queda quieto o sigue recto.</td>
+                <td>Que falle: aquí, devolver <code>null</code> para que <code>ActionLeaf</code> dé <code>FAILURE</code>.</td>
+              </tr>
+              <tr>
+                <td><code>RUNNING</code> en una acción que ya ha terminado, o que no termina nunca.</td>
+                <td>Lo que va detrás en la secuencia no se ejecuta; el árbol se queda atascado en una rama.</td>
+                <td>Aquí las acciones acaban en un turno: <code>SUCCESS</code> o <code>FAILURE</code>. <code>RUNNING</code>, sólo si de verdad dura.</td>
+              </tr>
+              <tr>
+                <td>Cálculos caros dentro de las condiciones: caminos, distancias a todo.</td>
+                <td>Se repiten en cada tick, en cada fantasma y en cada condición que pregunte lo mismo; se pasa de los 40&nbsp;ms.</td>
+                <td>Calcularlos una vez en <code>parseInput()</code> y que las condiciones lean el campo.</td>
+              </tr>
+              <tr>
+                <td>Una sola instancia del árbol para los cuatro fantasmas, con nodos que tienen memoria.</td>
+                <td>El enfriamiento de uno bloquea a los demás.</td>
+                <td>Un árbol por fantasma: <code>buildTree(g)</code> dentro del bucle.</td>
+              </tr>
+              <tr>
+                <td>Campos del <code>Input</code> inicializados en la declaración.</td>
+                <td>Las condiciones ven ceros o <code>null</code> aunque <code>parseInput()</code> los rellene.</td>
+                <td>Declararlos sin valor y crearlos en <code>parseInput()</code>.</td>
+              </tr>
+              <tr>
+                <td>Una condición justo en el borde de su umbral.</td>
+                <td>La rama ganadora cambia cada turno; el personaje titubea.</td>
+                <td>Histéresis: un umbral para entrar y otro para seguir, o un enfriamiento.</td>
+              </tr>
+              <tr>
+                <td>Traducir la máquina de estados copiando las transiciones como condiciones.</td>
+                <td>Guardas imposibles de leer que dependen de sucesos ya pasados.</td>
+                <td>Una guarda por estado, sacada de «cuándo debería estar aquí», y memoria para los sucesos.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="maquinas-estados.html"><span class="pager-l">Anterior</span><span class="pager-t">Máquinas de estados</span></a>
+        <a class="pager-next" href="index.html#resumen"><span class="pager-l">Siguiente</span><span class="pager-t">Lo que hay que llevarse</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#por-que">Por qué árboles</a></li>
+            <li><a href="#nodos">Los nodos</a></li>
+            <li><a href="#tick">El tick</a></li>
+            <li><a href="#hojas">Acciones y condiciones</a></li>
+            <li><a href="#secuencia-selector">Secuencia y selector</a></li>
+            <li><a href="#decoradores">Decoradores y demás</a></li>
+            <li><a href="#traza">Un tick, paso a paso</a></li>
+            <li><a href="#pizarra">La pizarra</a></li>
+            <li><a href="#de-fsm">De la FSM al árbol</a></li>
+            <li><a href="#java">Un árbol en Java</a></li>
+            <li><a href="#controladores">Fantasmas y Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="#depurar">Depurar</a></li>
+            <li><a href="#errores">Errores típicos</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html" aria-current="page"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>

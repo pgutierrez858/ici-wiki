@@ -61,7 +61,7 @@
     </h1>
     <p class="standfirst">
       Lo mismo que cuentan
-      <a href="apuntes-pathfinding.html">los apuntes de pathfinding y estrategias algorítmicas</a>, con los
+      <a href="tema1/index.html">los apuntes del tema 1</a>, de la página 01 a la 07, con los
       dibujos y el pseudocódigo delante: representar el mapa, buscar en él, A*, y qué de todo eso viene ya
       hecho en el simulador. Se pasa con las flechas del teclado y el botón de abajo la pone a pantalla
       completa.
@@ -947,16 +947,10 @@ open.add(start);
       <section class="slide s-code" id="d50">
         <span class="slide-num">Parte 5 · 50</span>
         <h2>El laberinto como mapa de costes</h2>
-        <pre class="pseudo"><span class="fn">ponerTodosLosNodosA</span>(<span class="var">costeBase</span>)
-<b>for each</b> <span class="var">f</span> <b>in</b> FANTASMAS <b>do</b>
-    <b>if</b> <span class="fn">esComestible</span>(<span class="var">f</span>) <b>then</b>
-        <span class="fn">abaratarAlrededorDe</span>(<span class="fn">nodo</span>(<span class="var">f</span>), radio, factor)
-    <b>else</b>
-        <span class="fn">encarecerAlrededorDe</span>(<span class="fn">nodo</span>(<span class="var">f</span>), radio, factor)
-        <span class="fn">encarecerElCamino</span>(<span class="fn">caminoHastaMí</span>(<span class="var">f</span>), factor)
-    <b>end if</b>
-<b>end for</b>
-<b>return</b> <span class="fn">búsquedaDeCosteMínimo</span>(<span class="var">miNodo</span>)</pre>
+        <pre class="pseudo"><span class="fn">pintarCapas</span>()                  <i>// comida, amenaza, presa, poder, salidas: de 0 a 1</i>
+<span class="var">coste</span>[<span class="var">n</span>] ← máx(<span class="var">costeMínimo</span>, <span class="var">base</span> − <span class="fn">U</span>(<span class="var">n</span>)) para todo nodo <span class="var">n</span>
+<span class="var">destino</span> ← el nodo de mayor <span class="fn">U</span> a como mucho <span class="var">horizonte</span> pasos
+<b>return</b> el primer paso de <span class="fn">costeUniforme</span>(<span class="var">miNodo</span>, <span class="var">destino</span>, <span class="var">coste</span>)</pre>
         <p class="lede">
           La decisión deja de estar en un <code>if</code> y pasa a estar en el mapa. Es el
           <em lang="en">influence map</em> de los juegos de estrategia. Se depura pintándolo.
@@ -1223,7 +1217,7 @@ open.add(start);
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

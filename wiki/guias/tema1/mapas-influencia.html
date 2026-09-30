@@ -1,0 +1,1994 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Mapas de influencia · Tema 1 · ICI</title>
+<meta name="description" content="Qué es una capa, cómo se propaga por el laberinto, cómo se combinan varias en una función objetivo, y cómo se escribe de principio a fin un controlador de Ms. Pac-Man que sólo decide con un mapa de influencia.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 1</a>
+    <span aria-hidden="true">/</span>
+    <span>Mapas de influencia</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 1 · 06 · Decidir</p>
+    <h1>
+      Mapas de influencia
+      <span class="thin">Pintar un número en cada nodo y dejar que el mapa decida.</span>
+    </h1>
+    <p class="standfirst">
+      Qué es una capa, cómo se propaga por el laberinto, cómo se combinan varias en una función objetivo, y cómo se escribe de principio a fin un controlador de Ms.&nbsp;Pac-Man que sólo decide con un mapa de influencia.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="idea">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué es un mapa de influencia</h2>
+        </div>
+        <p>
+          La idea viene de los juegos de estrategia. En vez de escribir reglas sobre cada unidad —«si hay
+          un enemigo a menos de tanto, retírate»—, se pinta sobre el mapa un número en cada casilla que dice
+          cuánto <em>pesa</em> allí cada cosa: cerca de un ejército enemigo, mucho peligro; cerca de un
+          recurso, mucho interés. Cada unidad <strong>irradia</strong> su influencia alrededor, la influencia
+          se va apagando con la distancia, y la decisión ya no mira a las unidades: mira el mapa. ¿Dónde
+          atacar? Donde el mapa diga que el enemigo es débil. ¿Por dónde ir? Por donde el peligro sea bajo.
+        </p>
+        <p>
+          En Ms.&nbsp;Pac-Man el mapa es el propio laberinto, y las «casillas» son sus nodos. A cada nodo se
+          le da un número por cada cosa que importa —comida, perseguidores, fantasmas comestibles, píldoras de
+          poder— y luego se mezclan en uno solo. Ese número se puede leer de dos formas, que son la misma con
+          el signo cambiado:
+        </p>
+        <ul>
+          <li>
+            Como <strong>coste</strong> de pasar por ese nodo: caro cerca de un perseguidor, barato cerca de
+            la comida. Entonces decide una búsqueda de coste mínimo, la de
+            <a href="busqueda.html#ciegas">coste uniforme</a>, sin cambiarle una línea: el camino más barato
+            da el rodeo solo.
+          </li>
+          <li>
+            Como <strong>utilidad</strong> de estar ahí: alta cerca de la comida, baja cerca del peligro.
+            Entonces decide un máximo: de las salidas que tienes, la que lleva a mejor sitio.
+          </li>
+        </ul>
+        <p>
+          Dicho en una frase, es una forma de escribir la decisión en la que el conocimiento sobre el juego
+          no está en una cadena de <code>if</code> ni en una fórmula que puntúa jugadas, sino <strong>pintado
+          en el mapa</strong>. Es la tercera de las <a href="estrategias.html#tres-formas">tres formas de
+          escribir la decisión</a> que se comparan en la página de estrategias, junto a las reglas con
+          prioridad y la función de evaluación.
+        </p>
+        <p>
+          El modelo tiene tres piezas. Son exactamente las del ejemplo interactivo y las figuras de esta
+          página, y el pseudocódigo de más abajo es lo que hace el código del ejemplo:
+        </p>
+        <ol>
+          <li>
+            <strong>Fuentes, agrupadas en capas.</strong> Cada cosa del juego que importa es una
+            <em>fuente</em>, y las fuentes del mismo tipo forman una <em>capa</em>: todas las píldoras, la
+            capa de comida; todos los perseguidores, la de amenaza. Cada capa se pinta por separado: cada
+            fuente reparte su influencia por el laberinto perdiendo fuerza con la distancia, las de la misma
+            capa se suman, y el resultado se divide por su máximo para que todas las capas vayan de 0 a 1.
+          </li>
+          <li>
+            <strong>Una suma con pesos.</strong> Las capas se juntan en un solo número por nodo,
+            <em>U</em>, con un peso por capa. El signo con el que entra cada una dice si atrae o repele.
+          </li>
+          <li>
+            <strong>Una decisión que lee el mapa.</strong> Se busca el mejor sitio al alcance y se va hacia
+            él por el camino más barato, con el coste sacado del mismo mapa con el signo cambiado.
+          </li>
+        </ol>
+        <p>
+          Una <strong>fuente</strong> es un registro de dos campos, y las listas se vacían y se vuelven a
+          llenar en cada turno, porque las cosas se mueven y desaparecen:
+        </p>
+        <ul>
+          <li>
+            <code>origen</code>: el índice del nodo donde está la cosa. Es de ahí de donde sale su influencia.
+          </li>
+          <li>
+            <code>sentido</code>: el último movimiento de la cosa, o <code>ninguno</code>. Sólo tiene sentido
+            para un perseguidor: como no puede darse la vuelta, su influencia podría salir sólo hacia
+            delante. Por defecto va a <code>ninguno</code> y la influencia sale hacia todos lados; el
+            interruptor <em>Sentido</em> del ejemplo lo enciende, y más abajo se ve por qué no está encendido
+            de entrada.
+          </li>
+        </ul>
+        <p>
+          La fuente no lleva peso: el peso es de la capa, el mismo para todas sus fuentes, y se aplica al
+          sumar. En un turno concreto, las listas tienen esta pinta:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Qué es</th>
+                <th scope="col">Capa</th>
+                <th scope="col"><code>origen</code></th>
+                <th scope="col"><code>sentido</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Una píldora</td><td>comida</td><td>412</td><td>ninguno</td></tr>
+              <tr><td>Otra píldora (hay una fila por píldora activa)</td><td>comida</td><td>413</td><td>ninguno</td></tr>
+              <tr><td>Una píldora de poder</td><td>poder</td><td>97</td><td>ninguno</td></tr>
+              <tr><td>Blinky, persiguiendo</td><td>amenaza</td><td>630</td><td>ninguno, o <code>LEFT</code> con <em>Sentido</em></td></tr>
+              <tr><td>Sue, comestible</td><td>presa</td><td>1&#8239;020</td><td>ninguno</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Los números de nodo son de ejemplo. Una fuente no es todavía una mancha: es sólo el punto de
+          partida. La mancha la hace <code>capa</code>, que reparte cada fuente por el laberinto; la quinta
+          capa, la de salidas, no tiene fuentes, porque sólo depende de la forma del laberinto:
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · el mapa de influencia entero, tal como lo hace el ejemplo interactivo</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">pintarCapas</span>()                      <i>// en cada turno</i>
+    <span class="var">comida</span>  ← <span class="fn">capa</span>(<span class="fn">píldoras</span>(), <span class="var">caída</span>)
+    <span class="var">poder</span>   ← <span class="fn">capa</span>(<span class="fn">píldorasDePoder</span>(), <span class="var">caída</span>)
+    <span class="var">presa</span>   ← <span class="fn">capa</span>(<span class="fn">comestibles</span>(), <span class="var">caída</span>)
+    <span class="var">amenaza</span> ← <span class="fn">capa</span>(<span class="fn">perseguidores</span>(), <span class="var">caída</span>)
+    <b>for each</b> nodo <span class="var">n</span> <b>do</b>                        <i>// la única que no cambia</i>
+        <span class="var">salidas</span>[<span class="var">n</span>] ← (<span class="fn">númeroDeSalidas</span>(<span class="var">n</span>) − 1) / 3
+    <b>end for</b>
+<b>end function</b>
+
+<b>function</b> <span class="fn">capa</span>(<span class="var">fuentes</span>, <span class="var">caída</span>)
+    <span class="var">c</span>[<span class="var">n</span>] ← 0 para todo nodo <span class="var">n</span>
+    <b>for each</b> {<span class="var">origen</span>, <span class="var">sentido</span>} <b>in</b> <span class="var">fuentes</span> <b>do</b>
+        <i>// una anchura desde el origen; si la fuente tiene sentido,</i>
+        <i>// el primer paso no vuelve hacia atrás</i>
+        <b>for each</b> nodo <span class="var">n</span> a <span class="var">d</span> pasos de <span class="var">origen</span> <b>do</b>
+            <span class="var">c</span>[<span class="var">n</span>] ← <span class="var">c</span>[<span class="var">n</span>] + <span class="var">caída</span><sup><span class="var">d</span></sup>        <i>// varias fuentes se suman</i>
+        <b>end for</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">c</span> dividido por su máximo               <i>// todas las capas de 0 a 1</i>
+<b>end function</b>
+
+<b>function</b> <span class="fn">U</span>(<span class="var">n</span>)
+    <b>return</b>   <span class="var">wComida</span>  × <span class="var">comida</span>[<span class="var">n</span>]  − <span class="var">wAmenaza</span> × <span class="var">amenaza</span>[<span class="var">n</span>]
+           + <span class="var">wPresa</span>   × <span class="var">presa</span>[<span class="var">n</span>]   + <span class="var">wPoder</span>   × <span class="var">poder</span>[<span class="var">n</span>]
+           + <span class="var">wSalidas</span> × <span class="var">salidas</span>[<span class="var">n</span>]
+<b>end function</b>
+
+<b>function</b> <span class="fn">decidir</span>()
+    <span class="var">destino</span> ← el nodo de mayor <span class="fn">U</span> a como mucho <span class="var">horizonte</span> pasos
+    <span class="var">coste</span>[<span class="var">n</span>] ← máx(<span class="var">costeMínimo</span>, <span class="var">base</span> − <span class="fn">U</span>(<span class="var">n</span>)) para todo nodo <span class="var">n</span>
+                                    <i>// base = 1, costeMínimo = 0,2</i>
+    <span class="var">camino</span> ← <span class="fn">costeUniforme</span>(<span class="var">miNodo</span>, <span class="var">destino</span>, <span class="var">coste</span>)
+    <b>return</b> el primer paso de <span class="var">camino</span>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Lo importante es que <strong>todo lo que interesa acaba en el mismo número</strong>. La comida, la
+          presa y las píldoras de poder suben <em>U</em>, la amenaza la baja, y los cruces con más salidas la
+          suben un poco, porque es donde es más difícil que te encierren. Añadir un factor nuevo es añadir
+          una capa con su peso; la decisión no se toca.
+        </p>
+        <p>
+          La línea del coste en <code>decidir</code> es la que convierte una lectura en la otra. La búsqueda
+          de coste uniforme necesita un <strong>coste de entrar</strong> en cada nodo, positivo, y lo que
+          tenemos es una utilidad, donde más es mejor. Así que se le da la vuelta al signo,
+          <code>base − U(n)</code>: un nodo bueno sale barato de pisar y uno malo, caro. La
+          <code>base</code> es lo que cuesta un nodo neutro, con <em>U</em> = 0; vale 1 para que en una
+          zona sin nada cada paso cueste lo mismo que en una búsqueda normal y el camino corto siga ganando.
+          Y el <code>máx</code> es un suelo, porque un nodo con <em>U</em> mayor que la base saldría a coste
+          cero o negativo:
+        </p>
+        <figure>
+          <figcaption>Cuenta · el coste de entrar en cuatro nodos, con base 1 y suelo 0,2</figcaption>
+          <pre class="cuenta">nodo neutro        U =  0     1 − 0      =  1
+junto a fantasma   U = −2,5   1 + 2,5    =  3,5
+cerca de comida    U =  0,6   1 − 0,6    =  0,4
+muy bueno          U =  1,5   1 − 1,5    = −0,5  → 0,2</pre>
+        </figure>
+        <p>
+          Sin el suelo pasarían dos cosas malas. Con coste cero, una zona muy buena se recorrería gratis y
+          daría igual lo lejos que estuviera. Y con costes negativos la búsqueda de coste uniforme deja de
+          ser correcta: da un nodo por cerrado con su mejor camino, y un paso negativo posterior podría
+          abaratárselo después. El 0,2 no es sagrado; lo que importa es que sea positivo y bastante menor
+          que la base.
+        </p>
+        <p>
+          Y lo que el modelo <em>no</em> hace, a propósito, para que se vea entero: la píldora de poder
+          atrae siempre con el mismo peso, aunque comérsela sólo rinde cuando hay perseguidores cerca —la
+          <a href="estrategias.html#tres-formas">función de evaluación</a> de estrategias le cambia el signo
+          según la situación—, y un fantasma comestible atrae aunque no dé tiempo a alcanzarlo —la cuenta
+          está en <a href="estrategias.html#alcanzar-comestible">¿me da tiempo a comérmelo?</a>—. Las dos
+          cosas se pueden meter en el mapa, y el <a href="#controlador">controlador en Java</a> de más abajo
+          es una versión aún más reducida que dice en qué se aparta de éste.
+        </p>
+      </section>
+
+      <section id="capas">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Pintar el mapa, capa por capa</h2>
+        </div>
+        <p>
+          Ese pseudocódigo esconde la técnica entera en una línea, <code>c[n] + caída<sup>d</sup></code>:
+          cuánto se apaga una fuente a cada paso. Así que conviene verla con números. Una <strong>capa</strong> es un número
+          por nodo que mide <em>una sola cosa</em>: lo cerca que se está de la comida, de un perseguidor, de
+          una píldora de poder. Cada fuente vale 1 en su nodo y va perdiendo fuerza a cada paso, con una
+          <strong>caída</strong> que es el único parámetro que tiene.
+        </p>
+        <figure class="wide">
+          <figcaption>Una sola fuente: 1 donde está, y un 25&#8239;% menos por cada paso de pasillo</figcaption>
+          <svg class="explica dgi1" viewBox="0 0 320 200" role="img" aria-label="Un laberinto de rejilla de dieciséis por diez casillas con un fantasma en el pasillo central. Cada casilla libre lleva escrito un número entre 0 y 1: vale 1 en la casilla del fantasma y va bajando a medida que se aleja contando pasos por el pasillo. Dos casillas están recuadradas: una justo encima del fantasma, a cuatro pasos, con 0,32, y otra dos casillas por debajo en línea recta pero a once pasos de pasillo, con 0,04.">
+            <style>
+              .dgi1 .sue{fill:var(--surface)}
+              .dgi1 .mal{fill:var(--blinky)}
+              .dgi1 .mu{fill:var(--maze);fill-opacity:.16;stroke:var(--maze);stroke-opacity:.45;stroke-width:.5}
+              .dgi1 .nu text{font-family:var(--f-mono);font-size:6.2px;text-anchor:middle;fill:var(--ink-2)}
+              .dgi1 .gh{fill:var(--blinky)}
+              .dgi1 .mar{fill:none;stroke:var(--ink);stroke-width:1.2}
+            </style>
+            <rect class="sue" x="0" y="0" width="320" height="200"/>
+            <path class="mal" fill-opacity="0.14" d="M20 20h20v20h-20zM40 20h20v20h-20zM60 20h20v20h-20zM180 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM220 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM220 80h20v20h-20zM20 100h20v20h-20zM220 100h20v20h-20zM20 140h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM80 160h20v20h-20zM100 160h20v20h-20zM120 160h20v20h-20z"/>
+            <path class="mal" fill-opacity="0.3" d="M80 20h20v20h-20zM100 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM20 40h20v20h-20zM180 40h20v20h-20zM20 60h20v20h-20zM180 60h20v20h-20zM200 60h20v20h-20zM20 80h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM80 120h20v20h-20zM80 140h20v20h-20z"/>
+            <path class="mal" fill-opacity="0.46" d="M120 20h20v20h-20zM120 40h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM80 80h20v20h-20zM80 100h20v20h-20z"/>
+            <path class="mal" fill-opacity="0.62" d="M80 60h20v20h-20zM120 60h20v20h-20z"/>
+            <path class="mal" fill-opacity="0.8" d="M100 60h20v20h-20z"/>
+            <path class="mu" d="M0 0h20v20h-20zM20 0h20v20h-20zM40 0h20v20h-20zM60 0h20v20h-20zM80 0h20v20h-20zM100 0h20v20h-20zM120 0h20v20h-20zM140 0h20v20h-20zM160 0h20v20h-20zM180 0h20v20h-20zM200 0h20v20h-20zM220 0h20v20h-20zM240 0h20v20h-20zM260 0h20v20h-20zM280 0h20v20h-20zM300 0h20v20h-20zM0 20h20v20h-20zM300 20h20v20h-20zM0 40h20v20h-20zM40 40h20v20h-20zM60 40h20v20h-20zM80 40h20v20h-20zM100 40h20v20h-20zM140 40h20v20h-20zM160 40h20v20h-20zM200 40h20v20h-20zM220 40h20v20h-20zM240 40h20v20h-20zM260 40h20v20h-20zM300 40h20v20h-20zM0 60h20v20h-20zM300 60h20v20h-20zM0 80h20v20h-20zM40 80h20v20h-20zM60 80h20v20h-20zM100 80h20v20h-20zM120 80h20v20h-20zM140 80h20v20h-20zM160 80h20v20h-20zM180 80h20v20h-20zM200 80h20v20h-20zM240 80h20v20h-20zM260 80h20v20h-20zM300 80h20v20h-20zM0 100h20v20h-20zM100 100h20v20h-20zM200 100h20v20h-20zM300 100h20v20h-20zM0 120h20v20h-20zM20 120h20v20h-20zM40 120h20v20h-20zM60 120h20v20h-20zM100 120h20v20h-20zM140 120h20v20h-20zM160 120h20v20h-20zM200 120h20v20h-20zM240 120h20v20h-20zM260 120h20v20h-20zM280 120h20v20h-20zM300 120h20v20h-20zM0 140h20v20h-20zM100 140h20v20h-20zM140 140h20v20h-20zM160 140h20v20h-20zM200 140h20v20h-20zM300 140h20v20h-20zM0 160h20v20h-20zM300 160h20v20h-20zM0 180h20v20h-20zM20 180h20v20h-20zM40 180h20v20h-20zM60 180h20v20h-20zM80 180h20v20h-20zM100 180h20v20h-20zM120 180h20v20h-20zM140 180h20v20h-20zM160 180h20v20h-20zM180 180h20v20h-20zM200 180h20v20h-20zM220 180h20v20h-20zM240 180h20v20h-20zM260 180h20v20h-20zM280 180h20v20h-20zM300 180h20v20h-20z"/>
+            <g class="nu">
+            <text x="30" y="33">.18</text><text x="50" y="33">.13</text><text x="70" y="33">.18</text><text x="90" y="33">.24</text><text x="110" y="33">.32</text><text x="130" y="33">.42</text><text x="150" y="33">.32</text><text x="170" y="33">.24</text><text x="190" y="33">.18</text><text x="210" y="33">.13</text><text x="230" y="33">.1</text><text x="250" y="33">.08</text><text x="270" y="33">.06</text><text x="290" y="33">.04</text>
+            <text x="30" y="53">.24</text><text x="130" y="53">.56</text><text x="190" y="53">.24</text><text x="290" y="53">.06</text>
+            <text x="30" y="73">.32</text><text x="50" y="73">.42</text><text x="70" y="73">.56</text><text x="90" y="73">.75</text><text x="110" y="73">1</text><text x="130" y="73">.75</text><text x="150" y="73">.56</text><text x="170" y="73">.42</text><text x="190" y="73">.32</text><text x="210" y="73">.24</text><text x="230" y="73">.18</text><text x="250" y="73">.13</text><text x="270" y="73">.1</text><text x="290" y="73">.08</text>
+            <text x="30" y="93">.24</text><text x="90" y="93">.56</text><text x="230" y="93">.13</text><text x="290" y="93">.06</text>
+            <text x="30" y="113">.18</text><text x="50" y="113">.24</text><text x="70" y="113">.32</text><text x="90" y="113">.42</text><text x="130" y="113">.04</text><text x="150" y="113">.03</text><text x="170" y="113">.02</text><text x="190" y="113">.02</text><text x="230" y="113">.1</text><text x="250" y="113">.08</text><text x="270" y="113">.06</text><text x="290" y="113">.04</text>
+            <text x="90" y="133">.32</text><text x="130" y="133">.06</text><text x="190" y="133">.02</text><text x="230" y="133">.08</text>
+            <text x="30" y="153">.1</text><text x="50" y="153">.13</text><text x="70" y="153">.18</text><text x="90" y="153">.24</text><text x="130" y="153">.08</text><text x="190" y="153">.03</text><text x="230" y="153">.06</text><text x="250" y="153">.04</text><text x="270" y="153">.03</text><text x="290" y="153">.02</text>
+            <text x="30" y="173">.08</text><text x="50" y="173">.1</text><text x="70" y="173">.13</text><text x="90" y="173">.18</text><text x="110" y="173">.13</text><text x="130" y="173">.1</text><text x="150" y="173">.08</text><text x="170" y="173">.06</text><text x="190" y="173">.04</text><text x="210" y="173">.03</text><text x="230" y="173">.04</text><text x="250" y="173">.03</text><text x="270" y="173">.02</text><text x="290" y="173">.02</text>
+            </g>
+            <rect class="mar" x="101.5" y="21.5" width="17" height="17"/><rect class="mar" x="121.5" y="101.5" width="17" height="17"/>
+            <path class="gh" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+          </svg>
+        </figure>
+        <p>
+          Con una caída de 0,75, cada paso vale tres cuartos de lo que valía el anterior:
+        </p>
+        <figure>
+          <figcaption>Cuenta · lo que vale un fantasma según lo lejos que estés</figcaption>
+          <pre class="cuenta">a  0 pasos                     1
+a  1 paso      1     × 0,75  =  0,75
+a  2 pasos     0,75  × 0,75  =  0,56
+a  3 pasos     0,56  × 0,75  =  0,42
+a  4 pasos     0,42  × 0,75  =  0,32
+   …
+a 11 pasos                      0,04</pre>
+        </figure>
+        <p>
+          Y ahora fijaos en las dos casillas recuadradas de la figura. Están <strong>las dos a dos casillas
+          del fantasma en línea recta</strong>, una por encima y otra por debajo, y valen
+          <strong>0,32</strong> y <strong>0,04</strong>: la de arriba está a cuatro pasos de pasillo y la de
+          abajo a once, porque para llegar hay que dar toda la vuelta. El mapa hereda la forma del laberinto
+          <em>porque se propaga por él</em>, y eso es justo lo que no consigue ningún radio pintado con la
+          distancia en línea recta. Es la lección del <a href="representacion.html#problema">problema de partida</a> otra vez, ahora del lado del mapa.
+        </p>
+        <p>
+          ¿Y cuánto tiene que valer la caída? Tiene que estar <strong>entre 0 y 1</strong>: con 1 o más la
+          influencia no se apaga nunca, y con 0 no sale de su nodo. Dentro de ese intervalo, el número no se
+          elige mirándolo a él, sino decidiendo <strong>hasta dónde tiene que notarse la fuente</strong>.
+          Digamos que una fuente deja de contar cuando vale menos de 0,1, una décima de lo que vale en su
+          nodo. Entonces se decide el alcance <var>d</var> en pasos y se despeja:
+        </p>
+        <figure>
+          <figcaption>Cuenta · de cuántos pasos quiero que se note la fuente a la caída</figcaption>
+          <pre class="cuenta">caída<sup>d</sup>  =  0,1
+caída   =  0,1<sup>1/d</sup>
+
+alcance  8 pasos    0,1<sup>1/8</sup>   =  0,75
+alcance 14 pasos    0,1<sup>1/14</sup>  =  0,85
+alcance 22 pasos    0,1<sup>1/22</sup>  =  0,90
+alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
+        </figure>
+        <p>
+          La cuenta al revés sirve para leer una caída que ya está puesta: el alcance es
+          ln&nbsp;0,1&nbsp;/&nbsp;ln&nbsp;caída. Con 0,4 son dos pasos y medio, y el mapa es miope; con
+          0,95 son 45, así que casi todo el laberinto se entera de todo y las casillas acaban valiendo parecido. Lo
+          razonable queda en medio, y depende de <em>qué</em> es la fuente: un perseguidor a quince pasos
+          todavía es un problema, pero un fantasma comestible a quince pasos seguramente no se alcanza antes
+          de que deje de serlo, porque <a href="estrategias.html#alcanzar-comestible">se tarda hasta el doble
+          de pasos</a> en cogerlo. Por eso el <a href="#controlador">controlador</a> de más abajo usa 0,90
+          para la comida y la amenaza y 0,85, más corta, para la presa. El ajuste fino se hace después
+          jugando partidas, como en <a href="#afinar">afinar</a>.
+        </p>
+        <p>
+          Con varias fuentes se suman las influencias, y después <strong>cada capa se divide por su
+          máximo</strong>. Ese paso parece de adorno y no lo es: sin él, una capa alimentada por veinte
+          píldoras llega a valores mucho más altos que la de un solo fantasma, y su peso acaba pesando más
+          sin que nadie lo haya decidido. Los pesos sólo se pueden comparar entre sí si todas las capas
+          están en la misma escala.
+        </p>
+        <p>
+          Hecho eso, la <strong>función objetivo</strong> es una suma con pesos, y el signo de cada término
+          dice si esa capa atrae o repele:
+        </p>
+        <figure>
+          <figcaption>La función objetivo, entera</figcaption>
+          <pre class="pseudo">U(<span class="var">c</span>) =   <span class="var">wComida</span>  × <span class="fn">comida</span>(<span class="var">c</span>)
+     − <span class="var">wAmenaza</span> × <span class="fn">amenaza</span>(<span class="var">c</span>)
+     + <span class="var">wPresa</span>   × <span class="fn">presa</span>(<span class="var">c</span>)      <i>// fantasmas comestibles</i>
+     + <span class="var">wPoder</span>   × <span class="fn">poder</span>(<span class="var">c</span>)      <i>// píldoras de poder</i>
+     + <span class="var">wSalidas</span> × <span class="fn">salidas</span>(<span class="var">c</span>)    <i>// cuántas salidas tiene el nodo: la única capa que no cambia nunca</i></pre>
+        </figure>
+        <figure class="wide">
+          <figcaption>Tres de las cinco capas, y lo que sale de sumarlas con sus pesos · amarillo
+            suma y rojo resta; los tres primeros paneles van de 0 a 1 y el último, de −1,69 a +1,69</figcaption>
+          <svg class="explica dgi2" viewBox="0 0 372 288" role="img" aria-label="Cuatro veces el mismo laberinto, con Ms. Pac-Man abajo en el centro, dos fantasmas rojos en el pasillo de en medio, uno azul comestible arriba a la derecha, píldoras repartidas y dos píldoras de poder en esquinas opuestas. En el primero se tiñe de amarillo lo que está cerca de la comida; en el segundo de rojo lo que está cerca de los fantasmas rojos; en el tercero de amarillo los cruces con más salidas. El cuarto es la suma de las cinco capas con sus pesos: el pasillo central sale rojo y parte el laberinto en dos, y las dos esquinas de abajo salen amarillas.">
+            <style>
+              .dgi2 .sue{fill:var(--surface)}
+              .dgi2 .bien{fill:var(--pill)}
+              .dgi2 .mal{fill:var(--blinky)}
+              .dgi2 .mu{fill:var(--maze);fill-opacity:.16;stroke:var(--maze);stroke-opacity:.45;stroke-width:.5}
+              .dgi2 .pi{fill:var(--pill-ink)}
+              .dgi2 .po{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1}
+              .dgi2 .gh{fill:var(--blinky)}
+              .dgi2 .gc{fill:var(--maze)}
+              .dgi2 .pc{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1.4}
+              .dgi2 .ti{font-family:var(--f-mono);font-size:8px;letter-spacing:.06em;fill:var(--ink-3)}
+            </style>
+            <defs>
+              <g id="dgi2-lab">
+                <path class="mu" d="M0 0h20v20h-20zM20 0h20v20h-20zM40 0h20v20h-20zM60 0h20v20h-20zM80 0h20v20h-20zM100 0h20v20h-20zM120 0h20v20h-20zM140 0h20v20h-20zM160 0h20v20h-20zM180 0h20v20h-20zM200 0h20v20h-20zM220 0h20v20h-20zM240 0h20v20h-20zM260 0h20v20h-20zM280 0h20v20h-20zM300 0h20v20h-20zM0 20h20v20h-20zM300 20h20v20h-20zM0 40h20v20h-20zM40 40h20v20h-20zM60 40h20v20h-20zM80 40h20v20h-20zM100 40h20v20h-20zM140 40h20v20h-20zM160 40h20v20h-20zM200 40h20v20h-20zM220 40h20v20h-20zM240 40h20v20h-20zM260 40h20v20h-20zM300 40h20v20h-20zM0 60h20v20h-20zM300 60h20v20h-20zM0 80h20v20h-20zM40 80h20v20h-20zM60 80h20v20h-20zM100 80h20v20h-20zM120 80h20v20h-20zM140 80h20v20h-20zM160 80h20v20h-20zM180 80h20v20h-20zM200 80h20v20h-20zM240 80h20v20h-20zM260 80h20v20h-20zM300 80h20v20h-20zM0 100h20v20h-20zM100 100h20v20h-20zM200 100h20v20h-20zM300 100h20v20h-20zM0 120h20v20h-20zM20 120h20v20h-20zM40 120h20v20h-20zM60 120h20v20h-20zM100 120h20v20h-20zM140 120h20v20h-20zM160 120h20v20h-20zM200 120h20v20h-20zM240 120h20v20h-20zM260 120h20v20h-20zM280 120h20v20h-20zM300 120h20v20h-20zM0 140h20v20h-20zM100 140h20v20h-20zM140 140h20v20h-20zM160 140h20v20h-20zM200 140h20v20h-20zM300 140h20v20h-20zM0 160h20v20h-20zM300 160h20v20h-20zM0 180h20v20h-20zM20 180h20v20h-20zM40 180h20v20h-20zM60 180h20v20h-20zM80 180h20v20h-20zM100 180h20v20h-20zM120 180h20v20h-20zM140 180h20v20h-20zM160 180h20v20h-20zM180 180h20v20h-20zM200 180h20v20h-20zM220 180h20v20h-20zM240 180h20v20h-20zM260 180h20v20h-20zM280 180h20v20h-20zM300 180h20v20h-20z"/>
+                <path class="pi" d="M30 148a2 2 0 1 0 .1 0zM50 148a2 2 0 1 0 .1 0zM70 148a2 2 0 1 0 .1 0zM30 168a2 2 0 1 0 .1 0zM50 168a2 2 0 1 0 .1 0zM70 168a2 2 0 1 0 .1 0zM30 108a2 2 0 1 0 .1 0zM50 108a2 2 0 1 0 .1 0zM230 108a2 2 0 1 0 .1 0zM250 108a2 2 0 1 0 .1 0zM270 108a2 2 0 1 0 .1 0zM290 108a2 2 0 1 0 .1 0zM230 88a2 2 0 1 0 .1 0zM250 148a2 2 0 1 0 .1 0zM270 148a2 2 0 1 0 .1 0zM130 28a2 2 0 1 0 .1 0zM190 28a2 2 0 1 0 .1 0z"/>
+                <circle class="po" cx="30" cy="30" r="4"/><circle class="po" cx="290" cy="170" r="4"/>
+                <path class="gh" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/><path class="gh" d="M203.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/><path class="gc" d="M263.8 35.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+                <g transform="translate(157 163) scale(-0.54 0.54)"><path class="pc" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/></g>
+              </g>
+            </defs>
+            <text class="ti" x="0" y="9">+ comida · peso 1</text>
+            <g transform="translate(0 13) scale(0.55)">
+              <rect class="sue" x="0" y="0" width="320" height="200"/>
+              <path class="bien" fill-opacity="0.14" d="M140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.3" d="M20 20h20v20h-20zM40 20h20v20h-20zM60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM20 60h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM120 100h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM280 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.46" d="M120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM180 20h20v20h-20zM120 40h20v20h-20zM180 40h20v20h-20zM80 60h20v20h-20zM100 60h20v20h-20zM120 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM180 60h20v20h-20zM200 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM280 60h20v20h-20zM20 80h20v20h-20zM80 80h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM280 140h20v20h-20zM120 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.62" d="M220 60h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM80 100h20v20h-20zM280 100h20v20h-20zM80 120h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM80 160h20v20h-20zM100 160h20v20h-20zM220 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.8" d="M220 80h20v20h-20zM220 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM80 140h20v20h-20zM20 160h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20z"/>
+              <use href="#dgi2-lab"/>
+            </g>
+            <text class="ti" x="196" y="9">− amenaza · peso 2</text>
+            <g transform="translate(196 13) scale(0.55)">
+              <rect class="sue" x="0" y="0" width="320" height="200"/>
+              <path class="mal" fill-opacity="0.14" d="M20 20h20v20h-20zM40 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 100h20v20h-20zM280 100h20v20h-20zM20 140h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM280 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM80 160h20v20h-20zM100 160h20v20h-20zM120 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.3" d="M60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM20 60h20v20h-20zM280 60h20v20h-20zM20 80h20v20h-20zM280 80h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM80 120h20v20h-20zM220 120h20v20h-20zM80 140h20v20h-20zM220 140h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.46" d="M120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM180 20h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM80 80h20v20h-20zM220 80h20v20h-20zM80 100h20v20h-20zM220 100h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.62" d="M120 40h20v20h-20zM180 40h20v20h-20zM80 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM220 60h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.8" d="M100 60h20v20h-20zM120 60h20v20h-20zM180 60h20v20h-20zM200 60h20v20h-20z"/>
+              <use href="#dgi2-lab"/>
+            </g>
+            <text class="ti" x="0" y="154">+ salidas · peso 0,5</text>
+            <g transform="translate(0 158) scale(0.55)">
+              <rect class="sue" x="0" y="0" width="320" height="200"/>
+              <path class="bien" fill-opacity="0.3" d="M20 20h20v20h-20zM40 20h20v20h-20zM60 20h20v20h-20zM80 20h20v20h-20zM100 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM200 20h20v20h-20zM220 20h20v20h-20zM240 20h20v20h-20zM260 20h20v20h-20zM280 20h20v20h-20zM20 40h20v20h-20zM120 40h20v20h-20zM180 40h20v20h-20zM280 40h20v20h-20zM40 60h20v20h-20zM60 60h20v20h-20zM100 60h20v20h-20zM140 60h20v20h-20zM160 60h20v20h-20zM200 60h20v20h-20zM240 60h20v20h-20zM260 60h20v20h-20zM20 80h20v20h-20zM80 80h20v20h-20zM220 80h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM120 100h20v20h-20zM140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM280 100h20v20h-20zM80 120h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM280 140h20v20h-20zM20 160h20v20h-20zM100 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20zM200 160h20v20h-20zM280 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.62" d="M120 20h20v20h-20zM180 20h20v20h-20zM20 60h20v20h-20zM80 60h20v20h-20zM120 60h20v20h-20zM180 60h20v20h-20zM220 60h20v20h-20zM280 60h20v20h-20zM80 100h20v20h-20zM220 100h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM80 140h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM80 160h20v20h-20zM120 160h20v20h-20zM180 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20zM260 160h20v20h-20z"/>
+              <use href="#dgi2-lab"/>
+            </g>
+            <text class="ti" x="196" y="154">la suma de las cinco</text>
+            <g transform="translate(196 158) scale(0.55)">
+              <rect class="sue" x="0" y="0" width="320" height="200"/>
+              <path class="bien" fill-opacity="0.14" d="M100 20h20v20h-20zM120 20h20v20h-20zM140 20h20v20h-20zM160 20h20v20h-20zM220 80h20v20h-20zM80 100h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.3" d="M60 20h20v20h-20zM80 20h20v20h-20zM180 20h20v20h-20zM200 20h20v20h-20zM20 60h20v20h-20zM260 60h20v20h-20zM20 80h20v20h-20zM40 100h20v20h-20zM60 100h20v20h-20zM120 100h20v20h-20zM140 100h20v20h-20zM160 100h20v20h-20zM180 100h20v20h-20zM80 120h20v20h-20zM120 120h20v20h-20zM180 120h20v20h-20zM120 140h20v20h-20zM180 140h20v20h-20zM100 160h20v20h-20zM140 160h20v20h-20zM160 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.46" d="M40 20h20v20h-20zM220 20h20v20h-20zM20 40h20v20h-20zM280 40h20v20h-20zM280 60h20v20h-20zM280 80h20v20h-20zM20 100h20v20h-20zM220 100h20v20h-20zM240 100h20v20h-20zM260 100h20v20h-20zM280 100h20v20h-20zM220 120h20v20h-20zM20 140h20v20h-20zM80 140h20v20h-20zM20 160h20v20h-20zM80 160h20v20h-20zM120 160h20v20h-20zM180 160h20v20h-20zM200 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.62" d="M20 20h20v20h-20zM240 20h20v20h-20zM280 20h20v20h-20zM40 140h20v20h-20zM60 140h20v20h-20zM220 140h20v20h-20zM240 140h20v20h-20zM260 140h20v20h-20zM280 140h20v20h-20zM40 160h20v20h-20zM60 160h20v20h-20zM220 160h20v20h-20zM240 160h20v20h-20z"/>
+              <path class="bien" fill-opacity="0.8" d="M260 20h20v20h-20zM260 160h20v20h-20zM280 160h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.14" d="M120 40h20v20h-20zM60 60h20v20h-20zM80 80h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.3" d="M80 60h20v20h-20zM120 60h20v20h-20zM160 60h20v20h-20zM180 60h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.46" d="M140 60h20v20h-20zM200 60h20v20h-20z"/>
+              <path class="mal" fill-opacity="0.62" d="M100 60h20v20h-20z"/>
+              <use href="#dgi2-lab"/>
+            </g>
+            <g transform="translate(0 282)">
+              <text class="ti" x="0" y="0">peor</text>
+              <rect class="mal" x="30" y="-7" width="9" height="9" fill-opacity="0.8"/>
+              <rect class="mal" x="40" y="-7" width="9" height="9" fill-opacity="0.62"/>
+              <rect class="mal" x="50" y="-7" width="9" height="9" fill-opacity="0.46"/>
+              <rect class="mal" x="60" y="-7" width="9" height="9" fill-opacity="0.3"/>
+              <rect class="mal" x="70" y="-7" width="9" height="9" fill-opacity="0.14"/>
+              <text class="ti" x="82" y="0">0</text>
+              <rect class="bien" x="92" y="-7" width="9" height="9" fill-opacity="0.14"/>
+              <rect class="bien" x="102" y="-7" width="9" height="9" fill-opacity="0.3"/>
+              <rect class="bien" x="112" y="-7" width="9" height="9" fill-opacity="0.46"/>
+              <rect class="bien" x="122" y="-7" width="9" height="9" fill-opacity="0.62"/>
+              <rect class="bien" x="132" y="-7" width="9" height="9" fill-opacity="0.8"/>
+              <text class="ti" x="146" y="0">mejor</text>
+            </g>
+          </svg>
+        </figure>
+        <p>
+          Mirad el panel de la amenaza: no es un círculo alrededor del fantasma, es una mancha con la forma
+          de los pasillos. Y mirad el total. El pasillo de en medio queda en rojo y <strong>parte el
+          laberinto en dos</strong>, así que cualquier búsqueda de coste mínimo que use este mapa va a dar
+          el rodeo sin que nadie haya escrito en ninguna parte «no pases por ahí». Ahí está la gracia de la
+          técnica: el conocimiento no está en el código que decide, está en el mapa que se le da.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Mapa de costes y mapa de utilidad son el mismo objeto</span>
+          <p>
+            Lo único que cambia es el signo. Donde la utilidad sube, entrar sale barato:
+<code>coste(c) = máx(costeMínimo, base − U(c))</code>, la línea de <code>decidir</code> que se explica al principio de la página. Se usa una forma u otra según lo que venga
+            detrás: si la decisión la va a tomar una <strong>búsqueda de coste mínimo</strong> —la de
+            <a href="busqueda.html#ciegas">coste uniforme</a>, sin tocar una línea— hacen falta costes; si la va a tomar un
+            <strong>máximo</strong> sobre las salidas, hace falta utilidad. El suelo del coste no es un
+            detalle: sin él, una zona muy buena saldría gratis y la distancia dejaría de contar.
+          </p>
+        </div>
+        <div class="demo" data-demo="influencia" id="influencia-demo">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Cambia los pesos y mira cómo cambia el mapa</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está en las dos figuras de aquí arriba y en el pseudocódigo.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          El mismo laberinto de las figuras, ahora vivo. Con <em>Colocas</em> se pone y se quita todo:
+          Ms.&nbsp;Pac-Man, fantasmas perseguidores, fantasmas comestibles, píldoras, píldoras de poder y
+          muros. El mapa se repinta solo en cuanto tocas cualquier cosa. La barra de <em>Pesos</em> es la
+          función objetivo de aquí arriba, un deslizador por término, y los cuatro botones de al lado son
+          juegos de pesos con nombre para comparar deprisa. Con <em>Ver</em> se mira una capa sola en vez de
+          la suma, que es la única forma de entender de dónde sale una mancha; con <em>Números</em>, el
+          valor exacto de cada casilla. Y <em>Jugar</em> repite la decisión turno a turno: no es el juego
+          —los fantasmas de aquí persiguen por el camino más corto y pierden un turno de cada tres—, pero
+          basta para ver a dónde lleva decidir así cien veces seguidas.
+        </p>
+        <p>
+          El ejemplo trae también las otras dos formas de decidir de
+          <a href="estrategias.html#tres-formas">estrategias algorítmicas</a> —reglas con prioridad y función
+          de evaluación— sobre la misma escena, para compararlas con el mapa, y lo que cambia entre ellas no es sólo
+          el resultado: es <strong>qué se toca para afinarlas</strong>. Al pasar a las reglas, la barra de
+          pesos desaparece de la pantalla, porque allí no pinta nada.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Qué probar</th>
+                <th scope="col">Qué se ve</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Los pesos son la estrategia.</strong> Pulsa <em>A lo miedosa</em> y <em>Jugar</em>; después <em>A lo glotona</em>, <em>Al principio</em> y <em>Jugar</em> otra vez.</td>
+                <td>Los mismos cinco números, con otros valores. La miedosa se lleva el nivel entero en 90 turnos; a la glotona la comen en 11.</td>
+              </tr>
+              <tr>
+                <td><strong>La amenaza no juega en la misma liga.</strong> Sube sólo su peso, de 0 a 4, mirando el pasillo de en medio.</td>
+                <td>Con 0 el laberinto es todo amarillo y ella cruza por delante de los fantasmas. Subiendo, el pasillo se cierra y la ruta se va por los bordes.</td>
+              </tr>
+              <tr>
+                <td><strong>La caída decide cuánto se ve.</strong> Bájala a 0,4 y súbela a 0,95.</td>
+                <td>Con 0,4 el mapa es miope y sólo sabe lo que tiene pegado. Con 0,95 todo el laberinto se entera de todo y el mapa se aplana hasta no distinguir nada.</td>
+              </tr>
+              <tr>
+                <td><strong>El sentido engaña a esta decisión.</strong> Pulsa <em>A lo miedosa</em>, enciende <em>Sentido</em> y pulsa <em>Jugar</em>. Con <em>Ver</em> en amenaza se ve por qué.</td>
+                <td>Sin sentido limpia el nivel en 90 turnos; con él, la comen en el turno 9. El mapa dice, con razón, que a la espalda de un fantasma no hay peligro, así que el mejor sitio del horizonte queda detrás de él, y el camino más barato hasta allí pasa por encima: pisar su casilla cuesta 4 y el rodeo, más. La información es buena; lo que falla es una decisión que suma costes y no ve que un nodo de coste 4 es un fantasma.</td>
+              </tr>
+              <tr>
+                <td><strong>Una capa sola.</strong> En <em>Ver</em>, pasa por comida, amenaza y salidas.</td>
+                <td>Las tres manchas que se suman en el mapa entero. Así es como se depura: capa por capa, no mirando el total.</td>
+              </tr>
+              <tr>
+                <td><strong>La función de evaluación mira mucho menos.</strong> Cambia a <em>Una función de evaluación</em>.</td>
+                <td>Sólo se puntúan los dos o tres cruces a los que se puede salir. Debajo está el desglose por términos, que es lo que hay que imprimir para depurar: los términos, nunca el total.</td>
+              </tr>
+              <tr>
+                <td><strong>El orden decide a ciegas.</strong> Cambia a <em>Reglas con prioridad</em> y prueba los dos órdenes con varios umbrales.</td>
+                <td>Con <em>Primero comer</em> el umbral da exactamente igual, porque la primera regla siempre se cumple y las demás no llegan a mirarse.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">El horizonte, y por qué hace falta</span>
+          <p>
+            Con el mapa pintado, la decisión más corta sería «vete a la casilla vecina que más valga». Eso
+            se atasca en cuanto hay un <strong>máximo local</strong>: un cruce que es mejor que sus cuatro
+            vecinas y peor que media docena de sitios a seis pasos, y ahí se queda oscilando. Por eso el
+            ejemplo mira primero <em>la mejor casilla dentro de un horizonte</em> y después va hasta ella
+            por el camino más barato. Baja el horizonte a 3 y se ve el atasco; súbelo a 16 y empieza a
+            cruzar el laberinto entero detrás de algo que para cuando llegue ya no estará.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">El peso de la amenaza no está en la misma liga que los demás</span>
+          <p>
+            Comer una píldora son 10 puntos y que te coman es la partida. Cuando pongáis pesos de verdad,
+            el de la amenaza va a salir varias veces más grande que todos los demás juntos, y eso
+            <strong>no es que esté mal afinado</strong>: es que las dos cosas no se miden en la misma
+            escala. Lo que sí es un aviso serio es lo otro: con cinco pesos hay cinco maneras de que el
+            controlador haga algo raro y ninguna de decir cuál ha sido. Por eso se toca <em>un peso cada
+            vez</em>, se mira la capa sola antes que el total, y se escriben los términos por separado en
+            el <code>println</code>.
+          </p>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Lo que cuesta pintarlo en el laberinto de verdad</span>
+          <p>
+            El primer laberinto tiene 1&#8239;293 nodos y al empezar el nivel hay unas 220 píldoras. Si la
+            capa de comida se calcula sumando una propagación por píldora, la cuenta por <em>tick</em> es
+            ésta:
+          </p>
+          <pre class="cuenta">una anchura por cada fuente          220 × 1 293  =  284 460 nodos
+una sola anchura, con las 220 ya en la cola                1 293 nodos</pre>
+          <p>
+            Doscientas veinte veces menos, y lo que se pierde es poco: la anchura multifuente no da la suma
+            de las influencias, da la de <strong>la fuente más cercana</strong>, que para decidir casi
+            siempre vale igual. Y hay otro ahorro más gordo todavía: la capa de comida sólo cambia cuando
+            te comes una píldora, y la de salidas no cambia nunca. Lo único que hay que repintar en cada
+            <em>tick</em> son los fantasmas.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Las tres formas de decidir tienen el mismo agujero</span>
+          <p>
+            Ninguna de las tres decide bien si los datos que recibe están mal. Una función de evaluación con
+            un término de amenaza calculado con la distancia sin <code>lastMove</code> elige mal con mucha
+            elegancia. El trabajo de verdad está en las funciones que contestan <a href="estrategias.html#llego-antes">«¿llego yo antes?»</a>,
+            «¿cuántas píldoras hay por aquí?» y «¿me da tiempo?». Lo de encima es la parte fácil.
+          </p>
+        </div>
+      </section>
+
+      <section id="controlador">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Un controlador que sólo mira el mapa</h2>
+        </div>
+        <p>
+          Hasta aquí el mapa se ha pintado para mirarlo. Ahora toca que decida él solo: una Ms.&nbsp;Pac-Man
+          escrita desde cero cuyo <code>getMove</code> no tiene ni una regla sobre el juego. Pinta tres capas,
+          las suma con sus pesos y elige la salida que mejor sale en el mapa. Nada más. Es a propósito un
+          controlador pequeño: sirve para ver qué da de sí la técnica pura, y todo lo que le falta
+          está al final de la página.
+        </p>
+        <p>
+          Antes de escribir una línea, el diseño en papel. Son tres capas y no las cinco de la función objetivo
+          de arriba, y para cada una hay que decidir lo mismo: qué la alimenta, con qué signo entra, cuánto
+          pesa, cuánto cae por paso y cada cuánto hay que repintarla.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Capa</th>
+                <th scope="col">Fuentes</th>
+                <th scope="col">Signo y peso</th>
+                <th scope="col">Caída</th>
+                <th scope="col">Se repinta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>comida</strong></td>
+                <td>Píldoras y píldoras de poder que quedan.</td>
+                <td>+&#8239;1</td>
+                <td>0,90</td>
+                <td>Cuando cambia cuántas quedan.</td>
+              </tr>
+              <tr>
+                <td><strong>amenaza</strong></td>
+                <td>Fantasmas que no son comestibles y no están en la cárcel.</td>
+                <td>−&#8239;6</td>
+                <td>0,90</td>
+                <td>En cada cruce.</td>
+              </tr>
+              <tr>
+                <td><strong>presa</strong></td>
+                <td>Fantasmas comestibles.</td>
+                <td>+&#8239;2</td>
+                <td>0,85</td>
+                <td>En cada cruce.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          ¿Por qué tan pocas? Porque cada capa es un peso más que afinar y una forma más de que el controlador
+          haga algo raro sin que se sepa por qué. Con tres todavía se puede mirar cada una por separado y
+          saber quién ha hecho qué. Y las dos que faltan no se echan de menos tanto como parece:
+        </p>
+        <ul>
+          <li>
+            La de <strong>salidas</strong> premia los cruces con muchas salidas. Aquí la decisión ya recorre el
+            pasillo entero hasta el cruce siguiente, así que lo que mira es el tramo que la compromete, no
+            el nodo suelto. Y en estos laberintos no hay callejones: <a href="estrategias.html#voraz">no hay un solo nodo con una única salida</a>.
+          </li>
+          <li>
+            La de <strong>poder</strong> se ha metido dentro de la comida. No es un capricho: si las píldoras de
+            poder no atraen, nada lleva a Ms.&nbsp;Pac-Man hasta ellas, y el nivel puede no acabarse nunca, porque
+            <code>Game.checkLevelState</code> sólo pasa de nivel cuando no quedan <em>ni</em> píldoras
+            <em>ni</em> píldoras de poder. El precio es que se las come en cuanto pasa cerca, las necesite
+            o no.
+          </li>
+        </ul>
+        <p>
+          Con eso, este controlador es el <a href="#idea">modelo del principio</a> con cuatro cambios, y
+          conviene tenerlos a la vista para no buscar en el código algo que no está:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">El modelo del principio (y el ejemplo)</th>
+                <th scope="col">Este controlador</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Capas</td>
+                <td>Cinco: comida, amenaza, presa, poder y salidas.</td>
+                <td>Tres. Las píldoras de poder entran en la comida, y la de salidas no está.</td>
+              </tr>
+              <tr>
+                <td>Comida</td>
+                <td>Una anchura por píldora, y se suman.</td>
+                <td>Una sola anchura con todas las píldoras a la vez: cada nodo se queda con la influencia de
+                  <strong>la más cercana</strong>. Es el ahorro de la nota de más arriba sobre lo que cuesta
+                  pintar el mapa, doscientas veinte veces menos trabajo.</td>
+              </tr>
+              <tr>
+                <td>Sentido de los perseguidores</td>
+                <td><code>ninguno</code> por defecto.</td>
+                <td>Siempre: la primera ola sale sólo hacia delante.</td>
+              </tr>
+              <tr>
+                <td>Decisión</td>
+                <td>En cada turno, el mejor nodo del horizonte y el camino más barato hasta él.</td>
+                <td>Sólo en los cruces: la salida cuyo tramo tiene el <strong>peor U menos malo</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          El tercer cambio sólo funciona gracias al cuarto. En el ejemplo, encender <em>Sentido</em> hace que
+          la comen antes, porque la decisión suma costes y un camino que pasa por encima de un fantasma le
+          sale barato si lo de detrás es bueno. Aquí eso no puede pasar: un tramo que pasa por un
+          perseguidor tiene en ese nodo el peor U de todo el mapa, y ese número es la nota del tramo entero.
+        </p>
+        <figure class="wide">
+          <figcaption>El controlador entero, de izquierda a derecha: del estado del juego a un movimiento</figcaption>
+          <svg class="explica dgm1" viewBox="0 0 480 250" role="img" aria-label="Diagrama de flujo en cuatro columnas. A la izquierda, una caja Game: una copia del estado por tick; debajo pone que en un pasillo el controlador devuelve NEUTRAL y no hace nada más. De Game salen tres flechas a tres capas apiladas: comida, con signo más y peso 1, alimentada por las píldoras y las píldoras de poder con una sola anchura multifuente y caída 0,90; amenaza, con signo menos y peso 6, alimentada por los fantasmas que comen, con una anchura por fantasma y caída 0,90; y presa, con signo más y peso 2, alimentada por los fantasmas comestibles, con una anchura por fantasma y caída 0,85. Las tres capas entran en una caja U de n, un número por nodo. De ahí se pasa a la caja de decisión, en el cruce: para cada salida se toma el peor U de su tramo y gana la mayor. De ella sale el MOVE.">
+            <style>
+              .dgm1 .caja{fill:var(--surface);stroke:var(--line);stroke-width:1}
+              .dgm1 .co{fill:var(--pill);fill-opacity:.2;stroke:var(--pill-ink);stroke-width:1}
+              .dgm1 .am{fill:var(--blinky);fill-opacity:.14;stroke:var(--blinky);stroke-width:1}
+              .dgm1 .pr{fill:var(--maze);fill-opacity:.12;stroke:var(--maze);stroke-width:1}
+              .dgm1 .sal{fill:var(--surface);stroke:var(--ok);stroke-width:1.6}
+              .dgm1 .tt{font-family:var(--f-display);font-weight:700;font-size:11px;fill:var(--ink)}
+              .dgm1 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .dgm1 .ts{font-family:var(--f-mono);font-size:8.5px;fill:var(--ink-2)}
+              .dgm1 .mid{text-anchor:middle}
+              .dgm1 .fl{fill:none;stroke:var(--ink-3);stroke-width:1.2;marker-end:url(#mi-f1)}
+            </style>
+            <defs>
+              <marker id="mi-f1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+            </defs>
+            <rect class="caja" x="6" y="92" width="84" height="66" rx="3"/>
+            <text class="tt mid" x="48" y="114">Game</text>
+            <text class="ts mid" x="48" y="131">una copia</text>
+            <text class="ts mid" x="48" y="143">por tick</text>
+            <text class="ts mid" x="48" y="180">en un pasillo:</text>
+            <text class="ts mid" x="48" y="192">NEUTRAL y fuera</text>
+
+            <rect class="co" x="118" y="14" width="148" height="66" rx="3"/>
+            <text class="tt" x="126" y="32">+ comida · peso 1</text>
+            <text class="ts" x="126" y="48">píldoras y de poder</text>
+            <text class="ts" x="126" y="61">una anchura multifuente</text>
+            <text class="ts" x="126" y="74">caída 0,90</text>
+
+            <rect class="am" x="118" y="92" width="148" height="66" rx="3"/>
+            <text class="tt" x="126" y="110">− amenaza · peso 6</text>
+            <text class="ts" x="126" y="126">fantasmas que comen</text>
+            <text class="ts" x="126" y="139">una anchura por fantasma</text>
+            <text class="ts" x="126" y="152">caída 0,90</text>
+
+            <rect class="pr" x="118" y="170" width="148" height="66" rx="3"/>
+            <text class="tt" x="126" y="188">+ presa · peso 2</text>
+            <text class="ts" x="126" y="204">fantasmas comestibles</text>
+            <text class="ts" x="126" y="217">una anchura por fantasma</text>
+            <text class="ts" x="126" y="230">caída 0,85</text>
+
+            <rect class="caja" x="296" y="92" width="80" height="66" rx="3"/>
+            <text class="tt mid" x="336" y="116">U(n)</text>
+            <text class="ts mid" x="336" y="133">un número</text>
+            <text class="ts mid" x="336" y="145">por nodo</text>
+
+            <rect class="caja" x="398" y="80" width="78" height="90" rx="3"/>
+            <text class="t mid" x="437" y="98">en el cruce</text>
+            <text class="ts mid" x="437" y="116">cada salida:</text>
+            <text class="ts mid" x="437" y="129">el peor U</text>
+            <text class="ts mid" x="437" y="142">de su tramo</text>
+            <text class="ts mid" x="437" y="159">gana el mayor</text>
+
+            <rect class="sal" x="404" y="196" width="66" height="30" rx="3"/>
+            <text class="t mid" x="437" y="215">MOVE</text>
+
+            <path class="fl" d="M90 125 C104 125 104 47 116 47"/>
+            <path class="fl" d="M90 125 H116"/>
+            <path class="fl" d="M90 125 C104 125 104 203 116 203"/>
+            <path class="fl" d="M266 47 C282 47 282 125 294 125"/>
+            <path class="fl" d="M266 125 H294"/>
+            <path class="fl" d="M266 203 C282 203 282 125 294 125"/>
+            <path class="fl" d="M376 125 H396"/>
+            <path class="fl" d="M437 170 V194"/>
+          </svg>
+        </figure>
+        <p>
+          Fijaos en lo que no aparece en el diagrama: ninguna caja pregunta «¿hay un fantasma cerca?» ni
+          «¿me conviene la píldora de poder?». Todo eso tiene que salir de los números del mapa. Si sale bien,
+          es mérito de las capas; si sale mal, también es culpa suya, y ahí es donde se mira.
+        </p>
+      </section>
+
+      <section id="estructuras">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Un array por capa</h2>
+        </div>
+        <p>
+          Una capa es un <code>double[]</code> con una casilla por nodo, indexado por el mismo índice de nodo
+          que usa el motor. Nada de mapas ni de objetos por nodo: el motor ya numera los nodos de 0 a
+          n&nbsp;−&nbsp;1, y todo lo que os da —<code>getActivePillsIndices</code>,
+          <code>getGhostCurrentNodeIndex</code>, <code>getNeighbouringNodes</code>— son índices de esos.
+          Leer lo que vale un nodo es leer una posición de un <em>array</em>.
+        </p>
+        <p>
+          Hay dos cosas que conviene hacer bien desde el principio. La primera es que <strong>el tamaño
+          cambia con el laberinto</strong>: los cuatro tienen 1&#8239;293, 1&#8239;319, 1&#8239;380 y
+          1&#8239;309 nodos. Así que los <em>arrays</em> se reservan cuando cambia
+          <code>getMazeIndex()</code>, y sólo entonces; nunca dentro de cada <em>tick</em>, que es fabricar
+          basura para el recolector cuarenta veces por segundo. La segunda es que
+          <code>getNeighbouringNodes</code> <strong>copia</strong> el <em>array</em> cada vez que la
+          llamáis (mirad el <code>Arrays.clone</code> de <span class="path">pacman.game.Game</span>). Una
+          anchura la llama una vez por nodo, así que merece la pena copiarlo todo una sola vez por
+          laberinto a una tabla <code>vecinos</code> propia.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// ---- Las capas: un número por nodo -------------------------------------</span>
+<span class="k">private</span> <span class="k">double</span>[] comida, amenaza, presa;
+
+<span class="c">// ---- Lo que se reserva una vez por laberinto ---------------------------</span>
+<span class="k">private</span> <span class="k">int</span> laberinto = -<span class="n">1</span>;        <span class="c">// para saber cuándo cambia</span>
+<span class="k">private</span> <span class="k">int</span>[][] vecinos;           <span class="c">// vecinos[n]: los nodos a un paso de n</span>
+<span class="k">private</span> <span class="k">int</span> claveComida = -<span class="n">1</span>;      <span class="c">// la capa de comida sólo cambia si cambia esto</span>
+
+<span class="c">// ---- La cola de la anchura, reutilizada --------------------------------</span>
+<span class="k">private</span> <span class="k">int</span>[] cola;
+<span class="k">private</span> <span class="k">double</span>[] valor;            <span class="c">// valor con el que entra cada nodo en la cola</span>
+<span class="k">private</span> <span class="k">boolean</span>[] visto;
+<span class="k">private</span> <span class="k">int</span> ini, fin;
+
+<span class="c">// ...</span>
+
+<span class="c">/** Todo lo que depende del laberinto se reserva aquí, y sólo aquí. */</span>
+<span class="k">private</span> <span class="k">void</span> reservar(Game game) {
+    laberinto = game.getMazeIndex();
+    <span class="k">int</span> n = game.getNumberOfNodes();
+    comida  = <span class="k">new</span> <span class="k">double</span>[n];
+    amenaza = <span class="k">new</span> <span class="k">double</span>[n];
+    presa   = <span class="k">new</span> <span class="k">double</span>[n];
+    valor   = <span class="k">new</span> <span class="k">double</span>[n];
+    visto   = <span class="k">new</span> <span class="k">boolean</span>[n];
+    cola    = <span class="k">new</span> <span class="k">int</span>[n];
+    vecinos = <span class="k">new</span> <span class="k">int</span>[n][];
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; n; i++) {
+        vecinos[i] = game.getNeighbouringNodes(i);
+    }
+    claveComida = -<span class="n">1</span>;                  <span class="c">// hay que repintar la comida</span>
+}</code></pre></div>
+        <p>
+          <code>valor</code>, <code>visto</code> y <code>cola</code> son la maquinaria de la anchura, que
+          se reutiliza para todas las capas sin crear nada. Y <code>claveComida</code> es lo que permite no
+          repintar la comida si no ha cambiado: se queda con el nivel y el número de píldoras que había la
+          última vez que se pintó.
+        </p>
+        <div class="note trap">
+          <span class="note-label">El <code>Game</code> que recibís es una copia</span>
+          <p>
+            El ejecutor os pasa en cada <em>tick</em> un <code>game.copy()</code> nuevo. Guardaros una
+            referencia al <code>Game</code> de un <em>tick</em> para usarla en el siguiente no da error, pero
+            os deja mirando una partida que ya no existe. Lo que tiene que durar entre <em>ticks</em> —las
+            capas, la tabla de vecinos, la clave— vive en el controlador, no en el juego.
+          </p>
+        </div>
+      </section>
+
+      <section id="propagar">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Propagar: una anchura con caída</h2>
+        </div>
+        <p>
+          Pintar una capa es hacer una <a href="busqueda.html#ciegas">búsqueda en anchura</a> por el
+          grafo del laberinto, con una sola diferencia: cada nodo entra en la cola con un valor, y a sus
+          vecinos les pasa ese valor multiplicado por la caída. Como la anchura visita los nodos en orden
+          de distancia, a cada nodo le llega el valor por el camino más corto, que es el que queremos.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · pintar una capa</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">propagar</span>(<span class="var">fuentes</span>, <span class="var">caída</span>, <span class="var">capa</span>)
+    <span class="var">cola</span> ← todas las <span class="var">fuentes</span>, cada una con valor 1; <span class="var">visto</span> ← <span class="var">fuentes</span>
+    <b>while</b> <span class="var">cola</span> no está vacía <b>do</b>
+        <span class="var">u</span> ← <span class="fn">sacar</span>(<span class="var">cola</span>)
+        <span class="var">capa</span>[<span class="var">u</span>] ← <span class="var">capa</span>[<span class="var">u</span>] + <span class="var">valor</span>[<span class="var">u</span>]
+        <b>for each</b> <span class="var">v</span> <b>in</b> <span class="fn">vecinos</span>(<span class="var">u</span>) <b>do</b>
+            <b>if</b> <span class="var">v</span> ∉ <span class="var">visto</span> <b>then</b>
+                <span class="var">valor</span>[<span class="var">v</span>] ← <span class="var">valor</span>[<span class="var">u</span>] × <span class="var">caída</span>       <i>// un paso más lejos, un poco menos</i>
+                <span class="fn">meter</span>(<span class="var">cola</span>, <span class="var">v</span>); <span class="var">visto</span> ← <span class="var">visto</span> ∪ {<span class="var">v</span>}
+            <b>end if</b>
+        <b>end for</b>
+    <b>end while</b>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Lo único que cambia de una capa a otra es <strong>qué se mete en la cola al empezar</strong>, y
+          ahí están las dos decisiones de diseño de esta sección.
+        </p>
+
+        <h3 class="label">La comida, de una vez; los fantasmas, de uno en uno</h3>
+        <p>
+          Para la comida se meten <strong>todas las píldoras en la cola a la vez</strong>. Es la anchura
+          multifuente de la nota de arriba: una sola pasada por el laberinto, y a cada nodo le queda
+          0,90<sup>d</sup>, con <var>d</var> la distancia a la píldora <em>más cercana</em>. Para los
+          fantasmas, en cambio, se hace <strong>una anchura por fantasma y se suman</strong>. La diferencia
+          se ve en un nodo con dos fuentes cerca:
+        </p>
+        <figure>
+          <figcaption>Cuenta · un nodo a 2 pasos de una fuente y a 5 de otra, caída 0,90</figcaption>
+          <pre class="cuenta">una anchura con las dos en la cola   se queda la cercana   0,90²          =  0,81
+una anchura por fuente, sumadas      cuentan las dos       0,90² + 0,90⁵  =  0,81 + 0,59  =  1,40</pre>
+        </figure>
+        <p>
+          Para la comida da igual: lo que importa es a cuánto está la próxima píldora, y con 220 píldoras
+          sumar sería hacer 220 anchuras. Para la amenaza no da igual: <strong>dos fantasmas cerca son
+          peores que uno</strong>, y la suma es la forma de que el mapa lo sepa. Con cuatro fantasmas como
+          mucho, son cuatro anchuras.
+        </p>
+
+        <h3 class="label">Un fantasma no se da la vuelta</h3>
+        <p>
+          Aquí hay que decidir algo que el pseudocódigo esconde. La anchura se extiende hacia los dos lados
+          de cada pasillo, y un fantasma <strong>no</strong>: no puede invertir el sentido salvo en el
+          instante en que te comes una píldora de poder, y en ese instante deja de ser amenaza y pasa a ser
+          presa. Así que el nodo que tiene justo detrás no está a un paso de él. Está a todo lo que le cueste
+          dar la vuelta a la manzana.
+        </p>
+        <figure class="wide">
+          <figcaption>El mismo fantasma en un bucle de doce nodos, pintado de las dos maneras · caída 0,90</figcaption>
+          <svg class="explica dgm2" viewBox="0 0 480 215" role="img" aria-label="Dos veces el mismo pasillo cerrado en bucle, de doce nodos, con un fantasma en el nodo de arriba en el centro y Ms. Pac-Man en el nodo de justo detrás de él, a su izquierda. Cada nodo lleva lo que vale la amenaza. A la izquierda, pintado sin mirar hacia dónde va el fantasma: los valores bajan igual hacia los dos lados, 1, 0,9, 0,81, 0,73, 0,66, 0,59, hasta 0,53 en el nodo opuesto, y el nodo de Ms. Pac-Man vale 0,9. A la derecha, sabiendo que el fantasma va hacia la derecha: los valores bajan en un solo sentido, siguiendo el bucle, 1, 0,9, 0,81 y así hasta 0,31, y el nodo de Ms. Pac-Man, que es el último al que llega, vale 0,31.">
+            <style>
+              .dgm2 .pas{fill:none;stroke:var(--surface-2);stroke-width:20;stroke-linejoin:round}
+              .dgm2 .nd{fill:var(--surface);stroke:var(--line);stroke-width:.8}
+              .dgm2 .v5{fill:var(--blinky);fill-opacity:.8}
+              .dgm2 .v4{fill:var(--blinky);fill-opacity:.62}
+              .dgm2 .v3{fill:var(--blinky);fill-opacity:.46}
+              .dgm2 .v2{fill:var(--blinky);fill-opacity:.3}
+              .dgm2 .v1{fill:var(--blinky);fill-opacity:.14}
+              .dgm2 .nu{font-family:var(--f-mono);font-size:8px;text-anchor:middle;fill:var(--ink)}
+              .dgm2 .ti{font-family:var(--f-mono);font-size:9px;letter-spacing:.04em;text-anchor:middle;fill:var(--ink-3)}
+              .dgm2 .pie{font-family:var(--f-mono);font-size:9px;text-anchor:middle;fill:var(--ink-2)}
+              .dgm2 .pieb{font-family:var(--f-mono);font-size:9px;font-weight:700;text-anchor:middle;fill:var(--ink)}
+              .dgm2 .gh{fill:var(--blinky)}
+              .dgm2 .pc{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1.4}
+              .dgm2 .mar{fill:none;stroke:var(--ink);stroke-width:1.4}
+              .dgm2 .fl{fill:none;stroke:var(--blinky);stroke-width:1.6;marker-end:url(#mi-f2)}
+            </style>
+            <defs>
+              <marker id="mi-f2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <text class="ti" x="120" y="16">SIN MIRAR HACIA DÓNDE VA</text>
+            <text class="ti" x="360" y="16">SABIENDO QUE VA A LA DERECHA</text>
+            <g transform="translate(20 50)">
+              <path class="pas" d="M0 0 H200 V100 H0 Z"/>
+              <circle class="nd" cx="100" cy="0" r="12"/><circle class="v5" cx="100" cy="0" r="12"/><text class="nu" x="100" y="3">1</text>
+              <circle class="nd" cx="150" cy="0" r="12"/><circle class="v4" cx="150" cy="0" r="12"/><text class="nu" x="150" y="3">0,9</text>
+              <circle class="nd" cx="200" cy="0" r="12"/><circle class="v4" cx="200" cy="0" r="12"/><text class="nu" x="200" y="3">0,81</text>
+              <circle class="nd" cx="200" cy="50" r="12"/><circle class="v3" cx="200" cy="50" r="12"/><text class="nu" x="200" y="53">0,73</text>
+              <circle class="nd" cx="200" cy="100" r="12"/><circle class="v3" cx="200" cy="100" r="12"/><text class="nu" x="200" y="103">0,66</text>
+              <circle class="nd" cx="150" cy="100" r="12"/><circle class="v2" cx="150" cy="100" r="12"/><text class="nu" x="150" y="103">0,59</text>
+              <circle class="nd" cx="100" cy="100" r="12"/><circle class="v2" cx="100" cy="100" r="12"/><text class="nu" x="100" y="103">0,53</text>
+              <circle class="nd" cx="50" cy="100" r="12"/><circle class="v2" cx="50" cy="100" r="12"/><text class="nu" x="50" y="103">0,59</text>
+              <circle class="nd" cx="0" cy="100" r="12"/><circle class="v3" cx="0" cy="100" r="12"/><text class="nu" x="0" y="103">0,66</text>
+              <circle class="nd" cx="0" cy="50" r="12"/><circle class="v3" cx="0" cy="50" r="12"/><text class="nu" x="0" y="53">0,73</text>
+              <circle class="nd" cx="0" cy="0" r="12"/><circle class="v4" cx="0" cy="0" r="12"/><text class="nu" x="0" y="3">0,81</text>
+              <circle class="nd" cx="50" cy="0" r="12"/><circle class="v4" cx="50" cy="0" r="12"/><text class="nu" x="50" y="3">0,9</text>
+              <circle class="mar" cx="50" cy="0" r="14.5"/>
+              <path class="gh" transform="translate(-10 -44)" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+              <g transform="translate(43.5 21.5) scale(0.5)"><path class="pc" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/></g>
+            </g>
+            <g transform="translate(260 50)">
+              <path class="pas" d="M0 0 H200 V100 H0 Z"/>
+              <circle class="nd" cx="100" cy="0" r="12"/><circle class="v5" cx="100" cy="0" r="12"/><text class="nu" x="100" y="3">1</text>
+              <circle class="nd" cx="150" cy="0" r="12"/><circle class="v4" cx="150" cy="0" r="12"/><text class="nu" x="150" y="3">0,9</text>
+              <circle class="nd" cx="200" cy="0" r="12"/><circle class="v4" cx="200" cy="0" r="12"/><text class="nu" x="200" y="3">0,81</text>
+              <circle class="nd" cx="200" cy="50" r="12"/><circle class="v3" cx="200" cy="50" r="12"/><text class="nu" x="200" y="53">0,73</text>
+              <circle class="nd" cx="200" cy="100" r="12"/><circle class="v3" cx="200" cy="100" r="12"/><text class="nu" x="200" y="103">0,66</text>
+              <circle class="nd" cx="150" cy="100" r="12"/><circle class="v2" cx="150" cy="100" r="12"/><text class="nu" x="150" y="103">0,59</text>
+              <circle class="nd" cx="100" cy="100" r="12"/><circle class="v2" cx="100" cy="100" r="12"/><text class="nu" x="100" y="103">0,53</text>
+              <circle class="nd" cx="50" cy="100" r="12"/><circle class="v2" cx="50" cy="100" r="12"/><text class="nu" x="50" y="103">0,48</text>
+              <circle class="nd" cx="0" cy="100" r="12"/><circle class="v1" cx="0" cy="100" r="12"/><text class="nu" x="0" y="103">0,43</text>
+              <circle class="nd" cx="0" cy="50" r="12"/><circle class="v1" cx="0" cy="50" r="12"/><text class="nu" x="0" y="53">0,39</text>
+              <circle class="nd" cx="0" cy="0" r="12"/><circle class="v1" cx="0" cy="0" r="12"/><text class="nu" x="0" y="3">0,35</text>
+              <circle class="nd" cx="50" cy="0" r="12"/><circle class="v1" cx="50" cy="0" r="12"/><text class="nu" x="50" y="3">0,31</text>
+              <circle class="mar" cx="50" cy="0" r="14.5"/>
+              <path class="gh" transform="translate(-10 -44)" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+              <path class="fl" d="M110 28 H132"/>
+              <g transform="translate(43.5 21.5) scale(0.5)"><path class="pc" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/></g>
+            </g>
+            <text class="pieb" x="120" y="182">justo detrás de él: 0,9</text>
+            <text class="pie" x="120" y="197">como si estuviera a 1 paso</text>
+            <text class="pieb" x="360" y="182">justo detrás de él: 0,31</text>
+            <text class="pie" x="360" y="197">a 11 pasos: tiene que dar la vuelta</text>
+          </svg>
+        </figure>
+        <figure>
+          <figcaption>Cuenta · lo que vale el nodo de Ms.&nbsp;Pac-Man en cada versión</figcaption>
+          <pre class="cuenta">sin mirar el sentido    a  1 paso     0,90¹   =  0,90
+mirando el sentido      a 11 pasos    0,90¹¹  =  0,31</pre>
+        </figure>
+        <p>
+          Con la primera versión, Ms.&nbsp;Pac-Man huye de un fantasma que se está alejando de ella. Arreglarlo
+          cuesta muy poco: <strong>la primera ola sale sólo hacia delante</strong>. Se marca el nodo del
+          fantasma como visto, se le suma su 1, y a la cola sólo entran los vecinos que da
+          <code>getNeighbouringNodes(nodo, últimoMovimiento)</code>, que ya excluye el de detrás. A partir de
+          ahí la anchura sigue normal.
+        </p>
+        <p>
+          Y aquí hay que ser honestos con lo que eso calcula. Después de la primera ola, la anchura deja que
+          la influencia se extienda hacia los dos lados, y aun así no invierte el sentido en ningún pasillo:
+          para hacerlo tendría que volver a un nodo ya visitado, y la anchura no vuelve nunca. Lo que no
+          ve es el caso raro de un fantasma que da la vuelta a un bucle y <em>vuelve a pasar por su propio
+          nodo</em>, que está marcado desde el principio. Es la misma aproximación que hace el
+          <a href="astar-mspacman.html">A* del motor</a> con su lista de cerrados, y en un laberinto hecho
+          de bucles pesa poco. Lo que sí pesa es mirar el sentido: en la tabla de
+          <a href="#afinar">afinar</a>, quitarlo cuesta unos 220 puntos de media, y 800 contra los
+          fantasmas aleatorios.
+        </p>
+        <p>
+          Todo junto, en Java. Primero la maquinaria de la anchura, que es el pseudocódigo casi línea a
+          línea:
+        </p>
+        <div class="codigo"><pre><code><span class="k">private</span> <span class="k">void</span> empezar() {
+    Arrays.fill(visto, <span class="k">false</span>);
+    ini = <span class="n">0</span>;
+    fin = <span class="n">0</span>;
+}
+
+<span class="k">private</span> <span class="k">void</span> sembrar(<span class="k">int</span> nodo, <span class="k">double</span> v) {
+    <span class="k">if</span> (!visto[nodo]) {
+        visto[nodo] = <span class="k">true</span>;
+        valor[nodo] = v;
+        cola[fin++] = nodo;
+    }
+}
+
+<span class="c">/** Anchura: cada nodo suma su valor a la capa y pasa valor × caída a sus vecinos. */</span>
+<span class="k">private</span> <span class="k">void</span> propagar(<span class="k">double</span> caida, <span class="k">double</span>[] capa) {
+    <span class="k">while</span> (ini &lt; fin) {
+        <span class="k">int</span> u = cola[ini++];
+        capa[u] += valor[u];
+        <span class="k">for</span> (<span class="k">int</span> v : vecinos[u]) {
+            sembrar(v, valor[u] * caida);
+        }
+    }
+}</code></pre></div>
+        <p>
+          Y después las tres capas. Fijaos en que las dos formas de empezar la cola son las dos de esta
+          sección: todas las píldoras a la vez, y cada fantasma por su cuenta con la primera ola hacia
+          delante.
+        </p>
+        <div class="codigo"><pre><code><span class="k">private</span> <span class="k">void</span> pintarCapas(Game game) {
+    <span class="c">// Comida: una sola anchura con todas las píldoras en la cola a la vez</span>
+    <span class="k">int</span> clave = game.getCurrentLevel() * <span class="n">10000</span>
+              + game.getNumberOfActivePills() + game.getNumberOfActivePowerPills();
+    <span class="k">if</span> (clave != claveComida) {
+        claveComida = clave;
+        Arrays.fill(comida, <span class="n">0</span>);
+        empezar();
+        <span class="k">for</span> (<span class="k">int</span> p : game.getActivePillsIndices())      sembrar(p, <span class="n">1.0</span>);
+        <span class="k">for</span> (<span class="k">int</span> p : game.getActivePowerPillsIndices()) sembrar(p, <span class="n">1.0</span>);
+        propagar(CAIDA_COMIDA, comida);
+        normalizar(comida);
+    }
+
+    <span class="c">// Amenaza y presa: una anchura por fantasma, sumadas</span>
+    Arrays.fill(amenaza, <span class="n">0</span>);
+    Arrays.fill(presa, <span class="n">0</span>);
+    <span class="k">for</span> (GHOST g : GHOST.values()) {
+        <span class="k">if</span> (game.getGhostLairTime(g) &gt; <span class="n">0</span>) {
+            <span class="k">continue</span>;                          <span class="c">// en la cárcel: no está en el laberinto</span>
+        }
+        <span class="k">int</span> nodo = game.getGhostCurrentNodeIndex(g);
+        <span class="k">if</span> (game.isGhostEdible(g)) {
+            empezar();
+            sembrar(nodo, <span class="n">1.0</span>);
+            propagar(CAIDA_PRESA, presa);
+        } <span class="k">else</span> {
+            <span class="c">// No puede darse la vuelta: la primera ola sólo sale hacia delante</span>
+            empezar();
+            visto[nodo] = <span class="k">true</span>;
+            amenaza[nodo] += <span class="n">1.0</span>;
+            <span class="k">int</span>[] delante = game.getNeighbouringNodes(nodo, game.getGhostLastMoveMade(g));
+            <span class="k">if</span> (delante == <span class="k">null</span>) {
+                delante = vecinos[nodo];       <span class="c">// sin sentido conocido: hacia todos lados</span>
+            }
+            <span class="k">for</span> (<span class="k">int</span> v : delante) {
+                sembrar(v, CAIDA_AMENAZA);
+            }
+            propagar(CAIDA_AMENAZA, amenaza);
+        }
+    }
+    normalizar(amenaza);
+    normalizar(presa);
+}</code></pre></div>
+        <div class="note trap">
+          <span class="note-label">Las dos exclusiones, y el <code>null</code></span>
+          <p>
+            El fantasma encerrado se salta: no os puede comer, y mientras está en la cárcel su nodo ni
+            siquiera está conectado con el laberinto. El comestible no entra en la amenaza sino en la presa: sin esa
+            separación, el controlador huiría de lo que vale 200 puntos. Y el <code>if (delante == null)</code>
+            no sobra: <code>getNeighbouringNodes(nodo, mov)</code> devuelve <code>null</code>, no un
+            <em>array</em> vacío, si el nodo no tiene entrada para ese movimiento. No lo hemos visto pasar en
+            ninguna de las partidas de la tabla, pero un <code>NullPointerException</code> a mitad de la
+            corrección no se recupera.
+          </p>
+        </div>
+        <p>
+          La presa se pinta sin mirar el sentido del fantasma. Es una simplificación, no una conclusión: un
+          comestible suele huir, así que lo que importa es a cuánto está, y la variante que mira el sentido
+          no la hemos medido.
+        </p>
+      </section>
+
+      <section id="combinar">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Normalizar y sumar</h2>
+        </div>
+        <p>
+          Con las tres capas pintadas, cada una se divide por su máximo y después se suman con sus pesos:
+        </p>
+        <figure>
+          <figcaption>La función objetivo de este controlador</figcaption>
+          <pre class="pseudo">U(<span class="var">n</span>) =   <span class="var">wComida</span>  × <span class="fn">comida</span>(<span class="var">n</span>)      <i>// 1</i>
+     − <span class="var">wAmenaza</span> × <span class="fn">amenaza</span>(<span class="var">n</span>)     <i>// 6</i>
+     + <span class="var">wPresa</span>   × <span class="fn">presa</span>(<span class="var">n</span>)       <i>// 2</i></pre>
+        </figure>
+        <p>
+          La normalización no hace lo mismo en las tres. En la <strong>comida</strong> no hace nada: con la
+          anchura multifuente, el nodo de cada píldora vale exactamente 1, y ése ya es el máximo. En la
+          <strong>amenaza</strong> sí, porque es una suma de hasta cuatro anchuras y su máximo puede pasar
+          de 1:
+        </p>
+        <figure>
+          <figcaption>Cuenta · normalizar la amenaza con dos fantasmas, caída 0,90</figcaption>
+          <pre class="cuenta">el máximo: el nodo del fantasma A, con B a 3 pasos viniendo hacia él   1 + 0,90³  =  1 + 0,73  =  1,73
+un nodo que valía 0,48 antes de normalizar                             0,48 / 1,73                =  0,28</pre>
+        </figure>
+        <p>
+          Eso tiene una consecuencia que conviene saber: después de normalizar, el pico vale 1 haya un
+          fantasma o cuatro. Lo que sobrevive es la <em>forma</em> de la mancha, no su altura. Para decidir
+          entre las salidas de un cruce es lo que hace falta, porque sólo se comparan unas con otras en el
+          mismo <em>tick</em>.
+        </p>
+        <p>
+          Ahora con números. La escena de la figura de abajo es de juguete, pero las cuentas son las del
+          controlador: Ms.&nbsp;Pac-Man ha llegado por la izquierda a un cruce del que salen tres pasillos.
+          Por la derecha hay píldoras en todo el pasillo, pero un fantasma viene hacia el cruce del fondo.
+          Arriba no hay nada hasta el cruce siguiente, y detrás de él hay píldoras. Abajo no hay píldoras,
+          pero al fondo hay un fantasma comestible. Los tres nodos pegados al cruce valen esto:
+        </p>
+        <figure>
+          <figcaption>Cuenta · U en los tres nodos vecinos del cruce, pesos 1 / 6 / 2</figcaption>
+          <pre class="cuenta">              comida        amenaza         presa
+arriba     1 × 0,810  −  6 × 0,430  +  2 × 0,321  =  0,810 − 2,580 + 0,642  =  −1,128
+derecha    1 × 1,000  −  6 × 0,531  +  2 × 0,321  =  1,000 − 3,186 + 0,642  =  −1,544
+abajo      1 × 0,810  −  6 × 0,430  +  2 × 0,444  =  0,810 − 2,580 + 0,888  =  −0,882</pre>
+        </figure>
+        <p>
+          De dónde sale cada número: la comida del nodo de la derecha es 1 porque tiene píldora, y los otros
+          dos están a dos pasos de ella, 0,90² = 0,81. El fantasma está a seis pasos del nodo de la derecha,
+          0,90⁶ = 0,531, y a ocho de los otros dos, 0,90⁸ = 0,430. El comestible está a cinco del de abajo,
+          0,85⁵ = 0,444, y a siete de los otros, 0,85⁷ = 0,321. Como sólo hay una fuente por capa, aquí la
+          normalización no cambia nada.
+        </p>
+        <p>
+          Fijaos en dos cosas. La primera, que <strong>los tres salen negativos</strong>, y no pasa nada: con
+          un peso de 6, un fantasma a 17 pasos todavía resta lo mismo que suma la mejor comida,
+          6&nbsp;×&nbsp;0,90¹⁷&nbsp;=&nbsp;1,00. U no se lee en absoluto, se lee comparando. La segunda, que <strong>mirando sólo la comida la
+          derecha ganaría</strong>, con 1 frente a 0,81. Es la amenaza la que la hunde.
+        </p>
+        <figure class="wide">
+          <figcaption>La escena entera · U en cada nodo de los tres tramos, y el peor de cada uno · cuanto más rojo, peor</figcaption>
+          <svg class="explica dgm3" viewBox="0 0 400 250" role="img" aria-label="Un cruce con Ms. Pac-Man, que ha llegado por el pasillo de la izquierda y no puede volver por él. Del cruce salen tres tramos, cada uno hasta el cruce siguiente, con el valor de U escrito en cada nodo. Arriba, tres nodos: menos 1,13, menos 0,97 y menos 0,73; detrás del cruce de arriba hay tres píldoras. A la derecha, cinco nodos con píldora: menos 1,54, menos 2,00, menos 2,47, menos 2,98 y menos 3,63 en el cruce del fondo; dos nodos más allá hay un fantasma rojo que viene hacia ese cruce. Abajo, tres nodos: menos 0,88, menos 0,55 y menos 0,21; al fondo, a la derecha, hay un fantasma azul comestible. El peor de cada tramo es menos 1,13 arriba, menos 3,63 a la derecha y menos 0,88 abajo, que es el mayor de los tres, así que gana abajo, marcado en verde.">
+            <style>
+              .dgm3 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round;stroke-linejoin:round}
+              .dgm3 .nd{fill:var(--surface);stroke:var(--line);stroke-width:.8}
+              .dgm3 .m5{fill:var(--blinky);fill-opacity:.8}
+              .dgm3 .m4{fill:var(--blinky);fill-opacity:.62}
+              .dgm3 .m3{fill:var(--blinky);fill-opacity:.46}
+              .dgm3 .m2{fill:var(--blinky);fill-opacity:.3}
+              .dgm3 .m1{fill:var(--blinky);fill-opacity:.14}
+              .dgm3 .pt{fill:var(--ink-3);opacity:.55}
+              .dgm3 .pi{fill:var(--pill-ink)}
+              .dgm3 .nu{font-family:var(--f-mono);font-size:7px;text-anchor:middle;fill:var(--ink)}
+              .dgm3 .et{font-family:var(--f-display);font-weight:700;font-size:10px;fill:var(--ink)}
+              .dgm3 .ts{font-family:var(--f-mono);font-size:8.5px;fill:var(--ink-2)}
+              .dgm3 .ok{fill:var(--ok)}
+              .dgm3 .gana{fill:none;stroke:var(--ok);stroke-width:1.6}
+              .dgm3 .gh{fill:var(--blinky)}
+              .dgm3 .gc{fill:var(--maze)}
+              .dgm3 .pc{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1.4}
+              .dgm3 .fl{fill:none;stroke:var(--blinky);stroke-width:1.6;marker-end:url(#mi-f3)}
+              .dgm3 .fin{font-family:var(--f-mono);font-size:8px;fill:var(--ink-3)}
+              .dgm3 .r{text-anchor:end}
+            </style>
+            <defs>
+              <marker id="mi-f3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <path class="pas" d="M30 126 H360 M150 36 V216 M120 36 H240 M120 216 H240 M300 96 V126"/>
+            <!-- por donde llegó, sin valor: no se puede volver -->
+            <circle class="pt" cx="120" cy="126" r="2.5"/><circle class="pt" cx="90" cy="126" r="2.5"/><circle class="pt" cx="60" cy="126" r="2.5"/><circle class="pt" cx="30" cy="126" r="2.5"/>
+            <text class="ts" x="26" y="108">por aquí llegó:</text>
+            <text class="ts" x="26" y="152">no puede volver</text>
+            <!-- nodos sin valor escrito -->
+            <circle class="pt" cx="120" cy="36" r="2.5"/><circle class="pt" cx="180" cy="36" r="2.5"/><circle class="pt" cx="210" cy="36" r="2.5"/><circle class="pt" cx="240" cy="36" r="2.5"/>
+            <circle class="pt" cx="120" cy="216" r="2.5"/><circle class="pt" cx="180" cy="216" r="2.5"/><circle class="pt" cx="210" cy="216" r="2.5"/>
+            <circle class="pt" cx="300" cy="96" r="2.5"/><circle class="pt" cx="330" cy="126" r="2.5"/>
+            <!-- tramo de arriba -->
+            <circle class="nd" cx="150" cy="96" r="12"/><circle class="m2" cx="150" cy="96" r="12"/><text class="nu" x="150" y="98.5">−1,13</text>
+            <circle class="nd" cx="150" cy="66" r="12"/><circle class="m2" cx="150" cy="66" r="12"/><text class="nu" x="150" y="68.5">−0,97</text>
+            <circle class="nd" cx="150" cy="36" r="12"/><circle class="m2" cx="150" cy="36" r="12"/><text class="nu" x="150" y="38.5">−0,73</text>
+            <!-- tramo de la derecha -->
+            <circle class="nd" cx="180" cy="126" r="12"/><circle class="m3" cx="180" cy="126" r="12"/><text class="nu" x="180" y="128.5">−1,54</text>
+            <circle class="nd" cx="210" cy="126" r="12"/><circle class="m4" cx="210" cy="126" r="12"/><text class="nu" x="210" y="128.5">−2,00</text>
+            <circle class="nd" cx="240" cy="126" r="12"/><circle class="m4" cx="240" cy="126" r="12"/><text class="nu" x="240" y="128.5">−2,47</text>
+            <circle class="nd" cx="270" cy="126" r="12"/><circle class="m4" cx="270" cy="126" r="12"/><text class="nu" x="270" y="128.5">−2,98</text>
+            <circle class="nd" cx="300" cy="126" r="12"/><circle class="m5" cx="300" cy="126" r="12"/><text class="nu" x="300" y="128.5">−3,63</text>
+            <!-- tramo de abajo -->
+            <circle class="nd" cx="150" cy="156" r="12"/><circle class="m2" cx="150" cy="156" r="12"/><text class="nu" x="150" y="158.5">−0,88</text>
+            <circle class="nd" cx="150" cy="186" r="12"/><circle class="m1" cx="150" cy="186" r="12"/><text class="nu" x="150" y="188.5">−0,55</text>
+            <circle class="nd" cx="150" cy="216" r="12"/><circle class="m1" cx="150" cy="216" r="12"/><text class="nu" x="150" y="218.5">−0,21</text>
+            <rect class="gana" x="135" y="141" width="30" height="90" rx="15"/>
+            <!-- píldoras -->
+            <circle class="pi" cx="180" cy="109" r="2"/><circle class="pi" cx="210" cy="109" r="2"/><circle class="pi" cx="240" cy="109" r="2"/><circle class="pi" cx="270" cy="109" r="2"/>
+            <circle class="pi" cx="180" cy="20" r="2"/><circle class="pi" cx="210" cy="20" r="2"/><circle class="pi" cx="240" cy="20" r="2"/>
+            <!-- figuras -->
+            <g transform="translate(140.5 116.5) scale(0.73)"><path class="pc" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/></g>
+            <path class="gh" transform="translate(250 54)" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+            <path class="fl" d="M368 108 H344"/>
+            <path class="gc" transform="translate(130 144)" d="M103.8 75.89v-5.89a6.2 6.2 0 0 1 12.4 0v5.89l-3.1 -2.1l-3.1 2.1l-3.1 -2.1z"/>
+            <!-- etiquetas de tramo -->
+            <text class="et" x="168" y="66">arriba</text>
+            <text class="ts" x="168" y="79">peor: −1,13</text>
+            <text class="et" x="196" y="160">derecha</text>
+            <text class="ts" x="196" y="173">peor: −3,63</text>
+            <text class="et ok r" x="128" y="178">abajo · gana</text>
+            <text class="ts r" x="128" y="191">peor: −0,88</text>
+            <!-- leyenda -->
+            <g transform="translate(26 244)">
+              <text class="fin" x="0" y="0">peor</text>
+              <circle class="m5" cx="34" cy="-3" r="5"/><circle class="m4" cx="47" cy="-3" r="5"/><circle class="m3" cx="60" cy="-3" r="5"/><circle class="m2" cx="73" cy="-3" r="5"/><circle class="m1" cx="86" cy="-3" r="5"/>
+              <text class="fin" x="96" y="0">menos malo</text>
+              <circle class="pi" cx="170" cy="-3" r="2"/><text class="fin" x="176" y="0">píldora</text>
+            </g>
+          </svg>
+        </figure>
+      </section>
+
+      <section id="decidir">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Decidir sólo en los cruces</h2>
+        </div>
+        <p>
+          En un pasillo no hay nada que decidir, y en este motor eso es literal. <code>Game.correctPacManDir</code>
+          rechaza el giro de 180°, y si el movimiento que devolvéis no vale —<code>NEUTRAL</code>,
+          <code>null</code>, una pared o darse la vuelta—, Ms.&nbsp;Pac-Man sigue con el último que hizo; y si
+          por ahí hay pared, como en una esquina, toma la primera salida que no sea volver. Así que fuera de los cruces el controlador devuelve
+          <code>NEUTRAL</code> sin pintar nada. En las partidas de la tabla, Ms.&nbsp;Pac-Man estaba en un cruce
+          en el 4,6&#8239;% de las llamadas: el resto es gratis.
+        </p>
+        <p>
+          En un cruce, las salidas legales son las de <code>getPossibleMoves(yo, getPacmanLastMoveMade())</code>,
+          que ya quita la de volver: dos o tres. Para cada una, el controlador <strong>recorre el pasillo
+          hasta el cruce siguiente, incluido, y se queda con el peor U que encuentra</strong>. Gana la salida
+          cuyo peor nodo es el menos malo.
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · la decisión del controlador: <code>getMove</code> y <code>valorarTramo</code>, sin la parte de depurar</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">getMove</span>()
+    <b>if</b> NOT <span class="fn">esCruce</span>(<span class="var">miNodo</span>) <b>then return</b> NEUTRAL <b>end if</b>   <i>// en un pasillo, seguir</i>
+    <span class="fn">pintarCapas</span>()
+    <span class="var">mejor</span> ← NEUTRAL;  <span class="var">mejorValor</span> ← −∞
+    <b>for each</b> <span class="var">m</span> <b>in</b> <span class="fn">salidasLegales</span>(<span class="var">miNodo</span>, <span class="var">miÚltimoMov</span>) <b>do</b>
+        <span class="var">v</span> ← <span class="fn">valorarTramo</span>(<span class="var">miNodo</span>, <span class="var">m</span>)
+        <b>if</b> <span class="var">v</span> &gt; <span class="var">mejorValor</span> <b>then</b> <span class="var">mejor</span> ← <span class="var">m</span>;  <span class="var">mejorValor</span> ← <span class="var">v</span> <b>end if</b>
+    <b>end for</b>
+    <b>return</b> <span class="var">mejor</span>
+<b>end function</b>
+
+<b>function</b> <span class="fn">valorarTramo</span>(<span class="var">desde</span>, <span class="var">m</span>)      <i>// el peor U hasta el siguiente cruce</i>
+    <span class="var">anterior</span> ← <span class="var">desde</span>;  <span class="var">n</span> ← <span class="fn">vecino</span>(<span class="var">desde</span>, <span class="var">m</span>);  <span class="var">peor</span> ← +∞
+    <b>loop</b>
+        <span class="var">peor</span> ← mín(<span class="var">peor</span>, <span class="fn">U</span>(<span class="var">n</span>))
+        <b>if</b> <span class="fn">esCruce</span>(<span class="var">n</span>) <b>then return</b> <span class="var">peor</span> <b>end if</b>
+        <span class="var">siguiente</span> ← el vecino de <span class="var">n</span> que no es <span class="var">anterior</span>
+        <span class="var">anterior</span> ← <span class="var">n</span>;  <span class="var">n</span> ← <span class="var">siguiente</span>
+    <b>end loop</b>
+<b>end function</b></pre>
+        </figure>
+        <figure>
+          <figcaption>Cuenta · el peor U de cada tramo de la figura, y la decisión</figcaption>
+          <pre class="cuenta">arriba     peor de  −1,13  −0,97  −0,73                  =  −1,13
+derecha    peor de  −1,54  −2,00  −2,47  −2,98  −3,63    =  −3,63
+abajo      peor de  −0,88  −0,55  −0,21                  =  −0,88    ← el mayor: abajo</pre>
+        </figure>
+        <p>
+          ¿Por qué el peor y no la media, o el del final? Porque meterse en un pasillo es un
+          <a href="estrategias.html#voraz">compromiso</a>: se sale por el otro extremo o no se sale. Un solo
+          nodo malo a mitad de camino, un fantasma que viene de frente, estropea el tramo entero por bueno que
+          sea todo lo demás, y la media lo diluiría. Antes de escribir este listado se probaron cuatro formas
+          con un prototipo, con otros pesos y en 400 partidas cada una: el nodo vecino solo, el cruce del
+          final solo, la media con descuento y el peor. Ganó el peor, y el cruce del final solo fue
+          claramente el más flojo. La comparación con el vecino está repetida con el listado en la tabla de
+          <a href="#afinar">afinar</a>.
+        </p>
+
+        <h3 class="label">El máximo local, y por qué aquí no atasca</h3>
+        <p>
+          La nota del horizonte avisaba de que «vete a la vecina que más valga» se atasca en máximos locales.
+          Este controlador los esquiva por tres lados, y conviene saber cuáles para no creerse que es
+          inmune:
+        </p>
+        <ul>
+          <li>
+            <strong>La capa de comida no tiene máximos locales.</strong> Con la anchura multifuente, cada nodo
+            sin píldora tiene un vecino un paso más cerca de alguna, que vale más que él. Siguiendo sólo la
+            comida siempre se llega a comer.
+          </li>
+          <li>
+            <strong>No puede oscilar.</strong> El vaivén entre dos nodos de la nota necesita darse la vuelta, y
+            el motor no le deja. Lo peor que puede pasar es que dé vueltas a una manzana.
+          </li>
+          <li>
+            <strong>El horizonte es un tramo entero, no un nodo.</strong> Y el cruce del final no es miope: su
+            valor ya trae lo que hay mucho más allá, porque la propagación lo ha llevado hasta él.
+          </li>
+        </ul>
+        <p>
+          Lo que no esquiva es lo que introduce la resta: con la amenaza encima, sí puede haber un sitio que
+          sea mejor que todos sus vecinos sin tener comida. No hemos medido cuánto pasa. Si lo veis, se nota
+          en pantalla con la depuración de más abajo: la misma manzana, vuelta tras vuelta.
+        </p>
+        <p>
+          Así queda en código. El recorrido del tramo aprovecha que un nodo de pasillo tiene exactamente dos
+          vecinos: el siguiente es el que no es el anterior.
+        </p>
+        <div class="codigo"><pre><code>@Override
+<span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+    <span class="k">if</span> (game.getMazeIndex() != laberinto) {
+        reservar(game);
+    }
+    <span class="k">int</span> yo = game.getPacmanCurrentNodeIndex();
+    <span class="k">boolean</span> cruce = game.isJunction(yo);
+    <span class="k">if</span> (!cruce &amp;&amp; !DEBUG) {
+        <span class="k">return</span> MOVE.NEUTRAL;       <span class="c">// en un pasillo sólo se puede seguir</span>
+    }
+
+    pintarCapas(game);
+    <span class="k">if</span> (DEBUG) {
+        depurar(game);
+    }
+    <span class="k">if</span> (!cruce) {
+        <span class="k">return</span> MOVE.NEUTRAL;
+    }
+
+    <span class="c">// Una salida por cada movimiento legal; gana la que tenga mejor tramo</span>
+    MOVE mejor = MOVE.NEUTRAL;
+    <span class="k">double</span> mejorValor = Double.NEGATIVE_INFINITY;
+    <span class="k">for</span> (MOVE m : game.getPossibleMoves(yo, game.getPacmanLastMoveMade())) {
+        <span class="k">double</span> v = valorarTramo(game, yo, m);
+        <span class="k">if</span> (v &gt; mejorValor) {
+            mejorValor = v;
+            mejor = m;
+        }
+    }
+    <span class="k">return</span> mejor;
+}
+
+<span class="c">/** La función objetivo, nodo a nodo. */</span>
+<span class="k">private</span> <span class="k">double</span> utilidad(<span class="k">int</span> n) {
+    <span class="k">return</span> wComida * comida[n] - wAmenaza * amenaza[n] + wPresa * presa[n];
+}
+
+<span class="c">/**
+ * Recorre el pasillo que empieza saliendo de 'desde' por 'm' hasta el
+ * siguiente cruce, incluido, y devuelve el peor U que encuentra.
+ */</span>
+<span class="k">private</span> <span class="k">double</span> valorarTramo(Game game, <span class="k">int</span> desde, MOVE m) {
+    <span class="k">int</span> anterior = desde;
+    <span class="k">int</span> n = game.getNeighbour(desde, m);
+    <span class="k">double</span> peor = Double.POSITIVE_INFINITY;
+    <span class="k">while</span> (<span class="k">true</span>) {
+        peor = Math.min(peor, utilidad(n));
+        <span class="k">if</span> (game.isJunction(n)) {
+            <span class="k">return</span> peor;
+        }
+        <span class="c">// un nodo de pasillo tiene dos vecinos: el siguiente es el que no es el anterior</span>
+        <span class="k">int</span> siguiente = (vecinos[n][<span class="n">0</span>] == anterior) ? vecinos[n][<span class="n">1</span>] : vecinos[n][<span class="n">0</span>];
+        anterior = n;
+        n = siguiente;
+    }
+}</code></pre></div>
+        <div class="note tip">
+          <span class="note-label">Por qué con <code>DEBUG</code> se pinta en todos los <em>ticks</em></span>
+          <p>
+            Sin depuración, fuera de un cruce el controlador sale en la primera línea sin pintar nada. Con
+            depuración pinta siempre, porque <code>GameView</code> borra lo dibujado en cada fotograma: si
+            sólo se pintara en los cruces, el mapa parpadearía y no se podría leer.
+          </p>
+        </div>
+      </section>
+
+      <section id="codigo">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">El controlador entero</h2>
+        </div>
+        <p>
+          Aquí está de una pieza, tal como compila contra <code>MsPacManEngine</code> y tal como se ha medido
+          en la tabla de <a href="#afinar">afinar</a>. Va en el paquete de la plantilla de la
+          Práctica&nbsp;1; cambiad <code>grupoYY</code> por el vuestro. No depende de nada más que del motor.
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica1.grupoYY;
+
+<span class="k">import</span> java.awt.Color;
+<span class="k">import</span> java.util.Arrays;
+
+<span class="k">import</span> pacman.controllers.PacmanController;
+<span class="k">import</span> pacman.game.Constants.GHOST;
+<span class="k">import</span> pacman.game.Constants.MOVE;
+<span class="k">import</span> pacman.game.Game;
+<span class="k">import</span> pacman.game.GameView;
+
+<span class="c">/**
+ * Ms. Pac-Man que decide sólo con un mapa de influencia de tres capas:
+ * comida (atrae), amenaza (repele) y presa (atrae).
+ */</span>
+<span class="k">public</span> <span class="k">class</span> MsPacMan <span class="k">extends</span> PacmanController {
+
+    <span class="c">// ---- Lo que se afina ---------------------------------------------------</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">double</span> CAIDA_COMIDA  = <span class="n">0.90</span>;  <span class="c">// lo que queda tras cada paso</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">double</span> CAIDA_AMENAZA = <span class="n">0.90</span>;
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">double</span> CAIDA_PRESA   = <span class="n">0.85</span>;
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">boolean</span> DEBUG = <span class="k">false</span>;        <span class="c">// pinta U(n); apagar al entregar</span>
+
+    <span class="k">private</span> <span class="k">final</span> <span class="k">double</span> wComida, wAmenaza, wPresa;
+
+    <span class="c">// ---- Las capas: un número por nodo -------------------------------------</span>
+    <span class="k">private</span> <span class="k">double</span>[] comida, amenaza, presa;
+
+    <span class="c">// ---- Lo que se reserva una vez por laberinto ---------------------------</span>
+    <span class="k">private</span> <span class="k">int</span> laberinto = -<span class="n">1</span>;        <span class="c">// para saber cuándo cambia</span>
+    <span class="k">private</span> <span class="k">int</span>[][] vecinos;           <span class="c">// vecinos[n]: los nodos a un paso de n</span>
+    <span class="k">private</span> <span class="k">int</span> claveComida = -<span class="n">1</span>;      <span class="c">// la capa de comida sólo cambia si cambia esto</span>
+
+    <span class="c">// ---- La cola de la anchura, reutilizada --------------------------------</span>
+    <span class="k">private</span> <span class="k">int</span>[] cola;
+    <span class="k">private</span> <span class="k">double</span>[] valor;            <span class="c">// valor con el que entra cada nodo en la cola</span>
+    <span class="k">private</span> <span class="k">boolean</span>[] visto;
+    <span class="k">private</span> <span class="k">int</span> ini, fin;
+
+    <span class="k">public</span> MsPacMan() {
+        <span class="k">this</span>(<span class="n">1.0</span>, <span class="n">6.0</span>, <span class="n">2.0</span>);
+    }
+
+    <span class="k">public</span> MsPacMan(<span class="k">double</span> wComida, <span class="k">double</span> wAmenaza, <span class="k">double</span> wPresa) {
+        <span class="k">this</span>.wComida = wComida;
+        <span class="k">this</span>.wAmenaza = wAmenaza;
+        <span class="k">this</span>.wPresa = wPresa;
+    }
+
+    @Override
+    <span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+        <span class="k">if</span> (game.getMazeIndex() != laberinto) {
+            reservar(game);
+        }
+        <span class="k">int</span> yo = game.getPacmanCurrentNodeIndex();
+        <span class="k">boolean</span> cruce = game.isJunction(yo);
+        <span class="k">if</span> (!cruce &amp;&amp; !DEBUG) {
+            <span class="k">return</span> MOVE.NEUTRAL;       <span class="c">// en un pasillo sólo se puede seguir</span>
+        }
+
+        pintarCapas(game);
+        <span class="k">if</span> (DEBUG) {
+            depurar(game);
+        }
+        <span class="k">if</span> (!cruce) {
+            <span class="k">return</span> MOVE.NEUTRAL;
+        }
+
+        <span class="c">// Una salida por cada movimiento legal; gana la que tenga mejor tramo</span>
+        MOVE mejor = MOVE.NEUTRAL;
+        <span class="k">double</span> mejorValor = Double.NEGATIVE_INFINITY;
+        <span class="k">for</span> (MOVE m : game.getPossibleMoves(yo, game.getPacmanLastMoveMade())) {
+            <span class="k">double</span> v = valorarTramo(game, yo, m);
+            <span class="k">if</span> (v &gt; mejorValor) {
+                mejorValor = v;
+                mejor = m;
+            }
+        }
+        <span class="k">return</span> mejor;
+    }
+
+    <span class="c">/** La función objetivo, nodo a nodo. */</span>
+    <span class="k">private</span> <span class="k">double</span> utilidad(<span class="k">int</span> n) {
+        <span class="k">return</span> wComida * comida[n] - wAmenaza * amenaza[n] + wPresa * presa[n];
+    }
+
+    <span class="c">/**
+     * Recorre el pasillo que empieza saliendo de 'desde' por 'm' hasta el
+     * siguiente cruce, incluido, y devuelve el peor U que encuentra.
+     */</span>
+    <span class="k">private</span> <span class="k">double</span> valorarTramo(Game game, <span class="k">int</span> desde, MOVE m) {
+        <span class="k">int</span> anterior = desde;
+        <span class="k">int</span> n = game.getNeighbour(desde, m);
+        <span class="k">double</span> peor = Double.POSITIVE_INFINITY;
+        <span class="k">while</span> (<span class="k">true</span>) {
+            peor = Math.min(peor, utilidad(n));
+            <span class="k">if</span> (game.isJunction(n)) {
+                <span class="k">return</span> peor;
+            }
+            <span class="c">// un nodo de pasillo tiene dos vecinos: el siguiente es el que no es el anterior</span>
+            <span class="k">int</span> siguiente = (vecinos[n][<span class="n">0</span>] == anterior) ? vecinos[n][<span class="n">1</span>] : vecinos[n][<span class="n">0</span>];
+            anterior = n;
+            n = siguiente;
+        }
+    }
+
+    <span class="c">// ---- Pintar las tres capas ---------------------------------------------</span>
+
+    <span class="k">private</span> <span class="k">void</span> pintarCapas(Game game) {
+        <span class="c">// Comida: una sola anchura con todas las píldoras en la cola a la vez</span>
+        <span class="k">int</span> clave = game.getCurrentLevel() * <span class="n">10000</span>
+                  + game.getNumberOfActivePills() + game.getNumberOfActivePowerPills();
+        <span class="k">if</span> (clave != claveComida) {
+            claveComida = clave;
+            Arrays.fill(comida, <span class="n">0</span>);
+            empezar();
+            <span class="k">for</span> (<span class="k">int</span> p : game.getActivePillsIndices())      sembrar(p, <span class="n">1.0</span>);
+            <span class="k">for</span> (<span class="k">int</span> p : game.getActivePowerPillsIndices()) sembrar(p, <span class="n">1.0</span>);
+            propagar(CAIDA_COMIDA, comida);
+            normalizar(comida);
+        }
+
+        <span class="c">// Amenaza y presa: una anchura por fantasma, sumadas</span>
+        Arrays.fill(amenaza, <span class="n">0</span>);
+        Arrays.fill(presa, <span class="n">0</span>);
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            <span class="k">if</span> (game.getGhostLairTime(g) &gt; <span class="n">0</span>) {
+                <span class="k">continue</span>;                          <span class="c">// en la cárcel: no está en el laberinto</span>
+            }
+            <span class="k">int</span> nodo = game.getGhostCurrentNodeIndex(g);
+            <span class="k">if</span> (game.isGhostEdible(g)) {
+                empezar();
+                sembrar(nodo, <span class="n">1.0</span>);
+                propagar(CAIDA_PRESA, presa);
+            } <span class="k">else</span> {
+                <span class="c">// No puede darse la vuelta: la primera ola sólo sale hacia delante</span>
+                empezar();
+                visto[nodo] = <span class="k">true</span>;
+                amenaza[nodo] += <span class="n">1.0</span>;
+                <span class="k">int</span>[] delante = game.getNeighbouringNodes(nodo, game.getGhostLastMoveMade(g));
+                <span class="k">if</span> (delante == <span class="k">null</span>) {
+                    delante = vecinos[nodo];       <span class="c">// sin sentido conocido: hacia todos lados</span>
+                }
+                <span class="k">for</span> (<span class="k">int</span> v : delante) {
+                    sembrar(v, CAIDA_AMENAZA);
+                }
+                propagar(CAIDA_AMENAZA, amenaza);
+            }
+        }
+        normalizar(amenaza);
+        normalizar(presa);
+    }
+
+    <span class="k">private</span> <span class="k">void</span> empezar() {
+        Arrays.fill(visto, <span class="k">false</span>);
+        ini = <span class="n">0</span>;
+        fin = <span class="n">0</span>;
+    }
+
+    <span class="k">private</span> <span class="k">void</span> sembrar(<span class="k">int</span> nodo, <span class="k">double</span> v) {
+        <span class="k">if</span> (!visto[nodo]) {
+            visto[nodo] = <span class="k">true</span>;
+            valor[nodo] = v;
+            cola[fin++] = nodo;
+        }
+    }
+
+    <span class="c">/** Anchura: cada nodo suma su valor a la capa y pasa valor × caída a sus vecinos. */</span>
+    <span class="k">private</span> <span class="k">void</span> propagar(<span class="k">double</span> caida, <span class="k">double</span>[] capa) {
+        <span class="k">while</span> (ini &lt; fin) {
+            <span class="k">int</span> u = cola[ini++];
+            capa[u] += valor[u];
+            <span class="k">for</span> (<span class="k">int</span> v : vecinos[u]) {
+                sembrar(v, valor[u] * caida);
+            }
+        }
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> normalizar(<span class="k">double</span>[] capa) {
+        <span class="k">double</span> max = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="k">double</span> x : capa) max = Math.max(max, x);
+        <span class="k">if</span> (max &gt; <span class="n">0</span>) {
+            <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; capa.length; i++) capa[i] /= max;
+        }
+    }
+
+    <span class="c">/** Todo lo que depende del laberinto se reserva aquí, y sólo aquí. */</span>
+    <span class="k">private</span> <span class="k">void</span> reservar(Game game) {
+        laberinto = game.getMazeIndex();
+        <span class="k">int</span> n = game.getNumberOfNodes();
+        comida  = <span class="k">new</span> <span class="k">double</span>[n];
+        amenaza = <span class="k">new</span> <span class="k">double</span>[n];
+        presa   = <span class="k">new</span> <span class="k">double</span>[n];
+        valor   = <span class="k">new</span> <span class="k">double</span>[n];
+        visto   = <span class="k">new</span> <span class="k">boolean</span>[n];
+        cola    = <span class="k">new</span> <span class="k">int</span>[n];
+        vecinos = <span class="k">new</span> <span class="k">int</span>[n][];
+        <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; n; i++) {
+            vecinos[i] = game.getNeighbouringNodes(i);
+        }
+        claveComida = -<span class="n">1</span>;                  <span class="c">// hay que repintar la comida</span>
+    }
+
+    <span class="c">// ---- Depurar: U(n) en cinco tramos por color ---------------------------</span>
+
+    <span class="k">private</span> <span class="k">void</span> depurar(Game game) {
+        <span class="k">double</span> escala = Math.max(wComida + wPresa, wAmenaza);
+        <span class="k">for</span> (<span class="k">int</span> n = <span class="n">0</span>; n &lt; comida.length; n++) {
+            <span class="k">double</span> u = utilidad(n) / escala;                  <span class="c">// entre -1 y 1</span>
+            <span class="k">int</span> tramo = (<span class="k">int</span>) Math.min(<span class="n">4</span>, Math.abs(u) * <span class="n">5</span>);   <span class="c">// 0..4</span>
+            <span class="k">if</span> (Math.abs(u) &lt; <span class="n">0.02</span>) <span class="k">continue</span>;                 <span class="c">// el cero no se pinta</span>
+            <span class="k">int</span> alfa = <span class="n">40</span> + <span class="n">45</span> * tramo;
+            Color c = (u &gt; <span class="n">0</span>) ? <span class="k">new</span> Color(<span class="n">245</span>, <span class="n">180</span>, <span class="n">0</span>, alfa) : <span class="k">new</span> Color(<span class="n">220</span>, <span class="n">40</span>, <span class="n">30</span>, alfa);
+            GameView.addPoints(game, c, n);
+        }
+    }
+
+    @Override
+    <span class="k">public</span> String getName() {
+        <span class="k">return</span> <span class="s">"MsPacManInfluencia"</span>;
+    }
+}</code></pre></div>
+        <p>Y pieza a pieza, en el orden en que se leen:</p>
+        <ol>
+          <li>
+            <strong>Las constantes.</strong> Las caídas son <code>static final</code>; los pesos entran por el
+            constructor, para poder probar varios juegos de pesos en el mismo programa sin recompilar. El
+            constructor sin argumentos, el que usará quien os evalúe, pone 1 / 6 / 2.
+          </li>
+          <li>
+            <strong><code>getMove</code></strong> reserva si ha cambiado el laberinto, sale con
+            <code>NEUTRAL</code> si no está en un cruce, pinta las capas y se queda con la salida de mejor
+            tramo. Empieza con <code>mejor = NEUTRAL</code> por si acaso, pero en un cruce siempre hay al
+            menos dos salidas legales.
+          </li>
+          <li>
+            <strong><code>utilidad</code></strong> es la función objetivo, en una línea. Si queréis añadir una
+            capa, es aquí donde entra su término.
+          </li>
+          <li>
+            <strong><code>valorarTramo</code></strong> anda por el pasillo hasta el cruce siguiente y devuelve
+            el peor U. Se apoya en <code>vecinos</code>, no en <code>getNeighbouringNodes</code>, por lo del
+            clon de cada llamada.
+          </li>
+          <li>
+            <strong><code>pintarCapas</code></strong> repinta la comida sólo si ha cambiado la clave, y los
+            fantasmas siempre. Cada fantasma va a una sola capa: amenaza o presa, nunca las dos.
+          </li>
+          <li>
+            <strong><code>empezar</code>, <code>sembrar</code> y <code>propagar</code></strong> son la anchura.
+            <code>sembrar</code> es por donde entra un nodo en la cola, y ahí mismo se marca como visto. La
+            única excepción es el nodo de un fantasma que amenaza: se marca a mano, sin meterlo en la cola,
+            para que la primera ola no salga hacia atrás.
+          </li>
+          <li>
+            <strong><code>normalizar</code></strong> divide por el máximo, si lo hay. Con todos los fantasmas en
+            la cárcel la amenaza es toda ceros y se queda así.
+          </li>
+          <li>
+            <strong><code>reservar</code></strong> crea todos los <em>arrays</em> y la tabla de vecinos. Es lo
+            único que reserva memoria en toda la clase.
+          </li>
+          <li>
+            <strong><code>depurar</code></strong> pinta U en pantalla. Está explicado dos secciones más abajo.
+          </li>
+        </ol>
+      </section>
+
+      <section id="coste">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">Lo que cuesta cada <em>tick</em></h2>
+        </div>
+        <p>
+          Una anchura toca cada nodo una vez, así que el coste se cuenta en capas por nodos. En el primer
+          laberinto:
+        </p>
+        <figure>
+          <figcaption>Cuenta · nodos que se recorren en una llamada a getMove, primer laberinto</figcaption>
+          <pre class="cuenta">en un pasillo                                               0 nodos    NEUTRAL y fuera
+en un cruce, fantasmas: una anchura cada uno   4 × 1 293  =  5 172 nodos
+en un cruce, comida, si ha cambiado            1 × 1 293  =  1 293 nodos
+en un cruce, como mucho                                      6 465 nodos
+más recorrer los tramos                        2 o 3 pasillos hasta el cruce siguiente</pre>
+        </figure>
+        <p>
+          Medido en las 1&#8239;800 partidas de la configuración 1 / 6 / 2 de la tabla, una llamada en un cruce
+          tarda <strong>0,026&nbsp;ms de media</strong>, y contando todas las llamadas, 0,0012&nbsp;ms. El
+          presupuesto es de 40&nbsp;ms. La única llamada cara es la primera de todas, unos 39&nbsp;ms,
+          que es la que carga las clases y ejecuta <code>reservar</code>; en 200 partidas seguidas contra el
+          mismo equipo, ninguna otra pasó de 1&nbsp;ms.
+        </p>
+        <p>
+          La caché de la comida ahorra menos de lo que prometía la nota de arriba, y conviene saber por qué.
+          Como sólo se pinta en los cruces, y entre dos cruces casi siempre se come algo, al llegar al
+          siguiente la clave ha cambiado. En 200 partidas contadas, 100 contra el grupo&nbsp;01 y 100 contra
+          <code>GhostsRandom</code>, la comida se repintó en 19&#8239;094 de
+          32&#8239;853 llamadas en cruce: <strong>el 58&#8239;%</strong>. La caché se lleva el 42&#8239;%
+          restante, que no está mal, pero no es el «sólo cuando te comes una píldora» de la nota. Con este
+          presupuesto da igual; si algún día pintáis capas caras de verdad, es lo primero que hay que
+          medir.
+        </p>
+      </section>
+
+      <section id="depurar">
+        <div class="sec-head">
+          <span class="num">10</span>
+          <h2 class="sec">Ver el mapa en pantalla</h2>
+        </div>
+        <p>
+          Un mapa de influencia se depura mirándolo, y el motor lo permite. <code>GameView.addPoints(game,
+          color, nodos...)</code> es estático y apunta un cuadrado de color sobre cada nodo que le paséis,
+          para el fotograma siguiente. Acepta cualquier <code>java.awt.Color</code>,
+          transparencia incluida, así que se puede copiar la idea de los cinco tramos del ejemplo
+          interactivo: amarillo lo que suma, rojo lo que resta, más opaco cuanto más lejos del cero.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// ---- Depurar: U(n) en cinco tramos por color ---------------------------</span>
+
+<span class="k">private</span> <span class="k">void</span> depurar(Game game) {
+    <span class="k">double</span> escala = Math.max(wComida + wPresa, wAmenaza);
+    <span class="k">for</span> (<span class="k">int</span> n = <span class="n">0</span>; n &lt; comida.length; n++) {
+        <span class="k">double</span> u = utilidad(n) / escala;                  <span class="c">// entre -1 y 1</span>
+        <span class="k">int</span> tramo = (<span class="k">int</span>) Math.min(<span class="n">4</span>, Math.abs(u) * <span class="n">5</span>);   <span class="c">// 0..4</span>
+        <span class="k">if</span> (Math.abs(u) &lt; <span class="n">0.02</span>) <span class="k">continue</span>;                 <span class="c">// el cero no se pinta</span>
+        <span class="k">int</span> alfa = <span class="n">40</span> + <span class="n">45</span> * tramo;
+        Color c = (u &gt; <span class="n">0</span>) ? <span class="k">new</span> Color(<span class="n">245</span>, <span class="n">180</span>, <span class="n">0</span>, alfa) : <span class="k">new</span> Color(<span class="n">220</span>, <span class="n">40</span>, <span class="n">30</span>, alfa);
+        GameView.addPoints(game, c, n);
+    }
+}</code></pre></div>
+        <p>
+          Para verlo, poned <code>DEBUG = true</code> y lanzad el <code>ExecutorTest</code> de la plantilla,
+          que ya viene con <code>setVisual(true)</code>. Y para depurar de verdad, no miréis U: cambiad
+          <code>utilidad(n)</code> por <code>-amenaza[n]</code> o por <code>comida[n]</code> y mirad
+          <strong>una capa cada vez</strong>. Con la amenaza sola se ve enseguida si la mancha sale hacia
+          delante del fantasma o hacia los dos lados.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Con <code>DEBUG</code> encendido no se entrega</span>
+          <p>
+            <code>addPoints</code> no dibuja: apunta en una lista <code>static</code> que sólo se vacía al
+            repintar la ventana, y sin ventana no se vacía nunca. Está contado en
+            <a href="predecir-coordinar.html#ver-lo-que-piensa">Ver lo que piensa</a>. Con
+            <code>DEBUG</code> a <code>false</code> y <code>static final</code>, el compilador quita la
+            llamada entera y no queda ni rastro.
+          </p>
+        </div>
+      </section>
+
+      <section id="afinar">
+        <div class="sec-head">
+          <span class="num">11</span>
+          <h2 class="sec">Afinar: qué hace cada número</h2>
+        </div>
+        <p>
+          Seis números: tres pesos y tres caídas. La forma de afinarlos es la de siempre, uno cada vez y
+          midiendo, y medir quiere decir muchas partidas contra varios rivales, no una partida en pantalla.
+          Esto es lo que se ha medido con el controlador del listado:
+        </p>
+        <ul>
+          <li>
+            <strong>Rivales</strong>: los <code>GhostsRandom</code> de la Práctica&nbsp;0 y los
+            <code>Ghosts</code> de los ocho grupos de la Práctica&nbsp;1 del curso 2024-25, los que vienen en
+            <span class="path">ICI-Evaluation/lib/ici-2425-practica1.jar</span>.
+          </li>
+          <li>
+            <strong>Partidas</strong>: 200 contra cada equipo con <code>runExperiment</code>, límite de
+            4&#8239;000 <em>ticks</em>, sin ventana y con observación completa. 1&#8239;800 partidas por
+            fila.
+          </li>
+          <li>
+            <strong>Cifras</strong>: puntuación media ± error típico. Las tres últimas filas son el mismo
+            listado con una sola línea cambiada.
+          </li>
+        </ul>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Qué se cambia</th>
+                <th scope="col">Los 9 rivales</th>
+                <th scope="col">Sólo los 8 de la Práctica&nbsp;1</th>
+                <th scope="col">Sólo GhostsRandom</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Nada: el listado, 1 / 6 / 2</strong></td><td><strong>5&#8239;265 ± 62</strong></td><td>4&#8239;970 ± 64</td><td>7&#8239;633 ± 136</td></tr>
+              <tr><td>Sólo comida, 1 / 0 / 0</td><td>2&#8239;743 ± 45</td><td>2&#8239;601 ± 47</td><td>3&#8239;877 ± 122</td></tr>
+              <tr><td>Sin presa, 1 / 6 / 0</td><td>4&#8239;730 ± 54</td><td>4&#8239;463 ± 55</td><td>6&#8239;864 ± 128</td></tr>
+              <tr><td>Amenaza floja, 1 / 1 / 2</td><td>4&#8239;834 ± 63</td><td>4&#8239;478 ± 63</td><td>7&#8239;681 ± 170</td></tr>
+              <tr><td>Amenaza muy fuerte, 1 / 20 / 2</td><td>5&#8239;236 ± 61</td><td>4&#8239;997 ± 65</td><td>7&#8239;144 ± 133</td></tr>
+              <tr><td>Presa fuerte, 1 / 6 / 6</td><td>5&#8239;380 ± 65</td><td>5&#8239;067 ± 67</td><td>7&#8239;888 ± 134</td></tr>
+              <tr><td>Caída de la amenaza 0,70</td><td>4&#8239;999 ± 67</td><td>4&#8239;604 ± 66</td><td>8&#8239;159 ± 172</td></tr>
+              <tr><td>Caída de la comida 0,75</td><td>4&#8239;879 ± 57</td><td>4&#8239;692 ± 60</td><td>6&#8239;377 ± 150</td></tr>
+              <tr><td>Amenaza sin mirar el sentido</td><td>5&#8239;043 ± 61</td><td>4&#8239;820 ± 63</td><td>6&#8239;824 ± 153</td></tr>
+              <tr><td>Puntuar sólo el nodo vecino</td><td>4&#8239;951 ± 68</td><td>4&#8239;543 ± 67</td><td>8&#8239;220 ± 174</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Antes de leerla, una advertencia: la fila del listado se lanzó dos veces, sin tocar nada, y dio
+          5&#8239;265 y 5&#8239;372. Ciento y pico puntos de diferencia es lo que mide el azar, así que
+          nada de lo que se mueva menos que eso cuenta. Con eso, la tabla dice esto:
+        </p>
+        <ul>
+          <li>
+            <strong>La amenaza es la capa que manda.</strong> Pasar de sólo comida a comida y amenaza sube de
+            2&#8239;743 a 4&#8239;730. La presa añade otros 535.
+          </li>
+          <li>
+            <strong>Su peso tiene un umbral y después una meseta.</strong> Con 1 se queda corta, 430 puntos
+            por debajo. Entre 6 y 20 hay 29 puntos de diferencia en la primera columna: no se puede decir que
+            una sea mejor. Pero contra los fantasmas aleatorios 20 pierde casi 500. Una Ms.&nbsp;Pac-Man
+            demasiado miedosa huye de fantasmas que no la persiguen.
+          </li>
+          <li>
+            <strong>El peso de la presa, dentro del ruido.</strong> Con 6 en vez de 2 sale 5&#8239;380, que
+            cae entre los dos lanzamientos del listado. Si os interesa, merece más partidas; con éstas no
+            se distingue.
+          </li>
+          <li>
+            <strong>Bajar las caídas sale caro, y no igual contra todos.</strong> Con 0,70 la amenaza se ve
+            tarde: a diez pasos un fantasma vale 0,70¹⁰&nbsp;=&nbsp;0,03 en vez de 0,90¹⁰&nbsp;=&nbsp;0,35. Pierde
+            casi 370 contra los de la Práctica&nbsp;1 y gana más de 500 contra los aleatorios, porque ahí
+            ver tarde al fantasma casi no se paga. Con 0,75 en la comida, una píldora a veinte pasos vale
+            0,75²⁰&nbsp;=&nbsp;0,003, y pierde en todas las columnas, sobre todo contra los aleatorios.
+          </li>
+          <li>
+            <strong>Mirar el sentido del fantasma vale unos 220 puntos</strong> en total, dos veces y media el
+            error típico de la diferencia, y 800 contra los aleatorios. Es una línea de código.
+          </li>
+          <li>
+            <strong>Mirar el tramo entero en vez del vecino vale 314</strong> en total y 427 contra los de la
+            Práctica&nbsp;1. Y sin embargo contra los aleatorios el vecino solo gana por casi 600: ser pesimista
+            con un pasillo entero cuesta comida cuando nadie persigue de verdad.
+          </li>
+        </ul>
+        <p>
+          Esa última fila, y la de la caída de 0,70, son la lección de la tabla: <strong>no hay pesos buenos
+          en abstracto</strong>, hay pesos buenos contra unos rivales. Si afinaseis sólo contra fantasmas
+          aleatorios, os quedaríais con esas dos variantes, que son peores que el listado contra los
+          fantasmas de verdad. Por eso los rivales se dicen siempre, y por eso
+          la guía de <a href="../competicion.html">probar los controladores</a> insiste en medir contra
+          varios.
+        </p>
+        <p>
+          Para repetirlo con vuestros rivales basta con esto, que compila tal cual al lado del
+          <code>ExecutorTest</code> de la plantilla:
+        </p>
+        <div class="codigo"><pre><code><span class="k">import</span> es.ucm.fdi.ici.c2627.practica1.grupoYY.Ghosts;
+<span class="k">import</span> es.ucm.fdi.ici.c2627.practica1.grupoYY.MsPacMan;
+<span class="k">import</span> pacman.Executor;
+<span class="k">import</span> pacman.game.util.Stats;
+
+<span class="k">public</span> <span class="k">class</span> Afinar {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(String[] args) {
+        Executor executor = <span class="k">new</span> Executor.Builder()
+                .setVisual(<span class="k">false</span>)
+                .setTickLimit(<span class="n">4000</span>)
+                .build();
+
+        <span class="k">double</span>[][] pesos = { {<span class="n">1</span>, <span class="n">0</span>, <span class="n">0</span>}, {<span class="n">1</span>, <span class="n">6</span>, <span class="n">0</span>}, {<span class="n">1</span>, <span class="n">6</span>, <span class="n">2</span>} };
+        <span class="k">for</span> (<span class="k">double</span>[] w : pesos) {
+            Stats[] s = executor.runExperiment(<span class="k">new</span> MsPacMan(w[<span class="n">0</span>], w[<span class="n">1</span>], w[<span class="n">2</span>]), <span class="k">new</span> Ghosts(), <span class="n">200</span>, <span class="s">"pesos"</span>);
+            System.out.printf(<span class="s">"%.0f / %.0f / %.0f  -&gt;  %.1f ± %.1f%n"</span>,
+                    w[<span class="n">0</span>], w[<span class="n">1</span>], w[<span class="n">2</span>], s[<span class="n">0</span>].getAverage(), s[<span class="n">0</span>].getStandardError());
+        }
+    }
+}</code></pre></div>
+        <div class="note mine">
+          <span class="note-label">Por qué dos lanzamientos no dan lo mismo</span>
+          <p>
+            El ejecutor siembra cada partida con un número aleatorio que no controláis, así que el mismo
+            experimento no sale igual dos veces. Con 1&#8239;800 partidas el error típico de la media ronda
+            los 60 puntos, y el de una diferencia entre dos filas, los 90. Si queréis distinguir cambios más
+            pequeños, la única salida son más partidas: para partir el error por la mitad hacen falta
+            cuatro veces más.
+          </p>
+        </div>
+      </section>
+
+      <section id="limites">
+        <div class="sec-head">
+          <span class="num">12</span>
+          <h2 class="sec">Hasta dónde llega un mapa solo</h2>
+        </div>
+        <p>
+          Este controlador saca casi el doble que el que sólo come, y lo hace sin una sola regla. Pero tiene
+          techo, y el techo está en lo que las capas no saben:
+        </p>
+        <ul>
+          <li>
+            <strong>No sabe si llega antes.</strong> La amenaza de un nodo dice lo cerca que está un fantasma
+            de él, no si Ms.&nbsp;Pac-Man llegará primero. Un cruce a cinco pasos del fantasma vale 0,59 tanto si
+            ella está a dos pasos como si está a veinte. Es justo la pregunta de
+            <a href="estrategias.html#llego-antes">¿llego yo antes?</a>, y el arreglo natural es una cuarta
+            capa: una anchura desde Ms.&nbsp;Pac-Man, comparada nodo a nodo con la de los fantasmas.
+          </li>
+          <li>
+            <strong>No mira el reloj.</strong> Un fantasma al que le quedan tres <em>ticks</em> de comestible
+            es presa, y va a dejar de serlo justo cuando lo alcance. Está contado en
+            <a href="predecir-coordinar.html#reloj">el reloj comestible</a>.
+          </li>
+          <li>
+            <strong>Gasta las píldoras de poder.</strong> Al estar dentro de la comida, se las come en cuanto
+            pasa cerca, haya fantasmas alrededor o no. El término de poder con el signo según la situación, el
+            de la <a href="estrategias.html#tres-formas">función de evaluación</a>, es lo que falta.
+          </li>
+          <li>
+            <strong>No predice.</strong> Pinta a los fantasmas donde están, no donde van a estar; la
+            primera ola hacia delante es toda la predicción que hace. Lo siguiente es
+            <a href="predecir-coordinar.html#predecir">predecir al otro</a>.
+          </li>
+        </ul>
+        <p>
+          En la tabla de las <a href="estrategias.html#tres-formas">tres formas de escribir la decisión</a>,
+          este controlador está entre dos columnas: el mapa es el de costes y la elección de salida es una
+          función de evaluación muy corta. Y lo que falla es lo que la tabla dice que falla en las dos: los
+          pesos se pisan, y sin pintar las capas no hay manera de saber por qué eligió lo que eligió. Lo que
+          tiene a favor es que cada una de esas mejoras es <em>una capa más o un término más</em>, no una
+          regla que haya que encajar entre las demás. Esa es la parte que conviene quedarse para la
+          práctica.
+        </p>
+      </section>
+
+
+      <nav class="pager" aria-label="Páginas del tema 1">
+        <a class="pager-prev" href="estrategias.html"><span class="pager-l">Anterior</span><span class="pager-t">Estrategias algorítmicas</span></a>
+        <a class="pager-next" href="predecir-coordinar.html"><span class="pager-l">Siguiente</span><span class="pager-t">Predecir, coordinar y medir</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#idea">Qué es</a></li>
+            <li><a href="#capas">Capa por capa</a></li>
+            <li><a href="#controlador">El diseño</a></li>
+            <li><a href="#estructuras">Un array por capa</a></li>
+            <li><a href="#propagar">Propagar</a></li>
+            <li><a href="#combinar">Normalizar y sumar</a></li>
+            <li><a href="#decidir">Decidir en los cruces</a></li>
+            <li><a href="#codigo">El código entero</a></li>
+            <li><a href="#coste">Lo que cuesta</a></li>
+            <li><a href="#depurar">Verlo en pantalla</a></li>
+            <li><a href="#afinar">Afinar</a></li>
+            <li><a href="#limites">Hasta dónde llega</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 1</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
+            <li><a href="busqueda.html"><span>02</span>Búsqueda en espacios de estados</a></li>
+            <li><a href="astar.html"><span>03</span>Heurísticas y A*</a></li>
+            <li><a href="astar-mspacman.html"><span>04</span>A* en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="estrategias.html"><span>05</span>Estrategias algorítmicas</a></li>
+            <li><a href="mapas-influencia.html" aria-current="page"><span>06</span>Mapas de influencia</a></li>
+            <li><a href="predecir-coordinar.html"><span>07</span>Predecir, coordinar y medir</a></li>
+            <li><a href="maquinas-estados.html"><span>08</span>Máquinas de estados</a></li>
+            <li><a href="arboles-comportamiento.html"><span>09</span>Árboles de comportamiento</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/demos.js" defer></script>
+</body>
+</html>
