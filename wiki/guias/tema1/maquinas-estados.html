@@ -259,28 +259,38 @@
         <h3 class="label">1 · La mala: <code>if</code> para cambiar, <code>switch</code> para actuar</h3>
         <figure>
           <figcaption>Pseudocódigo · la implementación que no hay que hacer</figcaption>
-          <pre class="pseudo"><i>// primero, un if por cada evento que puede cambiar el estado</i>
-<b>if</b> <span class="fn">jugadorMuerto</span>() AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(JUGADOR_MUERTO) <b>then return</b>
-<b>if</b> <span class="fn">jugadorInmortal</span>() AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(GHOSTBUSTER_PILL) <b>then return</b>
-<b>if</b> <span class="fn">comido</span>() AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(COMIDO) <b>then return</b>
-<b>if</b> <span class="fn">vuelveASerMortal</span>() AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(…) <b>then return</b>
-<b>if</b> <span class="var">posición</span> = <span class="var">centro</span> AND <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(POSICION_CENTRO) <b>then return</b>
-<b>if</b> <span class="fn">finTemporizador</span>() <b>then</b> <span class="var">maq</span>.<span class="fn">siguienteEstado</span>(FIN_TEMPORIZADOR)
+          <pre class="pseudo"><i>// primero, una cadena de if para cambiar de estado: cada uno repite</i>
+<i>// de qué estado sale, y el primero que se cumple gana</i>
+<b>if</b> <span class="var">estado</span> = PERSEGUIR AND <span class="fn">msPacManMuere</span>() <b>then</b>
+    <span class="var">estado</span> ← MOVIMIENTO_ALEATORIO
+<b>else if</b> <span class="var">estado</span> = MOVIMIENTO_ALEATORIO AND <span class="fn">msPacManReaparece</span>() <b>then</b>
+    <span class="var">estado</span> ← PERSEGUIR
+<b>else if</b> <span class="var">estado</span> = PERSEGUIR AND (<span class="fn">comestible</span>() OR <span class="fn">msPacManCercaPPill</span>()) <b>then</b>
+    <span class="var">estado</span> ← HUIR
+<b>else if</b> <span class="var">estado</span> = HUIR AND <span class="fn">meHanComido</span>() <b>then</b>
+    <span class="var">estado</span> ← EN_EL_CENTRO
+<b>else if</b> <span class="var">estado</span> = HUIR AND NOT <span class="fn">comestible</span>() AND NOT <span class="fn">msPacManCercaPPill</span>() <b>then</b>
+    <span class="var">estado</span> ← PERSEGUIR
+<b>else if</b> <span class="var">estado</span> = EN_EL_CENTRO AND <span class="fn">finPenalización</span>() <b>then</b>
+    <span class="var">estado</span> ← PERSEGUIR
+<b>end if</b>
 
-<i>// y después, un switch sobre el estado actual</i>
-<b>switch</b> <span class="var">maq</span>.<span class="fn">estadoActual</span>()
-    <b>case</b> PERSEGUIR:           <span class="fn">Perseguir</span>()
-    <b>case</b> HUIR:                <span class="fn">Huir</span>()
+<i>// y después, un switch sobre el estado para saber qué hacer</i>
+<b>switch</b> <span class="var">estado</span>
     <b>case</b> MOVIMIENTO_ALEATORIO: <span class="fn">MovimientoAleatorio</span>()
-    <b>case</b> MUERTO_AL_CENTRO:     <span class="fn">MuertoAlCentro</span>()
-    <b>case</b> ESPERAR_SALIR:        <span class="fn">EsperarSalir</span>()
+    <b>case</b> PERSEGUIR:            <span class="fn">Perseguir</span>()
+    <b>case</b> HUIR:                 <span class="fn">Huir</span>()
+    <b>case</b> EN_EL_CENTRO:         <span class="fn">EsperarASalir</span>()
 <b>end switch</b></pre>
         </figure>
         <p>
-          Hay una máquina, pero el grafo está desperdigado: las transiciones son <code>if</code> sueltos que no
-          dicen de qué estado salen, su prioridad es el orden en que alguien los escribió, y añadir un estado
-          obliga a tocar el <code>switch</code> y, probablemente, media docena de <code>if</code>. Es la cadena de
-          antes con otra forma.
+          Funciona, y es la máquina del diagrama: seis <code>if</code>, uno por flecha. Pero el grafo está
+          desperdigado. Para saber qué puede pasar estando en Huir hay que leer la cadena entera y quedarse con
+          los <code>if</code> que empiezan por <code>estado = HUIR</code>; la prioridad entre flechas es el orden
+          en que alguien las escribió, y si «me han comido» fuese después de «ya no soy comestible», el fantasma
+          comido, que ya no es comestible, podría salir hacia Perseguir en vez de volver al centro. Y añadir
+          un estado obliga a tocar el <code>switch</code> y a repasar cada <code>if</code> por si también tiene
+          que salir de él. Es la cadena de antes con otra forma.
         </p>
         <h3 class="label">2 · La sencilla: una tabla</h3>
         <p>
@@ -294,9 +304,16 @@
 <span class="k">public enum</span> EstadoFantasma {
     ALEATORIO, PERSEGUIR, HUIR, EN_EL_CENTRO;
 
+    <span class="c">// Un EnumMap es un Map cuyas claves son las constantes de un enum, guardado</span>
+    <span class="c">// como un array con una casilla por constante: get(HUIR) es leer array[2].</span>
+    <span class="c">// Por eso no vale new EnumMap&lt;&gt;(): los genéricos se borran al compilar, y</span>
+    <span class="c">// en ejecución el mapa no sabría de qué enum son las claves ni cuántas hay</span>
+    <span class="c">// para crear el array. EstadoFantasma.class se lo dice.</span>
     <span class="k">private static final</span> Map&lt;EstadoFantasma, Map&lt;String, EstadoFantasma&gt;&gt; TABLA =
             <span class="k">new</span> EnumMap&lt;&gt;(EstadoFantasma.<span class="k">class</span>);
 
+    <span class="c">// Un bloque static es código que Java ejecuta una sola vez, al cargar la clase y</span>
+    <span class="c">// antes de que nadie la use: aquí sirve para rellenar TABLA, que no cabe en una línea.</span>
     <span class="k">static</span> {
         <span class="k">for</span> (EstadoFantasma e : values())
             TABLA.put(e, <span class="k">new</span> HashMap&lt;&gt;());
@@ -330,8 +347,12 @@ penalización terminada -&gt; PERSEGUIR</code></pre>
           Ahora el grafo está en un sitio, y se lee como el dibujo. Fijaos en la segunda línea de la salida: un
           evento que no sale del estado actual —«comido» mientras persigue— no hace nada, y eso no hay que
           programarlo. Pero esta máquina funciona con <strong>eventos</strong>: alguien tiene que decirle
-          «comido». En un juego casi nunca hay eventos; hay un estado del mundo que cambia y que hay que
-          <strong>consultar en cada turno</strong>. Y la tabla no sabe qué hacer en cada estado: eso sigue siendo
+          «comido». Los juegos están llenos de eventos (colisiones, daño, disparadores, fin de animación), pero
+          el controlador de Ms.&nbsp;Pac-Man no recibe ninguno: en cada turno le llega el <code>Game</code> y
+          tiene que <strong>consultarlo</strong>. Lo más parecido son preguntas como
+          <code>wasPacManEaten()</code>, que valen <code>true</code> durante un turno. Y hay condiciones que no
+          son eventos en ningún juego: «Ms.&nbsp;Pac-Man está cerca de la PPill» no ocurre en un instante, es
+          algo que se cumple o no cada vez que se mira. Y la tabla no sabe qué hacer en cada estado: eso sigue siendo
           un <code>switch</code> en otra parte.
         </p>
         <h3 class="label">3 · Con objetos: estados, guardas y acciones como clases</h3>
