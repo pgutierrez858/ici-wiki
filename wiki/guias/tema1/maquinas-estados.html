@@ -2047,6 +2047,34 @@ entrar  salir
           máquina</strong>, antes del primer <code>add</code>, porque el grafo se construye con los avisos de
           <code>add</code>.
         </p>
+        <div class="codigo"><pre><code>FSM fsm = <span class="k">new</span> FSM(<span class="s">"MsPacMan"</span>);
+
+<span class="c">// 1. Los observadores, nada más crearla: todavía no hay ningún arco.</span>
+GraphFSMObserver grafo = <span class="k">new</span> GraphFSMObserver(<span class="s">"MsPacMan"</span>);
+fsm.addObserver(grafo);
+fsm.addObserver(<span class="k">new</span> ConsoleFSMObserver(<span class="s">"MsPacMan"</span>));
+
+<span class="c">// 2. Los arcos. Cada add() avisa a los observadores, y el grafo</span>
+<span class="c">//    crea en ese momento los dos nodos y la flecha.</span>
+fsm.add(comerState, <span class="k">new</span> AmenazaCercaTransition(<span class="n">12</span>), huir);
+fsm.add(huir,       <span class="k">new</span> AmenazaLejosTransition(<span class="n">20</span>), comerState);
+
+<span class="c">// 3. El estado inicial, y después la ventana.</span>
+fsm.ready(comerState);
+grafo.showInFrame(<span class="k">new</span> Dimension(<span class="n">320</span>, <span class="n">240</span>));</code></pre></div>
+        <p>
+          Si se cambia el orden y el <code>addObserver</code> va después de los <code>add</code>, el observador
+          no ha oído ningún aviso de arco: la ventana sale vacía y el de consola no escribe las líneas de los
+          arcos. Y el grafo hace algo peor: en el primer cambio de estado busca el nodo de destino para
+          pintarlo, no lo encuentra, y la partida se cae con una <code>NullPointerException</code> dentro de
+          <code>GraphFSMObserver.fsmTransition</code>.
+        </p>
+        <div class="codigo"><pre><code><span class="c">// Así no: cuando llega el observador, los avisos de add() ya han pasado.</span>
+FSM fsm = <span class="k">new</span> FSM(<span class="s">"MsPacMan"</span>);
+fsm.add(comerState, <span class="k">new</span> AmenazaCercaTransition(<span class="n">12</span>), huir);
+fsm.add(huir,       <span class="k">new</span> AmenazaLejosTransition(<span class="n">20</span>), comerState);
+fsm.addObserver(<span class="k">new</span> GraphFSMObserver(<span class="s">"MsPacMan"</span>));   <span class="c">// grafo vacío</span>
+fsm.ready(comerState);</code></pre></div>
         <h3 class="label"><code>ConsoleFSMObserver</code></h3>
         <p>
           <code>new ConsoleFSMObserver(id)</code> escribe en la salida estándar cada arco que se añade, cuándo la
