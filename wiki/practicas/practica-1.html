@@ -94,6 +94,15 @@
   <div class="cols" id="contenido" tabindex="-1">
     <main>
 
+      <div class="note tip">
+        <span class="note-label">La práctica está cerrada</span>
+        <p>
+          Los resultados del concurso, el punto extra de cada grupo, los errores que más se repitieron y
+          cómo funcionan las misiones de la reentrega y los enemigos de la defensa están en
+          <a href="practica-1-resultados.html"><strong>El concurso y la reentrega</strong></a>.
+        </p>
+      </div>
+
       <section id="que-se-pide">
         <div class="sec-head">
           <span class="num">01</span>
@@ -519,38 +528,40 @@
 
     <span class="k">switch</span> (f) {
         <span class="k">case</span> BLINKY:   <span class="c">// persigue por el camino más corto</span>
-            <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, pacman, ult));
+            <span class="k">return</span> primerMovimientoDe(game, nodo, game.getShortestPath(nodo, pacman, ult));
 
         <span class="k">case</span> PINKY:    <span class="c">// intercepta: va al próximo cruce de Ms. Pac-Man</span>
             <span class="k">int</span> destino = proximoCruceDe(game, pacman, game.getPacmanLastMoveMade());
-            <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, destino, ult));
+            <span class="k">return</span> primerMovimientoDe(game, nodo, game.getShortestPath(nodo, destino, ult));
 
         <span class="k">case</span> INKY:     <span class="c">// cubre la píldora de poder activa más cercana a Ms. Pac-Man</span>
             <span class="k">int</span>[] pp = game.getActivePowerPillsIndices();
             <span class="k">if</span> (pp.length &gt; <span class="n">0</span>) {
                 <span class="k">int</span> guardar = game.getClosestNodeIndexFromNodeIndex(pacman, pp, DM.PATH);
-                <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, guardar, ult));
+                <span class="k">return</span> primerMovimientoDe(game, nodo, game.getShortestPath(nodo, guardar, ult));
             }
-            <span class="k">return</span> primerMovimientoDe(game, game.getShortestPath(nodo, pacman, ult));
+            <span class="k">return</span> primerMovimientoDe(game, nodo, game.getShortestPath(nodo, pacman, ult));
 
         <span class="k">default</span>:      <span class="c">// SUE: persigue, pero de vez en cuando se sale del guion</span>
             <span class="k">return</span> (game.getCurrentLevelTime() % <span class="n">10</span> == <span class="n">0</span>)
                     ? movimientoAleatorioLegal(game, nodo, ult)
-                    : primerMovimientoDe(game, game.getShortestPath(nodo, pacman, ult));
+                    : primerMovimientoDe(game, nodo, game.getShortestPath(nodo, pacman, ult));
     }
 }
 
-<span class="k">private</span> MOVE primerMovimientoDe(Game game, <span class="k">int</span>[] camino) {
-    <span class="k">if</span> (camino == <span class="k">null</span> || camino.length &lt; <span class="n">2</span>) <span class="k">return</span> MOVE.NEUTRAL;
-    <span class="k">return</span> game.getMoveToMakeToReachDirectNeighbour(camino[<span class="n">0</span>], camino[<span class="n">1</span>]);
+<span class="c">// El camino NO incluye el nodo de origen: camino[0] ya es el primer paso.</span>
+<span class="k">private</span> MOVE primerMovimientoDe(Game game, <span class="k">int</span> nodo, <span class="k">int</span>[] camino) {
+    <span class="k">if</span> (camino == <span class="k">null</span> || camino.length == <span class="n">0</span>) <span class="k">return</span> MOVE.NEUTRAL;
+    <span class="k">return</span> game.getMoveToMakeToReachDirectNeighbour(nodo, camino[<span class="n">0</span>]);
 }</code></pre></div>
         <div class="note trap">
-          <span class="note-label">Cuidado con <code>getShortestPath</code> de longitud 0 o 1</span>
+          <span class="note-label">Cuidado con <code>getShortestPath</code> vacío</span>
           <p>
-            Devuelve un <code>int[]</code> vacío si el origen es la cárcel, y de un solo elemento si ya
-            estás en el destino. Acceder a <code>camino[1]</code> sin comprobarlo es la excepción que te
-            tumba la partida en la corrección, y pasa poco: justo lo suficiente para que no la veas
-            probando.
+            El camino <strong>no incluye el nodo de origen</strong>: <code>camino[0]</code> ya es el
+            vecino al que hay que moverse. Y devuelve un <code>int[]</code> vacío si el origen es la
+            cárcel o si ya estás en el destino. Acceder a <code>camino[0]</code> sin comprobarlo es la
+            excepción que te tumba la partida en la corrección, y pasa poco: justo lo suficiente para que
+            no la veas probando.
           </p>
         </div>
         <div class="note mine">
@@ -755,7 +766,7 @@
                 <td>Buena parte de la clase entregó con llamadas a <code>GameView</code> fuera del <code>if (DEBUG)</code>, o con el interruptor a <code>true</code>. Y no es un detalle de estilo: lo que se pinta se acumula en dos listas <code>static</code> que sólo se vacían al repintar la ventana, y en la corrección no hay ventana. En decenas de miles de partidas <strong>se acaba la memoria y se cae la ejecución entera</strong>, la vuestra y la de todos los demás.</td>
               </tr>
               <tr>
-                <td><strong>Acceder a <code>camino[1]</code> sin comprobar la longitud</strong></td>
+                <td><strong>Acceder a <code>camino[0]</code> sin comprobar la longitud</strong></td>
                 <td>Pasa poco, y cuando pasa tumba la partida entera. Justo lo suficientemente raro como para no verlo probando.</td>
               </tr>
               <tr>
@@ -919,6 +930,12 @@
           </ol>
         </nav>
         <div class="note mine rail-nota">
+          <span class="note-label">Resultados</span>
+          <p style="margin:0">
+            <a href="practica-1-resultados.html">El concurso, los errores comunes y la reentrega</a>.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
           <span class="note-label">El tema</span>
           <p style="margin:0">
             <a href="../guias/tema1/index.html">IA para videojuegos</a>, partido en páginas, y el
@@ -955,7 +972,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 28 de septiembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 7 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

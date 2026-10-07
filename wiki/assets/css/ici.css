@@ -1287,6 +1287,175 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
 }
 
 /* ============================================================
+   8b. Resultados de un concurso y fichas de la reentrega
+   ============================================================ */
+
+/* el nombre de la tabla, dentro de su marco y con la voz de las cabeceras */
+table caption {
+  caption-side: top;
+  text-align: left;
+  font-family: var(--f-mono);
+  font-size: .68rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding: .75rem .85rem .35rem;
+}
+.ranking tbody th { font-family: var(--f-mono); font-size: .8rem; font-weight: 500; white-space: nowrap; }
+.ranking td:first-child { color: var(--ink-3); width: 4.5rem; }
+.puesto {
+  display: inline-block;
+  min-width: 4.8rem;
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* la tabla de todos contra todos: diecinueve columnas de cifras. No cabe en
+   ninguna pantalla, así que se desplaza con el nombre de la fila pegado a la
+   izquierda, y las cabeceras van en vertical para que cada columna mida lo que
+   mide su cifra y no lo que mide el código del grupo */
+.matriz { font-size: .76rem; min-width: 0; width: auto; }
+.matriz th, .matriz td { padding: .42rem .5rem; }
+.matriz thead th {
+  writing-mode: sideways-lr;
+  height: 7.2rem;              /* sin alto fijo, la fila se queda corta y corta los códigos largos */
+  text-transform: none;
+  letter-spacing: .04em;
+  font-size: .68rem;
+  vertical-align: bottom;
+  text-align: left;
+  padding: .6rem .3rem;
+}
+.matriz thead th:first-child { writing-mode: horizontal-tb; }
+.matriz tbody th[scope="row"] {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  font-family: var(--f-mono);
+  font-size: .7rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.matriz td.propia { background: var(--surface-2); color: var(--ink-3); }
+.matriz .media { font-weight: 700; border-left: 1px solid var(--line); }
+.matriz tr.media td, .matriz tr.media th { font-weight: 700; border-top: 1px solid var(--line); }
+
+/* la escala de los cristales: una fila de cuatro, dos por fila en el móvil */
+.cristales {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.cristales li { margin: 0; display: flex; align-items: center; gap: .55rem; padding: .55rem .7rem; background: var(--surface); }
+.cristales img { width: 2.6rem; height: 2.6rem; flex: none; }
+.cristales span { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-2); line-height: 1.35; }
+.cristales b { display: block; font-family: var(--f-display); font-size: .9rem; font-weight: 600; color: var(--ink); }
+@media (max-width: 620px) { .cristales { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* una misión de la ficha: el cristal a la izquierda, el encargo a la derecha */
+.misiones { display: flex; flex-direction: column; gap: .7rem; max-width: var(--measure); margin: 0 0 1rem; }
+.mision {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+}
+.mision img { width: 4.5rem; height: 4.5rem; }
+.mision h4, .enemigo h4 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1.04rem;
+  letter-spacing: -.008em;
+  text-transform: none;
+  color: var(--ink);
+  margin: 0 0 .4rem;
+}
+.mision h4 .chip { vertical-align: .15em; margin-left: .3rem; }
+.valor { font-family: var(--f-mono); font-size: .82rem; font-weight: 500; color: var(--ok); margin-left: .25rem; white-space: nowrap; }
+.mision p { font-size: .95rem; margin: 0 0 .5rem; }
+.mision p:last-child { margin: 0; }
+.mision .entrega { color: var(--ink-2); }
+.mision .entrega b { color: var(--ink); font-weight: 600; }
+@media (max-width: 520px) {
+  .mision { grid-template-columns: 3rem minmax(0, 1fr); gap: .75rem; padding: .85rem .9rem; }
+  .mision img { width: 3rem; height: 3rem; }
+}
+
+/* los enemigos de la defensa: tres cartas iguales, el retrato arriba y lo que
+   resta abajo del todo, alineado entre las tres aunque la pregunta sea más larga */
+.enemigos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
+  gap: .7rem;
+  margin: 0 0 1rem;
+}
+.enemigo {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  padding: 1rem 1.05rem;
+}
+.enemigo .retrato { height: 7.5rem; display: flex; align-items: flex-end; justify-content: center; margin-bottom: .8rem; }
+.enemigo .retrato img { max-height: 100%; width: auto; }
+.enemigo .nivel {
+  font-family: var(--f-mono);
+  font-size: .68rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: .2rem;
+}
+.enemigo .nivel [aria-hidden] { color: var(--line); letter-spacing: .05em; }
+.enemigo .nivel .on { color: var(--pill-ink); }
+.enemigo p { font-size: .94rem; margin: 0 0 .8rem; }
+.enemigo .pista { font-style: italic; }
+.enemigo .penal {
+  margin: auto 0 0;
+  padding-top: .55rem;
+  border-top: 1px dashed var(--line);
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  color: var(--bad);
+}
+
+/* lo que se destapa a petición: la pregunta detrás de una pista */
+details.detras {
+  max-width: var(--measure);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  margin: 0 0 1rem;
+}
+details.detras summary {
+  cursor: pointer;
+  padding: .7rem 1.1rem;
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--maze);
+}
+details.detras > p { padding: 0 1.1rem; font-size: .97rem; }
+details.detras > p:last-child { padding-bottom: .9rem; margin-bottom: 0; }
+
+/* ============================================================
    9. Impresión — los enunciados se imprimen
    ============================================================ */
 
