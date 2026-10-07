@@ -334,6 +334,11 @@ v2 frente a v1    60 / √(41² + 40²)  =  60 / 57  ≈  1 error típico    →
           partidas concretas y, si usasteis IA, qué le pedisteis, qué os dio y qué cambiasteis vosotros.
           Con eso, un controlador flojo saca mejor nota que uno bueno sin historia.
         </p>
+        <p>
+          Y la tabla no tiene por qué quedarse en los puntos. Contar fantasmas comidos o píldoras de poder
+          gastadas por partida explica por qué se mueve la media; cómo se hace, en
+          <a href="#medir-mas">la sección de las misiones</a>.
+        </p>
 
         <h3 class="label">2 · Una rama que se come a las demás</h3>
         <p>
@@ -615,6 +620,99 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
           1,25 + 1 + 0,75 = 3. Al grupo que ya tiene documentado el proceso no le sale el diario: sus tres
           puntos se reparten entre misiones de código y de medida.
         </p>
+
+        <h3 class="label" id="medir-mas">Cómo medir algo que no es la puntuación</h3>
+        <p>
+          Muchas misiones piden contar cosas del juego: cuántos fantasmas se come Ms.&nbsp;Pac-Man, cuántas
+          píldoras de poder gasta, cuántas veces salta una rama. <code>runExperiment</code> sólo devuelve la
+          puntuación y los turnos, pero llama a <code>preCompute</code> antes de cada partida y a
+          <code>postCompute</code> después. Así que basta con envolver vuestra Ms.&nbsp;Pac-Man en otro
+          controlador que mira cada turno y cuenta, sin tocar su código:
+        </p>
+        <div class="codigo"><pre><code><span class="k">import</span> pacman.controllers.PacmanController;
+<span class="k">import</span> pacman.game.Constants.MOVE;
+<span class="k">import</span> pacman.game.Game;
+<span class="k">import</span> pacman.game.util.Stats;
+
+<span class="c">/** Juega con otra Ms. Pac-Man y cuenta lo que pasa en cada partida. */</span>
+<span class="k">public class</span> Contador <span class="k">extends</span> PacmanController {
+
+    <span class="k">private final</span> PacmanController real;
+    <span class="k">private int</span> fantasmas, pildorasDePoder;            <span class="c">// los de la partida en curso</span>
+
+    <span class="k">public final</span> Stats fantasmasPorPartida = <span class="k">new</span> Stats(<span class="s">"fantasmas comidos por partida"</span>);
+    <span class="k">public final</span> Stats poderPorPartida     = <span class="k">new</span> Stats(<span class="s">"píldoras de poder por partida"</span>);
+
+    <span class="k">public</span> Contador(PacmanController real) {
+        <span class="k">this</span>.real = real;
+        setName(real.getName());
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> preCompute(String rival) {              <span class="c">// antes de cada partida</span>
+        fantasmas = <span class="n">0</span>;
+        pildorasDePoder = <span class="n">0</span>;
+        real.preCompute(rival);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+        <span class="c">// Estos avisos dicen qué pasó en el turno anterior, y duran sólo un turno</span>
+        fantasmas += game.getNumGhostsEaten();
+        <span class="k">if</span> (game.wasPowerPillEaten()) pildorasDePoder++;
+        <span class="k">return</span> real.getMove(game, timeDue);
+    }
+
+    <span class="c">@Override</span>
+    <span class="k">public void</span> postCompute() {                          <span class="c">// después de cada partida</span>
+        fantasmasPorPartida.add(fantasmas);
+        poderPorPartida.add(pildorasDePoder);
+        real.postCompute();
+    }
+}</code></pre></div>
+        <p>
+          En el banco de pruebas, en lugar de <code>new MsPacMan()</code> se le pasa el contador, y al
+          acabar se leen sus <code>Stats</code> como los de la puntuación:
+        </p>
+        <div class="codigo"><pre><code>Contador pacMan = <span class="k">new</span> Contador(<span class="k">new</span> MsPacMan());
+Stats[] s = executor.runExperiment(pacMan, <span class="k">new</span> Ghosts(), <span class="n">300</span>, <span class="s">"v3"</span>);
+
+Stats f = pacMan.fantasmasPorPartida, p = pacMan.poderPorPartida;
+System.out.printf(<span class="s">"puntos       %8.1f ± %.1f%n"</span>, s[<span class="n">0</span>].getAverage(), s[<span class="n">0</span>].getStandardError());
+System.out.printf(<span class="s">"fantasmas    %8.2f ± %.2f%n"</span>, f.getAverage(), f.getStandardError());
+System.out.printf(<span class="s">"p. de poder  %8.2f ± %.2f%n"</span>, p.getAverage(), p.getStandardError());
+System.out.printf(<span class="s">"fantasmas por píldora  %.2f%n"</span>, f.getSum() / p.getSum());</code></pre></div>
+        <p>
+          Sale algo así (las cifras son inventadas):
+        </p>
+        <pre><code>puntos         3650,2 ± 45,1
+fantasmas        2,31 ± 0,08
+p. de poder      3,62 ± 0,04
+fantasmas por píldora  0,64</code></pre>
+        <p>
+          La última línea es la que dice algo que la puntuación esconde. Cada píldora de poder puede valer
+          hasta cuatro fantasmas, y esta Ms.&nbsp;Pac-Man se come 0,64 por píldora: la mayoría las gasta al pasar. Eso
+          es una misión con su medida de antes y de después.
+        </p>
+        <p>
+          Con el mismo esquema se cuenta cualquier cosa que se vea en <code>Game</code>: vidas perdidas con
+          <code>wasPacManEaten()</code>, turnos con un fantasma a menos de diez nodos, píldoras que quedan al
+          perder la última vida. Dos avisos:
+        </p>
+        <ul>
+          <li>
+            El último turno de cada partida no llega a <code>getMove</code>: si la partida acaba porque se
+            comen a Ms.&nbsp;Pac-Man, esa muerte no se cuenta, y desde el controlador no hay forma de verla.
+            Para lo que se mide al final, como las píldoras que quedan o el nivel alcanzado, guardad el
+            último <code>game</code> en un atributo y leedlo en <code>postCompute</code>: es el del turno
+            anterior, y para eso basta.
+          </li>
+          <li>
+            Para contar cuántas veces salta cada rama, el contador va dentro de vuestro controlador: un
+            atributo <code>int</code> por rama, que no sea <code>static</code>, y que se suma justo antes de
+            su <code>return</code>.
+          </li>
+        </ul>
       </section>
 
       <section id="enemigos">
