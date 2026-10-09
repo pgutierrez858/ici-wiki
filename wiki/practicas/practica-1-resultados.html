@@ -335,6 +335,13 @@ v2 frente a v1    60 / √(41² + 40²)  =  60 / 57  ≈  1 error típico    →
           Con eso, un controlador flojo saca mejor nota que uno bueno sin historia.
         </p>
         <p>
+          Desde la Práctica&nbsp;2 esto tiene un formato fijo, el
+          <a href="practica-2.html#diario"><strong>diario de desarrollo</strong></a>: un
+          <code>diario.md</code> con entradas cortas, versiones <code>v0</code>, <code>v1</code>… medidas
+          contra los mismos rivales, y un ejemplo completo de cómo queda. Es el mismo que se pide en la
+          reentrega.
+        </p>
+        <p>
           Y la tabla no tiene por qué quedarse en los puntos. Contar fantasmas comidos o píldoras de poder
           gastadas por partida explica por qué se mueve la media; cómo se hace, en
           <a href="#medir-mas">la sección de las misiones</a>.
@@ -555,8 +562,9 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
         <ul>
           <li>Las misiones de un grupo suman <strong>3 puntos</strong> entre todas, y no tienen por qué valer lo mismo.</li>
           <li>Cada misión completada suma lo que vale. La nota no pasa de 10.</li>
-          <li>Cada una dice qué hacer y qué entregar para demostrarlo: una versión nueva medida contra la anterior, una tabla, una sección del documento.</li>
-          <li>Todas parten de algo que ya teníais: arreglar lo que intentabais, medir lo que decíais haber medido, terminar una idea a medias. Ninguna pide cambiar de técnica.</li>
+          <li>Cada una dice qué hacer y qué entregar para demostrarlo: una versión nueva medida contra la anterior, una tabla, una prueba que faltaba.</li>
+          <li>Cada misión se documenta como una entrada de un <code>diario.md</code>, en el <a href="practica-2.html#diario">formato de la Práctica&nbsp;2</a>: qué cambiáis y por qué, cómo lo medís y con qué os quedáis.</li>
+          <li>Todas parten de vuestra propia solución: arreglar lo que intentabais, medir lo que decíais haber medido, terminar una idea a medias, o probar variantes de lo que ya hacíais si apenas lo probasteis. Ninguna pide cambiar de técnica ni de diseño.</li>
           <li>El concurso no se vuelve a jugar: el punto extra ya está cerrado y va aparte.</li>
         </ul>
 
@@ -582,11 +590,13 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
             <div>
               <h4>El diario de desarrollo <span class="valor">+1,25</span> <span class="chip free">Misión común</span></h4>
               <p>
-                Reconstruid el proceso: la línea base medida, cada versión con su hipótesis, sus mediciones
-                con media y error típico, lo que descartasteis y por qué, y qué hizo la IA y qué vosotros.
+                Reconstruid el proceso en el formato del diario de la Práctica&nbsp;2: la línea base medida,
+                cada versión con el problema, su porqué y el cambio, la comparación con la anterior, lo que
+                descartasteis y, si usasteis IA, los <em>prompts</em>.
               </p>
-              <p class="entrega"><b>Para conseguirlo:</b> el documento con la tabla de versiones y una
-              entrada por cambio, como la del <a href="#errores">error 1</a>.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> un <code>diario.md</code> como el
+              <a href="practica-2.html#diario">del ejemplo</a>, con la <code>v0</code> medida contra al
+              menos tres rivales fijos y una entrada corta por versión.</p>
             </div>
           </article>
           <article class="mision">
@@ -726,8 +736,8 @@ fantasmas por píldora  0,64</code></pre>
           grupo, y cada una que no sepáis responder resta lo que indica.
         </p>
         <ul>
-          <li>La <strong>fácil</strong> y la <strong>media</strong> vienen escritas en la ficha, tal cual os las haré.</li>
-          <li>La <strong>difícil</strong> sólo trae una pista: dónde miraría yo. Suele ser algo que llama la atención en el código: un caso límite, una incoherencia entre el documento y el código, una parte que conviene entender aunque no la escribierais vosotros.</li>
+          <li>Las tres vienen escritas en la ficha, tal cual os las haré, también la <strong>difícil</strong>: no hay nada escondido, lo que se mide es si la sabéis responder.</li>
+          <li>La difícil suele ser algo que llama la atención en el código: un caso límite, una incoherencia entre el documento y el código, una parte que conviene entender aunque no la escribierais vosotros.</li>
           <li>Los enemigos cambian con cada práctica.</li>
         </ul>
 
@@ -760,29 +770,24 @@ fantasmas por píldora  0,64</code></pre>
             <div class="retrato"><img src="../assets/img/misiones/ciervo-hueco.webp" alt="Ciervo Hueco, un ciervo con cornamenta" width="212" height="225"></div>
             <span class="nivel"><span class="on" aria-hidden="true">★★★</span> Difícil</span>
             <h4>Ciervo Hueco</h4>
-            <p class="pista">
-              «Yo miraría qué decide vuestra Ms.&nbsp;Pac-Man en el turno en que un fantasma sale de la
-              cárcel justo delante de ella.»
+            <p>
+              Mientras está en la cárcel, <code>llegoAntes</code> se salta a ese fantasma. ¿Qué pasa con una
+              salida que era segura en el turno anterior cuando ese fantasma aparece en la puerta? ¿Se vuelve
+              a calcular, o Ms.&nbsp;Pac-Man sigue con la decisión que había tomado?
             </p>
             <p class="penal">Sin respuesta: −0,75</p>
           </article>
         </div>
-        <details class="detras">
-          <summary>La pregunta que había detrás de la pista</summary>
-          <p>
-            Mientras está en la cárcel, <code>llegoAntes</code> se salta a ese fantasma. ¿Qué pasa con una
-            salida que era segura en el turno anterior cuando ese fantasma aparece en la puerta? ¿Se vuelve a
-            calcular, o Ms.&nbsp;Pac-Man sigue con la decisión que había tomado? Una buena respuesta explica
-            qué se recalcula en cada turno, enseña el caso con <code>GameView</code> y dice si es un fallo o
-            un riesgo aceptado, y por qué.
-          </p>
-        </details>
+        <p>
+          Una buena respuesta a la difícil explica qué se recalcula en cada turno, enseña el caso con
+          <code>GameView</code> y dice si es un fallo o un riesgo aceptado, y por qué.
+        </p>
         <div class="note tip">
           <span class="note-label">Cómo prepararla</span>
           <p>
             Leed el código que entregasteis, no el que tenéis ahora, y que cada uno sepa explicar las partes
-            que escribieron los demás. Para la difícil, id a donde apunta la pista y lanzad una partida con
-            la depuración encendida hasta ver el caso. Si una parte la generó la IA, la defensa es el sitio
+            que escribieron los demás. Para la difícil, buscad en el código lo que pregunta y lanzad una
+            partida con la depuración encendida hasta ver el caso. Si una parte la generó la IA, la defensa es el sitio
             donde se nota si la entendéis.
           </p>
         </div>
@@ -832,7 +837,7 @@ fantasmas por píldora  0,64</code></pre>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 8 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
