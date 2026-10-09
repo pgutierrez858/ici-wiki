@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 2 · Máquinas de estados · ICI</title>
+<meta name="description" content="Enunciado de la Práctica 2: diseñar e implementar con máquinas de estados jerárquicas los comportamientos de Ms. Pac-Man y de los fantasmas, en dos entregas, con un diario de desarrollo y versiones medidas.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <span>Práctica 2</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Máquinas de estados
+      <span class="thin">Diseñar primero, programar después, y medir cada versión.</span>
+    </h1>
+    <p class="standfirst">
+      El objetivo de esta práctica es implementar los comportamientos de Ms.&nbsp;Pac-Man y de los
+      fantasmas mediante <strong>máquinas de estados jerárquicas</strong>. Pero lo que de verdad se
+      evalúa no es la máquina que entreguéis al final: es <strong>cómo llegáis a ella</strong>. Un diseño
+      pensado antes de programar, unas versiones medidas una contra otra, y un diario corto que lo
+      cuente.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>1 · El diseño</dt>
+      <dd>11 de octubre<small>Domingo, a través del Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>2 · Los controladores</dt>
+      <dd>18 de octubre<small>Domingo, a través del Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Modalidad</dt>
+      <dd>Grupos de 2<small>Los mismos que en la Práctica 1</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Mínimo</dt>
+      <dd>10 estados simples<small>Por comportamiento, sin contar los compuestos</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="que-se-pide">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué se pide</h2>
+        </div>
+        <p>
+          Los mismos dos controladores de siempre, <code>MsPacMan</code> y <code>Ghosts</code>, pero ahora
+          cada uno decide con una máquina de estados construida con el paquete <code>fsm</code> del motor.
+          Se entregan en dos veces:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Entrega</th><th scope="col">Cuándo</th><th scope="col">Qué</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>1 · El diseño</strong></td>
+                <td>Domingo 11 de octubre</td>
+                <td>Las acciones, las transiciones y el diagrama de las dos máquinas, y el diario hasta ahí. Sirve para daros <em>feedback</em> antes de que programéis nada.</td>
+              </tr>
+              <tr>
+                <td><strong>2 · Los controladores</strong></td>
+                <td>Domingo 18 de octubre</td>
+                <td>El código, <strong>con todas sus versiones</strong> (<code>v0</code>, <code>v1</code>, <code>v2</code>…), las medidas de cada una, y el diario completo.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          La parte más importante de la práctica es la <strong>abstracción</strong>: decidir qué
+          <em>acciones</em> sabe hacer cada personaje, qué <em>condiciones</em> hacen que cambie de una a otra
+          y qué información del juego hace falta de verdad para calcularlas, que es lo que acaba en el
+          <code>Input</code>. Programar la máquina, una vez decidido eso, es casi mecánico.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Antes de empezar</span>
+          <p>
+            Leed <a href="../guias/tema1/maquinas-estados.html"><strong>Máquinas de estados</strong></a>, en
+            los apuntes del tema. Está escrita para esta práctica: el paquete <code>fsm</code> clase a clase,
+            dos ejemplos completos, cómo ver la máquina mientras juega, cuatro diseños de cursos anteriores
+            comentados y los errores típicos. Y lo que ya hicisteis en la
+            <a href="practica-1.html">Práctica&nbsp;1</a> no se tira: la mitad de aquellos métodos auxiliares
+            son acciones y transiciones que ya están escritas.
+          </p>
+        </div>
+
+        <h3 class="label">Reglas de simulación</h3>
+        <p>
+          Las de la Práctica&nbsp;1: <strong>sin visibilidad parcial</strong> y con el
+          <strong>tiempo de razonamiento por defecto (40&nbsp;ms)</strong>. Qué significa exactamente ese
+          presupuesto, y por qué en la corrección no os va a cortar nadie, está explicado en
+          <a href="practica-1.html#reglas-simulacion">su enunciado</a>.
+        </p>
+      </section>
+
+      <section id="evaluacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Cómo se evalúa</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Se mira</th><th scope="col">En concreto</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>El proceso</strong></td>
+                <td>Que el diseño exista antes que el código, que haya varias versiones, que cada una esté medida contra la anterior y que la decisión de quedarse con una salga de esas medidas. Es lo que más pesa.</td>
+              </tr>
+              <tr>
+                <td><strong>Las máquinas</strong></td>
+                <td>El número de estados, transiciones y acciones implementados. Para aprobar hacen falta <strong>al menos 10 estados simples por comportamiento</strong>, Ms.&nbsp;Pac-Man por un lado y fantasmas por otro.</td>
+              </tr>
+              <tr>
+                <td><strong>La jerarquía</strong></td>
+                <td>Usar estados compuestos sube la nota. Los compuestos <strong>no cuentan</strong> para los 10: cuentan los simples que llevan dentro.</td>
+              </tr>
+              <tr>
+                <td><strong>El rendimiento</strong></td>
+                <td>Cómo juega la versión que elijáis, contra rivales de referencia y contra los demás grupos en el concurso. <a href="../guias/competicion.html">Cómo se juega</a>, en la guía.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Por qué el proceso pesa más que el resultado</span>
+          <p>
+            Porque es lo que se aprende aquí. En la Práctica&nbsp;1 el fallo que más nota costó fue
+            <a href="practica-1-resultados.html#errores">un controlador y ningún rastro</a>: entregas con un
+            solo controlador, a veces bueno, sin una versión anterior ni una medida que explicara por qué es
+            así. <strong>Un controlador flojo con su historia saca mejor nota que uno bueno sin
+            ella.</strong>
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Los cuatro fantasmas cuentan una vez</span>
+          <p>
+            Si los cuatro fantasmas usan la misma máquina, cada uno con su copia, esa máquina cuenta una vez:
+            sus estados son los del diseño, no el diseño multiplicado por cuatro. Si les dais máquinas
+            distintas, cuenta cada una.
+          </p>
+        </div>
+      </section>
+
+      <section id="diseno">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Primera entrega: el diseño</h2>
+        </div>
+        <p>
+          Se diseña <strong>en este orden</strong>, y cada paso deja algo escrito en el diario:
+        </p>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Las acciones</h3>
+            <p>
+              Todo lo que queréis que sepa hacer cada personaje, con una frase por acción: «ir a la píldora
+              más cercana por un camino seguro», «ir al cruce al que va a llegar Ms.&nbsp;Pac-Man». Todavía
+              sin pensar cuándo. Las acciones son los verbos de la máquina, y si falta una, ningún diagrama
+              lo arregla.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Las transiciones</h3>
+            <p>
+              Las condiciones que hacen cambiar de acción, cada una como algo que se pueda
+              <strong>calcular</strong>: no «hay un fantasma cerca», sino «algún fantasma no comestible está a
+              menos de 25 nodos por camino». Cada palabra vaga, un número. Y si una condición tiene ida y
+              vuelta, dos números, uno para entrar y otro para salir: es la
+              <a href="../guias/tema1/maquinas-estados.html#prioridades">histéresis</a> de los apuntes.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">La máquina</h3>
+            <p>
+              Ahora sí, el diagrama: los estados, las flechas con su transición, el estado inicial de cada
+              máquina, en qué orden se miran las flechas que salen de un mismo estado, y qué estados se
+              agrupan en un compuesto porque comparten salidas. Antes de darlo por bueno, pasadle la lista
+              <a href="../guias/tema1/maquinas-estados.html#disenar">«Antes de programar, comprobad el
+              diagrama»</a> de los apuntes.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Enviarlo</h3>
+            <p>
+              Por el Campus Virtual, antes del <strong>domingo 11 de octubre</strong>. Os devuelvo
+              <em>feedback</em> sobre el diseño para que lo tengáis antes de programar en serio.
+            </p>
+          </div>
+        </div>
+        <div class="note tip">
+          <span class="note-label">No tiene que ser bonito</span>
+          <p>
+            A mano en un papel y una foto, en un editor de grafos, en una pizarra: lo que os resulte más
+            rápido. Lo único que se pide es que se lea. Podéis mandar <strong>más de un diseño</strong> si
+            dudáis entre dos ideas, y es buena idea; pero <strong>al menos uno</strong>, porque sin diseño no
+            hay sobre qué daros <em>feedback</em>. En los apuntes tenéis
+            <a href="../guias/tema1/maquinas-estados.html#disenar">cuatro diseños de otros cursos</a> tal como
+            se entregaron, con lo que tenía bien y mal cada uno.
+          </p>
+        </div>
+      </section>
+
+      <section id="controladores">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Segunda entrega: los controladores</h2>
+        </div>
+        <p>
+          La semana del 12 al 18 es un bucle, y cada vuelta deja una versión nueva. No se trata de llegar a la
+          máquina perfecta a la primera: se trata de que cada cambio tenga un motivo y una medida.
+        </p>
+        <div class="step">
+          <span class="step-num">0</span>
+          <div class="step-body">
+            <h3 class="label">v0: el diseño, tal cual</h3>
+            <p>
+              La primera versión implementa el diseño que enviasteis, con el <em>feedback</em> aplicado y
+              sin «mejoras» de por medio. Es vuestra línea base: todo lo que venga después se compara con
+              ella.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Probar contra varios rivales</h3>
+            <p>
+              Al menos tres, y <strong>siempre los mismos</strong> de aquí al final, con las mismas partidas
+              por rival: si cambiáis de rival a mitad, las versiones dejan de poder compararse. Buenos
+              candidatos: los fantasmas o la Ms.&nbsp;Pac-Man de la <a href="practica-0.html">Práctica&nbsp;0</a>,
+              <strong>vuestros propios controladores de la Práctica&nbsp;1</strong> —¿juega mejor la máquina
+              que el código a mano?—, los de cursos anteriores y los de otros grupos, compilados. Todos
+              están en <a href="../guias/competicion.html#rivales">Contra quién probar</a>.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Sacar las métricas que interesan</h3>
+            <p>
+              La puntuación media, con su error típico, siempre. Pero la puntuación dice <em>cuánto</em>, no
+              <em>por qué</em>, y para decidir el siguiente cambio hace falta el porqué. Estas son las que
+              suelen decir algo:
+            </p>
+          </div>
+        </div>
+        <div class="table-scroll" style="margin-top:1rem">
+          <table class="ancha">
+            <thead><tr><th scope="col">Métrica</th><th scope="col">Qué delata</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Puntos por partida</strong></td>
+                <td>Lo que cuenta en el concurso. Para los fantasmas, los que <em>dejan</em> hacer: cuanto menos, mejor.</td>
+              </tr>
+              <tr>
+                <td><strong>Fantasmas comidos por píldora de poder</strong></td>
+                <td>Si la píldora se usa o se gasta al pasar. Del lado de los fantasmas, si huyen a tiempo. Cómo se cuenta, en <a href="practica-1-resultados.html#medir-mas">Cómo medir algo que no es la puntuación</a>.</td>
+              </tr>
+              <tr>
+                <td><strong>Nivel alcanzado, vidas perdidas</strong></td>
+                <td>Si muere pronto, o si sobrevive y no come. Con el mismo contador, <code>wasPacManEaten()</code> y el último <code>game</code> en <code>postCompute</code>.</td>
+              </tr>
+              <tr>
+                <td><strong>Cambios de estado por partida</strong></td>
+                <td>Rebotes: una pareja de transiciones sin histéresis que entra y sale cada pocos turnos. Se cuentan con el <a href="../guias/tema1/maquinas-estados.html#depurar">observador propio</a> de los apuntes.</td>
+              </tr>
+              <tr>
+                <td><strong>Veces que se ejecuta cada estado</strong></td>
+                <td>Un estado que no se ejecuta nunca no existe, aunque esté en el diagrama. Un contador por acción, en <code>execute</code>; nunca en el <code>evaluate</code> de una transición.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Mirar las métricas y buscar el porqué</h3>
+            <p>
+              Qué métrica está mal, contra qué rival, y qué pasa en esas partidas. Esto último no se adivina
+              leyendo el código: se mira, con <code>runGame</code> despacio y el
+              <a href="../guias/tema1/maquinas-estados.html#depurar"><code>GraphFSMObserver</code></a> abierto
+              para ver en qué estado está la máquina cuando la cosa sale mal. Se apunta en una o dos líneas:
+              el problema, y por qué creéis que pasa.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Una versión nueva, con un solo cambio</h3>
+            <p>
+              El que ataca ese porqué: un umbral, una transición nueva, un estado que se parte en dos. Una
+              cosa cada vez, porque con dos cambios a la vez no hay forma de saber cuál ha servido. La versión
+              anterior <strong>no se borra</strong>: se entrega todo, <code>v0</code>, <code>v1</code>,
+              <code>v2</code>… Y vuelta al paso 1, comparando con la anterior como se explica
+              <a href="#significativa">en la sección siguiente</a>.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Elegir una para el concurso</h3>
+            <p>
+              Al final, en un par de líneas: con qué versión os quedáis, de Ms.&nbsp;Pac-Man y de fantasmas, y
+              por qué. Que no tiene por qué ser la última: si <code>v3</code> no mejora de forma medible a
+              <code>v2</code> y es más complicada, la buena es <code>v2</code>, y decirlo así es una decisión
+              de las que cuentan.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="label">Cómo organizar las versiones</h3>
+        <p>
+          Las acciones y las transiciones se comparten entre versiones; lo que cambia de una a otra es cómo
+          se monta la máquina y con qué umbrales. Así que cada versión es una clase controlador, y los dos
+          nombres obligatorios apuntan a la que elegís:
+        </p>
+<pre><code>es.ucm.fdi.ici.c2627.practica2.grupoYY
+├── MsPacMan.java        <span class="c">// extends MsPacManV2 { }  ← la del concurso</span>
+├── MsPacManV0.java      <span class="c">// el diseño tal cual</span>
+├── MsPacManV1.java
+├── MsPacManV2.java
+├── Ghosts.java          <span class="c">// extends GhostsV1 { }</span>
+├── GhostsV0.java
+├── GhostsV1.java
+├── mspacman/  actions/  transitions/  MsPacManInput.java
+└── ghosts/    actions/  transitions/  GhostsInput.java</code></pre>
+        <p>
+          Si una versión necesita que una acción haga otra cosa, que lo reciba por el constructor, o una
+          clase nueva al lado: lo que no vale es cambiar la acción que usan las versiones anteriores, porque
+          entonces sus medidas dejan de ser suyas.
+        </p>
+      </section>
+
+      <section id="significativa">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">¿La mejora es real?</h2>
+        </div>
+        <p>
+          Cada versión nueva se compara con la anterior, métrica a métrica, y la pregunta es siempre la
+          misma: ¿la diferencia es más grande que el ruido? Dos medias de partidas nunca salen iguales, aunque
+          el controlador sea el mismo. La cuenta, para cualquier métrica de la que tengáis un
+          <code>Stats</code>:
+        </p>
+<pre><code>ET     = σ / √n                    <span class="c">// de cada media: getStandardError()</span>
+D      = media nueva − media vieja
+ET_D   = √(ET_nueva² + ET_vieja²)  <span class="c">// el de la diferencia</span>
+real   si |D| &gt; 2 · ET_D</code></pre>
+        <p>
+          Y la regla de bolsillo, para hacerla de cabeza: <strong>creedla sólo si la diferencia pasa de
+          3 veces el mayor de los dos errores típicos</strong>. Es un poco más exigente que la cuenta de
+          arriba, así que por ahí no os vais a creer una mejora que no existe.
+        </p>
+        <p>
+          Un ejemplo con números. La <code>v0</code> hace 1&#8239;830&nbsp;±&nbsp;39 puntos contra un rival y
+          la <code>v1</code>, 2&#8239;340&nbsp;±&nbsp;45:
+        </p>
+<pre><code>D        = 2340 − 1830     = 510
+ET_D     = √(45² + 39²)    = √3546 ≈ 60
+2 · ET_D = 2 · 60          = 120
+510 &gt; 120                  → la mejora es real</code></pre>
+        <p>
+          Si en cambio sale <code>D</code>&nbsp;=&nbsp;80 con el mismo margen, no habéis mejorado nada:
+          habéis cambiado de ruido. Entonces hay dos salidas honestas, jugar más partidas con las dos
+          versiones o descartar el cambio, y las dos se apuntan en el diario. De dónde sale cada línea, por
+          qué los errores no se suman tal cual y cuántas partidas hacen falta para ver una mejora pequeña
+          está en <a href="../guias/competicion.html#medir">Medir: la media y el error típico</a>.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Con 20 partidas no se ve nada</span>
+          <p>
+            Con la dispersión típica de este juego, 100 partidas por rival sólo distinguen cambios de unos
+            600 puntos, y 300 bajan eso a unos 350. Fijad el número al principio, apuntadlo, y no lo cambiéis
+            entre versiones.
+          </p>
+        </div>
+      </section>
+
+      <section id="diario">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">El diario de desarrollo</h2>
+        </div>
+        <p>
+          Un solo archivo, <code>diario.md</code> (o <code>.txt</code>, o <code>.pdf</code>), que se escribe
+          <strong>mientras</strong> se trabaja, no la víspera. Entradas con fecha y cortas: qué hicisteis, qué
+          medisteis, qué decidisteis. Si una entrada pasa de diez líneas, sobra algo.
+        </p>
+        <ul>
+          <li>
+            <strong>Si usáis IA, el <em>prompt</em> va en el diario</strong>, tal cual, con una línea sobre qué
+            cambiasteis vosotros de lo que os dio. Usarla no resta; no saber qué es vuestro, sí.
+          </li>
+          <li>
+            Las métricas y el análisis de cada versión pueden ir en el diario o como comentario al principio
+            de su clase, <code>MsPacManV1</code>, <code>GhostsV2</code>. Donde os resulte más cómodo, pero
+            breve.
+          </li>
+          <li>
+            Arriba del todo, los integrantes del grupo y qué versiones van al concurso.
+          </li>
+        </ul>
+
+        <h3 class="label">El <em>prompt</em>, con el diseño ya hecho</h3>
+        <p>
+          Lo que interesa de vuestro uso de la IA es que, cuando le pedís algo, <strong>el diseño ya esté en
+          vuestra cabeza</strong>: la IA escribe lo que vosotros habéis decidido, no decide por vosotros. La
+          diferencia se ve en el propio <em>prompt</em>:
+        </p>
+        <figure>
+          <figcaption>Así no: el diseño lo hace la IA</figcaption>
+<pre><code>Hazme una máquina de estados jerárquica para Ms. Pac-Man
+con el paquete fsm del motor, que tenga al menos 10 estados
+y juegue bien.</code></pre>
+        </figure>
+        <figure>
+          <figcaption>Así sí: la IA programa lo que ya está decidido</figcaption>
+<pre><code>Escribe sólo la clase FantasmaCercaTransition, que
+implementa es.ucm.fdi.ici.fsm.Transition, en el paquete
+…grupoYY.mspacman.transitions.
+- Constructor: int umbral.
+- evaluate(Input in): cast a MsPacManInput; true si algún
+  fantasma fuera de la cárcel y no comestible está a menos
+  de umbral nodos. La distancia ya la da
+  input.getDistanciaFantasma(GHOST), medida desde el
+  fantasma con su último movimiento.
+- toString(): "fantasma a menos de " + umbral.
+La uso dos veces: con 25 para entrar en HUIR y, negada,
+con 35 para salir. No toques nada más.</code></pre>
+        </figure>
+        <p>
+          El segundo <em>prompt</em> sólo se puede escribir si ya se sabe qué transición hace falta, con qué
+          umbral, de dónde sale cada dato y dónde va en la máquina. Ese conocimiento es la práctica, y el
+          diario es donde se ve.
+        </p>
+
+        <h3 class="label">Un diario de ejemplo</h3>
+        <p>
+          De un grupo inventado, con cifras inventadas. Fijaos en la longitud: así de corto.
+        </p>
+<pre><code># Diario · Práctica 2 · grupo ZZ
+Integrantes: …
+Concurso: MsPacManV1 y GhostsV1 (ver la última entrada).
+Medimos siempre 300 partidas contra: GhostsRandom, GhostsAggressive y
+nuestros Ghosts de la P1.
+
+## mar 6 oct · Acciones
+Ms. Pac-Man (9): ComerPildora, ComerPildoraSegura, IrAPowerPill,
+  EsperarJuntoAPowerPill, PerseguirComestible, HuirPorSalidaSegura,
+  HuirHaciaPowerPill, CruzarTunel, LimpiarUltimas.
+Fantasmas (7): Perseguir, IrACruceDePacMan, TaparPowerPill, Dispersarse,
+  HuirSeparados, VolverACazar, SalirDeLaCarcel.
+Cinco de cada lista ya eran métodos en la P1. IA: no.
+
+## mié 7 oct · Transiciones
+FantasmaCerca(d)       no comestible a menos de d por camino    25 entra / 35 sale
+PowerPillAlAlcance(d)  llego antes que todos, a menos de d       d = 40
+ComestibleAlcanzable   2·dist + 10 &lt; tiempo comestible que le queda
+QuedanPocas(n)         píldoras activas &lt; n                      n = 20
+… (14 en total, en transiciones.md)
+IA: no.
+
+## jue 8 oct · Diseño v0 → enviado (diseno-v0.jpg, papel)
+Ms. Pac-Man: compuestos COMER, HUIR, CAZAR + LimpiarUltimas → 11 simples.
+Fantasmas: compuestos CAZAR, HUIR + SalirDeLaCarcel → 10 simples.
+Duda: ¿HUIR mejor como un solo estado, con la salida segura en la acción?
+
+## mar 13 oct · v0 = diseño + feedback (HUIR partido en dos)
+IA: sí, para pasar las 14 transiciones a clases. Prompts en prompts.md.
+  Corregido a mano: medía la distancia del fantasma sin su último movimiento.
+                 puntos       fantasmas/píldora   cambios de estado
+  Random         4120 ± 61    1,4                  88
+  Aggressive     1830 ± 39    0,6                 214
+  Ghosts P1      2210 ± 44    0,7                 190
+Problema: contra los agresivos, 214 cambios de estado por partida.
+Por qué: FantasmaCerca entraba y salía a 25; rebota entre COMER y HUIR.
+
+## mié 14 oct · v1: histéresis, sale de HUIR a 35
+  Aggressive     2340 ± 45    0,7                  96
+  D = 510, 2·ET_D = 120 → mejora real. Random y Ghosts P1: también suben.
+Problema: gasta la píldora al pasar (0,7 fantasmas por píldora).
+
+## vie 16 oct · v2: EsperarJuntoAPowerPill hasta tener 2 fantasmas a 30
+  Aggressive     2420 ± 46    1,1                 101
+  Puntos: D = 80, 2·ET_D = 129 → no se distingue de v1.
+  Fantasmas/píldora: 0,7 → 1,1, D = 0,4, 2·ET_D = 0,12 → sí sube.
+Come más fantasmas pero muere más esperando: se compensa.
+
+## sáb 17 oct · Para el concurso
+MsPacManV1: v2 no mejora los puntos de forma medible y añade un estado
+que nos cuesta vidas. GhostsV1: la única que baja los puntos de los tres
+rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre>
+        <p>
+          Todo lo que se pide está ahí: el orden del diseño, el <em>prompt</em> y lo que se corrigió a mano,
+          una tabla por versión, el problema y su porqué en una línea, la comparación con la anterior y una
+          elección razonada. Y una versión descartada, que también es un resultado.
+        </p>
+        <p>
+          Si preferís llevar las medidas en el código, la cabecera de cada versión basta:
+        </p>
+<pre><code><span class="c">/**
+ * v1 · Histéresis en FantasmaCerca: entra en HUIR a 25, sale a 35.
+ * Aggressive: 2340 ± 45 (v0: 1830 ± 39) → D = 510 &gt; 2·ET_D = 120, mejora real.
+ * Pendiente: gasta la píldora al pasar, 0,7 fantasmas por píldora.
+ */</span>
+<span class="k">public class</span> MsPacManV1 <span class="k">extends</span> PacmanController { … }</code></pre>
+      </section>
+
+      <section id="lista">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">La lista del proceso</h2>
+        </div>
+        <p>
+          Para ir tachando. Las casillas se quedan guardadas en este navegador, y la del bucle se puede
+          desmarcar entera cada vez que empezáis una versión nueva.
+        </p>
+
+        <h3 class="label">Para el domingo 11 · el diseño</h3>
+        <ul class="check" data-guardar="p2-diseno">
+          <li>Lista de acciones de Ms.&nbsp;Pac-Man, una frase cada una.</li>
+          <li>Lista de acciones de los fantasmas, una frase cada una.</li>
+          <li>Cada transición es una condición que se calcula con el <code>Input</code>, con un número donde decía «cerca» o «lejos».</li>
+          <li>Las condiciones de ida y vuelta tienen dos umbrales, uno para entrar y otro para salir.</li>
+          <li>El diagrama: estados, flechas con su transición, estado inicial de cada máquina y orden de las flechas.</li>
+          <li>Al menos 10 estados simples en cada comportamiento, sin contar los compuestos.</li>
+          <li>Pasada la lista «Antes de programar, comprobad el diagrama» de los apuntes.</li>
+          <li>El diario recoge las acciones, las transiciones y el diseño, con los <em>prompts</em> si hubo IA.</li>
+          <li>Diseño y diario subidos al Campus Virtual.</li>
+        </ul>
+
+        <h3 class="label">Una vez · la línea base</h3>
+        <ul class="check" data-guardar="p2-base">
+          <li>La <code>v0</code> de cada controlador implementa el diseño enviado, con el <em>feedback</em> aplicado.</li>
+          <li>Elegidos los rivales, al menos tres, y apuntados en el diario.</li>
+          <li>Elegidas las métricas, además de los puntos.</li>
+          <li>Fijado el número de partidas por rival, 300 si os da el tiempo, y apuntado.</li>
+          <li>Medida la <code>v0</code> contra todos, con media y error típico en cada métrica.</li>
+        </ul>
+
+        <h3 class="label">Cada versión · el bucle</h3>
+        <ul class="check" data-guardar="p2-bucle" data-reiniciar>
+          <li>Mirada la métrica que va peor, y en qué partidas pasa, con la máquina a la vista.</li>
+          <li>Escrito en una o dos líneas el problema y por qué creéis que pasa.</li>
+          <li>Decidido <strong>un</strong> cambio que ataca ese porqué, y escrito antes de programarlo.</li>
+          <li>Si hubo IA, el <em>prompt</em> está en el diario, escrito con el cambio ya decidido.</li>
+          <li>Versión nueva en su propia clase, sin tocar la anterior.</li>
+          <li>Medida contra los mismos rivales, con las mismas partidas.</li>
+          <li>Comparada con la anterior: <code>D</code>, <code>ET_D</code> y si |<code>D</code>| &gt; 2 · <code>ET_D</code>.</li>
+          <li>Entrada del diario cerrada: se queda o se descarta, y por qué.</li>
+        </ul>
+
+        <h3 class="label">Para el domingo 18 · el cierre</h3>
+        <ul class="check" data-guardar="p2-cierre">
+          <li>En dos líneas, qué versión va al concurso y por qué.</li>
+          <li><code>MsPacMan</code> y <code>Ghosts</code> son esas versiones.</li>
+          <li>Pasada la lista de <a href="#entrega">antes de subir el zip</a>.</li>
+        </ul>
+      </section>
+
+      <section id="entrega">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Reglas de entrega</h2>
+        </div>
+        <p>
+          Esta práctica se desarrolla en <strong>grupos de 2 estudiantes</strong>, y se entrega en dos tareas
+          del Campus Virtual:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Qué</th><th scope="col">Cómo exactamente</th></tr></thead>
+            <tbody>
+              <tr><td>Diseño</td><td>Uno o varios archivos, PDF o imagen (una foto del papel vale), y el <code>diario.md</code> hasta ese día. Domingo 11.</td></tr>
+              <tr><td>Controladores</td><td><code>practica2-grupoYY.zip</code>, donde <code>YY</code> es la letra de vuestro grupo. Domingo 18.</td></tr>
+              <tr><td>Paquete</td><td><code>es.ucm.fdi.ici.c2627.practica2.grupoYY</code></td></tr>
+              <tr><td>Controladores a concurso</td><td><code>MsPacMan</code> y <code>Ghosts</code></td></tr>
+              <tr><td>Versiones</td><td><code>MsPacManV0</code>, <code>MsPacManV1</code>… y <code>GhostsV0</code>, <code>GhostsV1</code>…, todas en el mismo paquete.</td></tr>
+              <tr><td>Raíz del zip</td><td>La carpeta <code>es</code>, comprimiendo desde la raíz del código fuente, y a su lado el <code>diario.md</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">No se modifica el simulador</span>
+          <p>
+            Obviamente no se permite modificar el código del simulador, ni tampoco el paquete
+            <code>fsm</code>. Por lo tanto, la entrega <strong>no debe contener el código del
+            simulador</strong> (paquete <code>pacman.*</code>).
+          </p>
+        </div>
+        <p>
+          Todas las prácticas serán comprobadas para la detección de plagios.
+        </p>
+
+        <h3 class="label">Antes de subir el zip</h3>
+        <ul class="check" data-guardar="p2-zip">
+          <li>El paquete es <code>es.ucm.fdi.ici.c2627.practica2.grupoYY</code>, con vuestra letra.</li>
+          <li>Están todas las versiones, y <code>MsPacMan</code> y <code>Ghosts</code> son las elegidas.</li>
+          <li>Cada máquina tiene al menos 10 estados simples, y el diagrama final coincide con el código.</li>
+          <li>Todo compila en un proyecto limpio que sólo referencia a <code>MsPacManEngine</code>.</li>
+          <li><code>GraphFSMObserver</code>, <code>showInFrame</code> y <code>GameView</code> están detrás de un <code>DEBUG</code> a <code>false</code>.</li>
+          <li>Cada máquina se resetea en <code>preCompute</code>, también las de dentro de los compuestos.</li>
+          <li>No hay estado en atributos <code>static</code>.</li>
+          <li><code>getName()</code> devuelve un nombre con vuestro grupo.</li>
+          <li>Al abrir el zip aparecen <code>es/</code> y <code>diario.md</code> en la raíz, y ni un archivo de <code>pacman.*</code>.</li>
+          <li>Trescientas partidas seguidas terminan sin una sola excepción.</li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#que-se-pide">Qué se pide</a></li>
+            <li><a href="#evaluacion">Cómo se evalúa</a></li>
+            <li><a href="#diseno">1 · El diseño</a></li>
+            <li><a href="#controladores">2 · Los controladores</a></li>
+            <li><a href="#significativa">¿La mejora es real?</a></li>
+            <li><a href="#diario">El diario</a></li>
+            <li><a href="#lista">La lista del proceso</a></li>
+            <li><a href="#entrega">Reglas de entrega</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El tema</span>
+          <p style="margin:0">
+            <a href="../guias/tema1/maquinas-estados.html">Máquinas de estados</a>: el paquete
+            <code>fsm</code>, ejemplos completos y diseños de otros cursos.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Probar y medir</span>
+          <p style="margin:0">
+            <a href="../guias/competicion.html">Cómo se mide, contra quién probar y cómo se juega el
+            concurso</a>.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Dudas</span>
+          <p style="margin:0">
+            <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a>. Mejor preguntar con el diseño en la mano
+            que con el código a medias.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 8 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

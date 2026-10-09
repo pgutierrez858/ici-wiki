@@ -61,6 +61,9 @@
     var start = parse(el.getAttribute('data-start'));
     var due = parse(el.getAttribute('data-due'));
     if (today >= start && today <= due) live = { el: el, due: due };
+    // una entrega intermedia del bloque va antes que la del domingo final
+    var hito = el.getAttribute('data-hito');
+    if (!next && hito && today <= parse(hito)) next = { el: el, due: parse(hito), hito: el.getAttribute('data-hito-txt') };
     if (!next && today <= due) next = { el: el, due: due };
 
     var slot = el.querySelector('[data-state]');
@@ -81,7 +84,7 @@
   if (next) {
     var days = Math.round((next.due - today) / 86400000);
     // un bloque puede no tener todavía fecha firme de entrega
-    var txt = next.el.getAttribute('data-due-txt');
+    var txt = next.hito ? null : next.el.getAttribute('data-due-txt');
     document.querySelectorAll('[data-next-due]').forEach(function (el) {
       el.textContent = txt || fmt(next.due);
     });
@@ -93,7 +96,7 @@
     });
     document.querySelectorAll('[data-next-name]').forEach(function (el) {
       var name = next.el.getAttribute('data-name');
-      if (name) el.textContent = name;
+      if (name) el.textContent = next.hito ? name + ' · ' + next.hito : name;
     });
   } else if (blocks.length) {
     // curso terminado: no dejar congelada la última entrega
@@ -200,4 +203,50 @@
     var t = cell.getAttribute('title');
     cell.setAttribute('title', t ? t + ' · hoy' : 'Hoy');
   }
+
+  /* ---------- listas para tachar ----------
+     Una .check con data-guardar se vuelve una lista de casillas que se
+     recuerdan en este navegador. Sin JavaScript sigue siendo la lista
+     impresa de siempre. Con data-reiniciar lleva un botón para empezar
+     otra vuelta, que es lo que pide una lista que se repite. */
+  [].slice.call(document.querySelectorAll('ul.check[data-guardar]')).forEach(function (ul) {
+    var clave = 'ici-lista:' + ul.getAttribute('data-guardar');
+    var marcadas = [];
+    try { marcadas = JSON.parse(localStorage.getItem(clave) || '[]'); } catch (e) { marcadas = []; }
+    if (!Array.isArray(marcadas)) marcadas = [];
+
+    var casillas = [].slice.call(ul.children).map(function (li, i) {
+      var label = document.createElement('label');
+      var caja = document.createElement('input');
+      caja.type = 'checkbox';
+      caja.checked = marcadas.indexOf(i) > -1;
+      var texto = document.createElement('span');
+      while (li.firstChild) texto.appendChild(li.firstChild);
+      label.appendChild(caja);
+      label.appendChild(texto);
+      li.appendChild(label);
+      return caja;
+    });
+    ul.classList.add('tachar');
+
+    function guarda() {
+      var hechas = [];
+      casillas.forEach(function (c, i) { if (c.checked) hechas.push(i); });
+      try { localStorage.setItem(clave, JSON.stringify(hechas)); } catch (e) {}
+    }
+    casillas.forEach(function (c) { c.addEventListener('change', guarda); });
+
+    if (ul.hasAttribute('data-reiniciar')) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'demo-btn lista-otra';
+      b.textContent = 'Desmarcar para la versión siguiente';
+      b.addEventListener('click', function () {
+        casillas.forEach(function (c) { c.checked = false; });
+        guarda();
+        avisa('Lista desmarcada.');
+      });
+      ul.parentNode.insertBefore(b, ul.nextSibling);
+    }
+  });
 })();
