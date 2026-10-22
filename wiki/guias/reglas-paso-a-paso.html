@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Ms. Pac-Man con siete reglas · Guías · ICI</title>
+<meta name="description" content="El ejemplo guiado de la Práctica 3: un controlador de reglas para Ms. Pac-Man montado de una regla a siete, con lo que cambió cada paso en 300 partidas contra los rivales de referencia, y cómo seguir con Ms. Pac-Man y con los fantasmas.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Ms. Pac-Man con siete reglas</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Ms.&nbsp;Pac-Man con siete reglas
+      <span class="thin">El ejemplo guiado de la Práctica&nbsp;3: de una regla a siete, midiendo cada paso.</span>
+    </h1>
+    <p class="standfirst">
+      Un controlador de reglas completo y pequeño, montado poco a poco: los hechos que ve, las cuatro acciones
+      que sabe hacer y siete reglas que se añaden de una en una, cada una con lo que cambió en 300 partidas
+      contra cinco rivales. Al final, lo que le falta a esta Ms.&nbsp;Pac-Man, y el esqueleto de los fantasmas
+      para que empecéis los vuestros.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <p>
+        Esta página da por leídas dos de los apuntes: <a href="tema2/clips.html">CLIPS y Jess</a>, para la
+        sintaxis, y <a href="tema2/reglas-mspacman.html">Reglas en Ms.&nbsp;Pac-Man</a>, para el paquete
+        <code>rules</code> del motor. Aquí no se explica qué es un <code>RulesInput</code>: se usa.
+      </p>
+
+      <section id="proyecto">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El proyecto de partida</h2>
+        </div>
+        <p>
+          Todo el código de esta página, y el de las guías para <a href="depurar-reglas.html">depurar</a> y
+          <a href="comparar-versiones.html">comparar versiones</a>, está en un proyecto de Eclipse listo para
+          importar, junto con los <strong>rivales de referencia</strong> contra los que medir: los dos fantasmas de
+          la Práctica&nbsp;0 y los tres rivales de la Práctica&nbsp;1, que traen fantasmas y Ms.&nbsp;Pac-Man.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../recursos/ICI-Practica3.zip" download>
+              <span class="lt"><code>ICI-Practica3.zip</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Proyecto de Eclipse · 42&nbsp;kB</span>
+              <span class="ld">
+                La Ms.&nbsp;Pac-Man de esta página en sus dos versiones, el esqueleto de los fantasmas, la traza de
+                reglas, el probador de casos, el banco para comparar versiones y los rivales. Compila sólo con
+                <code>MsPacManEngine</code> al lado.
+              </span>
+            </a>
+          </li>
+        </ul>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Importarlo</h3>
+            <p>
+              Descomprimidlo junto a <code>MsPacManEngine</code> y
+              <span class="path">File &gt; Import &gt; General &gt; Existing Projects into Workspace</span>, como el
+              de la <a href="eclipse.html">Práctica&nbsp;0</a>. Los rivales están en <code>lib/</code> y ya van en
+              el <em>Build Path</em>. El proyecto se llama <code>Practica3</code>; si ya tenéis uno con ese nombre,
+              cambiad el <code>&lt;name&gt;</code> de su <code>.project</code> antes de importarlo.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Verlo jugar</h3>
+            <p>
+              <span class="path">Run As &gt; Java Application</span> sobre <code>VerPartida</code>. Se abre el
+              laberinto contra los fantasmas agresivos y en la consola va saliendo qué reglas se disparan cada vez
+              que cambia de idea.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Probar sus reglas y medirlas</h3>
+            <p>
+              <code>ProbarReglas</code> pasa ocho situaciones escritas a mano y dice si cada una gana la acción
+              esperada. <code>Comparar</code> juega las dos versiones contra los cinco fantasmas de referencia, 300
+              partidas por rival, y saca las tablas en unos segundos. Si las tres cosas funcionan, el entorno
+              está bien.
+            </p>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Archivo</th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><code>grupoYY/MsPacMan.java</code></td><td>El controlador: un <code>RuleEngine</code>, el <code>Input</code> y las acciones. <a href="#controlador">Sección&nbsp;5</a>.</td></tr>
+              <tr><td><code>grupoYY/mspacman-v0.clp</code> · <code>-v1.clp</code></td><td>Las reglas, en dos versiones: las seis primeras, y las siete.</td></tr>
+              <tr><td><code>grupoYY/mspacman/</code></td><td><code>MsPacManInput</code> y las cuatro acciones.</td></tr>
+              <tr><td><code>grupoYY/UltimaAccion.java</code></td><td>La memoria entre turnos: apunta qué acción ganó. <a href="#paso3">Paso&nbsp;3</a>.</td></tr>
+              <tr><td><code>grupoYY/Ghosts.java</code> · <code>ghosts-v0.clp</code> · <code>-v1.clp</code> · <code>ghosts/</code></td><td>El esqueleto de los fantasmas, con dos y tres reglas. <a href="#seguir-fantasmas">Sección&nbsp;7</a>.</td></tr>
+              <tr><td><code>grupoYY/depurar/</code></td><td><code>TrazaReglas</code> y <code>ProbarReglas</code>. En <a href="depurar-reglas.html">Depurar reglas</a>.</td></tr>
+              <tr><td><code>Comparar.java</code> · <code>Metrica.java</code> · <code>Rivales.java</code></td><td>El banco de versiones y la lista de rivales de referencia. En <a href="comparar-versiones.html">Comparar versiones</a>.</td></tr>
+              <tr><td><code>lib/</code></td><td>Los tres rivales de la Práctica&nbsp;1, compilados.</td></tr>
+              <tr><td><code>GhostsRandom</code> · <code>GhostsAggressive</code> · <code>VerPartida</code></td><td>Los dos rivales de la Práctica&nbsp;0 y el <code>main</code> para ver una partida.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Al poner vuestra letra en el paquete</span>
+          <p>
+            <span class="path">Refactor &gt; Rename</span> sobre <code>grupoYY</code> cambia los
+            <code>package</code> y los <code>import</code>, pero no las rutas escritas como texto:
+            <code>RULES_PATH</code> en <code>MsPacMan</code> y en <code>Ghosts</code>, y <code>REGLAS</code> en
+            <code>ProbarReglas</code>. Si se os olvida, sale <code>Exception loading rules from file</code> y
+            Ms.&nbsp;Pac-Man no se mueve.
+          </p>
+        </div>
+      </section>
+
+      <section id="hechos">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Lo que ve: los hechos</h2>
+        </div>
+        <p>
+          Para decidir, a esta Ms.&nbsp;Pac-Man le bastan tres números sobre ella y un hecho por cada fantasma que
+          esté fuera de la cárcel. Un turno cualquiera, tal y como llega a Jess:
+        </p>
+<pre><code>(FANTASMA (nombre PINKY) (comestible true) (distancia 30) (tiempo 100))
+(FANTASMA (nombre SUE) (comestible false) (distancia 15) (tiempo 0))
+(MSPACMAN (distFantasma 15) (distPPill 40) (ultima comer))</code></pre>
+        <p>
+          Todo lo que necesita caminos o bucles se calcula en Java, en <code>parseInput</code>, y a Jess le llega
+          ya hecho. Las reglas sólo comparan números y símbolos:
+        </p>
+<div class="codigo"><pre><code><span class="k">public class</span> MsPacManInput <span class="k">extends</span> RulesInput {
+
+    <span class="k">private static final int</span> LEJOS = <span class="n">1000</span>;        <span class="c">// "no hay": ningún fantasma, ninguna píldora</span>
+
+    <span class="k">private int</span> distFantasma;                     <span class="c">// al fantasma peligroso más cercano</span>
+    <span class="k">private int</span> distPPill;                        <span class="c">// a la píldora de poder más cercana</span>
+    <span class="k">private</span> List&lt;String&gt; fantasmas;               <span class="c">// un hecho FANTASMA por cada uno fuera de la cárcel</span>
+    <span class="k">private final</span> String ultima;                  <span class="c">// la acción que ganó en el turno anterior</span>
+
+    <span class="k">public</span> MsPacManInput(Game game, String ultima) {
+        <span class="k">super</span>(game);                              <span class="c">// llama a parseInput()</span>
+        <span class="k">this</span>.ultima = ultima;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> parseInput() {
+        <span class="k">int</span> pacman = game.getPacmanCurrentNodeIndex();
+        distFantasma = LEJOS;
+        fantasmas = <span class="k">new</span> ArrayList&lt;&gt;();
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            <span class="k">if</span> (game.getGhostLairTime(g) &gt; <span class="n">0</span>) <span class="k">continue</span>;      <span class="c">// en la cárcel no cuenta</span>
+            <span class="k">int</span> nodo = game.getGhostCurrentNodeIndex(g);
+            <span class="k">boolean</span> comestible = game.isGhostEdible(g);
+            <span class="c">// peligroso: lo que tarda él en llegar a mí, que no puede dar la vuelta</span>
+            <span class="c">// comestible: lo que tardo yo en llegar a él</span>
+            <span class="k">int</span> d = comestible
+                    ? game.getShortestPathDistance(pacman, nodo)
+                    : game.getShortestPathDistance(nodo, pacman, game.getGhostLastMoveMade(g));
+            <span class="k">if</span> (!comestible) distFantasma = Math.min(distFantasma, d);
+            fantasmas.add(String.format(<span class="s">"(FANTASMA (nombre %s) (comestible %s) (distancia %d) (tiempo %d))"</span>,
+                    g, comestible, d, game.getGhostEdibleTime(g)));
+        }
+        distPPill = LEJOS;
+        <span class="k">for</span> (<span class="k">int</span> ppill : game.getActivePowerPillsIndices())
+            distPPill = Math.min(distPPill, game.getShortestPathDistance(pacman, ppill));
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> Collection&lt;String&gt; getFacts() {
+        List&lt;String&gt; facts = <span class="k">new</span> ArrayList&lt;&gt;(fantasmas);
+        facts.add(String.format(<span class="s">"(MSPACMAN (distFantasma %d) (distPPill %d) (ultima %s))"</span>,
+                distFantasma, distPPill, ultima));
+        <span class="k">return</span> facts;
+    }
+}</code></pre></div>
+        <p>Tres decisiones de diseño que conviene ver:</p>
+        <ul>
+          <li>
+            <strong>Las dos distancias no se miden igual.</strong> La de un fantasma peligroso se mide desde él y
+            con su último movimiento, porque un fantasma no puede dar media vuelta: lo que importa es cuánto
+            tarda él en llegar. La de uno comestible, desde Ms.&nbsp;Pac-Man, porque ahí la que se mueve hacia el
+            otro es ella. Es lo mismo que en la <a href="tema1/estrategias.html">Práctica&nbsp;1</a>.
+          </li>
+          <li>
+            <strong>"No hay" es un número grande, no un hueco.</strong> Jess no tiene <code>null</code>. Con
+            <code>LEJOS = 1000</code>, una regla que pregunta <code>(&lt; ?d 20)</code> funciona igual haya o no
+            fantasmas, sin un caso aparte.
+          </li>
+          <li>
+            <strong>Los fantasmas de la cárcel no se asertan.</strong> Para las reglas no existen, y así ninguna
+            tiene que acordarse de excluirlos.
+          </li>
+        </ul>
+        <div class="note trap">
+          <span class="note-label">Un error de Java que parece de Jess</span>
+          <p>
+            El constructor de <code>RulesInput</code> llama a <code>parseInput()</code> antes de que se inicialicen
+            los atributos de la subclase. Si escribís <code>private List&lt;String&gt; fantasmas = new
+            ArrayList&lt;&gt;();</code> en la declaración, esa línea se ejecuta <em>después</em> de
+            <code>parseInput</code> y borra lo que había rellenado: las reglas no ven ningún fantasma y no sale
+            ningún error. Los atributos que rellena <code>parseInput</code> se declaran sin valor.
+          </p>
+        </div>
+      </section>
+
+      <section id="acciones">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Lo que sabe hacer: cuatro acciones</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col"><code>id</code></th><th scope="col">Clase</th><th scope="col">Qué hace</th></tr></thead>
+            <tbody>
+              <tr><td><code>comer</code></td><td><code>ComerAction</code></td><td>Hacia la píldora normal más cercana; si no quedan, hacia la de poder.</td></tr>
+              <tr><td><code>huir</code></td><td><code>HuirAction</code></td><td>Lejos del fantasma peligroso más cercano.</td></tr>
+              <tr><td><code>irAPPill</code></td><td><code>IrAPPillAction</code></td><td>Hacia la píldora de poder más cercana.</td></tr>
+              <tr><td><code>perseguir</code></td><td><code>PerseguirAction</code></td><td>Hacia el fantasma que diga la regla, en el slot <code>fantasma</code> del <code>ACTION</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Las tres primeras son métodos de la Práctica&nbsp;1 metidos en una clase. La cuarta es la interesante,
+          porque tiene un <strong>parámetro</strong>: no sabe a quién perseguir hasta que se lo dice la regla que la
+          ha elegido. Lo lee en <code>parseFact</code>, que el motor llama justo antes de <code>execute</code>:
+        </p>
+<div class="codigo"><pre><code><span class="k">public class</span> PerseguirAction <span class="k">implements</span> RulesAction {
+
+    <span class="k">private</span> GHOST presa;
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> parseFact(Fact actionFact) {
+        <span class="k">try</span> {
+            presa = GHOST.valueOf(actionFact.getSlotValue(<span class="s">"fantasma"</span>).stringValue(<span class="k">null</span>));
+        } <span class="k">catch</span> (JessException | IllegalArgumentException e) {
+            presa = <span class="k">null</span>;                          <span class="c">// la regla no dijo a quién</span>
+        }
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> MOVE execute(Game game) {
+        <span class="k">if</span> (presa == <span class="k">null</span>) <span class="k">return</span> MOVE.NEUTRAL;
+        <span class="k">return</span> game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
+                game.getGhostCurrentNodeIndex(presa), DM.PATH);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> String getActionId() { <span class="k">return</span> <span class="s">"perseguir"</span>; }
+}</code></pre></div>
+        <p>
+          Una acción con parámetro ahorra clases: en vez de <code>PerseguirBlinky</code>,
+          <code>PerseguirInky</code>… hay una, y la regla dice cuál. Lo mismo vale para "ir a un nodo", "huir por
+          una salida" o "esperar junto a una píldora".
+        </p>
+      </section>
+
+      <section id="reglas">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Siete reglas, de una en una</h2>
+        </div>
+        <p>
+          Las reglas se escribieron en este orden, y después de cada paso se midió la versión nueva contra la
+          anterior con <a href="comparar-versiones.html"><code>Comparar</code></a>, contra los fantasmas de
+          referencia que trae el proyecto. Al final de cada paso va, en una línea, qué cambió.
+        </p>
+        <p>
+          El fichero empieza con las plantillas. Las dos primeras son las de los hechos del <code>Input</code>;
+          <code>PELIGRO</code> es un hecho que no viene de Java, sino de las propias reglas, y <code>ACTION</code>
+          lleva el slot <code>fantasma</code> para la acción con parámetro:
+        </p>
+<pre><code>(deftemplate MSPACMAN
+   (slot distFantasma (type NUMBER))   <span class="c">; al peligroso más cercano; 1000 si no hay</span>
+   (slot distPPill    (type NUMBER))   <span class="c">; a la PPill más cercana; 1000 si no quedan</span>
+   (slot ultima       (type SYMBOL)))  <span class="c">; la acción que ganó el turno anterior</span>
+
+(deftemplate FANTASMA
+   (slot nombre     (type SYMBOL))     <span class="c">; BLINKY, INKY, PINKY, SUE</span>
+   (slot comestible (type SYMBOL))     <span class="c">; true o false, en minúsculas, como Java</span>
+   (slot distancia  (type NUMBER))
+   (slot tiempo     (type NUMBER)))    <span class="c">; turnos que le quedan de comestible</span>
+
+(deftemplate PELIGRO)                  <span class="c">; un hecho intermedio: lo asertan unas reglas y lo leen otras</span>
+
+(deftemplate ACTION
+   (slot id) (slot info (default "")) (slot priority (type NUMBER))
+   (slot fantasma (type SYMBOL)))      <span class="c">; el parámetro de "perseguir"</span></code></pre>
+
+        <div class="step" id="paso1">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Comer, si no pasa nada más</h3>
+<pre><code><span class="c">;; R1 · si no pasa nada más, comer</span>
+(defrule comer
+   (MSPACMAN)
+   =&gt;
+   (assert (ACTION (id comer) (info "R1: no pasa nada") (priority 10))))</code></pre>
+            <p>
+              <code>(MSPACMAN)</code> sin slots se cumple con cualquier hecho <code>MSPACMAN</code>, o sea, en todos
+              los turnos. Es la <strong>regla por defecto</strong>: siempre hay un <code>ACTION</code>, y con
+              <code>priority 10</code> cualquier otra le gana. Sin una regla así, el turno en que no se cumpla
+              ninguna otra Ms.&nbsp;Pac-Man recibe <code>MOVE.NEUTRAL</code>.
+            </p>
+            <p>
+              <strong>Al medirla:</strong> unos 2&#8239;250 puntos de media. Es la Ms.&nbsp;Pac-Man de la
+              Práctica&nbsp;0 que sólo come, y la línea base de todo lo demás.
+            </p>
+          </div>
+        </div>
+
+        <div class="step" id="paso2">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Huir, con un hecho intermedio</h3>
+<pre><code><span class="c">;; R2 · un fantasma peligroso a menos de 20 es peligro</span>
+(defrule peligro
+   (declare (salience 10))             <span class="c">; antes que las que preguntan por PELIGRO (paso 5)</span>
+   (MSPACMAN (distFantasma ?d&amp;:(&lt; ?d 20)))
+   =&gt;
+   (assert (PELIGRO)))
+
+<span class="c">;; R4 · con peligro, huir</span>
+(defrule huir
+   (PELIGRO)
+   =&gt;
+   (assert (ACTION (id huir) (info "R4: hay peligro") (priority 80))))</code></pre>
+            <p>
+              Se podría escribir en una sola regla, "si hay un fantasma a menos de 20, huir". Se parte en dos porque
+              <strong>"estar en peligro" es una conclusión que van a usar varias reglas</strong>: <code>huir</code>
+              ahora, y en los pasos siguientes <code>aLaPPill</code>, que también la necesita, y <code>cazar</code>,
+              que necesita que <em>no</em> se cumpla. Y porque va a haber dos formas de llegar a ella (la del paso
+              3). Es el <a href="tema2/encadenamiento.html">encadenamiento hacia delante</a> de los apuntes: una regla
+              aserta un hecho que dispara otra.
+            </p>
+            <p>
+              <strong>Al medirlo:</strong> vive bastante más, una vida cada 470 turnos en vez de cada 330, pero no
+              hace más puntos, porque huyendo no come. Mirando sólo los puntos parecería que no ha cambiado nada: por
+              eso conviene medir más de una cosa.
+            </p>
+          </div>
+        </div>
+
+        <div class="step" id="paso3">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Recordar el turno anterior: histéresis</h3>
+<pre><code><span class="c">;; R3 · si ya venía huyendo, sigue siendo peligro hasta los 30</span>
+(defrule sigueElPeligro
+   (declare (salience 10))
+   (MSPACMAN (ultima huir) (distFantasma ?d&amp;:(&lt; ?d 30)))
+   =&gt;
+   (assert (PELIGRO)))</code></pre>
+            <p>
+              Con un solo umbral, un fantasma que ronda los 20 nodos hace que Ms.&nbsp;Pac-Man cambie de idea cada
+              pocos turnos. La solución es la <a href="tema1/maquinas-estados.html#prioridades">histéresis</a> de la
+              Práctica&nbsp;2, entrar a 20 y salir a 30, pero una base de reglas no se acuerda del turno anterior: el
+              motor <a href="tema2/reglas-mspacman.html#memoria">vacía la memoria en cada turno</a>. Así que la
+              memoria vive en Java y llega como un hecho más, el slot <code>ultima</code>.
+            </p>
+            <p>
+              ¿Quién apunta qué acción ganó? Un observador del motor, que es lo único que se entera del
+              <code>ACTION</code> ganador sin tocar las acciones:
+            </p>
+<div class="codigo"><pre><code><span class="c">/** Se apunta el id del ACTION que gana en cada turno, para dárselo al Input del siguiente. */</span>
+<span class="k">public class</span> UltimaAccion <span class="k">implements</span> RuleEngineObserver {
+
+    <span class="k">private</span> String id = <span class="s">"nada"</span>;
+
+    <span class="k">public</span> String get() { <span class="k">return</span> id; }
+
+    <span class="k">public void</span> olvidar() { id = <span class="s">"nada"</span>; }      <span class="c">// al empezar cada partida</span>
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> actionFired(String action, Collection&lt;String&gt; facts) {
+        <span class="c">// action es el hecho ganador como texto: (MAIN::ACTION (id huir) (info "...") ...)</span>
+        <span class="k">int</span> i = action.indexOf(<span class="s">"(id "</span>) + <span class="n">4</span>;
+        id = action.substring(i, action.indexOf(<span class="s">')'</span>, i));
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> ruleEngineReset() { }
+}</code></pre></div>
+            <p>
+              <strong>Al medirla:</strong> no se nota. Con esta forma de huir, cambiar de idea a los 20 nodos no le
+              costaba vidas. Se queda porque es el ejemplo de cómo recordar entre turnos; en vuestro diario, algo así
+              se apunta tal cual: "no se nota, y la dejo por esto".
+            </p>
+          </div>
+        </div>
+
+        <div class="step" id="paso4">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Comparar dos slots: ir a la píldora de poder</h3>
+<pre><code><span class="c">;; R5 · con peligro, si la píldora de poder está más cerca que el fantasma, a por ella</span>
+(defrule aLaPPill
+   (PELIGRO)
+   (MSPACMAN (distFantasma ?f) (distPPill ?p&amp;:(&lt; ?p ?f)))
+   =&gt;
+   (assert (ACTION (id irAPPill) (priority 90)
+                   (info "R5: la PPill está más cerca que él"))))</code></pre>
+            <p>
+              La condición compara dos slots del mismo hecho: <code>?f</code> se liga a la distancia del fantasma y
+              la restricción de <code>distPPill</code> la usa. Y su <code>priority 90</code> le gana a la de
+              <code>huir</code>, que también se aserta en ese turno: las dos se disparan, y el
+              <code>RuleEngine</code> se queda con la más alta.
+            </p>
+            <p>
+              <strong>Al medirla:</strong> tampoco se nota, y la <a href="depurar-reglas.html#resumen">traza</a> dice
+              por qué: en tres partidas contra los agresivos se dispara 40 veces, frente a las 7&#8239;260 de
+              <code>huir</code>. Una regla que casi nunca se cumple no puede cambiar mucho, por buena idea que sea.
+              Antes de darle vueltas a si está bien, hay que mirar si se dispara.
+            </p>
+          </div>
+        </div>
+
+        <div class="step" id="paso5">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Cazar: <code>not</code>, variables y un parámetro</h3>
+<pre><code><span class="c">;; R6 · sin peligro, a por el comestible más cercano, si llego antes de que se le pase</span>
+(defrule cazar
+   (not (PELIGRO))
+   (FANTASMA (nombre ?g) (comestible true)
+             (distancia ?d) (tiempo ?t&amp;:(&gt; ?t ?d)))
+   (not (FANTASMA (comestible true) (distancia ?d2&amp;:(&lt; ?d2 ?d))))
+   =&gt;
+   (assert (ACTION (id perseguir) (fantasma ?g) (priority 60)
+                   (info (str-cat "R6: cazar a " ?g)))))</code></pre>
+            <p>Es la regla con más cosas nuevas, línea a línea:</p>
+            <ul>
+              <li><code>(not (PELIGRO))</code>: sólo si ninguna regla ha concluido que hay peligro.</li>
+              <li>
+                El segundo patrón liga tres variables de un mismo fantasma: su nombre, su distancia y su tiempo de
+                comestible, y exige que el tiempo pase de la distancia, para llegar antes de que se recupere.
+              </li>
+              <li>
+                El tercero es la forma de decir "el más cercano" en CLIPS: <strong>que no haya otro comestible más
+                cerca que él</strong>. Con dos comestibles, la regla se cumple sólo para el de menor distancia.
+              </li>
+              <li><code>(fantasma ?g)</code> le pasa el nombre a <code>PerseguirAction</code>, que lo lee en <code>parseFact</code>.</li>
+            </ul>
+            <p>
+              Y con este <code>not</code> aparece un problema de orden. Si Jess dispara <code>cazar</code>
+              antes que <code>peligro</code>, en ese momento todavía no hay <code>PELIGRO</code> y <code>cazar</code>
+              se cumple. Con un fantasma comestible a 30 y otro peligroso a 15, sin <code>salience</code>, la traza
+              de Jess sale así:
+            </p>
+<pre><code>FIRE 1 MAIN::cazar f-0,, f-2,
+FIRE 2 MAIN::comer f-1
+FIRE 3 MAIN::peligro f-1
+FIRE 4 MAIN::huir f-6</code></pre>
+            <p>
+              Aquí gana <code>huir</code> igualmente, porque tiene más <code>priority</code>, pero de chiripa: ha
+              llegado a asertarse un <code>perseguir</code> que no debía existir. Con
+              <code>(declare (salience 10))</code> en las dos reglas que concluyen <code>PELIGRO</code>, Jess las
+              dispara siempre antes, y <code>cazar</code> ni siquiera entra:
+            </p>
+<pre><code>FIRE 1 MAIN::peligro f-1
+FIRE 2 MAIN::huir f-4
+FIRE 3 MAIN::comer f-1</code></pre>
+            <p>
+              La regla general: <strong>las reglas que asertan hechos intermedios van con más
+              <code>salience</code> que las que los leen</strong>. Es el único uso de <code>salience</code> que
+              necesitáis; para elegir entre acciones ya está <code>priority</code>.
+            </p>
+            <p>
+              <strong>Al medirla:</strong> el salto grande. Pasa de unos 2&#8239;150 puntos a unos 2&#8239;950, mejora
+              contra todos los rivales y se come más del doble de fantasmas.
+            </p>
+          </div>
+        </div>
+
+        <div class="step" id="paso6">
+          <span class="step-num">6</span>
+          <div class="step-body">
+            <h3 class="label">Rematar, y una regla que no sirve</h3>
+<pre><code><span class="c">;; R7 · un comestible a menos de 10 se remata, aunque haya peligro</span>
+(defrule rematar
+   (FANTASMA (nombre ?g) (comestible true)
+             (distancia ?d&amp;:(&lt; ?d 10)) (tiempo ?t&amp;:(&gt; ?t ?d)))
+   =&gt;
+   (assert (ACTION (id perseguir) (fantasma ?g) (priority 85)
+                   (info (str-cat "R7: rematar a " ?g)))))</code></pre>
+            <p>
+              La idea parece buena: con un comestible a menos de 10 nodos, comérselo vale más que huir. Su
+              <code>priority 85</code> la deja entre <code>huir</code> (80) y <code>aLaPPill</code> (90), que es
+              justo lo que dice esa frase.
+            </p>
+            <p>
+              <strong>Al medirla:</strong> no cambia nada, ni repitiendo la medida con otras partidas. Así que
+              <strong>la versión buena es la de seis reglas</strong>: con lo mismo, es más sencilla. En el proyecto,
+              <code>mspacman-v0.clp</code> son las seis primeras y <code>mspacman-v1.clp</code> las siete.
+            </p>
+          </div>
+        </div>
+
+        <p>
+          De seis pasos, dos cambiaron algo, y sólo uno subió los puntos. Es lo normal: sin medir, los seis
+          habrían parecido mejoras, porque todos tenían una buena razón. Cómo se mide y cómo se sabe si una
+          diferencia es de verdad está en <a href="comparar-versiones.html">Comparar versiones</a>.
+        </p>
+
+        <figure class="wide">
+          <figcaption>Las siete reglas de un vistazo: qué leen, qué asertan y cuánto pesa cada <code>ACTION</code></figcaption>
+          <svg class="explica d7r" viewBox="0 0 600 300" role="img" aria-label="A la izquierda, los hechos que llegan de Java: MSPACMAN arriba y FANTASMA abajo. De MSPACMAN salen las reglas R2 y R3, que asertan el hecho intermedio PELIGRO. En el centro, cinco reglas ordenadas por la prioridad de lo que asertan: aLaPPill, que lee PELIGRO y MSPACMAN, aserta irAPPill con 90; rematar, que lee FANTASMA, aserta perseguir con 85; huir, que lee PELIGRO, aserta huir con 80; cazar, que lee FANTASMA y exige que no haya PELIGRO, aserta perseguir con 60; comer, que lee MSPACMAN, aserta comer con 10. Gana el ACTION de prioridad más alta de los que se hayan asertado.">
+            <style>
+              .d7r .h{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .d7r .p{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.3;stroke-dasharray:5 3}
+              .d7r .r{fill:var(--surface);stroke:var(--ink-2);stroke-width:1.2}
+              .d7r .a{fill:var(--pill-soft);stroke:var(--pill);stroke-width:1.3}
+              .d7r .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+              .d7r .tb{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink)}
+              .d7r .s{font-family:var(--f-mono);font-size:8.6px;fill:var(--ink-3)}
+              .d7r .z{font-family:var(--f-mono);font-size:8.5px;font-weight:700;letter-spacing:.1em;fill:var(--ink-3)}
+              .d7r .f{fill:none;stroke:var(--ink-3);stroke-width:1.1;marker-end:url(#d7a)}
+              .d7r .fp{fill:none;stroke:var(--maze);stroke-width:1.3;marker-end:url(#d7b)}
+              .d7r .fn{fill:none;stroke:var(--blinky);stroke-width:1.3;stroke-dasharray:4 3;marker-end:url(#d7c)}
+              .d7r .n{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--blinky)}
+            </style>
+            <defs>
+              <marker id="d7a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+              <marker id="d7b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--maze)"/></marker>
+              <marker id="d7c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <text x="10" y="12" class="z">DE JAVA</text>
+            <text x="320" y="12" class="z">REGLAS</text>
+            <text x="476" y="12" class="z">ACTION · PRIORITY</text>
+            <rect x="10" y="30" width="130" height="34" rx="4" class="h"/>
+            <text x="20" y="45" class="tb">MSPACMAN</text><text x="20" y="57" class="s">distFantasma distPPill</text>
+            <rect x="10" y="212" width="130" height="34" rx="4" class="h"/>
+            <text x="20" y="227" class="tb">FANTASMA ×4</text><text x="20" y="239" class="s">comestible distancia</text>
+            <rect x="178" y="112" width="104" height="30" rx="4" class="p"/>
+            <text x="188" y="126" class="tb">PELIGRO</text><text x="188" y="137" class="s">hecho intermedio</text>
+            <path d="M140 54 C 160 60, 165 100, 178 118" class="fp"/>
+            <text x="166" y="84" class="s">R2 · R3</text>
+            <rect x="320" y="24" width="120" height="26" rx="4" class="r"/><text x="330" y="41" class="t">R5 aLaPPill</text>
+            <rect x="320" y="70" width="120" height="26" rx="4" class="r"/><text x="330" y="87" class="t">R7 rematar</text>
+            <rect x="320" y="116" width="120" height="26" rx="4" class="r"/><text x="330" y="133" class="t">R4 huir</text>
+            <rect x="320" y="162" width="120" height="26" rx="4" class="r"/><text x="330" y="179" class="t">R6 cazar</text>
+            <rect x="320" y="254" width="120" height="26" rx="4" class="r"/><text x="330" y="271" class="t">R1 comer</text>
+            <rect x="476" y="24" width="116" height="26" rx="4" class="a"/><text x="486" y="41" class="t">irAPPill · 90</text>
+            <rect x="476" y="70" width="116" height="26" rx="4" class="a"/><text x="486" y="87" class="t">perseguir · 85</text>
+            <rect x="476" y="116" width="116" height="26" rx="4" class="a"/><text x="486" y="133" class="t">huir · 80</text>
+            <rect x="476" y="162" width="116" height="26" rx="4" class="a"/><text x="486" y="179" class="t">perseguir · 60</text>
+            <rect x="476" y="254" width="116" height="26" rx="4" class="a"/><text x="486" y="271" class="t">comer · 10</text>
+            <path d="M440 37 H474" class="f"/><path d="M440 83 H474" class="f"/><path d="M440 129 H474" class="f"/>
+            <path d="M440 175 H474" class="f"/><path d="M440 267 H474" class="f"/>
+            <path d="M140 40 C 220 30, 260 34, 318 36" class="f"/>
+            <path d="M282 120 C 300 100, 300 50, 318 42" class="fp"/>
+            <path d="M282 128 H318" class="fp"/>
+            <path d="M282 136 C 296 150, 300 166, 318 172" class="fn"/>
+            <text x="292" y="162" class="n">no</text>
+            <path d="M140 222 C 220 200, 250 110, 318 86" class="f"/>
+            <path d="M140 232 C 220 220, 270 186, 318 180" class="f"/>
+            <path d="M140 60 H152 V267 H318" class="f"/>
+            <text x="476" y="214" class="s">gana el más alto</text>
+            <text x="476" y="226" class="s">de los que se hayan</text>
+            <text x="476" y="238" class="s">asertado en el turno</text>
+          </svg>
+        </figure>
+
+        <h3 class="label">Probadlas aquí</h3>
+        <p>
+          Las siete reglas, tal cual están en <code>mspacman-v1.clp</code>, con un turno escrito a mano en el
+          <code>deffacts</code>. Cambiad el turno, haced <em>reset</em> y <em>Run</em>: la última línea de la
+          traza dice qué <code>ACTION</code> elegiría el <code>RuleEngine</code> del juego.
+        </p>
+        <div class="demo" data-reglas="banco" data-presets="mspacman">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Un turno de Ms.&nbsp;Pac-Man, regla a regla</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este banco de pruebas necesita JavaScript. Las mismas situaciones se prueban con <code>ProbarReglas</code>, en <a href="depurar-reglas.html#probar">Depurar reglas</a>.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Poned <code>distFantasma</code> a 25: ya no hay peligro. Ahora cambiad <code>ultima</code> a <code>huir</code>: vuelve a haberlo, por <code>sigueElPeligro</code>.</li>
+            <li>Con el peligro puesto, bajad <code>distPPill</code> a 5: gana <code>irAPPill</code>, y <code>huir</code> sigue en la memoria, perdiendo.</li>
+            <li>Bajad la <code>distancia</code> de PINKY a 8: se dispara <code>rematar</code> y le gana a <code>huir</code>.</li>
+            <li>Borrad la línea de SUE y poned <code>distFantasma</code> a 1000: sin peligro, <code>cazar</code> elige a PINKY. Añadid otro comestible más cerca y mirad a quién elige ahora.</li>
+            <li>Escribid <code>(comestible TRUE)</code> en PINKY. Ninguna regla de cazar se dispara: <code>TRUE</code> y <code>true</code> son símbolos distintos.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="controlador">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">El controlador</h2>
+        </div>
+<div class="codigo"><pre><code><span class="k">public class</span> MsPacMan <span class="k">extends</span> PacmanController {
+
+    <span class="k">private static final</span> String RULES_PATH = <span class="s">"es/ucm/fdi/ici/c2627/practica3/grupoYY/"</span>;
+
+    <span class="k">private final</span> RuleEngine motor;
+    <span class="k">private final</span> UltimaAccion ultima = <span class="k">new</span> UltimaAccion();
+
+    <span class="k">public</span> MsPacMan() {
+        <span class="k">this</span>(<span class="s">"mspacman-v1.clp"</span>);                 <span class="c">// la versión que va al concurso</span>
+    }
+
+    <span class="c">/** Cada versión, un .clp distinto, con el mismo Input y las mismas acciones. */</span>
+    <span class="k">public</span> MsPacMan(String ficheroReglas) {
+        setName(<span class="s">"MsPacMan YY"</span>);
+        setTeam(<span class="s">"Grupo YY"</span>);
+
+        HashMap&lt;String, RulesAction&gt; acciones = <span class="k">new</span> HashMap&lt;&gt;();
+        <span class="k">for</span> (RulesAction a : <span class="k">new</span> RulesAction[] {
+                <span class="k">new</span> ComerAction(), <span class="k">new</span> HuirAction(),
+                <span class="k">new</span> IrAPPillAction(), <span class="k">new</span> PerseguirAction() })
+            acciones.put(a.getActionId(), a);
+
+        motor = <span class="k">new</span> RuleEngine(<span class="s">"MSPACMAN"</span>, RULES_PATH + ficheroReglas, acciones);
+        motor.addObserver(ultima);
+    }
+
+    <span class="c">/** Para engancharle la TrazaReglas desde fuera. */</span>
+    <span class="k">public</span> RuleEngine getMotor() { <span class="k">return</span> motor; }
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> preCompute(String rival) {
+        ultima.olvidar();
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+        MsPacManInput input = <span class="k">new</span> MsPacManInput(game, ultima.get());
+        motor.reset();
+        motor.assertFacts(input.getFacts());
+        <span class="k">return</span> motor.run(game);
+    }
+}</code></pre></div>
+        <ul>
+          <li>
+            <strong>El mapa de acciones se rellena con <code>getActionId()</code></strong>, no escribiendo el id a
+            mano otra vez: así el id sólo está escrito en dos sitios, la acción y las reglas, y no en tres.
+          </li>
+          <li>
+            <strong>Cada versión es un <code>.clp</code></strong>. El constructor sin argumentos apunta a la que va
+            al concurso; el otro sirve para que <code>Comparar</code> juegue con cualquiera de ellas sin duplicar
+            clases. Si una versión necesita un hecho o una acción nuevos, ved
+            <a href="#versiones">cómo organizar las versiones</a>.
+          </li>
+          <li>
+            <strong>El <code>RuleEngine</code> se crea en el constructor</strong>, y en ningún otro sitio. Jess no
+            sabe leer dos <code>.clp</code> a la vez, y el concurso juega en paralelo: crearlo en
+            <code>preCompute</code> o en el primer <code>getMove</code> puede romper la carga de las reglas sin que
+            os enteréis. Está contado en <a href="depurar-reglas.html#errores">Depurar reglas</a>.
+          </li>
+          <li>
+            <code>preCompute</code> se llama antes de cada partida: ahí se olvida la memoria de la anterior.
+          </li>
+        </ul>
+        <h3 class="label" id="versiones">Cómo organizar las versiones</h3>
+        <p>
+          Con reglas, lo normal es que de una versión a otra sólo cambie el <code>.clp</code>. Entonces basta con
+          un fichero por versión y nada más:
+        </p>
+<pre><code>es/ucm/fdi/ici/c2627/practica3/grupoYY/
+├── MsPacMan.java          <span class="c">// MsPacMan() → "mspacman-v2.clp", la del concurso</span>
+├── mspacman-v0.clp
+├── mspacman-v1.clp
+├── mspacman-v2.clp
+├── Ghosts.java            <span class="c">// Ghosts() → "ghosts-v1.clp"</span>
+├── ghosts-v0.clp
+├── ghosts-v1.clp
+├── mspacman/  MsPacManInput.java  actions/
+└── ghosts/    GhostsInput.java    actions/</code></pre>
+        <p>
+          Si una versión necesita un <strong>hecho nuevo</strong>, el <code>Input</code> lo aserta para todas, así
+          que su <code>deftemplate</code> tiene que estar también en los <code>.clp</code> anteriores; sin él, Jess
+          rechaza el hecho y lo dice en la consola. Añadir la plantilla no cambia lo que hacían, porque ninguna de
+          sus reglas lo mira. Si necesita una <strong>acción nueva</strong>, se añade al mapa: las versiones viejas
+          no la asertan nunca. Lo que no vale es cambiar lo que hace una acción o un hecho que ya usaban las
+          versiones anteriores, porque entonces sus medidas dejan de ser suyas.
+        </p>
+      </section>
+
+      <section id="seguir-mspacman">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Seguir con Ms.&nbsp;Pac-Man</h2>
+        </div>
+        <p>
+          Siete reglas, y tres de ellas no se notan: este controlador es un punto de partida, no una solución. Si
+          lo veis jugar un rato con <code>VerPartida</code>, sus fallos saltan a la vista:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Lo que hace mal</th><th scope="col">Por qué</th><th scope="col">Por dónde atacarlo</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Huye hacia otro fantasma, o hacia un callejón.</td>
+                <td><code>HuirAction</code> sólo mira el fantasma más cercano.</td>
+                <td>Un hecho que diga por qué salidas del próximo cruce llega antes que todos, y reglas que elijan una. La <a href="tema1/estrategias.html">Práctica&nbsp;1</a> tiene medio trabajo hecho.</td>
+              </tr>
+              <tr>
+                <td>Come hacia un fantasma que viene de frente.</td>
+                <td><code>comer</code> va a la píldora más cercana, esté donde esté.</td>
+                <td>Una acción <code>comer</code> con parámetro, por ejemplo la zona, y reglas que elijan zonas tranquilas. Un <a href="tema1/mapas-influencia.html">mapa de influencia</a> da ese hecho.</td>
+              </tr>
+              <tr>
+                <td>Gasta las píldoras de poder al pasar.</td>
+                <td>Ninguna regla dice qué hacer cerca de una píldora de poder sin peligro.</td>
+                <td>Reglas para esperar junto a ella hasta tener fantasmas cerca, o para no pisarla.</td>
+              </tr>
+              <tr>
+                <td>Persigue a un comestible que se está acabando.</td>
+                <td><code>tiempo &gt; distancia</code> no cuenta con que el fantasma también se mueve.</td>
+                <td>Un margen, o un hecho calculado en Java: "llego antes de que se recupere".</td>
+              </tr>
+              <tr>
+                <td>Huye mucho y no gana puntos huyendo.</td>
+                <td>Mientras huye no come, y contra los agresivos huye en cuatro de cada cinco turnos.</td>
+                <td>Huir hacia donde quedan píldoras, o un umbral de peligro que dependa de si el fantasma viene hacia ella o se aleja.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="label">Cómo crecer sin perder el control</h3>
+        <ul>
+          <li>
+            <strong>Primero el hecho, después las reglas.</strong> La mayoría de las reglas buenas salen de un hecho
+            nuevo bien calculado en Java. Si una condición os obliga a escribir una regla muy larga, probablemente
+            falta un hecho.
+          </li>
+          <li>
+            <strong>Una regla, un motivo.</strong> Y ese motivo en el <code>info</code>, empezando por el nombre de la
+            regla: es lo que vais a leer en la traza cuando algo salga mal.
+          </li>
+          <li>
+            <strong>Prioridades por franjas</strong>, para no tener que renumerar todo cada vez que añadís una:
+          </li>
+        </ul>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col"><code>priority</code></th><th scope="col">Para qué</th><th scope="col">En el ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td>0 a 19</td><td>Lo que se hace cuando no pasa nada</td><td><code>comer</code> 10</td></tr>
+              <tr><td>20 a 59</td><td>Oportunidades: cosas que conviene hacer si no hay prisa</td><td>libre</td></tr>
+              <tr><td>60 a 79</td><td>Ataque</td><td><code>cazar</code> 60</td></tr>
+              <tr><td>80 a 99</td><td>Supervivencia, y las excepciones que valen más que sobrevivir</td><td><code>huir</code> 80, <code>rematar</code> 85, <code>aLaPPill</code> 90</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul>
+          <li>
+            <strong>Cada regla nueva, con su caso.</strong> Antes de medirla, una línea en
+            <a href="depurar-reglas.html#probar"><code>ProbarReglas</code></a> con la situación para la que la
+            escribís y la acción que debería ganar. Si un cambio posterior la rompe, os enteráis en un segundo y no
+            después de 300 partidas.
+          </li>
+          <li>
+            <strong>Y cada versión, medida.</strong> Un cambio por versión, contra los mismos rivales, como en la
+            Práctica&nbsp;2. Ya habéis visto en la tabla de arriba cuántas ideas buenas no se notan.
+          </li>
+        </ul>
+        <div class="note mine">
+          <span class="note-label">Qué hace que una base de reglas sea más rica</span>
+          <p>
+            Para llegar a las 15 reglas que pide la práctica no sirve copiar una regla cambiando el número. Lo que
+            de verdad usa lo que tiene un sistema de reglas, y lo que más se nota al leerlo, son las cosas que han
+            ido apareciendo en esta página: hechos intermedios que encadenan reglas, memoria entre turnos,
+            <code>not</code>, variables que relacionan varios hechos, acciones con parámetros y
+            <code>salience</code> sólo donde hace falta y con su porqué.
+          </p>
+        </div>
+      </section>
+
+      <section id="seguir-fantasmas">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Seguir con los fantasmas</h2>
+        </div>
+        <p>
+          Los fantasmas tienen una dificultad que Ms.&nbsp;Pac-Man no tiene: son cuatro, y cada uno necesita su
+          motor de reglas, porque cada uno elige su propio <code>ACTION</code>. Hay dos formas de organizarlo:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Forma</th><th scope="col">Cómo es</th><th scope="col">Cuándo conviene</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Un <code>.clp</code> por fantasma</strong></td>
+                <td>La de la plantilla y los <a href="tema2/reglas-mspacman.html#java">apuntes</a>: <code>blinkyrules.clp</code>, <code>inkyrules.clp</code>…, ids como <code>BLINKYchases</code> y un mapa compartido.</td>
+                <td>Si cada fantasma va a tener una personalidad distinta, con reglas que no comparten.</td>
+              </tr>
+              <tr>
+                <td><strong>Una base para los cuatro</strong></td>
+                <td>La de este ejemplo: un solo <code>.clp</code>, un mapa de acciones por fantasma con ids genéricos, y un hecho <code>(YO (nombre BLINKY))</code> que le dice a cada motor quién es.</td>
+                <td>Si los cuatro piensan igual, o casi: las diferencias se escriben como reglas que preguntan por <code>YO</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Las dos valen. Con la primera es muy fácil acabar con cuatro copias del mismo fichero, y entonces cuentan
+          como uno; con la segunda, las copias no existen. El esqueleto del proyecto usa la segunda:
+        </p>
+<div class="codigo"><pre><code><span class="k">public</span> Ghosts(String ficheroReglas) {
+    setName(<span class="s">"Ghosts YY"</span>);
+    setTeam(<span class="s">"Grupo YY"</span>);
+    <span class="k">for</span> (GHOST g : GHOST.values()) {
+        HashMap&lt;String, RulesAction&gt; acciones = <span class="k">new</span> HashMap&lt;&gt;();   <span class="c">// las de ESTE fantasma</span>
+        <span class="k">for</span> (RulesAction a : <span class="k">new</span> RulesAction[] { <span class="k">new</span> PerseguirAction(g), <span class="k">new</span> HuirAction(g) })
+            acciones.put(a.getActionId(), a);
+        motores.put(g, <span class="k">new</span> RuleEngine(g.name(), RULES_PATH + ficheroReglas, acciones));
+    }
+}
+
+<span class="k">@Override</span>
+<span class="k">public</span> EnumMap&lt;GHOST, MOVE&gt; getMove(Game game, <span class="k">long</span> timeDue) {
+    GhostsInput input = <span class="k">new</span> GhostsInput(game);               <span class="c">// una vez para los cuatro</span>
+    EnumMap&lt;GHOST, MOVE&gt; movimientos = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+    <span class="k">for</span> (GHOST g : GHOST.values()) {
+        <span class="k">if</span> (!game.doesGhostRequireAction(g)) <span class="k">continue</span>;       <span class="c">// fuera de los cruces no hay nada que decidir</span>
+        RuleEngine motor = motores.get(g);
+        motor.reset();
+        motor.assertFacts(input.getFacts());
+        motor.assertFacts(List.of(<span class="s">"(YO (nombre "</span> + g + <span class="s">"))"</span>));
+        movimientos.put(g, motor.run(game));
+    }
+    <span class="k">return</span> movimientos;
+}</code></pre></div>
+        <p>
+          Cada fantasma tiene sus propias instancias de <code>PerseguirAction</code> y <code>HuirAction</code>, que
+          saben de qué fantasma son, así que el id puede ser el mismo para los cuatro: <code>perseguir</code> en el
+          motor de Blinky ejecuta la acción de Blinky. Y como un fantasma sólo puede cambiar de dirección en los
+          cruces, fuera de ellos ni se llama a Jess: ahorra la mayor parte del tiempo.
+        </p>
+        <p>
+          Las reglas del esqueleto, en <code>ghosts-v1.clp</code>. La <code>v0</code> es lo mismo sin G3, para tener
+          dos versiones que comparar desde el principio:
+        </p>
+<pre><code>(deftemplate FANTASMA
+   (slot nombre (type SYMBOL)) (slot comestible (type SYMBOL))
+   (slot enCarcel (type SYMBOL)) (slot distPacman (type NUMBER)))
+(deftemplate MSPACMAN (slot distPPill (type NUMBER)))
+(deftemplate YO (slot nombre (type SYMBOL)))          <span class="c">; distinto en cada motor: quién soy yo</span>
+(deftemplate ACTION (slot id) (slot info (default "")) (slot priority (type NUMBER)))
+
+<span class="c">;; G1 · si no soy comestible, perseguir</span>
+(defrule perseguir
+   (YO (nombre ?yo))
+   (FANTASMA (nombre ?yo) (comestible false))
+   =&gt;
+   (assert (ACTION (id perseguir) (info "G1: no soy comestible") (priority 10))))
+
+<span class="c">;; G2 · si soy comestible, huir</span>
+(defrule huirComestible
+   (YO (nombre ?yo))
+   (FANTASMA (nombre ?yo) (comestible true))
+   =&gt;
+   (assert (ACTION (id huir) (info "G2: soy comestible") (priority 50))))
+
+<span class="c">;; G3 · si Ms. Pac-Man está junto a una píldora de poder, no acercarse</span>
+(defrule huirDeLaPPill
+   (MSPACMAN (distPPill ?d&amp;:(&lt; ?d 15)))
+   =&gt;
+   (assert (ACTION (id huir) (priority 40)
+                   (info "G3: Ms. Pac-Man junto a una PPill"))))</code></pre>
+        <p>
+          Fijaos en el patrón de G1 y G2: <code>?yo</code> se liga en <code>YO</code> y se exige en
+          <code>FANTASMA</code>, así que cada motor razona sobre su propio fantasma aunque vea los cuatro hechos.
+          Los otros tres siguen ahí, y eso es lo que permite coordinarse.
+        </p>
+        <p>
+          <strong>Al medirlas</strong>, con <code>Comparar</code> en modo fantasmas, la diferencia entre la
+          <code>v0</code> y la <code>v1</code> es pequeña: G3 quizá conceda algo menos de puntos, pero harían falta
+          muchas más partidas para asegurarlo. Así son casi todas las mejoras de un controlador que ya funciona.
+        </p>
+        <h3 class="label">Ideas para llegar a 15</h3>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Idea</th><th scope="col">Qué hace falta</th></tr></thead>
+            <tbody>
+              <tr><td>Si otro fantasma ya está más cerca de Ms.&nbsp;Pac-Man que yo, no perseguirla: cortarle el paso.</td><td>Una regla que compare mi <code>distPacman</code> con la de otro, <code>(FANTASMA (nombre ?otro&amp;~?yo) (distPacman ?d2&amp;:(&lt; ?d2 ?d)))</code>, y una acción <code>cortar</code> que vaya al cruce hacia el que va ella.</td></tr>
+              <tr><td>Personalidades: Blinky persigue, Pinky embosca, Sue patrulla.</td><td>Reglas que preguntan por <code>(YO (nombre PINKY))</code> en vez de por cualquiera.</td></tr>
+              <tr><td>Tapar la píldora de poder cuando Ms.&nbsp;Pac-Man va hacia ella.</td><td>Un hecho con la píldora a la que se dirige y quién llega antes, y una acción con parámetro <code>ir a nodo</code>.</td></tr>
+              <tr><td>No huir todos por el mismo pasillo cuando son comestibles.</td><td>Reglas que miren a dónde va el resto, con un hecho por fantasma de su dirección.</td></tr>
+              <tr><td>Recordar el turno anterior para no cambiar de idea en cada cruce.</td><td>Un <code>UltimaAccion</code> por motor, como el de Ms.&nbsp;Pac-Man, y un slot <code>ultima</code> en el hecho del fantasma.</td></tr>
+              <tr><td>Hechos intermedios compartidos: <code>(ACORRALADA)</code>, <code>(PELIGRO_PPILL)</code>.</td><td>Reglas con <code>salience</code> que los concluyen, y otras que los usan, igual que <code>PELIGRO</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Y a partir de aquí, lo de siempre</span>
+          <p>
+            Una versión con un cambio, su caso en <code>ProbarReglas</code>, la traza para ver si las reglas
+            nuevas se disparan, y <code>Comparar</code> para ver si se nota. Las dos guías que siguen cuentan esas
+            herramientas con detalle: <a href="depurar-reglas.html">Depurar reglas</a> y
+            <a href="comparar-versiones.html">Comparar versiones</a>.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Guías de la Práctica 3">
+        <a class="pager-prev" href="../practicas/practica-3.html"><span class="pager-l">El enunciado</span><span class="pager-t">Práctica 3</span></a>
+        <a class="pager-next" href="depurar-reglas.html"><span class="pager-l">Siguiente</span><span class="pager-t">Depurar reglas</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#proyecto">El proyecto de partida</a></li>
+            <li><a href="#hechos">Los hechos</a></li>
+            <li><a href="#acciones">Las acciones</a></li>
+            <li><a href="#reglas">Siete reglas</a></li>
+            <li><a href="#controlador">El controlador</a></li>
+            <li><a href="#seguir-mspacman">Seguir con Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="#seguir-fantasmas">Seguir con los fantasmas</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">Práctica 3</h2>
+          <ol>
+            <li><a href="../practicas/practica-3.html"><span>00</span>El enunciado</a></li>
+            <li><a href="reglas-paso-a-paso.html" aria-current="page"><span>01</span>Siete reglas</a></li>
+            <li><a href="depurar-reglas.html"><span>02</span>Depurar reglas</a></li>
+            <li><a href="comparar-versiones.html"><span>03</span>Comparar versiones</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+<script src="../assets/js/reglas.js" defer></script>
+</body>
+</html>

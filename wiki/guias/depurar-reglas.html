@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Depurar reglas · Guías · ICI</title>
+<meta name="description" content="Cómo saber qué reglas se disparan y por qué gana una acción: probar reglas sin jugar con casos escritos a mano, una traza que cuenta las reglas disparadas en cada turno y las que no se disparan nunca, y los errores típicos de la Práctica 3.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Depurar reglas</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Depurar reglas
+      <span class="thin">Qué se ha disparado, qué ha ganado, y qué no se dispara nunca.</span>
+    </h1>
+    <p class="standfirst">
+      En una máquina de estados se ve en qué estado está el personaje. En un sistema de reglas no hay nada que
+      mirar: en cada turno se disparan unas cuantas reglas, gana un <code>ACTION</code> y el resto desaparece. Esta
+      guía da dos herramientas para verlo, una para probar reglas sin jugar y otra para seguirlas mientras se
+      juega, con el código entero y lo que sacan de verdad con el ejemplo de las siete reglas.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="preguntas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Tres preguntas, en este orden</h2>
+        </div>
+        <p>
+          Cuando Ms.&nbsp;Pac-Man hace algo raro, la causa está en uno de tres sitios, y cada uno se mira con una
+          herramienta distinta. Id en orden: no tiene sentido revisar una acción si su regla no se dispara.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Pregunta</th><th scope="col">Si la respuesta es no</th><th scope="col">Cómo se mira</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>1 · ¿Se dispara la regla?</strong></td>
+                <td>Falta un hecho, o un slot no vale lo que creéis, o un símbolo está mal escrito.</td>
+                <td>Un caso en <a href="#probar"><code>ProbarReglas</code></a>, o el <a href="#resumen">resumen</a> de la traza: "0 veces".</td>
+              </tr>
+              <tr>
+                <td><strong>2 · ¿Gana su <code>ACTION</code>?</strong></td>
+                <td>Otra regla aserta un <code>ACTION</code> con más <code>priority</code> en el mismo turno.</td>
+                <td>La <a href="#traza">traza</a>: dice quién gana y quién pierde, con su <code>priority</code> y su <code>info</code>.</td>
+              </tr>
+              <tr>
+                <td><strong>3 · ¿La acción hace lo que debe?</strong></td>
+                <td>El problema ya no es de reglas: es Java, como en la Práctica&nbsp;1.</td>
+                <td><code>VerPartida</code> despacio, con la traza diciendo qué acción se está ejecutando.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Todo el código de esta página está en el <a href="reglas-paso-a-paso.html#proyecto">proyecto del
+          ejemplo</a>, en el paquete <code>depurar</code>.
+        </p>
+      </section>
+
+      <section id="probar">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Probar las reglas sin jugar</h2>
+        </div>
+        <p>
+          Esperar a que en una partida se dé justo la situación que queréis probar es lento y no se puede repetir.
+          Es mucho más rápido <strong>escribir la situación a mano</strong>, como hechos, y preguntarle a Jess qué
+          gana. <code>ProbarReglas</code> hace eso con una lista de casos, cada uno con la acción que debería ganar:
+        </p>
+<div class="codigo"><pre><code><span class="k">public class</span> ProbarReglas {
+
+    <span class="k">static final</span> String REGLAS = <span class="s">"es/ucm/fdi/ici/c2627/practica3/grupoYY/mspacman-v1.clp"</span>;
+    <span class="k">static int</span> fallos = <span class="n">0</span>;
+
+    <span class="k">public static void</span> main(String[] args) <span class="k">throws</span> JessException {
+        Rete jess = <span class="k">new</span> Rete();
+        jess.batch(REGLAS);
+        jess.eval(<span class="s">"(watch rules)"</span>);           <span class="c">// Jess escribe cada regla que dispara</span>
+
+        caso(jess, <span class="s">"nada cerca: come"</span>, <span class="s">"comer"</span>,
+                <span class="s">"(MSPACMAN (distFantasma 80) (distPPill 40) (ultima comer))"</span>);
+
+        caso(jess, <span class="s">"a 25 viniendo de huir: sigue huyendo"</span>, <span class="s">"huir"</span>,
+                <span class="s">"(MSPACMAN (distFantasma 25) (distPPill 40) (ultima huir))"</span>);
+
+        caso(jess, <span class="s">"comestible a 5 y otro peligroso a 15: lo remata"</span>, <span class="s">"perseguir"</span>,
+                <span class="s">"(MSPACMAN (distFantasma 15) (distPPill 1000) (ultima huir))"</span>,
+                <span class="s">"(FANTASMA (nombre PINKY) (comestible true) (distancia 5) (tiempo 100))"</span>,
+                <span class="s">"(FANTASMA (nombre SUE) (comestible false) (distancia 15) (tiempo 0))"</span>);
+
+        <span class="c">// … en el proyecto hay ocho</span>
+
+        System.out.println(fallos == <span class="n">0</span> ? <span class="s">"\nTodos los casos bien."</span> : <span class="s">"\n"</span> + fallos + <span class="s">" casos MAL."</span>);
+    }
+
+    <span class="k">static void</span> caso(Rete jess, String nombre, String esperada, String... hechos) <span class="k">throws</span> JessException {
+        System.out.println(<span class="s">"\n--- "</span> + nombre);
+        jess.reset();
+        <span class="k">for</span> (String h : hechos) jess.assertString(h);
+        jess.run();
+
+        Fact gana = <span class="k">null</span>;                       <span class="c">// lo mismo que hace RuleEngine: la de más priority</span>
+        <span class="k">for</span> (Iterator&lt;?&gt; it = jess.listFacts(); it.hasNext(); ) {
+            Fact f = (Fact) it.next();
+            <span class="k">if</span> (f.getName().equals(<span class="s">"MAIN::ACTION"</span>) &amp;&amp; (gana == <span class="k">null</span>
+                    || f.getSlotValue(<span class="s">"priority"</span>).intValue(<span class="k">null</span>) &gt; gana.getSlotValue(<span class="s">"priority"</span>).intValue(<span class="k">null</span>)))
+                gana = f;
+        }
+        String id = gana == <span class="k">null</span> ? <span class="s">"(ninguna)"</span> : gana.getSlotValue(<span class="s">"id"</span>).toString();
+        <span class="k">boolean</span> bien = id.equals(esperada);
+        <span class="k">if</span> (!bien) fallos++;
+        System.out.printf(<span class="s">"%s  gana %s, esperaba %s%n"</span>, bien ? <span class="s">"BIEN"</span> : <span class="s">"MAL "</span>, id, esperada);
+    }
+}</code></pre></div>
+        <p>
+          Se lanza como cualquier <code>main</code>, sin abrir el juego, y tarda menos de un segundo. Esto es lo que
+          saca uno de los casos:
+        </p>
+<pre><code>--- comestible a 5 y otro peligroso a 15: lo remata
+FIRE 1 MAIN::sigueElPeligro f-1
+FIRE 2 MAIN::peligro f-1
+FIRE 3 MAIN::huir f-4
+FIRE 4 MAIN::rematar f-2
+FIRE 5 MAIN::comer f-1
+BIEN  gana perseguir, esperaba perseguir</code></pre>
+        <p>
+          Las líneas <code>FIRE</code> las escribe Jess por el <code>(watch rules)</code>: qué regla se dispara, en
+          qué orden y con qué hechos (<code>f-1</code> es el primero que se asertó, <code>f-4</code> el
+          <code>PELIGRO</code> que concluyó <code>sigueElPeligro</code>). Se disparan cinco reglas y se asertan tres
+          <code>ACTION</code>, de <code>huir</code>, <code>rematar</code> y <code>comer</code>; gana el de
+          <code>rematar</code> porque su <code>priority</code> es la más alta. <code>peligro</code> se dispara pero
+          no aserta nada nuevo, porque el <code>PELIGRO</code> ya existía.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Una regla nueva, un caso nuevo</span>
+          <p>
+            Antes de medir una regla con 300 partidas, escribid el caso para el que la habéis pensado y comprobad que
+            gana. Y no borréis los casos viejos: son la forma de enteraros en un segundo de que una regla nueva ha
+            roto otra. En la <a href="reglas-paso-a-paso.html#paso5">regla de cazar</a> del ejemplo, fue un caso de
+            estos el que destapó que <code>cazar</code> se disparaba aunque hubiera peligro, porque la traza
+            enseñaba un <code>FIRE</code> que no debía estar.
+          </p>
+        </div>
+        <p>
+          Los casos sirven también para el diario: "este caso fallaba, cambié esto y ya no" es exactamente el tipo
+          de entrada que se pide, y se puede comprobar.
+        </p>
+      </section>
+
+      <section id="traza">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Ver las reglas mientras se juega</h2>
+        </div>
+        <p>
+          El observador que trae el motor, <code>ConsoleRuleEngineObserver</code>, vuelca en cada turno todos los
+          hechos y el <code>ACTION</code> ganador. Tiene dos problemas: escribe cientos de líneas por segundo, y
+          <strong>no dice qué reglas se han disparado</strong>, sólo los hechos que han quedado. Una regla que
+          aserta un hecho intermedio, como <code>peligro</code>, o que aserta lo mismo que otra, no deja rastro.
+        </p>
+        <p>
+          <code>TrazaReglas</code> escucha a la vez al <code>RuleEngine</code> (para saber qué <code>ACTION</code>
+          gana) y a Jess (para saber qué reglas se disparan), y sólo escribe cuando cambia la acción ganadora:
+        </p>
+<div class="codigo"><pre><code><span class="c">/**
+ * Cuenta qué reglas se disparan en cada turno, qué ACTION gana, y al final
+ * cuántas veces se ha disparado cada regla. Sólo para depurar: no la entreguéis
+ * enganchada, que imprime mucho y va más lento.
+ */</span>
+<span class="k">public class</span> TrazaReglas <span class="k">implements</span> JessListener, RuleEngineObserver {
+
+    <span class="k">private final</span> String nombre;
+    <span class="k">private final boolean</span> soloCambios;      <span class="c">// true: sólo imprime cuando cambia la acción ganadora</span>
+    <span class="k">private final</span> Rete jess;
+
+    <span class="k">private final</span> List&lt;String&gt; esteTurno = <span class="k">new</span> ArrayList&lt;&gt;();
+    <span class="k">private final</span> Map&lt;String, Integer&gt; vecesRegla = <span class="k">new</span> TreeMap&lt;&gt;();
+    <span class="k">private final</span> Map&lt;String, Integer&gt; vecesGana = <span class="k">new</span> TreeMap&lt;&gt;();
+    <span class="k">private</span> String ganadora = <span class="s">""</span>;
+    <span class="k">private boolean</span> huboAction = <span class="k">true</span>;
+    <span class="k">private int</span> turno = <span class="n">0</span>;
+
+    <span class="k">public</span> TrazaReglas(String nombre, RuleEngine motor, <span class="k">boolean</span> soloCambios) {
+        <span class="k">this</span>.nombre = nombre;
+        <span class="k">this</span>.soloCambios = soloCambios;
+        <span class="k">this</span>.jess = reteDe(motor);
+        motor.addObserver(<span class="k">this</span>);                                  <span class="c">// avisa del ACTION ganador</span>
+        jess.addJessListener(<span class="k">this</span>);                               <span class="c">// avisa de cada regla</span>
+        jess.setEventMask(jess.getEventMask() | JessEvent.DEFRULE_FIRED | JessEvent.RESET);
+        <span class="k">for</span> (Iterator&lt;?&gt; it = jess.listDefrules(); it.hasNext(); ) <span class="c">// todas, para ver las que no salen</span>
+            vecesRegla.put(sinModulo(((Defrule) it.next()).getName()), <span class="n">0</span>);
+    }
+
+    <span class="c">/** Jess avisa de cada regla que se dispara y de cada reset (uno por turno). */</span>
+    <span class="k">@Override</span>
+    <span class="k">public void</span> eventHappened(JessEvent e) <span class="k">throws</span> JessException {
+        <span class="k">if</span> (e.getType() == JessEvent.RESET) {
+            <span class="k">if</span> (!huboAction)
+                System.out.printf(<span class="s">"[%s] t=%d  NINGÚN ACTION: devuelve NEUTRAL. Reglas: %s%n"</span>,
+                        nombre, turno, esteTurno);
+            esteTurno.clear();
+            huboAction = <span class="k">false</span>;
+            turno++;
+        } <span class="k">else if</span> (e.getType() == JessEvent.DEFRULE_FIRED) {
+            String regla = sinModulo(((Activation) e.getObject()).getRule().getName());
+            esteTurno.add(regla);
+            vecesRegla.merge(regla, <span class="n">1</span>, Integer::sum);
+        }
+    }
+
+    <span class="c">/** El RuleEngine avisa del ACTION ganador, después de run(). */</span>
+    <span class="k">@Override</span>
+    <span class="k">public void</span> actionFired(String action, Collection&lt;String&gt; facts) {
+        huboAction = <span class="k">true</span>;
+        String id = slot(action, <span class="s">"id"</span>);
+        vecesGana.merge(id, <span class="n">1</span>, Integer::sum);
+        <span class="k">if</span> (!soloCambios || !id.equals(ganadora)) {
+            System.out.printf(<span class="s">"[%s] t=%d  %s → gana %s %s%n"</span>, nombre, turno, esteTurno, id, slot(action, <span class="s">"info"</span>));
+            <span class="k">for</span> (String f : facts)                                <span class="c">// los candidatos que perdieron</span>
+                <span class="k">if</span> (f.startsWith(<span class="s">"(MAIN::ACTION"</span>) &amp;&amp; !f.equals(action))
+                    System.out.printf(<span class="s">"           pierde %s (%s) %s%n"</span>,
+                            slot(f, <span class="s">"id"</span>), slot(f, <span class="s">"priority"</span>), slot(f, <span class="s">"info"</span>));
+        }
+        ganadora = id;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> ruleEngineReset() { }
+
+    <span class="c">/** Llamadlo al final (por ejemplo en postCompute): las reglas a 0 no existen. */</span>
+    <span class="k">public void</span> resumen() {
+        System.out.printf(<span class="s">"[%s] %d turnos. Veces que se dispara cada regla:%n"</span>, nombre, turno);
+        vecesRegla.forEach((r, n) -&gt; System.out.printf(<span class="s">"   %6d  %s%s%n"</span>, n, r, n == <span class="n">0</span> ? <span class="s">"   &lt;-- NUNCA"</span> : <span class="s">""</span>));
+        System.out.printf(<span class="s">"[%s] Veces que gana cada acción:%n"</span>, nombre);
+        vecesGana.forEach((a, n) -&gt; System.out.printf(<span class="s">"   %6d  %s%n"</span>, n, a));
+    }
+
+    <span class="c">// ---- utilidades -------------------------------------------------------</span>
+
+    <span class="c">/** El RuleEngine del motor no deja ver su Rete: se lo pedimos por reflexión. */</span>
+    <span class="k">private static</span> Rete reteDe(RuleEngine motor) {
+        <span class="k">try</span> {
+            Field f = RuleEngine.<span class="k">class</span>.getDeclaredField(<span class="s">"jess"</span>);
+            f.setAccessible(<span class="k">true</span>);
+            <span class="k">return</span> (Rete) f.get(motor);
+        } <span class="k">catch</span> (ReflectiveOperationException e) {
+            <span class="k">throw new</span> IllegalStateException(<span class="s">"No puedo llegar al Rete del RuleEngine"</span>, e);
+        }
+    }
+
+    <span class="k">private static</span> String sinModulo(String regla) {
+        <span class="k">return</span> regla.startsWith(<span class="s">"MAIN::"</span>) ? regla.substring(<span class="n">6</span>) : regla;
+    }
+
+    <span class="c">/** El valor de un slot en un hecho escrito como texto: (MAIN::ACTION (id huir) ...). */</span>
+    <span class="k">private static</span> String slot(String hecho, String slot) {
+        <span class="k">int</span> i = hecho.indexOf(<span class="s">"("</span> + slot + <span class="s">" "</span>);
+        <span class="k">if</span> (i &lt; <span class="n">0</span>) <span class="k">return</span> <span class="s">""</span>;
+        i += slot.length() + <span class="n">2</span>;
+        <span class="k">return</span> hecho.substring(i, hecho.indexOf(<span class="s">')'</span>, i));
+    }
+}</code></pre></div>
+        <p>Tres cosas de cómo está hecha, por si queréis cambiarla:</p>
+        <ul>
+          <li>
+            <strong>Jess avisa con eventos.</strong> Un <code>JessListener</code> registrado en el <code>Rete</code>
+            recibe un <code>DEFRULE_FIRED</code> por cada regla que se dispara y un <code>RESET</code> por cada
+            <code>reset()</code>, que en el juego es uno por turno. Por eso <code>t</code> cuenta turnos.
+          </li>
+          <li>
+            <strong>El <code>Rete</code> se saca por reflexión.</strong> El <code>RuleEngine</code> del motor lo
+            guarda en un atributo sin <code>getter</code>, y el motor no se modifica. Leerlo así es una trampa
+            aceptable para depurar, que es lo único para lo que sirve esta clase.
+          </li>
+          <li>
+            <strong>El orden en el que llegan los avisos</strong> es <code>RESET</code>, después un
+            <code>DEFRULE_FIRED</code> por regla, y al final <code>actionFired</code>. Si un turno llega al
+            siguiente <code>RESET</code> sin <code>actionFired</code>, es que no hubo ningún <code>ACTION</code>.
+          </li>
+        </ul>
+
+        <h3 class="label">Engancharla</h3>
+        <p>
+          Al motor que queráis mirar, y sólo a ese. Es lo que hace <code>VerPartida</code>, en el proyecto:
+        </p>
+<div class="codigo"><pre><code>MsPacMan pacman = <span class="k">new</span> MsPacMan();
+TrazaReglas traza = <span class="k">new</span> TrazaReglas(<span class="s">"MSPACMAN"</span>, pacman.getMotor(), <span class="k">true</span>);   <span class="c">// true: sólo los cambios</span>
+
+executor.runGame(pacman, <span class="k">new</span> GhostsAggressive(), <span class="n">40</span>);   <span class="c">// 40 ms por turno: más, para verlo despacio</span>
+traza.resumen();</code></pre></div>
+        <p>
+          Para un fantasma, lo mismo con su motor: <code>new TrazaReglas("PINKY", ghosts.getMotor(GHOST.PINKY),
+          true)</code>. Con <code>false</code> escribe todos los turnos; sirve para mirar un momento concreto, no
+          una partida entera.
+        </p>
+
+        <h3 class="label">Leerla</h3>
+        <p>Las primeras líneas de una partida de verdad, con las siete reglas y contra los agresivos:</p>
+<pre><code>[MSPACMAN] t=1  [comer] → gana comer "R1: no pasa nada"
+[MSPACMAN] t=116  [peligro, huir, comer] → gana huir "R4: hay peligro"
+           pierde comer (10) "R1: no pasa nada"
+[MSPACMAN] t=222  [sigueElPeligro, peligro, aLaPPill, huir, comer] → gana irAPPill "R5: la PPill está más cerca que él"
+           pierde huir (80) "R4: hay peligro"
+           pierde comer (10) "R1: no pasa nada"
+[MSPACMAN] t=224  [comer, cazar, rematar] → gana perseguir "R7: rematar a PINKY"
+           pierde comer (10) "R1: no pasa nada"
+           pierde perseguir (60) "R6: cazar a PINKY"
+[MSPACMAN] t=262  [comer] → gana comer "R1: no pasa nada"</code></pre>
+        <p>
+          Se lee como un diario de la partida. Come durante 115 turnos sin cambiar de idea. En el 116 aparece un
+          fantasma a menos de 20, se dispara <code>peligro</code>, que no aserta ningún <code>ACTION</code> pero sí
+          aparece en la lista, y <code>huir</code> le gana a <code>comer</code>. En el 222 tiene la píldora de poder
+          más cerca que el fantasma y va a por ella; dos turnos después se la ha comido, PINKY está comestible a
+          menos de 10, y <code>rematar</code> le gana a <code>cazar</code>, las dos con el mismo id pero distinta
+          razón. A los 262 no queda nada que hacer y vuelve a comer.
+        </p>
+        <p>
+          Entre corchetes van <strong>todas</strong> las reglas disparadas en ese turno, por orden. Es lo que no
+          da el observador del motor, y es lo que hace falta para ver un hecho intermedio, una regla que se dispara
+          sin que se note o una que se dispara cuando no debería.
+        </p>
+      </section>
+
+      <section id="resumen">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">El resumen: las reglas que no existen</h2>
+        </div>
+        <p>
+          Al final de la partida, <code>resumen()</code> cuenta cuántas veces se ha disparado cada regla del
+          fichero, también las que no se han disparado nunca, y cuántas veces ha ganado cada acción. Con las siete
+          reglas, tres partidas contra los agresivos:
+        </p>
+<pre><code>[MSPACMAN] 8727 turnos. Veces que se dispara cada regla:
+       40  aLaPPill
+      276  cazar
+     8727  comer
+     7260  huir
+     7260  peligro
+       85  rematar
+     7213  sigueElPeligro
+[MSPACMAN] Veces que gana cada acción:
+     1196  comer
+     7220  huir
+       40  irAPPill
+      271  perseguir</code></pre>
+        <p>
+          Esto ya dice mucho antes de medir nada. Contra estos rivales, Ms.&nbsp;Pac-Man pasa huyendo más de
+          cuatro de cada cinco turnos. Y <code>aLaPPill</code> se dispara 40 veces en 8&#8239;727 turnos, así que
+          ninguna medida va a notar si es buena o mala: es justo lo que salió al
+          <a href="reglas-paso-a-paso.html#paso4">medirla</a>.
+        </p>
+        <p>
+          Ahora el mismo resumen con un error de una letra: en <code>rematar</code>, <code>(comestible TRUE)</code>
+          en vez de <code>(comestible true)</code>. Java escribe <code>true</code> en minúsculas, y para Jess son dos
+          símbolos distintos:
+        </p>
+<pre><code>[MSPACMAN] 2182 turnos. Veces que se dispara cada regla:
+       20  aLaPPill
+      491  cazar
+     2182  comer
+      686  huir
+      686  peligro
+        0  rematar   &lt;-- NUNCA
+      657  sigueElPeligro</code></pre>
+        <p>
+          Sin el resumen, esa regla estaría en el fichero, contaría para las quince, y nadie se enteraría de que no
+          hace nada: el juego no da ningún error. <strong>Una regla que no se dispara en una partida entera no
+          existe</strong>, y lo primero que hay que hacer con ella es averiguar por qué.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Para el diario</span>
+          <p>
+            El resumen de cada versión, contra el rival que más os preocupa, es una tabla de diez líneas que dice
+            qué reglas trabajan y cuáles no. Pegadlo en el diario junto a las medidas: "esta regla se dispara 40
+            veces en tres partidas" explica muchos "no se nota".
+          </p>
+        </div>
+      </section>
+
+      <section id="ningun-action">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Cuando no gana nadie</h2>
+        </div>
+        <p>
+          Si en un turno ninguna regla aserta un <code>ACTION</code>, el <code>RuleEngine</code> devuelve
+          <code>MOVE.NEUTRAL</code> sin decir nada, y Ms.&nbsp;Pac-Man sigue recta o se queda quieta. La traza lo
+          avisa. Esto es lo que sale si se quita la regla <code>comer</code>:
+        </p>
+<pre><code>[MSPACMAN] t=1  NINGÚN ACTION: devuelve NEUTRAL. Reglas: []
+[MSPACMAN] t=2  NINGÚN ACTION: devuelve NEUTRAL. Reglas: []
+[MSPACMAN] t=3  NINGÚN ACTION: devuelve NEUTRAL. Reglas: []</code></pre>
+        <p>
+          La lista de reglas vacía dice que no se disparó ninguna, ni siquiera las intermedias. Las causas
+          habituales, por orden de frecuencia: no hay regla por defecto; los hechos no se han asertado (en la
+          consola, más arriba, habrá un <code>Exception assserting fact</code>); o el <code>.clp</code> no se ha
+          cargado entero (al arrancar, <code>Exception loading rules from file</code>).
+        </p>
+      </section>
+
+      <section id="sin-java">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Sin escribir Java</h2>
+        </div>
+        <p>
+          Si sólo queréis ver un momento qué se dispara, hay dos atajos que no necesitan ninguna clase:
+        </p>
+        <ul>
+          <li>
+            <strong><code>(watch rules)</code> en la primera línea del <code>.clp</code>.</strong> El
+            <code>RuleEngine</code> lo ejecuta al cargar el fichero, y desde entonces Jess escribe una línea
+            <code>FIRE</code> por cada regla disparada, en todos los turnos, hasta que lo quitéis. Está comprobado
+            con el motor de la asignatura: sobrevive a los <code>reset</code> de cada turno. Con
+            <code>(watch facts)</code> salen también los hechos que entran y salen. Escribe muchísimo: para una
+            partida corta, o para un fantasma solo.
+          </li>
+          <li>
+            <strong>La consola de Jess</strong>, con el <code>.clp</code> cargado y unos hechos de prueba, como se
+            cuenta en <a href="tema2/clips.html#probar-jess">CLIPS y Jess</a>. Es <code>ProbarReglas</code> a mano.
+          </li>
+        </ul>
+        <p>
+          Y en la wiki misma, el <a href="reglas-paso-a-paso.html#reglas">banco de pruebas</a> de la guía del
+          ejemplo ejecuta un <code>.clp</code> en el navegador y dice qué <code>ACTION</code> elegiría el motor.
+        </p>
+      </section>
+
+      <section id="errores">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Errores típicos de la práctica</h2>
+        </div>
+        <p>
+          Los de Jess con el paquete <code>rules</code> (plantillas que no coinciden, ids que no están en el mapa,
+          <code>TRUE</code> en mayúsculas, empates de <code>priority</code>) están en
+          <a href="tema2/reglas-mspacman.html#errores">los apuntes</a>. Estos son los que salieron montando el
+          ejemplo:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Lo que pasa</th><th scope="col">Por qué, y qué hacer</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Al medir muchas partidas a la vez, la media de una versión baja de golpe unos cientos de puntos de una tanda a otra, sin cambiar nada.</td>
+                <td>Jess no sabe leer dos <code>.clp</code> a la vez: si dos controladores se crean al mismo tiempo en hilos distintos, uno puede quedarse con media base de reglas (en la consola de errores sale <code>Bad value at token</code> y <code>Exception loading rules from file</code>). Pasa una de cada pocas tandas. Se evita creando cada <code>RuleEngine</code> en el constructor del controlador, nunca en <code>preCompute</code> ni en <code>getMove</code>, y creando los controladores de uno en uno, como hace <a href="comparar-versiones.html"><code>Comparar</code></a>.</td>
+              </tr>
+              <tr>
+                <td>Las reglas no ven ningún fantasma, y no sale ningún error.</td>
+                <td>Un atributo del <code>Input</code> inicializado en su declaración: se ejecuta después de <code>parseInput</code> y lo vacía. Está en <a href="reglas-paso-a-paso.html#hechos">la guía del ejemplo</a>.</td>
+              </tr>
+              <tr>
+                <td>Después de cambiar <code>grupoYY</code> por vuestra letra, nada se mueve.</td>
+                <td>Las rutas del <code>.clp</code> son cadenas de texto y el <span class="path">Refactor &gt; Rename</span> no las toca: <code>RULES_PATH</code> y <code>REGLAS</code>.</td>
+              </tr>
+              <tr>
+                <td>Una versión vieja deja de funcionar después de añadir un hecho nuevo al <code>Input</code>.</td>
+                <td>Su <code>.clp</code> no tiene la plantilla del hecho nuevo y Jess lo rechaza. Añadidle el <code>deftemplate</code>: no cambia lo que hacía, porque ninguna de sus reglas lo usa.</td>
+              </tr>
+              <tr>
+                <td>Una regla se dispara dos veces y su <code>ACTION</code> aparece sólo una.</td>
+                <td>No es un error: Jess no aserta dos hechos idénticos. Pasa con <code>PELIGRO</code> en el ejemplo, que lo concluyen dos reglas. Si necesitáis distinguirlos, que el <code>info</code> sea distinto.</td>
+              </tr>
+              <tr>
+                <td>Se dispara una regla con un <code>not</code> que no debería cumplirse.</td>
+                <td>Se disparó antes de que otra regla asertara el hecho que niega. Dad más <code>salience</code> a las reglas que concluyen hechos intermedios: <a href="reglas-paso-a-paso.html#paso5">el caso de cazar</a>.</td>
+              </tr>
+              <tr>
+                <td>Con <code>ProbarReglas</code> funciona y en el juego no.</td>
+                <td>Los hechos del caso no son los que aserta el <code>Input</code>. Copiad un turno de verdad del <code>ConsoleRuleEngineObserver</code> con <code>true</code>, que escribe todos los hechos, y usadlo como caso.</td>
+              </tr>
+              <tr>
+                <td>El concurso o <code>Comparar</code> van muy lentos y la consola no para.</td>
+                <td>Una <code>TrazaReglas</code>, un <code>ConsoleRuleEngineObserver</code> o un <code>(watch rules)</code> olvidado. Detrás de un <code>DEBUG</code> a <code>false</code>, o fuera antes de entregar.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Guías de la Práctica 3">
+        <a class="pager-prev" href="reglas-paso-a-paso.html"><span class="pager-l">Anterior</span><span class="pager-t">Siete reglas</span></a>
+        <a class="pager-next" href="comparar-versiones.html"><span class="pager-l">Siguiente</span><span class="pager-t">Comparar versiones</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#preguntas">Tres preguntas</a></li>
+            <li><a href="#probar">Probar sin jugar</a></li>
+            <li><a href="#traza">La traza</a></li>
+            <li><a href="#resumen">El resumen</a></li>
+            <li><a href="#ningun-action">Cuando no gana nadie</a></li>
+            <li><a href="#sin-java">Sin escribir Java</a></li>
+            <li><a href="#errores">Errores típicos</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">Práctica 3</h2>
+          <ol>
+            <li><a href="../practicas/practica-3.html"><span>00</span>El enunciado</a></li>
+            <li><a href="reglas-paso-a-paso.html"><span>01</span>Siete reglas</a></li>
+            <li><a href="depurar-reglas.html" aria-current="page"><span>02</span>Depurar reglas</a></li>
+            <li><a href="comparar-versiones.html"><span>03</span>Comparar versiones</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

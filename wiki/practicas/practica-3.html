@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 3 · Sistemas de reglas · ICI</title>
+<meta name="description" content="Enunciado de la Práctica 3: implementar con un sistema de reglas en Jess los comportamientos de Ms. Pac-Man y de los fantasmas, partiendo de un ejemplo guiado de siete reglas, depurando qué reglas se disparan y midiendo cada versión contra rivales fijos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <span>Práctica 3</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Sistemas de reglas
+      <span class="thin">Reglas que se ven disparar, y versiones que se miden contra los mismos rivales.</span>
+    </h1>
+    <p class="standfirst">
+      El objetivo de esta práctica es implementar los comportamientos de Ms.&nbsp;Pac-Man y de los fantasmas
+      mediante un <strong>sistema de reglas en CLIPS</strong>, ejecutado por Jess. Como en la Práctica&nbsp;2, lo
+      que más pesa es <strong>cómo llegáis</strong> al controlador final: saber qué reglas se disparan y por
+      qué, y saber si cada versión es mejor que la anterior, con números.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Entrega</dt>
+      <dd>1 de noviembre<small>Domingo, a través del Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Modalidad</dt>
+      <dd>Grupos de 2<small>Como en las prácticas anteriores</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Mínimo</dt>
+      <dd>15 reglas<small>Por comportamiento, y que se disparen</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Para empezar</dt>
+      <dd>Siete reglas<small>Un ejemplo guiado, con su proyecto</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="que-se-pide">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué se pide</h2>
+        </div>
+        <p>
+          Los dos controladores de siempre, <code>MsPacMan</code> y <code>Ghosts</code>, pero ahora cada uno decide
+          con reglas, usando el paquete <code>rules</code> del motor. Las piezas son cuatro:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Pieza</th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Los hechos</strong></td><td>Una clase que extiende <code>RulesInput</code> y en cada turno convierte el juego en hechos de CLIPS. Seguramente, muchos coinciden con las entradas de vuestra máquina de estados de la Práctica&nbsp;2.</td></tr>
+              <tr><td><strong>Las plantillas</strong></td><td>Los <code>deftemplate</code> de esos hechos, en un fichero <code>.clp</code>, y el del hecho de salida <code>ACTION</code>.</td></tr>
+              <tr><td><strong>Las reglas</strong></td><td>En el mismo <code>.clp</code>. Razonan sobre los hechos y asertan uno o varios <code>ACTION</code>, cada uno con el id de la acción que proponen y su <code>priority</code>.</td></tr>
+              <tr><td><strong>Las acciones</strong></td><td>Clases que implementan <code>RulesAction</code>. El motor ejecuta la del <code>ACTION</code> de más prioridad.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Antes de empezar</span>
+          <p>
+            Leed <a href="../guias/tema2/reglas-mspacman.html"><strong>Reglas en Ms.&nbsp;Pac-Man</strong></a>, en
+            los apuntes del tema 2: el paquete <code>rules</code> pieza a pieza. Y después haced entera la guía
+            <a href="../guias/reglas-paso-a-paso.html"><strong>Ms.&nbsp;Pac-Man con siete reglas</strong></a>, con
+            su proyecto descargado y abierto: es el punto de partida de la práctica. Lo que hicisteis en la
+            Práctica&nbsp;2 tampoco se tira: vuestras acciones son casi <code>RulesAction</code> tal cual, y vuestras
+            transiciones, condiciones de reglas.
+          </p>
+        </div>
+        <h3 class="label">Las tres guías de la práctica</h3>
+        <ul class="links">
+          <li>
+            <a href="../guias/reglas-paso-a-paso.html">
+              <span class="lt">Ms.&nbsp;Pac-Man con siete reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · el ejemplo</span>
+              <span class="ld">
+                Un controlador de reglas montado de una regla a siete, con lo que cambió cada paso medido contra los
+                rivales de referencia. Después, cómo seguir con Ms.&nbsp;Pac-Man y el esqueleto de los fantasmas.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="../guias/depurar-reglas.html">
+              <span class="lt">Depurar reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · la traza</span>
+              <span class="ld">
+                Probar reglas sin jugar con casos escritos a mano, y una traza que dice en cada turno qué reglas se
+                han disparado, qué acción ha ganado y cuáles no se disparan nunca.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="../guias/comparar-versiones.html">
+              <span class="lt">Comparar versiones<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · el banco</span>
+              <span class="ld">
+                Un banco que juega cada versión contra los rivales de referencia, con la métrica que elijáis, y
+                dice si la diferencia es real, rival a rival y en media.
+              </span>
+            </a>
+          </li>
+        </ul>
+        <h3 class="label">Reglas de simulación</h3>
+        <p>
+          Las de las prácticas anteriores: <strong>sin visibilidad parcial</strong> y con el <strong>tiempo de
+          razonamiento por defecto (40&nbsp;ms)</strong>. Jess es más lento que el código a mano, pero no tanto: el
+          ejemplo de siete reglas gasta unos 40&nbsp;ms <em>por partida</em>, no por turno.
+        </p>
+      </section>
+
+      <section id="evaluacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Cómo se evalúa</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Se mira</th><th scope="col">En concreto</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>El proceso</strong></td>
+                <td>Que haya varias versiones, que cada una esté medida contra la anterior con los mismos rivales, que se vea en el diario cómo depurasteis las reglas (casos que fallaban, reglas que no se disparaban) y que la versión elegida salga de las medidas. Es lo que más pesa.</td>
+              </tr>
+              <tr>
+                <td><strong>Las reglas</strong></td>
+                <td>El número de plantillas, reglas y acciones, y su complejidad. Hacen falta <strong>al menos 15 reglas por comportamiento</strong>, Ms.&nbsp;Pac-Man por un lado y fantasmas por otro, y sólo cuentan las que <strong>se disparan</strong>: una regla que en una partida entera no se dispara nunca no hace nada. El resumen de la <a href="../guias/depurar-reglas.html#resumen">traza</a> lo dice.</td>
+              </tr>
+              <tr>
+                <td><strong>El rendimiento</strong></td>
+                <td>Cómo juega la versión que elijáis, contra rivales de referencia y contra los demás grupos en el concurso. <a href="../guias/competicion.html">Cómo se juega</a>, en la guía.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Los cuatro fantasmas cuentan una vez</span>
+          <p>
+            Si los cuatro usan la misma base de reglas, o cuatro <code>.clp</code> que son copias cambiando el nombre
+            del fantasma, cuentan una vez. Si cada uno tiene reglas propias, cuentan las de cada uno. Las dos formas
+            de organizarlo están en <a href="../guias/reglas-paso-a-paso.html#seguir-fantasmas">Seguir con los
+            fantasmas</a>.
+          </p>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Quince reglas que hagan algo</span>
+          <p>
+            No sirve copiar una regla cambiando un número. La complejidad que se valora es la que aprovecha lo que
+            tiene un sistema de reglas: hechos intermedios que encadenan reglas, memoria entre turnos,
+            <code>not</code>, variables que relacionan varios hechos, acciones con parámetros. Todo eso aparece en
+            el ejemplo guiado, con su porqué.
+          </p>
+        </div>
+      </section>
+
+      <section id="como-trabajar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Cómo trabajar</h2>
+        </div>
+        <p>
+          Igual que en la segunda semana de la Práctica&nbsp;2: un bucle, y cada vuelta deja una versión. Lo nuevo
+          es que ahora tenéis herramientas para ver qué hacen las reglas y para comparar sin hacer cuentas a mano.
+        </p>
+        <div class="step">
+          <span class="step-num">0</span>
+          <div class="step-body">
+            <h3 class="label">Arrancad con el ejemplo</h3>
+            <p>
+              Descargad <a href="../recursos/ICI-Practica3.zip" download><code>ICI-Practica3.zip</code></a>: es el
+              <a href="../guias/reglas-paso-a-paso.html#proyecto">proyecto del ejemplo guiado</a>, con los rivales de
+              referencia dentro. Importadlo y ejecutad sus tres programas: <code>VerPartida</code>,
+              <code>ProbarReglas</code> y <code>Comparar</code>. Si los tres funcionan, el entorno está listo. Poned vuestra letra en el paquete y
+              cambiad a mano las rutas de los <code>.clp</code>, que son texto.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Vuestros hechos y vuestras acciones</h3>
+            <p>
+              Qué tiene que saber cada personaje para decidir, como hechos calculados en Java, y qué sabe hacer, como
+              acciones. Partid de vuestra Práctica&nbsp;2: el <code>Input</code> y las acciones de la máquina de
+              estados se adaptan casi sin cambios. Lo que necesite caminos o bucles, en Java; las reglas sólo
+              comparan.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">v0: una base pequeña que funcione</h3>
+            <p>
+              Pocas reglas, como las del ejemplo: una por defecto, una para sobrevivir, una para aprovechar algo.
+              Cada una con su caso en <a href="../guias/depurar-reglas.html#probar"><code>ProbarReglas</code></a>
+              desde el principio.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Fijad las métricas, y medid la v0</h3>
+            <p>
+              Los rivales ya vienen: <a href="../guias/comparar-versiones.html#rivales">cinco fantasmas y tres
+              Ms.&nbsp;Pac-Man de referencia</a>, los mismos para todos los grupos. Si queréis añadir más (vuestros
+              controladores de la Práctica&nbsp;2, por ejemplo), ahora, y ya no se cambian hasta el final. Elegid las métricas,
+              además de los puntos, y dejad las partidas en 300. Con eso,
+              <a href="../guias/comparar-versiones.html"><code>Comparar</code></a> mide la <code>v0</code>, y todo
+              queda apuntado arriba del diario.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Mirad qué hacen las reglas</h3>
+            <p>
+              Con la <a href="../guias/depurar-reglas.html#traza">traza</a> enganchada: qué regla gana cuando las cosas
+              salen mal, cuáles no se disparan nunca, cuál se lleva casi todos los turnos. Apuntad en una o dos líneas
+              el problema y por qué creéis que pasa.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Una versión nueva, con un solo cambio</h3>
+            <p>
+              Un <code>.clp</code> nuevo (y clases nuevas si hacen falta), sin tocar el anterior. Su caso nuevo en
+              <code>ProbarReglas</code>, con todos los viejos en <code>BIEN</code>. Comprobad en la traza que la regla
+              nueva se dispara, y medid contra la anterior. Se queda o se descarta, y por qué, en el diario. Y vuelta
+              al paso 4.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">6</span>
+          <div class="step-body">
+            <h3 class="label">Elegir para el concurso</h3>
+            <p>
+              Con qué versión os quedáis, de Ms.&nbsp;Pac-Man y de fantasmas, y por qué. No tiene por qué ser la
+              última: en el ejemplo guiado, la buena es la de seis reglas, porque la séptima no cambia nada medible.
+            </p>
+          </div>
+        </div>
+        <p>
+          Los fantasmas siguen el mismo bucle, con <code>COMPARO_FANTASMAS = true</code> en <code>Comparar</code>:
+          entonces juegan contra las tres Ms.&nbsp;Pac-Man de referencia, más las que añadáis. Cómo organizar las versiones
+          en el paquete está en <a href="../guias/reglas-paso-a-paso.html#versiones">la guía del ejemplo</a>: con
+          reglas, normalmente basta un <code>.clp</code> por versión.
+        </p>
+      </section>
+
+      <section id="significativa">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">¿La mejora es real?</h2>
+        </div>
+        <p>
+          La cuenta es la de la <a href="practica-2.html#significativa">Práctica&nbsp;2</a>, y ahora la hace
+          <code>Comparar</code> por vosotros, contra cada rival y en media:
+        </p>
+<pre><code>D      = media nueva − media vieja
+ET_D   = √(ET_nueva² + ET_vieja²)
+real   si |D| &gt; 2 · ET_D</code></pre>
+        <p>
+          La fila de la media trata a todos los rivales por igual, y con los cinco de referencia su error típico es
+          algo más de dos veces menor que el de cada rival, así que ve mejoras que ninguna fila por separado ve. Dos avisos, que
+          salieron midiendo el ejemplo y están explicados en
+          <a href="../guias/comparar-versiones.html#dudas">Cuando la media y los rivales no dicen lo mismo</a>:
+        </p>
+        <ul>
+          <li>
+            <strong>Con cinco rivales, casi una de cada cuatro tablas trae un veredicto falso</strong> en algún rival.
+            Un <code>mejor</code> o un <code>peor</code> suelto, con el resto en <code>ruido</code>, no se cree hasta
+            que se repite.
+          </li>
+          <li>
+            <strong>Si la media pasa el umbral, y sobre todo si es por poco, repetid</strong> con otra
+            <code>SEMILLA</code>. Si no se sostiene, era ruido: en el ejemplo pasó una vez, con −117 y un umbral de
+            75.
+          </li>
+        </ul>
+      </section>
+
+      <section id="diario">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">El diario de desarrollo</h2>
+        </div>
+        <p>
+          Como el de la <a href="practica-2.html#diario">Práctica&nbsp;2</a>: un solo <code>diario.md</code>, escrito
+          <strong>mientras</strong> trabajáis, con entradas cortas y con fecha. Arriba, los integrantes, los rivales,
+          las partidas, las métricas y qué versiones van al concurso. En cada versión:
+        </p>
+        <ul>
+          <li><strong>Qué cambia y por qué</strong>, en una o dos líneas: el problema que visteis y el cambio que lo ataca.</li>
+          <li><strong>Los casos nuevos</strong> de <code>ProbarReglas</code>, o el que fallaba y cómo se arregló.</li>
+          <li><strong>La fila de la media</strong> de cada métrica y el recuento de rivales, tal cual los saca <code>Comparar</code>.</li>
+          <li><strong>El resumen de la traza</strong> cuando diga algo: una regla a 0, una que casi no se dispara, una acción que se lleva casi todos los turnos.</li>
+          <li><strong>Si usáis IA, el <em>prompt</em></strong>, tal cual, y qué cambiasteis vosotros. Con la regla que ya sabéis escribir decidida antes de pedirla, como en la <a href="practica-2.html#diario">Práctica&nbsp;2</a>.</li>
+        </ul>
+        <h3 class="label">Un diario de ejemplo</h3>
+        <p>
+          El del ejemplo guiado, con sus cifras de verdad, y sólo la parte de Ms.&nbsp;Pac-Man. Así de corto:
+        </p>
+<pre><code># Diario · Práctica 3 · grupo YY
+Integrantes: …
+Concurso: MsPacMan con mspacman-v0.clp (6 reglas). Ghosts con ghosts-v1.clp.
+Rivales: los de referencia. 300 partidas por rival. Métricas: puntos,
+turnos por vida, fantasmas comidos.
+
+## lun 19 oct · comer + peligro + huir (3 reglas)
+PELIGRO como hecho intermedio: lo van a usar varias reglas.
+  turnos/vida  332 → 470  mejor
+  puntos       ruido
+Vive más pero no puntúa más: huyendo no come.
+
+## lun 19 oct · + sigueElPeligro (histéresis)
+Salía peor en todo (−117, umbral 75). Repetida: ruido. Falsa alarma.
+
+## mar 20 oct · + aLaPPill
+Ruido. Traza: 40 disparos en 3 partidas. Casi nunca se cumple.
+
+## mar 20 oct · + cazar (6 reglas) → v0
+Caso "comestible a 30 y peligroso a 15" fallaba: cazar se disparaba
+antes que peligro. salience 10 en las reglas de PELIGRO. BIEN.
+  puntos  2144 → 2930  D = +786, 2·ET_D = 105  → mejor (5 de 5)
+
+## mié 21 oct · + rematar (7 reglas) → v1
+Ruido, también repitiendo con otras semillas. Al concurso va v0.</code></pre>
+        <p>
+          Están el porqué de cada regla, un caso que falló y cómo se arregló, la traza explicando un "no se nota",
+          una falsa alarma deshecha repitiendo y una versión descartada. Eso es lo que se pide.
+        </p>
+      </section>
+
+      <section id="lista">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">La lista del proceso</h2>
+        </div>
+        <p>
+          Para ir tachando. Las casillas se quedan guardadas en este navegador, y la del bucle se puede desmarcar
+          entera cada vez que empezáis una versión nueva.
+        </p>
+
+        <h3 class="label">Una vez · arrancar</h3>
+        <ul class="check" data-guardar="p3-base">
+          <li><code>ICI-Practica3.zip</code> importado, y <code>VerPartida</code>, <code>ProbarReglas</code> y <code>Comparar</code> funcionando.</li>
+          <li>El paquete con vuestra letra, y <code>RULES_PATH</code> y <code>REGLAS</code> cambiados a mano.</li>
+          <li>Los hechos y las acciones de cada personaje, partiendo de la Práctica&nbsp;2.</li>
+          <li>Decidido si añadís rivales a los de referencia, y apuntado en el diario.</li>
+          <li>Fijado el número de partidas y elegidas las métricas, además de los puntos.</li>
+          <li>La <code>v0</code> de cada controlador, con un caso en <code>ProbarReglas</code> por regla, medida contra todos.</li>
+        </ul>
+
+        <h3 class="label">Cada versión · el bucle</h3>
+        <ul class="check" data-guardar="p3-bucle" data-reiniciar>
+          <li>Mirado con la traza qué regla gana cuando sale mal, y cuáles no se disparan.</li>
+          <li>Escrito en una o dos líneas el problema y por qué creéis que pasa.</li>
+          <li>Decidido <strong>un</strong> cambio, y escrito antes de programarlo.</li>
+          <li>Si hubo IA, el <em>prompt</em> está en el diario.</li>
+          <li>Versión nueva en su propio <code>.clp</code>, sin tocar la anterior.</li>
+          <li>Su caso nuevo en <code>ProbarReglas</code>, y todos los casos en <code>BIEN</code>.</li>
+          <li>En el resumen de la traza, ninguna regla nueva a 0.</li>
+          <li>Medida con <code>Comparar</code> contra los mismos rivales y las mismas partidas.</li>
+          <li>Si la media pasa el umbral por poco, repetida con otra semilla.</li>
+          <li>Entrada del diario cerrada: se queda o se descarta, y por qué.</li>
+        </ul>
+
+        <h3 class="label">Para el domingo 1 · el cierre</h3>
+        <ul class="check" data-guardar="p3-cierre">
+          <li>Al menos 15 reglas por comportamiento en las versiones elegidas, y todas se disparan.</li>
+          <li>En dos líneas, qué versiones van al concurso y por qué.</li>
+          <li><code>MsPacMan()</code> y <code>Ghosts()</code>, sin argumentos, cargan esas versiones.</li>
+          <li>Pasada la lista de <a href="#entrega">antes de subir el zip</a>.</li>
+        </ul>
+      </section>
+
+      <section id="entrega">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Reglas de entrega</h2>
+        </div>
+        <p>
+          Esta práctica se desarrolla en <strong>grupos de 2 estudiantes</strong>, y se entrega en una tarea del
+          Campus Virtual antes del <strong>domingo 1 de noviembre</strong>:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Qué</th><th scope="col">Cómo exactamente</th></tr></thead>
+            <tbody>
+              <tr><td>Archivo</td><td><code>practica3-grupoYY.zip</code>, donde <code>YY</code> es la letra de vuestro grupo.</td></tr>
+              <tr><td>Paquete</td><td><code>es.ucm.fdi.ici.c2627.practica3.grupoYY</code></td></tr>
+              <tr><td>Controladores a concurso</td><td><code>MsPacMan</code> y <code>Ghosts</code>. Su constructor sin argumentos carga la versión elegida.</td></tr>
+              <tr><td>Nombres</td><td>Es requisito imprescindible dar nombre al equipo y a cada comportamiento con <code>setName</code> y <code>setTeam</code>.</td></tr>
+              <tr><td>Reglas</td><td>Los <code>.clp</code> de todas las versiones, dentro del paquete, junto a las clases.</td></tr>
+              <tr><td>Raíz del zip</td><td>La carpeta <code>es</code>, comprimiendo desde la raíz del código fuente, y a su lado el <code>diario.md</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">No se modifica el simulador</span>
+          <p>
+            Obviamente no se permite modificar el código del simulador, ni tampoco el paquete <code>rules</code>.
+            Por lo tanto, la entrega <strong>no debe contener el código del simulador</strong> (paquete
+            <code>pacman.*</code>). Cumpliendo esto, podéis crear los paquetes y clases que queráis.
+          </p>
+        </div>
+        <p>
+          Todas las prácticas serán comprobadas para la detección de plagios.
+        </p>
+
+        <h3 class="label">Antes de subir el zip</h3>
+        <ul class="check" data-guardar="p3-zip">
+          <li>El paquete es <code>es.ucm.fdi.ici.c2627.practica3.grupoYY</code>, con vuestra letra, y las rutas de los <code>.clp</code> también.</li>
+          <li>Al abrir el zip, los <code>.clp</code> están dentro del paquete, al lado de las clases.</li>
+          <li><code>setName</code> y <code>setTeam</code> llevan el nombre de vuestro grupo, en los dos controladores.</li>
+          <li>Cada <code>RuleEngine</code> se crea en el constructor del controlador, no en <code>preCompute</code> ni en <code>getMove</code>.</li>
+          <li>Ninguna <code>TrazaReglas</code>, <code>ConsoleRuleEngineObserver</code> ni <code>(watch …)</code> activos.</li>
+          <li>No hay estado en atributos <code>static</code>.</li>
+          <li>Todo compila en un proyecto limpio que sólo referencia a <code>MsPacManEngine</code>.</li>
+          <li>Una pasada de <code>Comparar</code> con las versiones elegidas termina sin ningún <code>OJO</code> y sin <code>Exception</code> en la consola.</li>
+          <li>Al abrir el zip aparecen <code>es/</code> y <code>diario.md</code> en la raíz, y ni un archivo de <code>pacman.*</code>.</li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#que-se-pide">Qué se pide</a></li>
+            <li><a href="#evaluacion">Cómo se evalúa</a></li>
+            <li><a href="#como-trabajar">Cómo trabajar</a></li>
+            <li><a href="#significativa">¿La mejora es real?</a></li>
+            <li><a href="#diario">El diario</a></li>
+            <li><a href="#lista">La lista del proceso</a></li>
+            <li><a href="#entrega">Reglas de entrega</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">Las guías</h2>
+          <ol>
+            <li><a href="../guias/reglas-paso-a-paso.html"><span>01</span>Siete reglas</a></li>
+            <li><a href="../guias/depurar-reglas.html"><span>02</span>Depurar reglas</a></li>
+            <li><a href="../guias/comparar-versiones.html"><span>03</span>Comparar versiones</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El tema</span>
+          <p style="margin:0">
+            <a href="../guias/tema2/index.html">Sistemas de reglas</a>: hechos, encadenamiento, conflictos, Rete y
+            Jess, con bancos de pruebas en la página.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Dudas</span>
+          <p style="margin:0">
+            <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a>. Mejor preguntar con la traza en la mano que con
+            "no se mueve".
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

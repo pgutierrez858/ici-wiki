@@ -1,0 +1,38 @@
+;;; Los cuatro fantasmas con la misma base de reglas: la v1, con G3
+
+;; ---- Los hechos que aserta GhostsInput, iguales para los cuatro ---------
+(deftemplate FANTASMA
+   (slot nombre     (type SYMBOL))
+   (slot comestible (type SYMBOL))
+   (slot enCarcel   (type SYMBOL))
+   (slot distPacman (type NUMBER)))    ; lo que tarda en llegar a ella; 1000 en la cárcel
+
+(deftemplate MSPACMAN
+   (slot distPPill (type NUMBER)))     ; de Ms. Pac-Man a su PPill más cercana
+
+;; ---- Y uno más, distinto en cada motor: quién soy yo --------------------
+(deftemplate YO (slot nombre (type SYMBOL)))
+
+(deftemplate ACTION
+   (slot id) (slot info (default "")) (slot priority (type NUMBER)))
+
+;; G1 · si no soy comestible, perseguir
+(defrule perseguir
+   (YO (nombre ?yo))
+   (FANTASMA (nombre ?yo) (comestible false))
+   =>
+   (assert (ACTION (id perseguir) (info "G1: no soy comestible") (priority 10))))
+
+;; G2 · si soy comestible, huir
+(defrule huirComestible
+   (YO (nombre ?yo))
+   (FANTASMA (nombre ?yo) (comestible true))
+   =>
+   (assert (ACTION (id huir) (info "G2: soy comestible") (priority 50))))
+
+;; G3 · si Ms. Pac-Man está junto a una píldora de poder, no acercarse
+(defrule huirDeLaPPill
+   (MSPACMAN (distPPill ?d&:(< ?d 15)))
+   =>
+   (assert (ACTION (id huir) (priority 40)
+                   (info "G3: Ms. Pac-Man junto a una PPill"))))

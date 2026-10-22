@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Comparar versiones · Guías · ICI</title>
+<meta name="description" content="Un banco de pruebas para saber si una versión de un controlador es mejor que otra contra un conjunto fijo de rivales, rival a rival y en media, con la métrica que elijáis: el código entero, cómo leer su salida con un ejemplo real y las trampas de medir en paralelo.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Comparar versiones</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Comparar versiones
+      <span class="thin">¿Es mejor la nueva que la vieja, contra los mismos rivales y en media?</span>
+    </h1>
+    <p class="standfirst">
+      Tenéis dos versiones de Ms.&nbsp;Pac-Man y un conjunto fijo de fantasmas rivales, y queréis saber si la
+      segunda es mejor que la primera contra esos rivales, en media, con la métrica que hayáis decidido. Esta guía da el
+      programa que lo contesta, explica su salida con un caso real y cuenta las trampas que aparecen al medir
+      miles de partidas en paralelo. Sirve igual para comparar fantasmas, y para cualquier práctica con
+      Ms.&nbsp;Pac-Man.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="pregunta">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Lo que hace falta para poder comparar</h2>
+        </div>
+        <p>
+          Que una versión saque más puntos que otra no quiere decir nada si no se jugaron en las mismas
+          condiciones. Para que la comparación valga, tres cosas tienen que quedarse fijas de una versión a la
+          siguiente, y apuntadas en el diario:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Fijo</th><th scope="col">Por qué</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Los rivales</strong></td><td>Una versión que gana a los aleatorios y pierde con los agresivos no es mejor ni peor: es distinta. Si cambiáis de rivales a mitad, las versiones de antes y las de después dejan de poder compararse.</td></tr>
+              <tr><td><strong>Las partidas</strong></td><td>El mismo número por rival, y las mismas semillas: la partida 17 contra Blinky empieza igual para las dos versiones.</td></tr>
+              <tr><td><strong>La métrica</strong></td><td>Decidida antes de medir. Si se elige después de ver los resultados, siempre hay alguna que sale mejor.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Y una cuarta que no se fija, se calcula: <strong>el ruido</strong>. Dos tandas de partidas con el mismo
+          controlador nunca dan la misma media. La cuenta para saber si una diferencia es más grande que el ruido es
+          la de la <a href="../practicas/practica-2.html#significativa">Práctica&nbsp;2</a>, explicada desde el
+          principio en <a href="competicion.html#medir">Medir: la media y el error típico</a>. Aquí se hace sola.
+        </p>
+      </section>
+
+      <section id="archivos">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Dónde está</h2>
+        </div>
+        <p>
+          En el proyecto de la Práctica&nbsp;3, <a href="../recursos/ICI-Practica3.zip" download><code>ICI-Practica3.zip</code></a>,
+          ya configurado: tres archivos en la raíz de <code>src</code> y los rivales compilados en <code>lib/</code>. Cómo se
+          importa está en <a href="reglas-paso-a-paso.html#proyecto">la guía del ejemplo</a>. Aquí están sueltos,
+          para leerlos o para llevarlos a otro proyecto:
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../recursos/p3/src/Comparar.java" download>
+              <span class="lt"><code>Comparar.java</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">El <code>main</code></span>
+              <span class="ld">
+                Juega cada versión contra cada rival, en paralelo, con las mismas semillas; compara cada versión con
+                la anterior rival a rival y en media, y dice si la diferencia es real.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="../recursos/p3/src/Metrica.java" download>
+              <span class="lt"><code>Metrica.java</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Qué se mide</span>
+              <span class="ld">
+                Puntos, nivel, fantasmas comidos, vidas perdidas y turnos por vida, ya hechas. Copiad una para hacer
+                la vuestra.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="../recursos/p3/src/Rivales.java" download>
+              <span class="lt"><code>Rivales.java</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Los de referencia</span>
+              <span class="ld">
+                Los cinco fantasmas y las tres Ms.&nbsp;Pac-Man de referencia. Necesita los jar de <code>lib/</code>,
+                que vienen en el proyecto.
+              </span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="configurar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Configurarlo</h2>
+        </div>
+        <p>
+          Todo lo que se cambia está arriba del todo, en <code>Comparar.java</code>. Así viene:
+        </p>
+<div class="codigo"><pre><code><span class="k">static final boolean</span> COMPARO_FANTASMAS = <span class="k">false</span>;  <span class="c">// false: vuestras Ms. Pac-Man contra RIVALES_FANTASMAS</span>
+                                                 <span class="c">// true:  vuestros fantasmas contra RIVALES_PACMANS</span>
+
+<span class="c">// ---- 1. Vuestras versiones, en orden: cada una contra la anterior -------</span>
+<span class="k">static final</span> Map&lt;String, Supplier&lt;PacmanController&gt;&gt; MIS_PACMANS = <span class="k">new</span> LinkedHashMap&lt;&gt;();
+<span class="k">static final</span> Map&lt;String, Supplier&lt;GhostController&gt;&gt; MIS_FANTASMAS = <span class="k">new</span> LinkedHashMap&lt;&gt;();
+
+<span class="c">// ---- 2. Los rivales: los de referencia (Rivales.java), y los que añadáis</span>
+<span class="k">static final</span> Map&lt;String, Supplier&lt;GhostController&gt;&gt; RIVALES_FANTASMAS = Rivales.fantasmas();
+<span class="k">static final</span> Map&lt;String, Supplier&lt;PacmanController&gt;&gt; RIVALES_PACMANS = Rivales.pacmans();
+
+<span class="k">static</span> {
+    MIS_PACMANS.put(<span class="s">"v0"</span>, () -&gt; <span class="k">new</span> MsPacMan(<span class="s">"mspacman-v0.clp"</span>));     <span class="c">// las seis primeras reglas</span>
+    MIS_PACMANS.put(<span class="s">"v1"</span>, () -&gt; <span class="k">new</span> MsPacMan(<span class="s">"mspacman-v1.clp"</span>));     <span class="c">// con rematar</span>
+
+    MIS_FANTASMAS.put(<span class="s">"v0"</span>, () -&gt; <span class="k">new</span> Ghosts(<span class="s">"ghosts-v0.clp"</span>));       <span class="c">// G1 y G2</span>
+    MIS_FANTASMAS.put(<span class="s">"v1"</span>, () -&gt; <span class="k">new</span> Ghosts(<span class="s">"ghosts-v1.clp"</span>));       <span class="c">// con G3</span>
+
+    <span class="c">// Si queréis más rivales, aquí, y desde el principio: los mismos para todas las versiones.</span>
+    <span class="c">// RIVALES_FANTASMAS.put("P2 nuestros", es.ucm.fdi.ici.c2627.practica2.grupoYY.Ghosts::new);</span>
+    <span class="c">// RIVALES_PACMANS.put("P2 nuestra", es.ucm.fdi.ici.c2627.practica2.grupoYY.MsPacMan::new);</span>
+}
+
+<span class="c">// ---- 3. Cómo se mide ----------------------------------------------------</span>
+<span class="k">static final</span> List&lt;Supplier&lt;Metrica&gt;&gt; METRICAS = List.of(
+        Metrica::puntos, Metrica::turnosPorVida, Metrica::fantasmasComidos);
+
+<span class="k">static final int</span> PARTIDAS = <span class="n">300</span>;          <span class="c">// por versión y rival; no lo cambiéis entre versiones</span>
+<span class="k">static final long</span> SEMILLA = <span class="n">1</span>;            <span class="c">// la partida i usa la semilla SEMILLA + i</span>
+<span class="k">static final int</span> LIMITE_TURNOS = <span class="n">4000</span>;    <span class="c">// el mismo que el Executor</span>
+<span class="k">static final int</span> HILOS = Runtime.getRuntime().availableProcessors();</code></pre></div>
+        <ul>
+          <li>
+            <strong>Vuestras versiones van en orden</strong>, y cada una se compara con la anterior: con
+            <code>v0</code>, <code>v1</code> y <code>v2</code> salen dos tablas por métrica, <code>v1</code> frente a
+            <code>v0</code> y <code>v2</code> frente a <code>v1</code>.
+          </li>
+          <li>
+            <strong>Cada controlador va como una receta</strong>, no como un objeto: <code>GhostsRandom::new</code>,
+            o <code>() -&gt; new MsPacMan("mspacman-v2.clp")</code> si el constructor lleva argumentos. El programa
+            crea controladores nuevos para cada bloque de 25 partidas, y así cada hilo tiene los suyos.
+          </li>
+          <li>
+            <strong>Para medir los fantasmas</strong>, <code>COMPARO_FANTASMAS = true</code>: entonces juegan
+            vuestros fantasmas contra las Ms.&nbsp;Pac-Man de referencia. Las métricas se dan la vuelta solas: en
+            puntos, para los fantasmas, menos es mejor.
+          </li>
+        </ul>
+
+        <h3 class="label" id="rivales">Los rivales de referencia</h3>
+        <p>
+          Cinco fantasmas y tres Ms.&nbsp;Pac-Man, de flojos a muy fuertes, y los mismos para todos los grupos: así
+          vuestras medidas se pueden comparar con las de los demás y con las de estas guías. Están en <code>Rivales.java</code>, y no
+          conviene tocarlos. Junto a cada uno, lo que sacó contra el ejemplo de la wiki (la <code>v0</code> del
+          otro lado, 300 partidas), para que os hagáis una idea de su fuerza. Están ordenados de más flojo a más
+          fuerte:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Fantasma</th><th scope="col">De dónde sale</th><th scope="col">Puntos que encaja</th></tr></thead>
+            <tbody>
+              <tr><td><code>Random</code></td><td>Práctica&nbsp;0</td><td>4&#8239;368</td></tr>
+              <tr><td><code>Aggressive</code></td><td>Práctica&nbsp;0</td><td>3&#8239;868</td></tr>
+              <tr><td><code>Basico</code></td><td>rivales de la Práctica&nbsp;1</td><td>2&#8239;432</td></tr>
+              <tr><td><code>Intermedio</code></td><td>rivales de la Práctica&nbsp;1</td><td>2&#8239;273</td></tr>
+              <tr><td><code>Avanzado</code></td><td>rivales de la Práctica&nbsp;1</td><td>1&#8239;781</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Ms.&nbsp;Pac-Man</th><th scope="col">De dónde sale</th><th scope="col">Puntos que hace</th></tr></thead>
+            <tbody>
+              <tr><td><code>Intermedio</code></td><td>rivales de la Práctica&nbsp;1</td><td>2&#8239;155</td></tr>
+              <tr><td><code>Basico</code></td><td>rivales de la Práctica&nbsp;1</td><td>2&#8239;561</td></tr>
+              <tr><td><code>Avanzado</code></td><td>rivales de la Práctica&nbsp;1</td><td>12&#8239;829</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Los de la Práctica&nbsp;0 vienen como código en el proyecto, y los tres rivales de la Práctica&nbsp;1,
+          compilados en <code>lib/</code>, los mismos que se dieron entonces.
+        </p>
+        <h3 class="label">Añadir los vuestros</h3>
+        <p>
+          Si queréis medir también contra otros, se añaden en el bloque <code>static</code>, como en las líneas
+          comentadas, <strong>desde la primera versión</strong>: si un rival entra a mitad, las versiones de antes y
+          las de después dejan de poder compararse. Buenos candidatos:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Rival</th><th scope="col">Cómo se añade</th></tr></thead>
+            <tbody>
+              <tr><td>Los vuestros de prácticas anteriores</td><td>Copiad su paquete al proyecto, o añadid el proyecto entero en <span class="path">Properties &gt; Java Build Path &gt; Projects &gt; Add</span>. Después, una línea <code>put</code> con el nombre completo de la clase.</td></tr>
+              <tr><td>Vuestro otro lado</td><td>Vuestros fantasmas de esta práctica como rivales de vuestra Ms.&nbsp;Pac-Man, y al revés: los dos conocen las mismas debilidades.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Por qué varios</span>
+          <p>
+            Cada rival más cuesta otras 300 partidas por versión, pero la media de varios tiene un error típico más
+            pequeño que el de cada uno: con los cinco fantasmas de referencia, algo más de dos veces menor
+            (√5&nbsp;≈&nbsp;2,2). Así detecta mejoras que ningún rival por separado detecta, y es más difícil afinar
+            el controlador contra uno solo sin darse cuenta.
+          </p>
+        </div>
+      </section>
+
+      <section id="leer">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Leer la salida</h2>
+        </div>
+        <p>
+          Una tabla por métrica y por pareja de versiones. Esta es real: el paso&nbsp;5 del
+          <a href="reglas-paso-a-paso.html#paso5">ejemplo de las siete reglas</a>, cuando se añadió la regla
+          <code>cazar</code>, frente al paso&nbsp;4, contra los cinco fantasmas de referencia y 300 partidas por
+          rival:
+        </p>
+<pre><code>== puntos: 5 frente a 4 (más es mejor) ==
+rival                         4                5         D   2·ET_D
+Random                3462 ± 92       4246 ± 129      +785      317  mejor
+Aggressive            2285 ± 63       3628 ± 138     +1343      303  mejor
+Basico                1787 ± 42        2462 ± 79      +675      179  mejor
+Intermedio            1720 ± 45        2468 ± 88      +748      198  mejor
+Avanzado              1466 ± 32        1843 ± 52      +377      121  mejor
+------------------------------------------------------------------------
+MEDIA (5)             2144 ± 26        2930 ± 46      +786      105  mejor
+5 es mejor contra 5 rivales, peor contra 0 y no se distingue contra 0.</code></pre>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Columna</th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Las dos versiones</strong></td><td>Media de las 300 partidas contra ese rival, ± su error típico.</td></tr>
+              <tr><td><strong>D</strong></td><td>La nueva menos la vieja. Positivo es que sube, sea bueno o malo.</td></tr>
+              <tr><td><strong>2·ET<sub>D</sub></strong></td><td>El umbral: dos veces el error típico de la diferencia, √(ET<sub>vieja</sub>² + ET<sub>nueva</sub>²).</td></tr>
+              <tr><td><strong>Veredicto</strong></td><td><code>mejor</code> o <code>peor</code> si |D| pasa el umbral, según la métrica suba o baje cuando mejora; <code>ruido</code> si no lo pasa.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="label">La fila de la media</h3>
+        <p>
+          Es la media de las cinco medias, con todos los rivales pesando lo mismo. Su error típico sale de sumar
+          varianzas, que es lo único que se puede sumar, y volver con la raíz. Con los números del
+          paso&nbsp;4:
+        </p>
+<pre><code>media     = (3462 + 2285 + 1787 + 1720 + 1466) / 5   = 2144
+suma ET²  = 92² + 63² + 42² + 45² + 32²
+          = 17246
+ET media  = √17246 / 5
+          = 131,3 / 5
+          ≈ 26</code></pre>
+        <p>Y la comparación, como en cualquier fila:</p>
+<pre><code>D         = 2930 − 2144        = 786
+ET_D      = √(26² + 46²)
+          = √(676 + 2116)
+          = √2792              ≈ 52,8
+2 · ET_D                       ≈ 105
+786 &gt; 105                      → mejor</code></pre>
+        <p>
+          Fijaos en que el error típico de la media, 26, es más pequeño que el de cualquier rival suelto (entre 32 y
+          138). Promediar cinco rivales reparte el ruido entre cinco. No es lo mismo que meter las 1&#8239;500
+          partidas en un solo <code>Stats</code>: eso contaría como ruido la diferencia entre unos rivales y otros,
+          que no lo es, porque los rivales son siempre los mismos, y daría un error típico mayor.
+        </p>
+        <p>
+          La última línea es el recuento. Con este, "mejor contra los cinco y en media" no deja dudas: la regla
+          <code>cazar</code> sube los puntos contra cualquier rival.
+        </p>
+      </section>
+
+      <section id="dudas">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Cuando la media y los rivales no dicen lo mismo</h2>
+        </div>
+        <p>
+          Casi nunca sale tan claro como arriba. Estos son los casos que os vais a encontrar, con ejemplos que
+          salieron midiendo el ejemplo de las siete reglas.
+        </p>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Un rival dice algo, y los demás no</h3>
+            <p>
+              La primera vez que se lanzó <code>Comparar</code> tal y como viene, la <code>v1</code> frente a la
+              <code>v0</code> (la regla <code>rematar</code>), todo salió <code>ruido</code> salvo esta fila:
+            </p>
+<pre><code>Aggressive           3868 ± 133       3403 ± 130      -465      371  peor</code></pre>
+            <p>
+              ¿Empeora contra los agresivos? La misma comparación se repitió con otras cinco tandas, y contra
+              Aggressive salió <code>ruido</code> las cinco veces, con D entre −305 y +199. No era verdad. Con el
+              umbral de 2·ET<sub>D</sub>, una diferencia que no existe pasa el umbral una de cada veinte veces, y con
+              cinco rivales eso da que <strong>casi una de cada cuatro tablas</strong> tendrá al menos un veredicto
+              falso:
+            </p>
+<pre><code>P(ningún falso en 5)  = 0,95⁵  ≈ 0,77
+P(alguno)             = 1 − 0,77 = 0,23</code></pre>
+            <p>
+              Un veredicto suelto contra un solo rival, con los demás en <code>ruido</code>, no se cree hasta que se
+              repite.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Ruido en todos, pero no en la media</h3>
+            <p>
+              Puede pasar, y no es un error: la media tiene un error típico más de dos veces menor que cada rival, así
+              que detecta mejoras pequeñas y constantes que ninguna fila por separado detecta. Si la media dice
+              <code>mejor</code> y casi todas las D van en la misma dirección, la mejora es real aunque sea pequeña.
+              Si la media pasa el umbral por poco y las D van cada una por su lado, repetid antes de creerla.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Mejor contra unos, peor contra otros</h3>
+            <p>
+              La versión nueva no es mejor ni peor: es distinta, y eso es lo que se escribe en el diario, con qué
+              rivales gana y con cuáles pierde y una idea de por qué. Para el concurso cuenta la media contra todos
+              los grupos, así que la decisión suele salir de la fila de la media; pero un <code>peor</code> claro
+              contra un tipo de rival es una pista para la versión siguiente.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Repetir, cuando hay duda</h3>
+            <p>
+              Cambiad <code>SEMILLA</code> (a 1001, por ejemplo) y volved a lanzar las dos versiones. La regla
+              <code>rematar</code> se midió así cinco veces, con 1&#8239;500 partidas por versión cada vez, y salió:
+            </p>
+<pre><code>D = +117, −78, +91, −18, −46        umbral 2·ET_D entre 126 y 133</code></pre>
+            <p>
+              Esto es exactamente lo que significa <code>ruido</code>: el mismo experimento, repetido, da diferencias
+              de hasta 100 puntos en los dos sentidos sin que nada haya cambiado.
+            </p>
+            <p>
+              Y a veces lo que se equivoca es la media. En el <a href="reglas-paso-a-paso.html#paso3">paso&nbsp;3</a>
+              del ejemplo, la primera tanda dio −117 con un umbral de 75, y además empeoraban a la vez los puntos,
+              los turnos por vida y los fantasmas comidos. Repetida cinco veces: +6, +52, −1, −27 y −6. Que las tres
+              métricas fueran en la misma dirección no confirmaba nada, porque salen de las mismas partidas: una tanda
+              con mala suerte la tiene en todas. Lo que confirma una diferencia es repetirla con otras partidas.
+            </p>
+            <p>
+              Si el cambio os importa y la diferencia está cerca del umbral, la otra salida es subir
+              <code>PARTIDAS</code>, para las dos versiones y no sólo para la nueva.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tiempo">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Cuánto tarda</h2>
+        </div>
+        <p>
+          Con reglas, una partida cuesta más que con código a mano, porque Jess trabaja en cada turno. Medido con
+          el ejemplo de las siete reglas y los rivales de referencia:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Comparación</th><th scope="col">Partidas</th><th scope="col">Tiempo, en 18 núcleos</th></tr></thead>
+            <tbody>
+              <tr><td>Ms.&nbsp;Pac-Man: 2 versiones, 5 rivales, 300 partidas (como viene)</td><td>3&#8239;000</td><td>15 s</td></tr>
+              <tr><td>Fantasmas: 2 versiones, 3 rivales, 300 partidas</td><td>1&#8239;800</td><td>9 s</td></tr>
+              <tr><td>Ms.&nbsp;Pac-Man: 6 versiones, 5 rivales, 300 partidas</td><td>9&#8239;000</td><td>40 s</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Sale a unos 40&nbsp;ms de procesador por partida, repartidos entre los núcleos que tengáis. En un portátil
+          de 8 núcleos, la comparación tal como viene serían unos 15 segundos. Pero depende mucho de vuestras
+          reglas, de los rivales que añadáis y de cuánto duren las partidas, así que la primera vez lanzadlo con
+          <code>PARTIDAS = 25</code>, mirad cuánto tarda y multiplicad.
+        </p>
+      </section>
+
+      <section id="metrica">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Vuestra propia métrica</h2>
+        </div>
+        <p>
+          Una métrica es una clase con dos métodos: <code>turno</code>, que se llama después de cada turno con el
+          juego de verdad, y <code>alFinal</code>, que devuelve el valor de la partida. Así son dos de las que vienen
+          hechas:
+        </p>
+<div class="codigo"><pre><code><span class="k">public static</span> Metrica puntos() {
+    <span class="k">return new</span> Metrica(<span class="s">"puntos"</span>, <span class="k">true</span>) {
+        <span class="k">public double</span> alFinal(Game game) { <span class="k">return</span> game.getScore(); }
+    };
+}
+
+<span class="k">public static</span> Metrica fantasmasComidos() {
+    <span class="k">return new</span> Metrica(<span class="s">"fantasmas comidos"</span>, <span class="k">true</span>) {
+        <span class="k">int</span> n = <span class="n">0</span>;
+        <span class="k">public void</span> turno(Game game) { n += game.getNumGhostsEaten(); }
+        <span class="k">public double</span> alFinal(Game game) { <span class="k">return</span> n; }
+    };
+}</code></pre></div>
+        <p>
+          El segundo argumento del constructor dice si que la métrica suba es bueno <strong>para
+          Ms.&nbsp;Pac-Man</strong>: <code>true</code> para puntos, <code>false</code> para vidas perdidas. Cuando
+          comparáis fantasmas, el programa le da la vuelta.
+        </p>
+        <p>
+          Como <code>Comparar</code> juega la partida él mismo, <code>turno</code> ve también el último turno, el de
+          la muerte que acaba la partida, que el contador de la
+          <a href="../practicas/practica-1-resultados.html#medir-mas">Práctica&nbsp;1</a> no llegaba a ver. Algunas
+          ideas que se hacen en cinco líneas:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Métrica</th><th scope="col">Cómo</th><th scope="col">Qué delata</th></tr></thead>
+            <tbody>
+              <tr><td>Píldoras que quedan al acabar</td><td><code>alFinal</code>: <code>game.getNumberOfActivePills()</code>.</td><td>Si muere con el nivel casi limpio o a medias.</td></tr>
+              <tr><td>Turnos con un fantasma a menos de 10</td><td><code>turno</code>: un contador.</td><td>Si vive al límite, aunque sobreviva.</td></tr>
+              <tr><td>Píldoras de poder comidas</td><td><code>turno</code>: <code>if (game.wasPowerPillEaten()) n++</code>.</td><td>Con <code>fantasmasComidos</code>, cuántos fantasmas saca de cada píldora.</td></tr>
+              <tr><td>Nivel alcanzado</td><td>Ya hecha: <code>Metrica.nivel()</code>.</td><td>Si pasa de nivel o se queda en el primero.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Para un cociente, como fantasmas por píldora, no hagáis una métrica que divida en cada partida: en las
+          partidas sin píldoras sale una división por cero. Medid las dos cosas por separado y dividid las medias.
+        </p>
+      </section>
+
+      <section id="trampas">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Trampas de medir en paralelo</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Lo que pasa</th><th scope="col">Por qué, y qué hacer</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>De una tanda a otra, sin cambiar nada, una versión baja de golpe varios cientos de puntos.</td>
+                <td>Jess no sabe leer dos <code>.clp</code> a la vez, y si dos controladores de reglas se crean al mismo tiempo, uno puede quedarse con media base de reglas. Pasó montando esta guía, en una de cada seis tandas. Por eso <code>Comparar</code> crea los controladores dentro de un <code>synchronized</code>: no lo quitéis, y cread vuestros <code>RuleEngine</code> en el constructor del controlador, no después.</td>
+              </tr>
+              <tr>
+                <td>Con <code>HILOS = 1</code> sale una cosa y con todos los núcleos, otra.</td>
+                <td>Algún atributo <code>static</code> en vuestro controlador o en un rival: las partidas simultáneas se lo pisan.</td>
+              </tr>
+              <tr>
+                <td>Sale <code>OJO: v1 contra X, 3 partidas con excepción que no cuentan</code>.</td>
+                <td>Esas partidas no entran en la media, y la causa está en la consola de errores, con la partida y la semilla. Si es vuestra, arregladla antes de comparar nada: una excepción cada cien partidas también os la va a dar el concurso.</td>
+              </tr>
+              <tr>
+                <td>Dos tandas idénticas no dan exactamente lo mismo.</td>
+                <td>Algún rival usa su propio <code>Random</code>, como <code>GhostsRandom</code>, y no depende de la semilla. No pasa nada: las diferencias son del tamaño del error típico, que ya lo cuenta.</td>
+              </tr>
+              <tr>
+                <td>Una versión vieja mide distinto que la última vez.</td>
+                <td>Habéis cambiado algo que usaba: una acción, el <code>Input</code>, un umbral compartido. Lo de una versión que ya está medida no se toca; lo nuevo va en clases o en <code>.clp</code> nuevos.</td>
+              </tr>
+              <tr>
+                <td>La consola se llena y va lentísimo.</td>
+                <td>Una traza, un observador o un <code>(watch rules)</code> enganchado. En las comparaciones, todos quitados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Y en el diario</span>
+          <p>
+            Arriba del todo, una vez: los rivales, el número de partidas y las métricas. En cada versión, la fila
+            de la media de cada métrica y el recuento de la última línea, que caben en tres líneas. Las tablas
+            enteras, sólo cuando un rival diga algo distinto de la media.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Guías de la Práctica 3">
+        <a class="pager-prev" href="depurar-reglas.html"><span class="pager-l">Anterior</span><span class="pager-t">Depurar reglas</span></a>
+        <a class="pager-next" href="../practicas/practica-3.html"><span class="pager-l">Volver al</span><span class="pager-t">Enunciado</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#pregunta">Lo que hace falta</a></li>
+            <li><a href="#archivos">Los dos archivos</a></li>
+            <li><a href="#configurar">Configurarlo</a></li>
+            <li><a href="#leer">Leer la salida</a></li>
+            <li><a href="#dudas">Cuando no está claro</a></li>
+            <li><a href="#tiempo">Cuánto tarda</a></li>
+            <li><a href="#metrica">Vuestra métrica</a></li>
+            <li><a href="#trampas">Trampas</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">Práctica 3</h2>
+          <ol>
+            <li><a href="../practicas/practica-3.html"><span>00</span>El enunciado</a></li>
+            <li><a href="reglas-paso-a-paso.html"><span>01</span>Siete reglas</a></li>
+            <li><a href="depurar-reglas.html"><span>02</span>Depurar reglas</a></li>
+            <li><a href="comparar-versiones.html" aria-current="page"><span>03</span>Comparar versiones</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>
