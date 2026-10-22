@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Encadenar reglas · Tema 2 · ICI</title>
+<meta name="description" content="Encadenamiento hacia delante y hacia atrás en un sistema de reglas, con un ejemplo interactivo paso a paso, los palíndromos como las mismas reglas usadas en los dos sentidos, y cuándo conviene cada uno en un juego.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>Encadenar reglas</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 02 · Sistemas de reglas</p>
+    <h1>
+      Encadenar reglas
+      <span class="thin">Hacia delante, de los hechos a las conclusiones; hacia atrás, de la pregunta a las pruebas.</span>
+    </h1>
+    <p class="standfirst">
+      Las mismas reglas se pueden usar en dos sentidos: partir de lo que se sabe y ver qué sale, o partir de una pregunta y buscar qué la sostiene. Un ejemplo para seguir paso a paso en los dos, los palíndromos, y por qué en un juego casi siempre se va hacia delante.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        Una regla dice "si A y B, entonces C". Eso se puede leer de dos maneras. <strong>Hacia delante</strong>:
+        tengo A y B, así que puedo concluir C. <strong>Hacia atrás</strong>: quiero saber si C es verdad, así que
+        voy a ver si tengo A y B. Las reglas son las mismas; lo que cambia es por dónde empieza el motor y, sobre
+        todo, cuánto trabajo hace.
+      </p>
+
+      <section id="adelante" data-corto="Hacia delante">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Hacia delante: de los datos a las conclusiones</h2>
+        </div>
+        <p>
+          El encadenamiento hacia delante (<em lang="en">forward chaining</em>) está <strong>dirigido por los
+          datos</strong>. El motor mira los hechos, ve qué reglas tienen la parte izquierda satisfecha, dispara una,
+          y eso cambia los hechos; vuelta a empezar. No sabe adónde va: va sacando todo lo que se puede sacar hasta
+          que no queda nada. Es el ciclo de la <a href="que-es.html#ciclo">página anterior</a> tal cual, y es lo
+          que hace Jess por defecto.
+        </p>
+        <p>
+          Un ejemplo con letras, para que no distraiga el significado. Tres reglas y seis hechos de partida:
+        </p>
+<pre class="cuenta">Base de reglas                  Base de hechos inicial
+  R1:  h2 y h5  →  h1             h6, h7, h9, h8, h4, h5
+  R2:  h4 y h3  →  h2
+  R3:  h6       →  h3</pre>
+        <p>
+          Al principio sólo puede dispararse R3: es la única cuya parte izquierda está entera en la memoria. Al
+          dispararse aserta <code>h3</code>, y eso completa la parte izquierda de R2. R2 aserta <code>h2</code>, que
+          completa R1. R1 aserta <code>h1</code> y ya no queda nada nuevo que hacer:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th scope="col">Iteración</th><th scope="col">Memoria de trabajo</th><th scope="col">Agenda</th><th scope="col">Se dispara</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>BH<sub>0</sub></td><td>h6, h7, h9, h8, h4, h5</td><td>R3</td><td>R3 → h3</td></tr>
+              <tr><td>BH<sub>1</sub></td><td>… y h3</td><td>R2</td><td>R2 → h2</td></tr>
+              <tr><td>BH<sub>2</sub></td><td>… y h2</td><td>R1</td><td>R1 → h1</td></tr>
+              <tr><td>BH<sub>3</sub></td><td>… y h1</td><td>vacía</td><td>fin</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          ¿Por qué en BH<sub>1</sub> la agenda tiene sólo R2, si R3 se sigue cumpliendo? Por la
+          <strong>refracción</strong>: R3 ya se disparó con <code>h6</code>, y con los mismos hechos no se vuelve a
+          disparar. En algunos libros veréis esta tabla con R1, R2 y R3 en la agenda de la última fila: ahí la
+          columna cuenta las reglas que se <em>cumplen</em>, y la refracción se aplica después, al elegir. Es lo mismo
+          contado de otra forma. Esto es lo que dice Jess si le pasáis el ejemplo con <code>(watch rules)</code>:
+        </p>
+<pre><code>FIRE 1 MAIN::R3 f-1
+FIRE 2 MAIN::R2 f-5, f-7
+FIRE 3 MAIN::R1 f-8, f-6</code></pre>
+        <p>
+          Cada <code>f-</code> es el número de un hecho en la memoria: <code>f-1</code> es <code>h6</code>,
+          <code>f-7</code> es el <code>h3</code> que acaba de asertar R3. Lo vais a ver mucho en la consola.
+        </p>
+      </section>
+
+      <section id="atras" data-corto="Hacia atrás">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Hacia atrás: de la pregunta a las pruebas</h2>
+        </div>
+        <p>
+          El encadenamiento hacia atrás (<em lang="en">backward chaining</em>) está <strong>dirigido por
+          objetivos</strong>. Se empieza con una pregunta, "¿es verdad <code>h1</code>?", y se trabaja así:
+        </p>
+        <ol>
+          <li>Si <code>h1</code> está en la base de hechos, es verdad. Fin.</li>
+          <li>Si no, se buscan las reglas que tienen <code>h1</code> a la <strong>derecha</strong>, las que lo
+            concluyen. Para cada una, sus condiciones de la izquierda pasan a ser <strong>subobjetivos</strong>, y se
+            prueba cada uno con este mismo procedimiento.</li>
+          <li>Si <code>h1</code> no está y ninguna regla lo concluye, se da por falso. Es la <strong>hipótesis del
+            mundo cerrado</strong>: lo que no se puede demostrar, no es verdad.</li>
+        </ol>
+        <figure>
+          <figcaption>El árbol de subobjetivos para demostrar h1</figcaption>
+          <svg class="explica dgr6" viewBox="0 0 440 212" role="img" aria-label="El objetivo h1 arriba. R1 lo concluye y pide h2 y h5. h5 está en la base de hechos: demostrado. Para h2, R2 pide h4 y h3. h4 está en la base. Para h3, R3 pide h6, que está en la base. Todo demostrado, y por tanto h1 también.">
+            <style>
+              .dgr6 .o{fill:color-mix(in srgb,var(--ok) 18%,var(--surface));stroke:var(--ok);stroke-width:1.4}
+              .dgr6 .r{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.1}
+              .dgr6 .t{font-family:var(--f-mono);font-size:10px;font-weight:500;fill:var(--ink);text-anchor:middle}
+              .dgr6 .s{font-family:var(--f-mono);font-size:8.5px;fill:var(--ink-2);text-anchor:start}
+              .dgr6 .a{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+            </style>
+            <circle cx="120" cy="22" r="14" class="o"/><text x="120" y="26" class="t">h1</text>
+            <rect x="103" y="50" width="34" height="18" rx="3" class="r"/><text x="120" y="63" class="t">R1</text>
+            <path d="M120 36 V50" class="a"/>
+            <circle cx="70" cy="100" r="14" class="o"/><text x="70" y="104" class="t">h2</text>
+            <circle cx="170" cy="100" r="14" class="o"/><text x="170" y="104" class="t">h5</text>
+            <path d="M112 68 L78 87" class="a"/><path d="M128 68 L162 87" class="a"/>
+            <text x="190" y="104" class="s">✓ está en la base de hechos</text>
+            <rect x="53" y="128" width="34" height="18" rx="3" class="r"/><text x="70" y="141" class="t">R2</text>
+            <path d="M70 114 V128" class="a"/>
+            <circle cx="30" cy="178" r="14" class="o"/><text x="30" y="182" class="t">h4</text>
+            <circle cx="110" cy="178" r="14" class="o"/><text x="110" y="182" class="t">h3</text>
+            <path d="M62 146 L38 165" class="a"/><path d="M78 146 L102 165" class="a"/>
+            <rect x="140" y="169" width="34" height="18" rx="3" class="r"/><text x="157" y="182" class="t">R3</text>
+            <path d="M124 178 H140" class="a"/>
+            <circle cx="210" cy="178" r="14" class="o"/><text x="210" y="182" class="t">h6</text>
+            <path d="M174 178 H196" class="a"/>
+            <text x="232" y="182" class="s">✓ en la base</text>
+            <text x="10" y="206" class="s">h4 ✓ en la base · los verdes quedan demostrados de abajo arriba</text>
+          </svg>
+        </figure>
+        <p>
+          Las conclusiones son las mismas, pero la forma de llegar no. Hacia atrás no se ha mirado ni
+          <code>h7</code>, ni <code>h8</code>, ni <code>h9</code>: no hacían falta para la pregunta. Hacia delante,
+          en cambio, el motor no sabe qué le vais a preguntar, así que deduce todo lo que puede. Con tres reglas da
+          igual; con tres mil, no. En el ejemplo de abajo podéis añadir dos reglas que usan <code>h7</code>,
+          <code>h8</code> y <code>h9</code> y ver la diferencia.
+        </p>
+      </section>
+
+      <section id="paso-a-paso" data-corto="Los dos, paso a paso">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Los dos, paso a paso</h2>
+        </div>
+        <div class="demo" data-reglas="encadenar">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>El mismo grafo de reglas, recorrido en los dos sentidos</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Lo que enseña está contado en las dos tablas de arriba.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Los círculos son hechos y los rectángulos, reglas: cada regla recibe flechas de sus condiciones y manda
+          una a su conclusión. En <em>Hacia delante</em>, el azul es lo que hay en la memoria, el amarillo lo que
+          está en la agenda, el rojo la regla que se dispara y el filo amarillo el hecho que acaba de entrar. En
+          <em>Hacia atrás</em>, el verde es lo demostrado y el rojo lo que no se ha podido demostrar. Pulsad un hecho
+          de la fila de abajo para quitarlo de la base de hechos inicial.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Con <strong>R1–R3</strong>, recorred los dos sentidos: llegan a lo mismo. Hacia atrás hay más
+              pasos porque cuenta también las preguntas ("para h2, R2 pide h4 y h3"), no sólo los disparos.</li>
+            <li>Pasad a <strong>Con R4 y R5</strong> y repetid. Hacia delante dispara cinco reglas y deduce
+              <code>h10</code> y <code>h11</code>, que no sirven para nada. Hacia atrás ni las mira.</li>
+            <li>Quitad <code>h6</code>. Hacia delante no se dispara ninguna regla; hacia atrás llega a
+              <code>h3</code>, no encuentra cómo demostrarlo y aplica el mundo cerrado.</li>
+            <li>Poned <code>h6</code> y quitad <code>h5</code>. Los dos sentidos trabajan para nada: deducen o
+              demuestran <code>h3</code> y <code>h2</code> antes de descubrir que falta <code>h5</code>. Hacia atrás
+              se habría dado cuenta en el segundo paso si R1 pidiera <code>h5</code> antes que <code>h2</code>: el
+              orden de las condiciones no cambia el resultado, pero sí el trabajo.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="palindromos" data-corto="Palíndromos">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Las mismas reglas, para generar o para reconocer</h2>
+        </div>
+        <p>
+          Un ejemplo que se ve muy bien con dibujos. Tres reglas de reescritura, donde <code>$</code> es "cualquier
+          cadena":
+        </p>
+<pre class="cuenta">(R1)  $  →  a$a
+(R2)  $  →  b$b
+(R3)  $  →  c$c</pre>
+        <p>
+          <strong>Hacia delante</strong> generan palíndromos: partiendo de <code>c</code> y aplicando R1, R2, R3, R2,
+          R3, sale una cadena que se lee igual al derecho y al revés. <strong>Hacia atrás</strong> los reconocen: dada
+          <code>bacab</code>, se busca una regla cuya derecha encaje (R2, con <code>$ = aca</code>), y se repite con
+          lo que queda hasta llegar a una sola letra.
+        </p>
+        <figure class="wide">
+          <figcaption>Generar hacia delante y reconocer hacia atrás, con las mismas tres reglas</figcaption>
+          <svg class="explica dgr7" viewBox="0 0 560 150" role="img" aria-label="Arriba, hacia delante: c, aplicando R1 da aca, R2 da bacab, R3 da cbacabc, R2 da bcbacabcb, R3 da cbcbacabcbc. Abajo, hacia atrás: bacab encaja con la derecha de R2 y deja aca; aca encaja con la derecha de R1 y deja c; c es una sola letra: es palíndromo.">
+            <style>
+              .dgr7 .c{fill:var(--surface);stroke:var(--maze);stroke-width:1.3}
+              .dgr7 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink);text-anchor:middle}
+              .dgr7 .r{font-family:var(--f-mono);font-size:8.5px;font-weight:700;fill:var(--blinky);text-anchor:middle}
+              .dgr7 .tt{font-family:var(--f-mono);font-size:8.5px;font-weight:700;letter-spacing:.1em;fill:var(--ink-3)}
+              .dgr7 .a{fill:none;stroke:var(--ink-3);stroke-width:1.2;marker-end:url(#r7a)}
+              .dgr7 .ok{fill:color-mix(in srgb,var(--ok) 18%,var(--surface));stroke:var(--ok);stroke-width:1.3}
+            </style>
+            <defs><marker id="r7a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <text x="6" y="14" class="tt">HACIA DELANTE · GENERAR</text>
+            <rect x="6" y="24" width="30" height="24" rx="4" class="c"/><text x="21" y="40" class="t">c</text>
+            <path d="M36 36 H58" class="a"/><text x="47" y="30" class="r">R1</text>
+            <rect x="60" y="24" width="46" height="24" rx="4" class="c"/><text x="83" y="40" class="t">aca</text>
+            <path d="M106 36 H128" class="a"/><text x="117" y="30" class="r">R2</text>
+            <rect x="130" y="24" width="62" height="24" rx="4" class="c"/><text x="161" y="40" class="t">bacab</text>
+            <path d="M192 36 H214" class="a"/><text x="203" y="30" class="r">R3</text>
+            <rect x="216" y="24" width="78" height="24" rx="4" class="c"/><text x="255" y="40" class="t">cbacabc</text>
+            <path d="M294 36 H316" class="a"/><text x="305" y="30" class="r">R2</text>
+            <rect x="318" y="24" width="94" height="24" rx="4" class="c"/><text x="365" y="40" class="t">bcbacabcb</text>
+            <path d="M412 36 H434" class="a"/><text x="423" y="30" class="r">R3</text>
+            <rect x="436" y="24" width="118" height="24" rx="4" class="c"/><text x="495" y="40" class="t">cbcbacabcbc</text>
+            <text x="6" y="88" class="tt">HACIA ATRÁS · RECONOCER bacab</text>
+            <rect x="6" y="98" width="62" height="24" rx="4" class="c"/><text x="37" y="114" class="t">bacab</text>
+            <path d="M68 110 H118" class="a"/><text x="93" y="104" class="r">R2: $=aca</text>
+            <rect x="120" y="98" width="46" height="24" rx="4" class="c"/><text x="143" y="114" class="t">aca</text>
+            <path d="M166 110 H210" class="a"/><text x="188" y="104" class="r">R1: $=c</text>
+            <rect x="212" y="98" width="30" height="24" rx="4" class="ok"/><text x="227" y="114" class="t">c</text>
+            <text x="252" y="114" class="t" style="text-anchor:start">una sola letra: sí, es palíndromo</text>
+            <text x="6" y="142" class="t" style="text-anchor:start">las reglas son las mismas; hacia atrás se leen de derecha a izquierda</text>
+          </svg>
+        </figure>
+        <p>
+          Este ejemplo enseña además algo incómodo del encadenamiento hacia delante: <strong>no tiene por qué
+          parar</strong>. Las tres reglas se pueden aplicar siempre, a cualquier cadena, así que un motor que va hacia
+          delante sin un objetivo seguiría generando palíndromos cada vez más largos. Hacia atrás, en cambio, cada
+          paso quita dos letras y el problema se acaba.
+        </p>
+      </section>
+
+      <section id="cuando" data-corto="Cuál usar">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Cuál usar, y dónde los habéis visto ya</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr><th scope="col"></th><th scope="col">Hacia delante</th><th scope="col">Hacia atrás</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Empieza por</td><td>Los hechos que hay.</td><td>Una pregunta concreta.</td></tr>
+              <tr><td>Va bien cuando</td><td>Llegan datos nuevos y hay que reaccionar: "ha pasado esto, ¿qué hago?".</td><td>Hay pocas preguntas posibles y muchos hechos: "¿tiene el paciente varicela?".</td></tr>
+              <tr><td>El riesgo</td><td>Deducir montones de cosas que no hacían falta, o no parar.</td><td>Repetir trabajo si se hacen muchas preguntas que comparten subobjetivos.</td></tr>
+              <tr><td>Fuera de la IA</td><td>Una hoja de cálculo: cambiáis una celda y se recalculan todas las que dependen de ella.</td><td><code>make</code>: para construir el objetivo, mira de qué depende, y de qué dependen esas dependencias.</td></tr>
+              <tr><td>Ejemplos clásicos</td><td>XCON, CLIPS, Jess, Drools.</td><td>MYCIN, Prolog.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          El <code>Makefile</code> es encadenamiento hacia atrás en estado puro. Cada regla dice "para tener esto,
+          necesito aquello":
+        </p>
+<pre><code>practica3.zip: Ghosts.class MsPacMan.class     <span class="c"># el objetivo y lo que pide</span>
+Ghosts.class: Ghosts.java GhostsInput.java     <span class="c"># un subobjetivo y lo que pide</span>
+	javac Ghosts.java GhostsInput.java</code></pre>
+        <p>
+          Al pedir <code>make practica3.zip</code>, <code>make</code> no compila todo lo que encuentra: baja por las
+          dependencias del objetivo, y sólo rehace lo que haga falta. Lo que ya está hecho y al día es un hecho en la
+          base; lo que no existe ni se puede construir es un error, el mundo cerrado de <code>make</code>.
+        </p>
+        <h3 class="label">En un juego, hacia delante</h3>
+        <p>
+          Un personaje tiene que reaccionar a lo que pasa, no demostrar teoremas: en cada turno llegan hechos nuevos
+          y la pregunta es "¿qué hago?", que no es una pregunta con respuesta sí o no. Por eso los motores de reglas
+          de juegos van hacia delante, y por eso es lo que usaréis en la práctica: vuestro <code>Input</code>
+          aserta los hechos del turno, Jess encadena hacia delante, y alguna regla acaba asertando la acción.
+        </p>
+        <p>
+          Jess sabe también ir hacia atrás. Se le dice qué hechos pueden ser objetivos con
+          <code>(do-backward-chaining h1)</code>, y cuando una regla necesita un <code>h1</code> que no está, el
+          motor aserta él solo un hecho <code>(need-h1)</code> que otras reglas pueden atender. Con el ejemplo de
+          arriba, Jess crea <code>need-h1</code>, después <code>need-h2</code> y <code>need-h3</code>, y dispara R3,
+          R2 y R1 en ese orden. Es útil para preguntas del tipo "¿me conviene ir a por la píldora?", que podrían
+          sostenerse en subpreguntas ("¿llego antes?", "¿hay fantasmas cerca de ella?"). Para la práctica no os hace
+          falta.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Un parecido con el tema 1</span>
+          <p>
+            Hacia atrás es una <a href="../tema1/busqueda.html">búsqueda en profundidad</a> sobre un árbol de
+            subobjetivos: se baja por la primera regla que concluye lo que se busca, y si falla se vuelve a
+            intentar con la siguiente. Hacia delante se parece más a la anchura: todo lo que se puede deducir ahora,
+            antes que lo que se podrá deducir después.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="que-es.html"><span class="pager-l">Anterior</span><span class="pager-t">Qué es un sistema de reglas</span></a>
+        <a class="pager-next" href="conflictos.html"><span class="pager-l">Siguiente</span><span class="pager-t">La agenda y los conflictos</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#adelante">Hacia delante</a></li>
+            <li><a href="#atras">Hacia atrás</a></li>
+            <li><a href="#paso-a-paso">Los dos, paso a paso</a></li>
+            <li><a href="#palindromos">Palíndromos</a></li>
+            <li><a href="#cuando">Cuál usar</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html" aria-current="page"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/reglas.js" defer></script>
+</body>
+</html>

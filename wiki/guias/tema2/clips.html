@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>CLIPS y Jess · Tema 2 · ICI</title>
+<meta name="description" content="El lenguaje de reglas de CLIPS tal como lo entiende Jess 7.1: hechos ordenados y con plantilla, deftemplate, deffacts, defrule, variables, comodines, restricciones, test y not, las órdenes de la memoria de trabajo, un banco de pruebas interactivo y cómo probar las reglas sin lanzar el juego.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>CLIPS y Jess</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 05 · Sistemas de reglas</p>
+    <h1>
+      CLIPS y Jess: el lenguaje
+      <span class="thin">Hechos, plantillas, reglas y variables, con un banco de pruebas para escribir y ejecutar.</span>
+    </h1>
+    <p class="standfirst">
+      Todo lo que hace falta del lenguaje para la práctica, en el orden en que lo vais a necesitar: hechos, plantillas, reglas, variables y restricciones. Con un banco de pruebas en la propia página para escribir reglas y verlas dispararse, y la forma de probarlas en Eclipse sin lanzar una partida.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        <strong>CLIPS</strong> (<em lang="en">C Language Integrated Production System</em>) es un lenguaje y un motor
+        de reglas que hizo la NASA en 1985, escrito en C, gratuito y todavía mantenido. <strong>Jess</strong> es su
+        versión para Java: entiende casi el mismo lenguaje y se puede llamar desde un programa Java, que es lo que hace
+        el motor de Ms.&nbsp;Pac-Man. Los ficheros de reglas llevan la extensión <code>.clp</code>. Todo lo de esta
+        página está comprobado con el Jess 7.1 que viene en <code>MsPacManEngine/lib/jess.jar</code>.
+      </p>
+      <p>
+        Si habéis visto Lisp o Scheme, la sintaxis os sonará: todo va entre paréntesis y lo primero de cada paréntesis
+        dice qué es. Si no, no pasa nada; es muy regular y en diez minutos se lee sin esfuerzo. Los comentarios
+        empiezan con <code>;</code> y van hasta el final de la línea. Las mayúsculas cuentan: <code>BLINKY</code> y
+        <code>blinky</code> son símbolos distintos.
+      </p>
+
+      <section id="hechos" data-corto="Hechos">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Hechos: ordenados y con plantilla</h2>
+        </div>
+        <p>
+          Un hecho es una lista entre paréntesis. Hay dos tipos, y la diferencia es cómo se sabe qué es cada dato.
+        </p>
+        <h3 class="label">Hechos ordenados: el significado está en la posición</h3>
+<pre><code>(hola)
+(alumnos Juan Luis Pedro)
+(lista-de-la-compra pan leche arroz)
+(fantasma-cerca blinky 12)</code></pre>
+        <p>
+          El primer campo es un símbolo que hace de nombre, y los demás pueden ser lo que sea: símbolos
+          (<code>blinky</code>), números (<code>12</code>, <code>3.5</code>) o cadenas (<code>"hola"</code>). No hace
+          falta declararlos. El precio es que <strong>tenéis que acordaros del orden</strong>: en
+          <code>(fantasma-cerca blinky 12)</code>, ¿el 12 era la distancia o el tiempo de comestible? Para una regla
+          que lo use, <code>(fantasma-cerca ?f ?d)</code> y <code>(fantasma-cerca ?d ?f)</code> son cosas distintas.
+        </p>
+        <h3 class="label">Hechos con plantilla: el significado está en el nombre</h3>
+        <p>
+          Con <code>deftemplate</code> se declara la forma del hecho, con un nombre para cada campo (<em>slot</em>). Es
+          como un <code>struct</code> de C o un <code>record</code> de Java:
+        </p>
+<pre><code>(deftemplate fantasma
+   "Un fantasma, tal como lo ve el Input"     <span class="c">; comentario opcional</span>
+   (slot nombre)
+   (slot comestible (default false))
+   (slot distancia (type INTEGER))
+   (multislot camino))                       <span class="c">; un slot con varios valores</span>
+
+(fantasma (nombre blinky) (distancia 12))</code></pre>
+        <p>
+          Ese hecho, en la memoria, queda como
+          <code>(fantasma (nombre blinky) (comestible false) (distancia 12) (camino))</code>: lo que no se dice toma
+          su <code>default</code>, y si no hay <code>default</code>, el valor <code>nil</code> (o la lista vacía, en un
+          <code>multislot</code>). El orden de los slots al escribir el hecho da igual. Es lo que usa la plantilla de la
+          práctica para todo: <code>(BLINKY (edible true))</code> es un hecho con plantilla <code>BLINKY</code> y un
+          slot, <code>edible</code>.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Jess no es CLIPS en los detalles</span>
+          <p>
+            En CLIPS los slots admiten <code>(allowed-symbols …)</code> para limitar los valores y <code>(range 0
+            300)</code> para limitar los números. <strong>Jess 7.1 no los entiende</strong>: da el error
+            <code>Unimplemented slot qualifier</code> y la plantilla no se carga, con lo que todas las reglas que la
+            usan fallan detrás. Y <code>(type INTEGER)</code> lo acepta, pero <strong>no lo comprueba</strong>: deja
+            asertar <code>(fantasma (distancia hola))</code> sin quejarse. En Jess, de los calificadores de slot, el
+            único que hace algo es <code>default</code>.
+          </p>
+        </div>
+      </section>
+
+      <section id="memoria" data-corto="La memoria de trabajo">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Poner y quitar hechos</h2>
+        </div>
+        <p>
+          <code>deffacts</code> declara los hechos con los que se empieza. No los aserta todavía: lo hace
+          <code>(reset)</code>, que vacía la memoria, mete el hecho especial <code>(initial-fact)</code> como
+          <code>f-0</code> y aserta todos los <code>deffacts</code>.
+        </p>
+<pre><code>(deffacts turno "lo que ve Blinky al empezar"
+   (fantasma (nombre blinky) (distancia 12))
+   (fantasma (nombre inky) (comestible true) (distancia 40)))</code></pre>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr><th scope="col">Orden</th><th scope="col">Qué hace</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>(reset)</code></td><td>Vacía la memoria y la agenda, aserta <code>(initial-fact)</code> y los <code>deffacts</code>. Las reglas se quedan.</td></tr>
+              <tr><td><code>(run)</code> · <code>(run 5)</code></td><td>Ejecuta el ciclo hasta vaciar la agenda, o como mucho cinco disparos.</td></tr>
+              <tr><td><code>(facts)</code></td><td>Lista la memoria de trabajo, con el número <code>f-</code> de cada hecho.</td></tr>
+              <tr><td><code>(assert (h1) (h2))</code></td><td>Añade hechos. Si ya hay uno idéntico, no lo repite.</td></tr>
+              <tr><td><code>(retract 3)</code></td><td>Quita el hecho <code>f-3</code>. Dentro de una regla, con una variable: <code>(retract ?f)</code>.</td></tr>
+              <tr><td><code>(modify ?f (slot valor))</code></td><td>Cambia slots de un hecho con plantilla. Para el motor, es retirarlo y asertar uno nuevo.</td></tr>
+              <tr><td><code>(clear)</code></td><td>Lo borra todo, también las reglas y las plantillas.</td></tr>
+              <tr><td><code>(watch all)</code></td><td>Que el motor cuente lo que hace: hechos que entran (<code>==&gt;</code>) y salen (<code>&lt;==</code>), activaciones y disparos (<code>FIRE</code>). Se quita con <code>(unwatch all)</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="reglas" data-corto="Reglas">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Reglas</h2>
+        </div>
+<pre><code>(defrule nombre-de-la-regla
+   "documentación, opcional"
+   (declare (salience 10))       <span class="c">; prioridad, opcional; por defecto 0</span>
+   (patrón 1)                    <span class="c">; entre los patrones hay un AND implícito</span>
+   (patrón 2)
+   =&gt;
+   (acción 1)
+   (acción 2))</code></pre>
+        <p>
+          A la izquierda de la flecha <code>=&gt;</code>, los patrones que tienen que casar con hechos, <strong>todos a
+          la vez</strong>. A la derecha, lo que se hace: <code>assert</code>, <code>retract</code>,
+          <code>modify</code>, <code>printout</code>… La regla más simple posible:
+        </p>
+<pre><code>(defrule marca-del-ibiza
+   (modelo ibiza)
+   =&gt;
+   (assert (marca-es SEAT)))</code></pre>
+        <p>
+          Para tocar un hecho desde la derecha hay que saber cuál es, y eso se hace ligándolo a una variable con
+          <code>&lt;-</code> en la izquierda:
+        </p>
+<pre><code>(defrule casa-mayores-25
+   ?p &lt;- (persona (nombre ?nombre) (edad ?edad) (estado soltero))
+   (test (&gt;= ?edad 25))
+   =&gt;
+   (modify ?p (estado casado))
+   (printout t ?nombre " tiene " ?edad " años" crlf))</code></pre>
+        <p>
+          <code>printout t</code> escribe en la consola (<code>t</code> es la salida estándar) y <code>crlf</code> es el
+          salto de línea. Con dos personas, Pepe de 20 y Juan de 25, Jess dice:
+        </p>
+<pre><code>Jess&gt; (reset)
+Jess&gt; (run)
+Juan tiene 25 años
+Jess&gt; (facts)
+f-0   (MAIN::initial-fact)
+f-1   (MAIN::persona (nombre Pepe) (edad 20) (estado soltero))
+f-2   (MAIN::persona (nombre Juan) (edad 25) (estado casado))
+For a total of 3 facts in module MAIN.</code></pre>
+        <p>
+          El <code>MAIN::</code> es el módulo en el que vive cada hecho; en la práctica todo está en <code>MAIN</code> y
+          podéis ignorarlo. Fijaos en que Juan sigue siendo <code>f-2</code> después del <code>modify</code>.
+        </p>
+      </section>
+
+      <section id="variables" data-corto="Variables y restricciones">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Variables, comodines y restricciones</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr><th scope="col">Se escribe</th><th scope="col">Significa</th><th scope="col">Ejemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>?x</code></td><td>Variable: casa con cualquier valor y se queda con él. Si aparece dos veces, tiene que valer lo mismo en las dos.</td><td><code>(profesor ?n ?a ?a)</code>: los dos apellidos iguales</td></tr>
+              <tr><td><code>?</code></td><td>Comodín: casa con un valor cualquiera, y no se guarda.</td><td><code>(profesor ? ?a ?)</code>: sólo me interesa el primer apellido</td></tr>
+              <tr><td><code>$?x</code></td><td>Variable multicampo: casa con cero o más valores seguidos.</td><td><code>(cadena $?antes b a $?despues)</code></td></tr>
+              <tr><td><code>~valor</code></td><td>Cualquier cosa menos ese valor.</td><td><code>(fantasma (nombre ~sue))</code></td></tr>
+              <tr><td><code>a|b</code></td><td>Una cosa o la otra.</td><td><code>(fantasma (nombre blinky|pinky))</code></td></tr>
+              <tr><td><code>?d&amp;:(&lt; ?d 20)</code></td><td>Liga <code>?d</code> y además exige que se cumpla la expresión.</td><td><code>(fantasma (distancia ?d&amp;:(&lt; ?d 20)))</code></td></tr>
+              <tr><td><code>(test …)</code></td><td>Un patrón que no casa con ningún hecho: es una comprobación sobre variables ya ligadas.</td><td><code>(test (&gt;= ?edad 25))</code></td></tr>
+              <tr><td><code>(not …)</code></td><td>Se cumple si <strong>no</strong> hay ningún hecho que case con el patrón.</td><td><code>(not (fantasma (comestible false)))</code>: no queda ninguno peligroso</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          El ejemplo de los profesores enseña variables y comodines a la vez. Con estos hechos:
+        </p>
+<pre><code>(deffacts profesores
+   (profesor Gregorio Fernández Fernández)
+   (profesor Mercedes López Pérez)
+   (profesor José-Carlos González Cristóbal))
+
+(defrule apellidos-iguales
+   (profesor ?x ?y ?y)
+   =&gt;
+   (printout t "D. " ?x " tiene los dos apellidos iguales" crlf))
+
+(defrule buenos-dias
+   (profesor ? ?x ?)
+   =&gt;
+   (printout t "Buenos días, " ?x crlf))</code></pre>
+<pre><code>Buenos días, González
+Buenos días, López
+D. Gregorio tiene los dos apellidos iguales
+Buenos días, Fernández</code></pre>
+        <p>
+          <code>apellidos-iguales</code> sólo casa con Gregorio, porque <code>?y</code> tiene que ser el mismo en las dos
+          posiciones. <code>buenos-dias</code> casa con los tres. ¿Y el orden? Es la estrategia <code>depth</code> de la
+          <a href="conflictos.html#estrategias">página anterior</a>: primero lo más reciente, y el hecho más reciente es
+          el último del <code>deffacts</code>.
+        </p>
+        <h3 class="label">Las cuentas, en notación prefija</h3>
+        <p>
+          Las expresiones también van entre paréntesis y con el operador delante: <code>(+ ?p 1)</code> es
+          <code>?p + 1</code>, <code>(&lt;= ?d 30)</code> es <code>?d ≤ 30</code>, y <code>(and (&gt; ?d 5) (&lt; ?d
+          30))</code> es lo que imagináis. Para comparar símbolos se usa <code>eq</code>: <code>(eq ?nombre
+          blinky)</code>. Los verdaderos y falsos de Jess son los símbolos <code>TRUE</code> y <code>FALSE</code>, en
+          mayúsculas, y eso tiene una trampa que veréis en la <a href="reglas-mspacman.html#errores">página del
+          motor</a>.
+        </p>
+      </section>
+
+      <section id="banco" data-corto="Banco de pruebas">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Banco de pruebas</h2>
+        </div>
+        <p>
+          Aquí podéis escribir reglas y ejecutarlas. Es un motor pequeño hecho para estos apuntes que entiende lo que
+          cuenta esta página (plantillas, <code>deffacts</code>, reglas con <code>salience</code>, variables, comodines,
+          restricciones, <code>test</code> y <code>not</code>, y en la derecha <code>assert</code>,
+          <code>retract</code>, <code>modify</code> y <code>printout</code>) y ordena la agenda como Jess. Los ejemplos
+          de abajo dan lo mismo aquí que en Jess, salvo el de ordenar letras, que tiene empates y los resuelve en otro
+          orden, aunque acaba en la misma cadena.
+        </p>
+        <div class="demo" data-reglas="banco" data-presets="persona ojos cadena letras bucle fantasma">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Escribid reglas, haced reset y disparadlas</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este banco de pruebas necesita JavaScript. Los mismos ejemplos se pueden ejecutar con Jess, como se cuenta más abajo.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          <em>reset</em> carga lo que hay escrito y aserta los <code>deffacts</code>; <em>Paso</em> dispara una regla, la
+          primera de la agenda, y <em>Run</em>, todas. A la izquierda queda la memoria de trabajo y a la derecha la
+          agenda, con la siguiente en amarillo. Debajo, la traza: lo que diría Jess con <code>(watch all)</code>, y en
+          negrita lo que escriben los <code>printout</code>. El banco corta a los 25 disparos para que un bucle no os
+          cuelgue la página.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>En <strong>Casar a los mayores de 25</strong>, quitad <code>(estado soltero)</code> de la regla y haced
+              reset. ¿Qué pasa con Juan, y por qué?</li>
+            <li>En <strong>Variables: ojos azules</strong>, cambiad la estrategia a <em>breadth</em>: Juan sale antes que
+              Pedro.</li>
+            <li>En <strong>Un turno de Blinky</strong>, cambiad <code>mindistancePPill</code> a 45 o <code>edible</code> a
+              <code>true</code> y volved a ejecutar: mirad cuántos <code>ACTION</code> quedan en la memoria y cuál tiene
+              más <code>priority</code>. Eso es lo que elige el motor del juego.</li>
+            <li>Escribid un hecho <code>(INKY (edible true))</code> en el <code>deffacts</code> sin declarar su
+              plantilla, y leed el error. Os lo vais a encontrar.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="probar-jess" data-corto="Probar con Jess">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Probar las reglas sin lanzar el juego</h2>
+        </div>
+        <p>
+          Lanzar una partida para ver si una regla se dispara es lento y se ve mal. Es mucho más cómodo darle a Jess el
+          fichero de reglas, unos hechos de prueba, y mirar qué sale. Hay dos formas, y las dos funcionan desde el
+          proyecto de la práctica, porque <code>jess.jar</code> viene con el motor.
+        </p>
+        <h3 class="label">1 · La consola de Jess</h3>
+        <p>
+          <code>jess.Main</code> es el intérprete de Jess. En Eclipse, <em>Run → Run Configurations… → Java
+          Application → New</em>, con vuestro proyecto, <em>Main class</em> <code>jess.Main</code> y en
+          <em>Arguments</em> la ruta del fichero. Si al final del fichero ponéis las órdenes, se ejecutan al cargarlo:
+        </p>
+<pre><code><span class="c">; al final de una copia de blinkyrules.clp, para probarla</span>
+(deffacts prueba
+   (BLINKY (edible false))
+   (MSPACMAN (mindistancePPill 12)))
+(watch rules)
+(reset)
+(run)
+(facts)</code></pre>
+<pre><code>FIRE 1 MAIN::BLINKYrunsAwayMSPACMANclosePPill f-2
+FIRE 2 MAIN::BLINKYchases f-1
+f-0   (MAIN::initial-fact)
+f-1   (MAIN::BLINKY (edible false))
+f-2   (MAIN::MSPACMAN (mindistancePPill 12))
+f-3   (MAIN::ACTION (id BLINKYrunsAway) (info "MSPacMan cerca PPill") (priority 50) (runawaystrategy RANDOM))
+f-4   (MAIN::ACTION (id BLINKYchases) (info "No comestible --&gt; perseguir") (priority 10) (runawaystrategy nil))
+For a total of 5 facts in module MAIN.</code></pre>
+        <p>
+          Y sin argumentos, <code>jess.Main</code> abre una consola en la que escribir órdenes una a una.
+        </p>
+        <h3 class="label">2 · Desde Java, con <code>Retetest</code></h3>
+        <p>
+          La plantilla de la práctica trae <code>Retetest.java</code>, que hace lo mismo desde código: crea un motor,
+          carga un fichero de prueba, ejecuta y lista los hechos. Son cinco llamadas, y son las mismas que usa por dentro
+          el motor del juego:
+        </p>
+<pre><code>Rete jess = <span class="k">new</span> Rete();
+jess.batch(rulesFile);         <span class="c">// carga el .clp: plantillas, deffacts y reglas</span>
+jess.reset();                  <span class="c">// (reset)</span>
+jess.run();                    <span class="c">// (run)</span>
+Iterator&lt;?&gt; it = jess.listFacts();   <span class="c">// (facts), para recorrerlos</span>
+<span class="k">while</span> (it.hasNext())
+    System.out.println(it.next());</code></pre>
+        <p>
+          En la <a href="reglas-mspacman.html">página siguiente</a> está cómo usa todo esto el motor de
+          Ms.&nbsp;Pac-Man en cada turno.
+        </p>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="rete.html"><span class="pager-l">Anterior</span><span class="pager-t">Rete</span></a>
+        <a class="pager-next" href="reglas-mspacman.html"><span class="pager-l">Siguiente</span><span class="pager-t">Reglas en Ms.&nbsp;Pac-Man</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#hechos">Hechos</a></li>
+            <li><a href="#memoria">La memoria de trabajo</a></li>
+            <li><a href="#reglas">Reglas</a></li>
+            <li><a href="#variables">Variables y restricciones</a></li>
+            <li><a href="#banco">Banco de pruebas</a></li>
+            <li><a href="#probar-jess">Probar con Jess</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html" aria-current="page"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/reglas.js" defer></script>
+</body>
+</html>

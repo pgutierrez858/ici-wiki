@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Reglas, máquinas y árboles · Tema 2 · ICI</title>
+<meta name="description" content="Comparación entre la cadena de if, la máquina de estados, el árbol de comportamiento y el sistema de reglas con el mismo fantasma escrito en los cuatro formatos: dónde se escribe cuándo toca cada cosa, qué recuerda cada uno, qué cuesta cambiarlo, en qué juegos se usa cada técnica y qué problema queda para la lógica borrosa.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>Reglas, máquinas y árboles</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 07 · Sistemas de reglas</p>
+    <h1>
+      Reglas, máquinas y árboles
+      <span class="thin">El mismo fantasma en cuatro formatos, y cuándo conviene cada uno.</span>
+    </h1>
+    <p class="standfirst">
+      Ya tenéis cuatro formas de escribir el mismo comportamiento. Aquí están juntas, con el mismo fantasma, para ver qué cambia de una a otra: dónde se escribe <em>cuándo</em> toca cada cosa, quién se acuerda de qué, qué cuesta añadir una idea nueva, y quién usa cada una en la industria.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="cuatro" data-corto="El mismo fantasma, cuatro veces">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El mismo fantasma, cuatro veces</h2>
+        </div>
+        <p>
+          Un fantasma con tres ideas: <strong>huir</strong> si es comestible o si Ms.&nbsp;Pac-Man está cerca de una
+          píldora (con histéresis: entrar a menos de 30, salir a 40), <strong>cortarle el paso</strong> si está a menos de
+          20 y no es comestible, y <strong>perseguir</strong> en otro caso.
+        </p>
+        <h3 class="label">1 · Cadena de <code>if</code> (Práctica 1)</h3>
+        <figure>
+          <figcaption>Pseudocódigo · la histéresis necesita una variable a mano</figcaption>
+          <pre class="pseudo"><b>if</b> <span class="fn">comestible</span>() OR <span class="var">dPPill</span> &lt; 30 OR (<span class="var">huía</span> AND <span class="var">dPPill</span> &lt; 40) <b>then</b> <span class="var">huía</span> ← <b>true</b>;  <b>return</b> <span class="fn">huir</span>()
+<span class="var">huía</span> ← <b>false</b>
+<b>if</b> <span class="var">dMsPacMan</span> &lt; 20 <b>then return</b> <span class="fn">cortarElPaso</span>()
+<b>return</b> <span class="fn">perseguir</span>()</pre>
+        </figure>
+        <h3 class="label">2 · Máquina de estados (Práctica 2)</h3>
+        <figure>
+          <figcaption>Tres estados; las flechas llevan el "cuándo"</figcaption>
+          <svg class="explica dgr11" viewBox="0 0 470 150" role="img" aria-label="Tres estados: Perseguir, el inicial, Cortar el paso y Huir. De Perseguir a Cortar el paso si Ms. Pac-Man está a menos de 20, y de vuelta si está a 20 o más. De Perseguir y de Cortar el paso a Huir si es comestible o la píldora está a menos de 30. De Huir a Perseguir si no es comestible y la píldora está a 40 o más.">
+            <style>
+              .dgr11 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgr11 .t{font-family:var(--f-mono);font-size:10.5px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgr11 .l{font-family:var(--f-mono);font-size:8.8px;fill:var(--ink-2);text-anchor:middle}
+              .dgr11 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#r11a)}
+              .dgr11 .ini{fill:var(--ink)}
+            </style>
+            <defs><marker id="r11a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <circle cx="12" cy="40" r="4" class="ini"/><path d="M16 40 H34" class="a"/>
+            <rect x="36" y="24" width="110" height="32" rx="14" class="st"/><text x="91" y="44" class="t">Perseguir</text>
+            <rect x="330" y="24" width="120" height="32" rx="14" class="st"/><text x="390" y="44" class="t">Huir</text>
+            <rect x="36" y="108" width="120" height="32" rx="14" class="st"/><text x="96" y="128" class="t">Cortar el paso</text>
+            <path d="M146 34 H327" class="a"/><text x="238" y="26" class="l">comestible | PPill &lt; 30</text>
+            <path d="M330 48 H149" class="a"/><text x="238" y="62" class="l">no comestible y PPill ≥ 40</text>
+            <path d="M76 56 V105" class="a"/><text x="70" y="86" class="l" style="text-anchor:end">d &lt; 20</text>
+            <path d="M116 108 V59" class="a"/><text x="122" y="86" class="l" style="text-anchor:start">d ≥ 20</text>
+            <path d="M156 124 C 260 124, 360 100, 384 59" class="a"/><text x="300" y="112" class="l">comestible | PPill &lt; 30</text>
+          </svg>
+        </figure>
+        <h3 class="label">3 · Árbol de comportamiento</h3>
+        <figure>
+          <figcaption>Pseudocódigo · un selector; el orden de las ramas es la prioridad</figcaption>
+          <pre class="pseudo">Selector
+├─ Secuencia ─ <span class="fn">¿comestible o PPill &lt; 30, o (huía en la pizarra y PPill &lt; 40)?</span> ─ Huir
+├─ Secuencia ─ <span class="fn">¿MsPacMan a menos de 20?</span> ─ CortarElPaso
+└─ Perseguir</pre>
+        </figure>
+        <h3 class="label">4 · Sistema de reglas (Práctica 3)</h3>
+<pre><code>(defrule huir-comestible  (BLINKY (edible true))                              =&gt; (assert (ACTION (id BLINKYrunsAway) (priority 50))))
+(defrule huir-entra       (MSPACMAN (mindistancePPill ?d&amp;:(&lt; ?d 30)))       =&gt; (assert (ACTION (id BLINKYrunsAway) (priority 50))))
+(defrule huir-sigue       (BLINKY (ultima runsAway))
+                          (MSPACMAN (mindistancePPill ?d&amp;:(&lt; ?d 40)))       =&gt; (assert (ACTION (id BLINKYrunsAway) (priority 50))))
+(defrule cortar           (BLINKY (edible false) (distancia ?d&amp;:(&lt; ?d 20))) =&gt; (assert (ACTION (id BLINKYcuts) (priority 30))))
+(defrule perseguir        (BLINKY (edible false))                             =&gt; (assert (ACTION (id BLINKYchases) (priority 10))))</code></pre>
+        <p>
+          Los cuatro hacen lo mismo. Mirad <strong>dónde ha ido a parar la histéresis</strong>: en la cadena de
+          <code>if</code>, una variable <code>huía</code> que hay que mantener a mano; en la máquina, gratis, porque el
+          estado es la memoria; en el árbol, en la pizarra; en las reglas, en un hecho que Java tiene que recordar y asertar.
+          Y dónde ha ido la prioridad: el orden de las líneas, el orden de las transiciones, el orden de las ramas, un
+          número en cada regla.
+        </p>
+      </section>
+
+      <section id="tabla" data-corto="Frente a frente">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Frente a frente</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Máquina de estados</th>
+                <th scope="col">Árbol de comportamiento</th>
+                <th scope="col">Sistema de reglas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Dónde está el "cuándo"</td><td>En las flechas que salen del estado actual.</td><td>En el orden de las ramas y en las condiciones de cada una.</td><td>En la parte izquierda de cada regla, entera; la prioridad, aparte.</td></tr>
+              <tr><td>Qué recuerda</td><td>El estado actual, sin hacer nada.</td><td>Nada, salvo lo que se apunte en la pizarra.</td><td>Lo que haya en la memoria. En la práctica, nada entre turnos, salvo lo que Java aserte.</td></tr>
+              <tr><td>Si se cumplen dos cosas a la vez</td><td>Gana la primera transición que se añadió.</td><td>Gana la rama de más a la izquierda.</td><td>Las dos entran en la agenda, y decide la estrategia de resolución.</td></tr>
+              <tr><td>Añadir una idea nueva</td><td>Un estado y sus flechas de entrada y salida, a veces muchas.</td><td>Una rama, en la posición de su prioridad.</td><td>Una regla. No hay que tocar las demás… si las prioridades lo permiten.</td></tr>
+              <tr><td>Dónde vive el conocimiento</td><td>En Java, en las llamadas a <code>add</code>.</td><td>En Java, o en el editor visual del motor.</td><td>En un fichero de texto aparte, que se puede cambiar sin recompilar.</td></tr>
+              <tr><td>Razonar por capas</td><td>No: cada transición mira el juego directamente.</td><td>Con la pizarra, a mano.</td><td>Sí, de forma natural: reglas que deducen hechos que usan otras reglas.</td></tr>
+              <tr><td>Para depurar</td><td>Ver el estado actual y la última flecha cruzada.</td><td>Ver el camino del <em lang="en">tick</em>.</td><td>Ver la memoria, la agenda y qué se ha disparado.</td></tr>
+              <tr><td>Lo hace bien</td><td>Modos que duran y cambian por sucesos.</td><td>Comportamientos reactivos con prioridades claras y muchas tareas pequeñas.</td><td>Muchas situaciones distintas, pocas respuestas, conocimiento de un experto.</td></tr>
+              <tr><td>Lo hace mal</td><td>Muchos estados que dependen de todos: explota en flechas.</td><td>Recordar y esperar: necesita la pizarra para todo.</td><td>Secuencias en el tiempo, y saber de un vistazo qué va a pasar.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="industria" data-corto="Quién usa qué">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Quién usa qué, y por qué</h2>
+        </div>
+        <ul>
+          <li><strong>Máquinas de estados</strong> en casi cualquier juego, para lo que de verdad son modos: animaciones,
+            estados de un enemigo sencillo, menús. Los motores las traen hechas: Unity tiene una para las animaciones,
+            con estados y transiciones dibujados como en la Práctica&nbsp;2.</li>
+          <li><strong>Árboles de comportamiento</strong> para la IA de los personajes en los juegos grandes, desde
+            <em>Halo&nbsp;2</em>. Unreal Engine los trae de serie con su editor visual y su pizarra.</li>
+          <li><strong>Reglas</strong> donde hay mucho conocimiento y poca secuencia: la IA estratégica de un juego de
+            estrategia (los <em>scripts</em> de <em>Age of Empires&nbsp;II</em>), qué frase dice un personaje (Valve),
+            sistemas de misiones y de reacciones del mundo, y fuera de los juegos, todo lo que tenga que poder cambiar
+            alguien que no es programador: reglas de negocio, de fraude, de configuración.</li>
+        </ul>
+        <p>
+          Y es muy normal mezclarlas. Las reglas pueden decidir el <strong>modo</strong> en el que está un personaje y una
+          máquina de estados ejecutarlo; un nodo condición de un árbol puede preguntarle a un motor de reglas. La
+          pregunta útil no es cuál es la mejor, sino <strong>en qué parte del comportamiento</strong> encaja cada una.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Para vuestra memoria de la Práctica 3</span>
+          <p>
+            Lo interesante no es que vuestro fantasma de reglas juegue mejor o peor que el de estados: es qué os ha
+            resultado más fácil de escribir en cada formato, qué habéis echado de menos, y si alguna regla os ha salido
+            sola porque en la máquina no tenía dónde ponerse. Apuntadlo mientras programáis, no al final.
+          </p>
+        </div>
+      </section>
+
+      <section id="lo-que-falta" data-corto="Lo que falta">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Lo que no arregla ninguno de los cuatro</h2>
+        </div>
+        <p>
+          Mirad los números: 20, 30, 40. Con el umbral en 30, una Ms.&nbsp;Pac-Man a 29 pasos de la píldora hace huir al
+          fantasma y una a 31, no. Dos pasos de diferencia, comportamiento opuesto. La histéresis evita que oscile, pero no
+          que el corte sea arbitrario: ¿por qué 30 y no 28? Un jugador no piensa "a 30 o menos"; piensa
+          <strong>"está cerca"</strong>, y "cerca" no es verdad o mentira, es <em>más o menos</em> verdad.
+        </p>
+        <figure>
+          <figcaption>Un umbral de sí o no frente a un "cerca" que va por grados</figcaption>
+          <svg class="explica dgr12" viewBox="0 0 440 150" role="img" aria-label="Dos gráficas con la distancia de Ms. Pac-Man a la píldora en el eje horizontal, de 0 a 80. Arriba, la regla clásica: cerca vale 1 hasta 30 y salta a 0 justo en 30. Abajo, la lógica borrosa: cerca vale 1 hasta 15 y baja poco a poco hasta 0 en 45, de forma que a 30 pasos está cerca en un grado de 0,5.">
+            <style>
+              .dgr12 .ej{stroke:var(--ink-3);stroke-width:1}
+              .dgr12 .c{fill:none;stroke:var(--blinky);stroke-width:2.2;stroke-linejoin:round}
+              .dgr12 .f{fill:none;stroke:var(--maze);stroke-width:2.2;stroke-linejoin:round}
+              .dgr12 .t{font-family:var(--f-mono);font-size:8.6px;fill:var(--ink-2)}
+              .dgr12 .tt{font-family:var(--f-mono);font-size:8.5px;font-weight:700;letter-spacing:.08em;fill:var(--ink-3)}
+              .dgr12 .g{stroke:var(--line);stroke-width:1;stroke-dasharray:2 2}
+            </style>
+            <text x="40" y="12" class="tt">REGLA CLÁSICA · "PPill a menos de 30"</text>
+            <line x1="40" y1="58" x2="420" y2="58" class="ej"/><line x1="40" y1="18" x2="40" y2="58" class="ej"/>
+            <path d="M40 22 H182 V58 H420" class="c"/>
+            <text x="30" y="25" class="t" style="text-anchor:end">1</text><text x="30" y="61" class="t" style="text-anchor:end">0</text>
+            <text x="182" y="70" class="t" style="text-anchor:middle">30</text>
+            <text x="40" y="88" class="tt">BORROSA · "cerca"</text>
+            <line x1="40" y1="134" x2="420" y2="134" class="ej"/><line x1="40" y1="94" x2="40" y2="134" class="ej"/>
+            <path d="M40 98 H111 L253 134 H420" class="f"/>
+            <line x1="182" y1="134" x2="182" y2="116" class="g"/><line x1="40" y1="116" x2="182" y2="116" class="g"/>
+            <text x="30" y="101" class="t" style="text-anchor:end">1</text><text x="30" y="119" class="t" style="text-anchor:end">0,5</text><text x="30" y="137" class="t" style="text-anchor:end">0</text>
+            <text x="111" y="146" class="t" style="text-anchor:middle">15</text><text x="182" y="146" class="t" style="text-anchor:middle">30</text><text x="253" y="146" class="t" style="text-anchor:middle">45</text>
+            <text x="420" y="146" class="t" style="text-anchor:end">distancia a la PPill</text>
+          </svg>
+        </figure>
+        <p>
+          Eso es la <a href="borroso.html"><strong>lógica borrosa</strong></a>, el siguiente bloque: reglas como las de esta semana, "si la píldora
+          está <em>cerca</em> y el fantasma está <em>lejos</em>, la urgencia de huir es <em>alta</em>", pero con
+          palabras que se cumplen por grados, y una decisión que cambia suavemente en vez de a saltos. Todo lo que habéis
+          aprendido aquí de hechos, reglas y motores os va a servir tal cual.
+        </p>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="reglas-mspacman.html"><span class="pager-l">Anterior</span><span class="pager-t">Reglas en Ms.&nbsp;Pac-Man</span></a>
+        <a class="pager-next" href="borroso.html"><span class="pager-l">Siguiente</span><span class="pager-t">Conjuntos borrosos</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#cuatro">El mismo fantasma, cuatro veces</a></li>
+            <li><a href="#tabla">Frente a frente</a></li>
+            <li><a href="#industria">Quién usa qué</a></li>
+            <li><a href="#lo-que-falta">Lo que falta</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html" aria-current="page"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/reglas.js" defer></script>
+</body>
+</html>

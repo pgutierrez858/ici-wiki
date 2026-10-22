@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Conjuntos borrosos · Tema 2 · ICI</title>
+<meta name="description" content="Introducción a la lógica borrosa para videojuegos: el problema de los umbrales, de dónde viene la lógica borrosa y dónde se usa, conjuntos y funciones de pertenencia, variables lingüísticas, y las operaciones AND, OR y NOT, con ejemplos interactivos sobre Ms. Pac-Man.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>Conjuntos borrosos</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 08 · Razonamiento borroso</p>
+    <h1>
+      Conjuntos borrosos
+      <span class="thin">Cuando "cerca" no es verdad ni mentira, sino verdad en cierto grado.</span>
+    </h1>
+    <p class="standfirst">
+      Por qué un umbral de sí o no hace cosas raras, de dónde sale la lógica borrosa y dónde se usa hoy, qué es un conjunto borroso y cómo se dibuja, cómo se describe una distancia con palabras, y cómo se calculan el AND, el OR y el NOT cuando las cosas son verdad a medias.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        Las reglas de Jess son de sí o no: <code>(test (&lt;= ?d 30))</code> se cumple o no se cumple. Funciona, pero
+        tiene un precio que ya visteis al <a href="comparar.html#lo-que-falta">comparar los cuatro formatos</a>: el
+        comportamiento salta en el umbral. A 29 pasos de la píldora el fantasma huye; a 31, no. La <strong>lógica
+        borrosa</strong> (o difusa, del inglés <em lang="en">fuzzy</em>) permite escribir reglas con las mismas palabras
+        con las que piensa un jugador ("si el fantasma está <em>cerca</em>…") y dejar que "cerca" se cumpla
+        <strong>por grados</strong>.
+      </p>
+
+      <section id="umbral" data-corto="El problema del umbral">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Precisión o relevancia</h2>
+        </div>
+        <p>
+          Imaginad que un compañero de partida os avisa así:
+        </p>
+        <blockquote>
+          <p>"El Balrog, un Maia de fuego corrompido por Morgoth, que combatió en las guerras de la Primera Edad y se
+          refugió en las minas de Moria, y al que no podéis vencer, se acerca amenazadoramente con su látigo de fuego."</p>
+        </blockquote>
+        <p>
+          Todo es cierto y está muy bien contado, pero para cuando termina ya os han alcanzado. Lo que hacía falta era
+          "¡huid!". Es lo que Lotfi Zadeh, el inventor de la lógica borrosa, llamó el <strong>principio de
+          incompatibilidad</strong>:
+        </p>
+        <blockquote>
+          <p>A medida que crece la complejidad de un sistema, disminuye nuestra capacidad para hacer afirmaciones precisas
+          y a la vez significativas sobre su comportamiento, hasta que se llega a un punto en el que la precisión y la
+          relevancia se vuelven casi excluyentes.</p>
+        </blockquote>
+        <p>
+          Lo vemos todos los días. Nadie da una receta así:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Preciso</th><th scope="col">Como se dice de verdad</th></tr></thead>
+            <tbody>
+              <tr><td>Cortad dos rebanadas de pan de 1,5&nbsp;cm.</td><td>Cortad dos rebanadas medianas.</td></tr>
+              <tr><td>Poned el horno a 180&nbsp;°C.</td><td>Poned el horno fuerte.</td></tr>
+              <tr><td>Tostad hasta que el color se acerque a <code>#AA9900</code>.</td><td>Tostad hasta que esté doradito.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          La segunda columna es más útil, y un cocinero la sigue sin problemas porque sabe qué es "mediana" y "fuerte".
+          Con Ms.&nbsp;Pac-Man pasa lo mismo: la regla de un buen jugador no es "si el mínimo de las distancias de los
+          fantasmas es menor que 20 nodos, ir a la píldora de distancia mínima", sino <strong>"si los fantasmas están
+          cerca, ve a por la píldora más cercana"</strong>. La lógica borrosa es una forma de darle a "cerca" un
+          significado matemático preciso sin convertirlo en un umbral.
+        </p>
+      </section>
+
+      <section id="donde" data-corto="Dónde se usa">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">De dónde viene y dónde se usa</h2>
+        </div>
+        <p>
+          Zadeh, en Berkeley, publicó <em lang="en">Fuzzy Sets</em> en 1965. La idea tardó en cuajar en Occidente (a muchos
+          les parecía poco seria una lógica de "más o menos"), pero en 1975 Ebrahim Mamdani la usó para controlar una
+          máquina de vapor con un puñado de reglas escritas como las diría un operario, y el método que vais a usar en la
+          práctica lleva su nombre. Funcionó muy bien precisamente donde no hay un modelo matemático limpio del sistema
+          pero sí alguien que sabe manejarlo.
+        </p>
+        <p>
+          El salto vino de Japón. En 1987 empezó a funcionar el metro de Sendai con un control borroso de aceleración y
+          frenada que daba un viaje más suave que el de un conductor humano, y a principios de los noventa la palabra
+          <em>fuzzy</em> aparecía impresa en lavadoras, arroceras, cámaras de vídeo con estabilizador y aires
+          acondicionados. Hoy no se anuncia, pero sigue dentro de muchos controladores: cambios automáticos, frenos ABS,
+          electrodomésticos.
+        </p>
+        <h3 class="label">En los videojuegos</h3>
+        <ul>
+          <li>
+            <strong>Decidir con números en vez de con umbrales.</strong> El ejemplo clásico es el de Mat Buckland en
+            <em lang="en">Programming Game AI by Example</em>: un bot que elige arma con reglas como "si el enemigo está
+            <em>lejos</em> y me queda <em>mucha</em> munición del lanzacohetes, el lanzacohetes es <em>muy
+            deseable</em>". Cada arma recibe una puntuación y se coge la mejor.
+          </li>
+          <li>
+            <strong>La IA de utilidad</strong>, muy usada hoy en juegos de simulación y estrategia, es prima hermana: cada
+            acción se puntúa con curvas que convierten las medidas del juego en números entre 0 y 1, y gana la que más
+            puntúa. Las funciones de pertenencia que vais a ver aquí son exactamente ese tipo de curva.
+          </li>
+          <li>
+            <strong>Suavizar comportamientos</strong>: velocidad de persecución que crece poco a poco según la distancia,
+            agresividad que depende "más o menos" de la vida que queda. Donde una máquina de estados daría saltos, la
+            lógica borrosa da rampas.
+          </li>
+        </ul>
+      </section>
+
+      <section id="conjuntos" data-corto="Conjuntos y pertenencia">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Conjuntos y funciones de pertenencia</h2>
+        </div>
+        <p>
+          En un conjunto normal (nítido), un elemento está o no está. En un <strong>conjunto borroso</strong>, cada
+          elemento pertenece <strong>en un grado</strong> entre 0 y 1, y ese grado lo da su <strong>función de
+          pertenencia</strong>, que se escribe μ (mu). Si μ<sub>cerca</sub>(20) = 0,83, una distancia de 20 pasos es
+          "cerca" en un 83&nbsp;%.
+        </p>
+        <p>
+          El ejemplo de las diapositivas es la temperatura en Madrid, entre −10 y 50&nbsp;°C. Con conjuntos nítidos se
+          reparte en intervalos:
+        </p>
+<pre class="cuenta">frío       [−10, 20)
+templado   [20, 30)
+caluroso   [30, 50]</pre>
+        <p>
+          ¿Y 19,9&nbsp;°C es frío pero 20,0 es templado? Con conjuntos borrosos cada palabra tiene una curva, las curvas se
+          solapan, y 22&nbsp;°C es "bastante templado y un poco frío". Los conjuntos nítidos no desaparecen: son el caso
+          particular en el que la curva sólo vale 0 o 1.
+        </p>
+        <figure class="wide">
+          <figcaption>Las formas más habituales, y cómo se escriben en FCL, el lenguaje de jFuzzyLogic</figcaption>
+          <svg class="explica dgz1" viewBox="0 0 560 150" role="img" aria-label="Cuatro funciones de pertenencia en el intervalo de 0 a 100. Triangular: sube de 20 a 50 y baja hasta 80. Trapezoidal: sube de 10 a 30, se queda en 1 hasta 60 y baja hasta 80. Gaussiana: una campana centrada en 50. Nítida: vale 1 entre 30 y 60 y 0 fuera, con saltos verticales.">
+            <style>
+              .dgz1 .e{stroke:var(--ink-3);stroke-width:1}
+              .dgz1 .c{fill:none;stroke:var(--maze);stroke-width:2;stroke-linejoin:round}
+              .dgz1 .t{font-family:var(--f-mono);font-size:9.5px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgz1 .s{font-family:var(--f-mono);font-size:8.4px;fill:var(--ink-2);text-anchor:middle}
+            </style>
+            <g transform="translate(10,14)">
+              <line x1="0" y1="80" x2="120" y2="80" class="e"/><line x1="0" y1="10" x2="0" y2="80" class="e"/>
+              <path d="M0 80 H24 L60 10 L96 80 H120" class="c"/>
+              <text x="60" y="98" class="t">triangular</text><text x="60" y="112" class="s">trian 20 50 80</text>
+            </g>
+            <g transform="translate(150,14)">
+              <line x1="0" y1="80" x2="120" y2="80" class="e"/><line x1="0" y1="10" x2="0" y2="80" class="e"/>
+              <path d="M0 80 H12 L36 10 H72 L96 80 H120" class="c"/>
+              <text x="60" y="98" class="t">trapezoidal</text><text x="60" y="112" class="s">trape 10 30 60 80</text>
+              <text x="60" y="124" class="s">o (10,0) (30,1) (60,1) (80,0)</text>
+            </g>
+            <g transform="translate(290,14)">
+              <line x1="0" y1="80" x2="120" y2="80" class="e"/><line x1="0" y1="10" x2="0" y2="80" class="e"/>
+              <path d="M0 79.4 C 20 79, 34 74, 42 56 C 50 30, 55 10, 60 10 C 65 10, 70 30, 78 56 C 86 74, 100 79, 120 79.4" class="c"/>
+              <text x="60" y="98" class="t">gaussiana</text><text x="60" y="112" class="s">gauss 50 12</text>
+            </g>
+            <g transform="translate(430,14)">
+              <line x1="0" y1="80" x2="120" y2="80" class="e"/><line x1="0" y1="10" x2="0" y2="80" class="e"/>
+              <path d="M0 80 H36 V10 H72 V80 H120" class="c"/>
+              <text x="60" y="98" class="t">nítida</text><text x="60" y="112" class="s">un intervalo de toda</text><text x="60" y="124" class="s">la vida: 0 o 1</text>
+            </g>
+          </svg>
+        </figure>
+        <p>
+          La más práctica es la definida <strong>por puntos</strong>: <code>(0, 1) (15, 1) (45, 0)</code> es una línea que
+          vale 1 hasta 15 y baja hasta 0 en 45. Con dos, tres o cuatro puntos salen rampas, triángulos y trapecios, y es
+          lo que usa la plantilla de la práctica casi siempre. Un detalle que importa: <strong>fuera de los puntos, la
+          función se queda con el valor del extremo</strong>. Con <code>(0, 1) (60, 0)</code>, una distancia de −1
+          vale 1. Lo recordaremos en la <a href="borroso-mspacman.html#visibilidad">página del motor</a>.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Posibilidad no es probabilidad</span>
+          <p>
+            Que una distancia sea "cerca" en un 0,8 no quiere decir que haya un 80&nbsp;% de probabilidad de que esté
+            cerca. La distancia se conoce exactamente; lo que es vago es la palabra. Un ejemplo clásico: una botella con
+            pertenencia 0,9 al conjunto de "bebidas potables" es agua un poco turbia, y os la podéis beber; una botella con
+            un 90&nbsp;% de probabilidad de ser potable puede ser veneno en uno de cada diez casos. Las dos cosas se miden
+            con números entre 0 y 1, y no tienen nada que ver.
+          </p>
+        </div>
+      </section>
+
+      <section id="variables" data-corto="Variables lingüísticas">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Variables lingüísticas: una distancia, en palabras</h2>
+        </div>
+        <p>
+          Una <strong>variable lingüística</strong> es una magnitud del juego (la distancia de Ms.&nbsp;Pac-Man a la
+          píldora) junto con unas cuantas palabras para describirla, sus <strong>términos</strong>: <em>cerca</em>,
+          <em>media</em>, <em>lejos</em>, cada uno con su función de pertenencia. Al convertir un número en grados de
+          cada término se dice que se <strong>difumina</strong> (<em lang="en">fuzzify</em>).
+        </p>
+        <div class="demo" data-borroso="variable">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>La misma distancia, con conjuntos nítidos y borrosos</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Las tres funciones son: cerca, (0,1) (15,1) (45,0); media, trian 20 50 80; lejos, (55,0) (85,1) (100,1).</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <ul>
+            <li>Con <strong>Nítidos</strong>, moved la distancia de 29 a 31: "cerca" pasa de 1 a 0 de golpe. Es el umbral
+              de las reglas de Jess.</li>
+            <li>Con <strong>Borrosos</strong>, haced lo mismo: "cerca" baja de 0,53 a 0,47 y "media" sube un poco. Nada
+              salta.</li>
+            <li>Hay distancias que son dos cosas a la vez (a 30, un 0,5 cerca y un 0,33 media) y ninguna que no sea nada:
+              las curvas <strong>cubren todo el rango y se solapan</strong> con la vecina.</li>
+          </ul>
+        </div>
+        <h3 class="label">Cómo elegir los términos</h3>
+        <ul>
+          <li><strong>Pocos.</strong> Tres por variable suele bastar; cinco ya es mucho. Cada término de más multiplica las
+            reglas que hay que escribir.</li>
+          <li><strong>Que cubran todo el rango.</strong> Si hay un hueco donde ningún término vale nada, las reglas no
+            dirán nada para esos valores. Lo veréis pasar en la <a href="inferencia-borrosa.html#trampas">página de
+            inferencia</a>.</li>
+          <li><strong>Que se solapen con la vecina.</strong> Una buena costumbre es que en la zona de solape los grados de
+            los dos términos sumen más o menos 1, como en el ejemplo.</li>
+          <li><strong>Con los números del juego.</strong> ¿Cuánto es "cerca" en el laberinto? Medidlo: imprimid las
+            distancias de unas cuantas partidas y mirad cómo se reparten. Un término mal colocado estropea todas las reglas
+            que lo usan.</li>
+        </ul>
+      </section>
+
+      <section id="operaciones" data-corto="AND, OR y NOT">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">AND, OR y NOT por grados</h2>
+        </div>
+        <p>
+          Para escribir reglas con más de una condición hacen falta los conectivos. Las definiciones de Zadeh son las más
+          usadas, y se entienden solas:
+        </p>
+<pre class="cuenta">A AND B   =  min(μA, μB)      lo justo para las dos: tan verdad como la más falsa
+A OR B    =  max(μA, μB)      tan verdad como la más verdadera
+NOT A     =  1 − μA</pre>
+        <p>
+          Con 0 y 1 son el AND, el OR y el NOT de toda la vida: <code>min(1, 0) = 0</code>, <code>max(1, 0) = 1</code>.
+          Por eso se dice que la lógica clásica es un caso particular de la borrosa. Hay otras definiciones válidas (a las
+          de AND se les llama <strong>t-normas</strong> y a las de OR, <strong>t-conormas</strong>), y la más común después
+          del mínimo es el producto:
+        </p>
+<pre class="cuenta">A AND B   =  μA · μB                 (PROD en FCL)
+A OR B    =  μA + μB − μA · μB       (PROBOR, la "suma probabilística")</pre>
+        <p>
+          La diferencia práctica: con el mínimo, si una condición ya es floja, mejorar la otra no cambia nada; con el
+          producto, las dos cuentan siempre. Un fantasma cerca en un 0,9 y comestible en un 0,4 da 0,4 con el mínimo y 0,36
+          con el producto; si el fantasma se acerca hasta 1,0, el mínimo sigue en 0,4 y el producto sube a 0,4.
+        </p>
+        <div class="demo" data-borroso="operaciones">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Combinar "cerca" y "media" con cada operación</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Las fórmulas están justo encima.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <ul>
+            <li><strong>AND · min</strong> es la parte de abajo de las dos curvas: el triángulo pequeño donde se solapan.</li>
+            <li><strong>OR · max</strong> es la parte de arriba: cubre todo lo que es cerca <em>o</em> media.</li>
+            <li><strong>NOT</strong> da la vuelta a "cerca". Fijaos en que <code>cerca AND NOT cerca</code> no es 0: en la
+              rampa llega a 0,5. "Estar cerca y no estar cerca" es imposible en lógica clásica, y en la borrosa es verdad a
+              medias en la frontera. No es un error: es justo lo que significa que la frontera sea borrosa.</li>
+          </ul>
+        </div>
+        <h3 class="label">Y con dos variables distintas</h3>
+        <p>
+          "El fantasma está <em>cerca</em> y le queda <em>poco</em> tiempo de comestible" mezcla dos magnitudes, distancia y
+          tiempo. Para hacer el mínimo de las dos, cada conjunto se extiende a las dos dimensiones como si no dependiera de
+          la otra variable (se le llama <strong>extensión cilíndrica</strong>) y el AND se hace punto a punto en el plano.
+          En la práctica no tenéis que hacer nada: jFuzzyLogic calcula el grado de cada condición con su variable y después
+          los combina. Pero es lo que justifica que <code>IF fantasma IS cerca AND tiempo IS poco</code> tenga sentido.
+        </p>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="comparar.html"><span class="pager-l">Anterior</span><span class="pager-t">Reglas, máquinas y árboles</span></a>
+        <a class="pager-next" href="inferencia-borrosa.html"><span class="pager-l">Siguiente</span><span class="pager-t">Inferencia borrosa</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#umbral">El problema del umbral</a></li>
+            <li><a href="#donde">Dónde se usa</a></li>
+            <li><a href="#conjuntos">Conjuntos y pertenencia</a></li>
+            <li><a href="#variables">Variables lingüísticas</a></li>
+            <li><a href="#operaciones">AND, OR y NOT</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html" aria-current="page"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/borroso.js" defer></script>
+</body>
+</html>

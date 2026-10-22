@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Rete · Tema 2 · ICI</title>
+<meta name="description" content="El algoritmo Rete explicado con dibujos: por qué comparar todas las reglas con todos los hechos en cada ciclo no escala, la red de nodos alfa y beta, un ejemplo interactivo que cuenta las comprobaciones, y lo que cuesta de verdad un turno del motor de la práctica.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>Rete</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 04 · Sistemas de reglas</p>
+    <h1>
+      Rete: por qué el motor no se ahoga
+      <span class="thin">En vez de que cada regla busque sus hechos, que cada hecho nuevo busque sus reglas.</span>
+    </h1>
+    <p class="standfirst">
+      Comparar todas las reglas con todos los hechos en cada vuelta del ciclo sale carísimo. Rete, el algoritmo que llevan dentro CLIPS, Jess y Drools, se ahorra casi todo ese trabajo con dos observaciones sencillas. Una red que podéis ver por dentro y una medida de lo que cuesta un turno de vuestro fantasma.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        El pseudocódigo del motor de la <a href="que-es.html#ciclo">primera página</a> tiene una línea muy cara:
+        "la agenda son las reglas cuya parte izquierda casa con los hechos". Hecho a lo bruto, eso es probar cada
+        regla con cada combinación posible de hechos, <em>en cada vuelta</em>. No hace falta saber cómo lo resuelve el
+        motor para usar Jess, pero sí ayuda a entender por qué escribir las reglas de una forma u otra cambia lo que
+        cuesta, y por qué Jess es rápido aunque tengáis muchas.
+      </p>
+
+      <section id="problema" data-corto="El problema">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El problema: todas contra todos, en cada vuelta</h2>
+        </div>
+        <p>
+          Una regla con tres patrones casa con <em>tres</em> hechos a la vez, así que para saber si se cumple hay que
+          probar ternas. Con <var>n</var> hechos en la memoria, son hasta <var>n</var>³ ternas por regla:
+        </p>
+<pre class="cuenta">reglas en la base                     15
+patrones por regla                     3
+hechos en la memoria                  30
+ternas por regla           30 × 30 × 30 = 27 000
+por las 15 reglas         15 × 27 000 = 405 000 comprobaciones
+y otra vez después de cada disparo</pre>
+        <p>
+          Y casi todo es trabajo repetido. Charles Forgy, que inventó Rete a finales de los setenta en Carnegie
+          Mellon, partió de dos observaciones:
+        </p>
+        <ul>
+          <li><strong>Redundancia temporal.</strong> Entre una vuelta y la siguiente cambian muy pocos hechos: una regla
+            aserta uno o dos y retira alguno. Los otros veintiocho siguen igual, y las comprobaciones que se hicieron
+            con ellos siguen valiendo.</li>
+          <li><strong>Similitud estructural.</strong> Muchas reglas comparten condiciones. Si diez reglas empiezan con
+            "el fantasma no es comestible", no hace falta comprobarlo diez veces.</li>
+        </ul>
+        <p>
+          De ahí sale la idea que le da la vuelta al problema: <strong>en vez de que cada regla busque qué hechos la
+          cumplen, cada hecho nuevo busca a qué reglas afecta</strong>, y el motor recuerda todo lo que ya había
+          averiguado.
+        </p>
+        <figure class="wide">
+          <figcaption>El método ingenuo y Rete, con los mismos hechos y las mismas reglas</figcaption>
+          <svg class="explica dgr9" viewBox="0 0 560 170" role="img" aria-label="A la izquierda, el método tradicional: cada regla consulta la base de hechos completa en cada ciclo y de ahí sale la agenda. A la derecha, Rete: sólo los hechos nuevos, como fichas, entran en una red ya construida con las reglas, la recorren y actualizan la agenda.">
+            <style>
+              .dgr9 .b{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgr9 .r{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.3}
+              .dgr9 .n{fill:color-mix(in srgb,var(--pill) 50%,var(--surface));stroke:var(--pill-ink);stroke-width:1.3}
+              .dgr9 .ag{fill:color-mix(in srgb,var(--pill) 22%,var(--surface));stroke:var(--pill-ink);stroke-width:1.1}
+              .dgr9 .t{font-family:var(--f-mono);font-size:9px;fill:var(--ink);text-anchor:middle}
+              .dgr9 .tt{font-family:var(--f-mono);font-size:8.5px;font-weight:700;letter-spacing:.1em;fill:var(--ink-3);text-anchor:middle}
+              .dgr9 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#r9a)}
+              .dgr9 .m{fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 2}
+            </style>
+            <defs><marker id="r9a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <text x="135" y="14" class="tt">INGENUO · CADA REGLA BUSCA SUS HECHOS</text>
+            <rect x="10" y="30" width="90" height="70" rx="4" class="b"/><text x="55" y="62" class="t">todos los</text><text x="55" y="74" class="t">hechos</text>
+            <rect x="170" y="30" width="90" height="70" rx="4" class="r"/><text x="215" y="68" class="t">reglas</text>
+            <path d="M168 45 H103" class="a"/><path d="M168 65 H103" class="a"/><path d="M168 85 H103" class="a"/>
+            <rect x="170" y="126" width="90" height="28" rx="4" class="ag"/><text x="215" y="144" class="t">agenda</text>
+            <path d="M215 100 V123" class="a"/>
+            <text x="135" y="166" class="t">todas otra vez, en cada ciclo</text>
+            <text x="420" y="14" class="tt">RETE · CADA HECHO NUEVO BUSCA SUS REGLAS</text>
+            <rect x="300" y="30" width="80" height="70" rx="4" class="b"/><text x="340" y="62" class="t">hechos</text><text x="340" y="74" class="t">(ya vistos)</text>
+            <rect x="300" y="120" width="80" height="34" rx="4" class="n"/><text x="340" y="134" class="t">hechos</text><text x="340" y="146" class="t">nuevos</text>
+            <rect x="440" y="30" width="110" height="80" rx="4" class="r"/><text x="495" y="62" class="t">red Rete</text><text x="495" y="76" class="t">(recuerda lo</text><text x="495" y="88" class="t">ya averiguado)</text>
+            <path d="M380 137 C 410 137, 420 90, 437 80" class="a"/>
+            <path d="M380 60 H437" class="m"/>
+            <rect x="450" y="126" width="90" height="28" rx="4" class="ag"/><text x="495" y="144" class="t">agenda</text>
+            <path d="M495 110 V123" class="a"/>
+            <text x="420" y="166" class="t">sólo pasan los nuevos</text>
+          </svg>
+        </figure>
+      </section>
+
+      <section id="red" data-corto="La red">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">La red: filtros, cruces y memorias</h2>
+        </div>
+        <p>
+          Al cargar las reglas, Rete las compila en una red (<em>rete</em> es "red" en latín) con tres tipos de nodo:
+        </p>
+        <dl class="gloss">
+          <div><dt>Nodos alfa</dt><dd>Filtros de un solo hecho: "es un fantasma y no es comestible". Cada hecho nuevo pasa por ellos, y si cumple el filtro se guarda en la <strong>memoria alfa</strong> del nodo. Si dos reglas tienen la misma condición, comparten el nodo: aquí está la similitud estructural.</dd></div>
+          <div><dt>Nodos beta</dt><dd>Cruces entre dos memorias: "un fantasma no comestible <em>y</em> un hecho que dice que Ms.&nbsp;Pac-Man está cerca <em>de ese mismo fantasma</em>". Comprueban que las variables casen (el mismo <code>?f</code> en los dos lados) y guardan las parejas que lo cumplen en su <strong>memoria beta</strong>.</dd></div>
+          <div><dt>Nodos terminales</dt><dd>Uno por regla. Lo que llega hasta aquí es una combinación de hechos que cumple la parte izquierda entera: una activación, que entra en la agenda.</dd></div>
+        </dl>
+        <p>
+          Cuando entra un hecho nuevo, sólo se hace el trabajo que ese hecho puede cambiar: pasar por los filtros alfa,
+          y en los cruces a los que llega, compararlo con lo que ya está guardado <em>al otro lado</em>. Nada más.
+          Cuando se retira un hecho, recorre el mismo camino borrando lo que había dejado. Esa es la redundancia
+          temporal aprovechada: lo que se averiguó en vueltas anteriores está en las memorias y no se repite.
+        </p>
+        <div class="demo" data-reglas="rete">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Siete cambios en la memoria, y lo que cuesta cada uno</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. La red está descrita en la lista de arriba.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Tres reglas: <code>perseguir</code> (un fantasma no comestible), <code>emboscar</code> (no comestible y con
+          Ms.&nbsp;Pac-Man cerca) y <code>huir-ya</code> (comestible y con Ms.&nbsp;Pac-Man cerca). Las dos primeras
+          comparten el filtro <code>a1</code> y las dos últimas, el <code>a3</code>. Debajo de cada nodo está su
+          memoria; abajo, la agenda. Con cada paso entra o sale un hecho, y en amarillo se ve por dónde pasa.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <ul>
+            <li>En los pasos 1 a 3 entran fantasmas. <code>perseguir</code> entra en la agenda en cuanto llega el
+              primero; las reglas de dos condiciones no, porque falta el otro lado del cruce, pero <strong>sus memorias
+              alfa ya se van llenando</strong>.</li>
+            <li>En el paso 4 entra "Ms.&nbsp;Pac-Man cerca de Blinky". Sólo pasa por <code>a3</code> y se cruza con lo que ya
+              estaba guardado en <code>a1</code> y <code>a2</code>: no se vuelve a mirar ningún fantasma.</li>
+            <li>En el paso 6 se retira ese mismo hecho, y la activación de <code>emboscar</code> desaparece sin
+              recalcular nada más.</li>
+            <li>Comparad las dos cifras de la tira de abajo según avanza el guion. La de Rete crece poco con cada
+              hecho; la del método ingenuo, cada vez más, porque cada vuelta lo prueba todo con todo.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="precio" data-corto="Lo que cuesta">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Lo que se paga, y cómo escribir reglas que le gusten</h2>
+        </div>
+        <p>
+          Rete cambia tiempo por memoria: guarda todas las coincidencias parciales, también las que nunca llegarán a
+          ser activaciones. Casi siempre compensa, pero de ahí salen dos consejos que valen para Jess:
+        </p>
+        <ul>
+          <li><strong>Las condiciones más restrictivas, primero.</strong> Los cruces se hacen en el orden en que
+            escribís los patrones. Si el primero casa con muchos hechos y el segundo con muy pocos, las memorias beta se
+            llenan de parejas que no van a ningún sitio. Poned delante lo que filtra más.</li>
+          <li><strong>Mejor restricciones en el patrón que <code>test</code> sueltos.</strong>
+            <code>(MSPACMAN (mindistancePPill ?d&amp;:(&lt;= ?d 30)))</code> filtra en el nodo alfa, al entrar el
+            hecho. Un <code>(test (&lt;= ?d 30))</code> aparte hace lo mismo, pero más tarde, cuando el hecho ya ha
+            pasado por la red. Con pocas reglas da igual; es buena costumbre.</li>
+        </ul>
+
+        <h3 class="label">Y en vuestro fantasma, ¿importa?</h3>
+        <p>
+          Poco, y es bueno saber por qué. El motor de la práctica <strong>vacía la memoria en cada turno</strong> con
+          <code>reset</code> y vuelve a asertar los hechos del <code>Input</code>, así que la redundancia temporal
+          <em>entre turnos</em> se pierde: Rete rehace sus memorias desde cero cada vez. Dentro de un mismo turno sí
+          se aprovecha, porque después de cada disparo sólo pasa por la red el <code>ACTION</code> nuevo.
+        </p>
+        <p>
+          Lo hemos medido en el portátil donde se han escrito estos apuntes, con Jess 7.1 y las reglas de Blinky de la
+          plantilla: <code>reset</code>, asertar los cinco hechos como cadenas (como hace <code>RuleEngine</code>) y
+          <code>run</code>, cien mil veces seguidas.
+        </p>
+<pre class="cuenta">un turno de un fantasma                  ≈ 12 µs
+los cuatro fantasmas                     ≈ 50 µs
+lo que da el simulador por turno           40 ms = 40 000 µs
+margen                                     unas 800 veces</pre>
+        <p>
+          Con quince o treinta reglas por fantasma seguiréis muy lejos del límite. Si un controlador de reglas se queda
+          sin tiempo, casi seguro que el problema no es Jess: es algo caro calculado en el <code>Input</code> (un
+          camino por cada píldora, por ejemplo) o una regla que no para de dispararse, como el <a href="conflictos.html#refraccion">bucle de
+          <code>modify</code></a>.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Por qué contamos esto</span>
+          <p>
+            Rete es la razón de que los sistemas de reglas sean viables con miles de reglas, y la idea (no recalcular,
+            propagar sólo lo que cambia) reaparece por todas partes: en las hojas de cálculo, en los sistemas de
+            compilación incremental y en cómo React decide qué partes de una página volver a pintar. Os la vais a
+            volver a encontrar.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="conflictos.html"><span class="pager-l">Anterior</span><span class="pager-t">La agenda y los conflictos</span></a>
+        <a class="pager-next" href="clips.html"><span class="pager-l">Siguiente</span><span class="pager-t">CLIPS y Jess</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#problema">El problema</a></li>
+            <li><a href="#red">La red</a></li>
+            <li><a href="#precio">Lo que cuesta</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html" aria-current="page"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/reglas.js" defer></script>
+</body>
+</html>

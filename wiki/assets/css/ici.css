@@ -1337,6 +1337,9 @@ table caption {
 }
 .ranking tbody th { font-family: var(--f-mono); font-size: .8rem; font-weight: 500; white-space: nowrap; }
 .ranking td:first-child { color: var(--ink-3); width: 4.5rem; }
+/* un controlador descalificado: al final del ranking, apagado, sin media */
+.ranking tr.fuera th, .ranking tr.fuera td { color: var(--ink-3); }
+.ranking tr.fuera td[colspan] { text-align: center; font-family: var(--f-mono); font-size: .72rem; }
 .puesto {
   display: inline-block;
   min-width: 4.8rem;
@@ -2262,6 +2265,140 @@ figure.lab-uno { max-width: 17rem; }
 
 /* la ruta, en todos */
 .dm-ruta { fill: none; stroke: var(--pill-ink); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+
+/* ---------- sistemas de reglas (assets/js/reglas.js) ----------
+   Los papeles del color son los del bucle de búsqueda: azul flojo lo que ya
+   está en la memoria de trabajo, píldora lo que espera en la agenda —la
+   frontera de un motor de reglas—, Blinky la regla que se dispara ahora y un
+   filo de píldora para el hecho que acaba de entrar. Al encadenar hacia atrás,
+   el par --ok/--bad dice demostrado o refutado, como en la relajación. */
+.rg-svg { cursor: default; }
+.rg-flecha { fill: none; stroke: var(--ink-3); stroke-width: 1.1; opacity: .7; }
+.rg-flecha.on { stroke: var(--blinky); stroke-width: 2; opacity: 1; }
+.rg-hecho { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.3; }
+.rg-hecho.si { fill: color-mix(in srgb, var(--maze) 30%, var(--surface)); stroke: var(--maze); }
+.rg-hecho.nuevo { stroke: var(--pill-ink); stroke-width: 2.4; }
+.rg-hecho.no { fill: color-mix(in srgb, var(--bad) 22%, var(--surface)); stroke: var(--bad); }
+.rg-hecho.foco { stroke: var(--blinky); stroke-width: 2.4; }
+.rg-hecho.quitado { stroke-dasharray: 3 2; opacity: .55; }
+.rg-click { cursor: pointer; }
+.rg-click:focus-visible { outline: none; }
+.rg-click:focus-visible .rg-hecho { stroke: var(--focus); stroke-width: 2.6; }
+.rg-regla { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.2; }
+.rg-regla.agenda { fill: color-mix(in srgb, var(--pill) 55%, var(--surface)); stroke: var(--pill-ink); }
+.rg-regla.dispara { fill: color-mix(in srgb, var(--blinky) 45%, var(--surface)); stroke: var(--blinky); stroke-width: 1.8; }
+.rg-etq { font-family: var(--f-mono); font-size: 8.5px; font-weight: 500; text-anchor: middle; fill: var(--ink); }
+.rg-mem { font-family: var(--f-mono); font-size: 8px; text-anchor: middle; fill: var(--ink-2); }
+.rg-raiz { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.2; }
+.rg-alfa, .rg-beta { fill: var(--surface); stroke: var(--maze); stroke-width: 1.2; }
+.rg-alfa.on, .rg-beta.on { fill: color-mix(in srgb, var(--pill) 55%, var(--surface)); stroke: var(--pill-ink); stroke-width: 1.6; }
+
+.rg-tabla { overflow-x: auto; border-top: 1px solid var(--line-soft); background: var(--surface); }
+.rg-pasos { width: 100%; min-width: 30rem; border-collapse: collapse; font-family: var(--f-mono); font-size: .72rem; margin: 0; }
+.rg-pasos th { text-align: left; font-weight: 500; font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); padding: .45rem .6rem; border-bottom: 1px solid var(--line); }
+.rg-pasos td { padding: .35rem .6rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; color: var(--ink); font-variant-numeric: tabular-nums; }
+.rg-pasos td.num { text-align: right; }
+.rg-pasos tr.ahora td { background: var(--pill-soft); }
+.rg-pasos td.bien { color: var(--ok); }
+.rg-pasos td.mal { color: var(--bad); }
+.rg-conf { min-width: 42rem; }
+.rg-conf code { white-space: nowrap; }
+.rg-conf tr.fuera td { color: var(--ink-3); }
+.rg-conf tr.fuera td.mal { color: var(--ink-3); }
+.rg-conf tr.gana td { background: color-mix(in srgb, var(--blinky) 14%, var(--surface)); }
+.rg-conf tr.gana td:first-child { box-shadow: inset 3px 0 0 var(--blinky); }
+
+/* el banco de pruebas: el fichero .clp a la izquierda y lo que sabe el motor */
+.rg-banco { padding: .7rem .9rem; display: grid; gap: .7rem; }
+.rg-editor {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--f-mono);
+  font-size: .74rem;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: .55rem .65rem;
+  resize: vertical;
+  tab-size: 3;
+}
+.rg-editor:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
+.rg-paneles { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+.rg-panel { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 3px; padding: .45rem .6rem; min-width: 0; }
+.rg-lista { list-style: none; margin: .3rem 0 0; padding: 0; font-family: var(--f-mono); font-size: .7rem; line-height: 1.5; color: var(--ink); }
+.rg-lista li { padding: .12rem 0; overflow-wrap: anywhere; }
+.rg-lista li b { font-weight: 500; color: var(--ink-3); margin-right: .2rem; }
+.rg-lista li.rg-sig { background: color-mix(in srgb, var(--pill) 30%, var(--surface)); box-shadow: -.3rem 0 0 color-mix(in srgb, var(--pill) 30%, var(--surface)); }
+.rg-lista li.rg-sig b { color: var(--ink); }
+.rg-lista li.rg-vacio { color: var(--ink-3); font-style: italic; }
+.rg-traza { background: var(--surface-2); max-height: 15rem; overflow-y: auto; }
+.rg-l.rg-cmd { color: var(--ink-3); }
+.rg-l.rg-activa, .rg-l.rg-desactiva { color: var(--pill-ink); }
+.rg-l.rg-dispara { color: var(--blinky); font-weight: 700; }
+.rg-l.rg-sale { color: var(--ink); font-weight: 700; }
+.rg-l.rg-gana { color: var(--maze); font-weight: 700; }
+.rg-l.rg-error { color: var(--bad); font-weight: 700; }
+.rg-l.rg-aserta, .rg-l.rg-retira, .rg-l.rg-modifica { color: var(--ink-2); }
+@media (max-width: 640px) {
+  .rg-paneles { grid-template-columns: 1fr; }
+}
+
+/* ---------- razonamiento borroso (assets/js/borroso.js) ----------
+   Aquí el color es categórico: cada término de una variable lleva uno, y el
+   mismo en la entrada, en la tabla y en lo que deja en la salida. Se usan el
+   azul del laberinto y tres fantasmas, que son los cuatro tonos que se
+   distinguen entre sí en claro y en oscuro; Blinky queda libre para el número
+   que sale, que es la respuesta, y la píldora para lo que se acumula. */
+.bz-svg { cursor: default; }
+.bz-eje { stroke: var(--ink-3); stroke-width: 1; }
+.bz-n { font-family: var(--f-mono); font-size: 8px; fill: var(--ink-3); text-anchor: middle; }
+.bz-v { font-family: var(--f-mono); font-size: 9px; font-weight: 700; }
+.bz-curva { fill: none; stroke-width: 2; stroke-linejoin: round; }
+.bz-curva.bz-fina { stroke-width: 1.1; opacity: .55; stroke-dasharray: 3 2; }
+.bz-t0 { stroke: var(--maze); fill: var(--maze); }
+.bz-t1 { stroke: var(--clyde); fill: var(--clyde); }
+.bz-t2 { stroke: var(--inky); fill: var(--inky); }
+.bz-t3 { stroke: var(--pinky); fill: var(--pinky); }
+.bz-t4 { stroke: var(--ink-2); fill: var(--ink-2); }
+.bz-curva.bz-t0, .bz-curva.bz-t1, .bz-curva.bz-t2, .bz-curva.bz-t3, .bz-curva.bz-t4 { fill: none; }
+.bz-v.bz-t0, .bz-v.bz-t1, .bz-v.bz-t2, .bz-v.bz-t3, .bz-v.bz-t4 { stroke: none; }
+.bz-punto { stroke: var(--surface); stroke-width: 1.4; }
+.bz-x { stroke: var(--ink-2); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.bz-res { fill: var(--pill); fill-opacity: .42; stroke: var(--pill-ink); stroke-width: 1.4; }
+.bz-res-p { fill: var(--pill); stroke: var(--pill-ink); stroke-width: 1.6; }
+.bz-recorte { fill-opacity: .16; stroke-width: .8; stroke-opacity: .7; }
+.bz-agregado { fill: var(--pill); fill-opacity: .34; stroke: var(--pill-ink); stroke-width: 1.6; stroke-linejoin: round; }
+.bz-salida-x { stroke: var(--blinky); stroke-width: 2.2; }
+.bz-salida-t { fill: var(--blinky); }
+.bz-control { fill: none; stroke: var(--pill-ink); stroke-width: 2.2; stroke-linejoin: round; }
+.bz-muestra { display: inline-block; width: .9rem; height: .22rem; border-radius: 1px; }
+.bz-muestra.bz-t0 { background: var(--maze); }
+.bz-muestra.bz-t1 { background: var(--clyde); }
+.bz-muestra.bz-t2 { background: var(--inky); }
+.bz-muestra.bz-t3 { background: var(--pinky); }
+.bz-muestra.bz-res-m { background: var(--pill); height: .6rem; outline: 1px solid var(--pill-ink); }
+.bz-leyenda-en-barra { border: 0; padding: 0; background: none; }
+
+.bz-banco { display: grid; gap: 0; }
+/* sin esto, la tabla de reglas (con su min-width) ensancha la rejilla y la página entera se desplaza de lado */
+.bz-banco > *, .rg-banco > *, .rg-paneles > * { min-width: 0; }
+.bz-fcl { padding: .55rem .9rem; border-bottom: 1px solid var(--line-soft); }
+.bz-fcl summary { cursor: pointer; font-family: var(--f-mono); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.bz-fcl[open] summary { margin-bottom: .5rem; }
+.bz-fcl-pie { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: .45rem; }
+.bz-aviso { font-family: var(--f-mono); font-size: .7rem; color: var(--bad); }
+.bz-entradas { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .2rem .9rem; padding: .5rem .9rem; }
+.bz-entrada .demo-campo { margin: .2rem 0 0; }
+.bz-entrada .demo-campo input[type="range"] { width: 9rem; }
+.bz-salidas { padding: .3rem .9rem .5rem; border-top: 1px solid var(--line-soft); }
+.bz-salida + .bz-salida { border-top: 1px dashed var(--line-soft); margin-top: .2rem; }
+.bz-reglas { min-width: 34rem; }
+.bz-reglas tr.bz-apagada td { color: var(--ink-3); }
+.bz-grado { position: relative; min-width: 6rem; white-space: nowrap; }
+.bz-barra { display: inline-block; vertical-align: middle; height: .5rem; max-width: 3.5rem; margin-right: .4rem; background: var(--pill); outline: 1px solid var(--pill-ink); }
+.bz-grado { font-variant-numeric: tabular-nums; }
 
 @media (max-width: 560px) {
   .demo-campo input[type="range"] { width: 4.5rem; }

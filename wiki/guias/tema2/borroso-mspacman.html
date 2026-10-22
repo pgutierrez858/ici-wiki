@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Lógica borrosa en Ms. Pac-Man · Tema 2 · ICI</title>
+<meta name="description" content="Cómo se usa la lógica borrosa en el motor de Ms. Pac-Man: el lenguaje FCL de jFuzzyLogic, cómo probar un FCL sin lanzar el juego, el paquete fuzzy del motor (FuzzyInput, FuzzyEngine, ActionSelector), cómo convertir salidas borrosas en una acción, la visibilidad parcial y la memoria, el observador y los errores típicos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>Lógica borrosa en Ms. Pac-Man</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 10 · Razonamiento borroso</p>
+    <h1>
+      Lógica borrosa en Ms.&nbsp;Pac-Man
+      <span class="thin">FCL, jFuzzyLogic y el paquete <code>fuzzy</code> del motor, de las distancias a un movimiento.</span>
+    </h1>
+    <p class="standfirst">
+      El fichero FCL pieza a pieza, cómo probarlo desde la consola, y lo que hace el motor en cada turno: el <code>FuzzyInput</code> que mide, jFuzzyLogic que razona y el <code>ActionSelector</code> que convierte unos números en un movimiento. Con la visibilidad parcial, los errores típicos y una comparación final con las reglas de Jess.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="fcl" data-corto="El fichero FCL">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El fichero FCL, pieza a pieza</h2>
+        </div>
+        <p>
+          <strong>FCL</strong> (<em lang="en">Fuzzy Control Language</em>) es un lenguaje estándar para describir sistemas
+          borrosos, de la norma IEC&nbsp;61131-7 de los autómatas industriales. jFuzzyLogic lo lee y lo ejecuta desde Java.
+          Como el <code>.clp</code> de Jess, va en un fichero aparte del código, y el conocimiento queda fuera del Java.
+          Un bloque completo, el del <a href="inferencia-borrosa.html#banco">banco de pruebas</a>:
+        </p>
+<pre><code>FUNCTION_BLOCK huida                <span class="c">// un bloque; un fichero puede tener varios</span>
+
+VAR_INPUT                           <span class="c">// lo que llega del juego</span>
+   fantasma : REAL;
+   ppill    : REAL;
+END_VAR
+
+VAR_OUTPUT                          <span class="c">// lo que sale</span>
+   huir : REAL;
+END_VAR
+
+FUZZIFY fantasma                    <span class="c">// los términos de cada entrada</span>
+   TERM cerca := (0, 1) (15, 1) (45, 0);
+   TERM media := trian 20 50 80;
+   TERM lejos := (55, 0) (85, 1) (100, 1);
+END_FUZZIFY
+
+FUZZIFY ppill
+   TERM cerca := (0, 1) (10, 1) (40, 0);
+   TERM lejos := (20, 0) (60, 1) (100, 1);
+END_FUZZIFY
+
+DEFUZZIFY huir                      <span class="c">// los términos de la salida y cómo se desdifumina</span>
+   TERM poco  := (0, 1) (4, 0);
+   TERM algo  := trian 2 5 8;
+   TERM mucho := (6, 0) (10, 1);
+   METHOD : COG;
+   DEFAULT := 0;                    <span class="c">// lo que sale si no se activa ninguna regla</span>
+END_DEFUZZIFY
+
+RULEBLOCK reglas
+   AND : MIN;                       <span class="c">// y por tanto OR : MAX</span>
+   ACT : MIN;
+   ACCU : MAX;
+   RULE 1 : IF fantasma IS cerca AND ppill IS lejos THEN huir IS mucho;
+   RULE 2 : IF fantasma IS cerca AND ppill IS cerca THEN huir IS poco;
+   RULE 3 : IF fantasma IS media THEN huir IS algo;
+   RULE 4 : IF fantasma IS lejos THEN huir IS poco;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK</code></pre>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Se escribe</th><th scope="col">Qué hace</th></tr></thead>
+            <tbody>
+              <tr><td><code>TERM t := (x, y) (x, y) …;</code></td><td>Término por puntos, de menor a mayor <code>x</code>. Fuera de los puntos se queda con el valor del extremo.</td></tr>
+              <tr><td><code>trian a b c</code> · <code>trape a b c d</code> · <code>gauss m σ</code></td><td>Triángulo, trapecio y campana. Fuera del triángulo y del trapecio vale 0.</td></tr>
+              <tr><td><code>RANGE := (0 .. 30);</code></td><td>En un <code>DEFUZZIFY</code>, fija el universo de la salida. Si no, va del extremo izquierdo al derecho de sus términos (una gaussiana llega a ±4σ).</td></tr>
+              <tr><td><code>IF x IS NOT t</code> · <code>NOT (…)</code></td><td>Negación: 1 − μ.</td></tr>
+              <tr><td><code>THEN a IS t1, b IS t2</code></td><td>Una regla puede dar valor a varias salidas.</td></tr>
+              <tr><td><code>… THEN a IS t WITH 0.5;</code></td><td>Peso de la regla: su grado se multiplica por 0,5.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">En jFuzzyLogic, el AND no va antes que el OR</span>
+          <p>
+            En casi todos los lenguajes, <code>a OR b AND c</code> es <code>a OR (b AND c)</code>. En jFuzzyLogic,
+            <strong>no</strong>: lee de izquierda a derecha y entiende <code>(a OR b) AND c</code>. Lo hemos comprobado con la
+            versión del motor: con <code>a</code> a 1 y <code>b</code> y <code>c</code> a 0, la regla se activa con un 0, no
+            con un 1. Siempre que mezcléis AND y OR, <strong>poned paréntesis</strong>.
+          </p>
+        </div>
+      </section>
+
+      <section id="probar" data-corto="Probar sin jugar">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Probar un FCL sin lanzar el juego</h2>
+        </div>
+        <p>
+          <code>jFuzzyLogic.jar</code>, que viene en <code>MsPacManEngine/lib</code>, se puede ejecutar solo. En Eclipse,
+          una <em>Run Configuration</em> de tipo <em>Java Application</em> con <em>Main class</em>
+          <code>net.sourceforge.jFuzzyLogic.JFuzzyLogic</code>, o desde una terminal:
+        </p>
+<pre><code>java -jar jFuzzyLogic.jar huida.fcl                  <span class="c"># dibuja los términos de cada variable</span>
+java -jar jFuzzyLogic.jar -e huida.fcl 25 50         <span class="c"># evalúa con esas entradas</span></code></pre>
+        <p>
+          Con <code>-e</code> escribe las variables, la salida y el grado con el que se ha activado cada regla, que es lo que
+          más ayuda a depurar:
+        </p>
+<pre><code>	VAR_INPUT 	  fantasma = 25.000000
+	VAR_OUTPUT	      huir = 7.372145
+	VAR_INPUT 	     ppill = 50.000000
+	RULE_BLOCK reglas
+		Support  	Rule name 	Rule
+		0.666667	1         	IF (fantasma IS cerca) AND (ppill IS lejos) THEN huir IS mucho;
+		0.000000	2         	IF (fantasma IS cerca) AND (ppill IS cerca) THEN huir IS poco;
+		0.166667	3         	IF fantasma IS media THEN huir IS algo;
+		0.000000	4         	IF fantasma IS lejos THEN huir IS poco;</code></pre>
+        <div class="note trap">
+          <span class="note-label">El orden de los números con <code>-e</code></span>
+          <p>
+            Los valores <strong>no</strong> se asignan en el orden en que declaráis las variables, sino en <strong>orden
+            alfabético</strong> de sus nombres, que es también el orden en que las lista. En <code>tipper.fcl</code> se declara
+            primero <code>service</code> y después <code>food</code>, pero <code>-e tipper.fcl 8 3</code> da
+            <code>food = 8</code> y <code>service = 3</code>. Mirad siempre las líneas <code>VAR_INPUT</code> para comprobar qué
+            le ha tocado a cada una.
+          </p>
+        </div>
+        <p>
+          Si el FCL tiene un error de sintaxis, jFuzzyLogic lo dice con la línea y la columna (<code>line 15:3 missing
+          SEMICOLON at 'TERM'</code>) y, ojo, a veces sigue adelante como si nada. Leed lo que escribe al cargar.
+        </p>
+      </section>
+
+      <section id="motor" data-corto="El paquete fuzzy">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El paquete <code>fuzzy</code> del motor</h2>
+        </div>
+        <p>
+          Es la tercera vez que lo veis, con otra pieza en medio: un <code>Input</code> que mide, un motor que razona y unas
+          acciones que mueven. Lo nuevo es el <strong><code>ActionSelector</code></strong>, porque el sistema borroso no
+          devuelve una acción sino <strong>números</strong>, y alguien tiene que decidir qué hacer con ellos.
+        </p>
+        <figure class="wide">
+          <figcaption>Un turno de Ms.&nbsp;Pac-Man con lógica borrosa</figcaption>
+          <svg class="explica dgz3" viewBox="0 0 560 128" role="img" aria-label="Cuatro pasos en fila. Uno: el FuzzyInput mide el juego y devuelve un mapa de nombre a número, por ejemplo BLINKYdistance 20. Dos: FuzzyEngine.run da esos valores a jFuzzyLogic con setVariable y llama a evaluate. Tres: se desdifumina cada salida y se obtiene otro mapa de nombre a número, por ejemplo Runaway 24 y GoToPPill 5. Cuatro: el ActionSelector elige una acción a partir de ese mapa, y su execute devuelve el movimiento.">
+            <style>
+              .dgz3 .b{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgz3 .j{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.3}
+              .dgz3 .w{fill:color-mix(in srgb,var(--blinky) 14%,var(--surface));stroke:var(--blinky);stroke-width:1.3}
+              .dgz3 .t{font-family:var(--f-mono);font-size:9.4px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgz3 .s{font-family:var(--f-mono);font-size:8.3px;fill:var(--ink-2);text-anchor:middle}
+              .dgz3 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#z3a)}
+            </style>
+            <defs><marker id="z3a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <rect x="4" y="18" width="124" height="86" rx="5" class="b"/><text x="66" y="36" class="t">1 · FuzzyInput</text><text x="66" y="54" class="s">mide el juego</text><text x="66" y="72" class="s">BLINKYdistance → 20</text><text x="66" y="84" class="s">BLINKYconfidence → 100</text>
+            <path d="M128 60 H142" class="a"/>
+            <rect x="144" y="18" width="128" height="86" rx="5" class="j"/><text x="208" y="36" class="t">2 · jFuzzyLogic</text><text x="208" y="54" class="s">setVariable(…)</text><text x="208" y="66" class="s">evaluate()</text><text x="208" y="84" class="s">el FCL hace el resto</text>
+            <path d="M272 60 H286" class="a"/>
+            <rect x="288" y="18" width="124" height="86" rx="5" class="j"/><text x="350" y="36" class="t">3 · salidas</text><text x="350" y="54" class="s">defuzzify() de cada</text><text x="350" y="66" class="s">VAR_OUTPUT</text><text x="350" y="84" class="s">Runaway → 24 …</text>
+            <path d="M412 60 H426" class="a"/>
+            <rect x="428" y="18" width="128" height="86" rx="5" class="w"/><text x="492" y="36" class="t">4 · ActionSelector</text><text x="492" y="54" class="s">números → una acción</text><text x="492" y="72" class="s">action.execute(game)</text><text x="492" y="84" class="s">→ MOVE</text>
+          </svg>
+        </figure>
+<div class="codigo"><pre><code><span class="k">public class</span> MsPacManInput <span class="k">extends</span> FuzzyInput {
+    <span class="k">private double</span>[] distance;
+
+    <span class="k">public</span> MsPacManInput(Game game) { <span class="k">super</span>(game); }
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> parseInput() {
+        distance = <span class="k">new double</span>[4];
+        <span class="k">for</span> (GHOST g : GHOST.values()) {
+            <span class="k">int</span> pos = game.getGhostCurrentNodeIndex(g);      <span class="c">// -1 si no se ve</span>
+            distance[g.ordinal()] = pos == -1 ? -1
+                    : game.getDistance(game.getPacmanCurrentNodeIndex(), pos, DM.PATH);
+        }
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> HashMap&lt;String, Double&gt; getFuzzyValues() {
+        HashMap&lt;String, Double&gt; vars = <span class="k">new</span> HashMap&lt;&gt;();
+        <span class="k">for</span> (GHOST g : GHOST.values())
+            vars.put(g.name() + <span class="s">"distance"</span>, distance[g.ordinal()]);   <span class="c">// la clave = el nombre en VAR_INPUT</span>
+        <span class="k">return</span> vars;
+    }
+}</code></pre></div>
+<div class="codigo"><pre><code><span class="k">public</span> MsPacMan() {
+    Action[] actions = { <span class="k">new</span> GoToPPillAction(), <span class="k">new</span> RunAwayAction() };
+    ActionSelector actionSelector = <span class="k">new</span> MaxActionSelector(actions);
+    fuzzyEngine = <span class="k">new</span> FuzzyEngine(<span class="s">"MsPacMan"</span>,
+            RULES_PATH + <span class="s">"mspacman.fcl"</span>,        <span class="c">// ruta en el disco: "bin/es/ucm/…/mspacman/"</span>
+            <span class="s">"FuzzyMsPacMan"</span>,                      <span class="c">// el nombre del FUNCTION_BLOCK</span>
+            actionSelector);
+}
+
+<span class="k">@Override</span>
+<span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
+    MsPacManInput input = <span class="k">new</span> MsPacManInput(game);
+    <span class="k">return</span> fuzzyEngine.run(input.getFuzzyValues(), game);
+}</code></pre></div>
+        <p>
+          Dos diferencias con Jess. La primera, el fichero se carga con una <strong>ruta del disco</strong>, no del
+          <em lang="en">classpath</em>: <code>"bin/es/ucm/…"</code> funciona porque Eclipse lanza el programa desde la carpeta
+          del proyecto. La segunda, <strong>no hay <code>reset</code></strong>: el mismo sistema borroso se reutiliza en cada
+          turno, y lo que cambia son los valores de las variables.
+        </p>
+      </section>
+
+      <section id="acciones" data-corto="De números a una acción">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">De números a una acción</h2>
+        </div>
+        <p>
+          La plantilla trae un <code>MaxActionSelector</code>: hay una variable de salida por acción, con el mismo nombre que el
+          <code>getActionId()</code> de la acción, y gana la que tenga el valor más alto.
+        </p>
+<div class="codigo"><pre><code><span class="k">public</span> Action selectAction(HashMap&lt;String, Double&gt; fuzzyOutput) {
+    <span class="k">double</span> max = Double.NEGATIVE_INFINITY;
+    String actionName = <span class="k">null</span>;
+    <span class="k">for</span> (Entry&lt;String, Double&gt; e : fuzzyOutput.entrySet())
+        <span class="k">if</span> (e.getValue() &gt; max) { max = e.getValue(); actionName = e.getKey(); }
+    <span class="k">for</span> (Action a : actions)
+        <span class="k">if</span> (a.getActionId().equals(actionName)) <span class="k">return</span> a;
+    <span class="k">return null</span>;
+}</code></pre></div>
+        <p>
+          Es la forma más directa de llevar "cuánto me conviene cada cosa" a una decisión, y es la idea de la IA de utilidad.
+          Pero sólo funciona si los números de las distintas salidas <strong>se pueden comparar</strong>, y eso hay que
+          diseñarlo:
+        </p>
+        <ul>
+          <li><strong>La misma escala para todas.</strong> Si <code>Runaway</code> va de 0 a 30 y <code>GoToPPill</code> de 0
+            a 10, compararlas no tiene sentido.</li>
+          <li><strong>Términos que cubran la escala</strong> (poco, algo, mucho), para que la salida crezca de verdad con la
+            conveniencia. Recordad la <a href="inferencia-borrosa.html#trampas">tercera trampa</a>: con un solo término activo,
+            el centro de gravedad casi no se mueve, y si ese término es una campana en el centro de la escala, la salida
+            será siempre ese centro, se active la regla con un 0,1 o con un 1.</li>
+          <li><strong>Un <code>DEFAULT</code> bajo</strong> para cada salida, para que "ninguna regla dice nada" signifique "no
+            me conviene", no "me conviene a medias".</li>
+        </ul>
+        <p>
+          Hay otras formas de usar la salida, y a veces son mejores:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Diseño</th><th scope="col">Cómo es</th><th scope="col">Cuándo conviene</th></tr></thead>
+            <tbody>
+              <tr><td>Una salida por acción y gana la mayor</td><td>El <code>MaxActionSelector</code> de la plantilla.</td><td>Pocas acciones, cada una con reglas claras de cuándo conviene.</td></tr>
+              <tr><td>Una sola salida, partida en tramos</td><td>"Agresividad" de 0 a 10: por debajo de 3 huir, de 3 a 7 comer pastillas, por encima de 7 cazar.</td><td>Cuando las acciones son grados de una misma cosa.</td></tr>
+              <tr><td>La salida como parámetro</td><td>La lógica borrosa no elige qué hacer, sino cuánto: cuántos pasos de margen dejar con el fantasma, o qué peso dar a cada objetivo en un <a href="../tema1/mapas-influencia.html">mapa de influencia</a>.</td><td>Cuando la decisión ya está clara y lo vago es la intensidad.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="visibilidad" data-corto="Visibilidad y memoria">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Visibilidad parcial y memoria</h2>
+        </div>
+        <p>
+          La plantilla del curso pasado jugaba con <strong>visibilidad parcial</strong>: Ms.&nbsp;Pac-Man sólo ve a los fantasmas
+          que tiene cerca, y de los demás <code>getGhostCurrentNodeIndex</code> devuelve −1. Es un caso perfecto para la lógica
+          borrosa, porque aparece una magnitud vaga de verdad: <strong>cuánto me fío</strong> de lo que sé de cada fantasma. La
+          plantilla la llama <em>confianza</em>: 100 si lo estoy viendo, y cinco puntos menos por cada turno que pasa sin verlo.
+          Así las reglas pueden decir "si Blinky está <em>cerca</em> y la confianza es <em>alta</em>, emergencia".
+        </p>
+        <p>
+          Para que eso funcione, la memoria tiene que <strong>guardarse</strong> de un turno a otro. Esto es lo que hay que
+          hacer con la confianza, en una clase que vive tanto como el controlador:
+        </p>
+<div class="codigo"><pre><code><span class="k">double</span>[] confidence = { 100, 100, 100, 100 };     <span class="c">// un campo: sobrevive entre turnos</span>
+
+<span class="k">public void</span> update(MsPacManInput input) {
+    <span class="k">for</span> (GHOST g : GHOST.values()) {
+        <span class="k">int</span> i = g.ordinal();
+        confidence[i] = input.isVisible(g) ? 100 : Math.max(0, confidence[i] - 5);   <span class="c">// ← guardarlo, no sólo calcularlo</span>
+        mem.put(g.name() + <span class="s">"confidence"</span>, confidence[i]);
+    }
+}</code></pre></div>
+        <div class="note trap">
+          <span class="note-label">El fantasma invisible que está encima</span>
+          <p>
+            Si a un fantasma que no se ve le pasáis −1 como distancia, recordad cómo se evalúa un término por puntos fuera de
+            su rango: <code>TERM near := (0, 1) (60, 0)</code> se queda con el valor del extremo, y −1 es <strong>cerca con un
+            1</strong>. El fantasma que no veis cuenta como si lo tuvierais pegado. Para un fantasma que no se ve, pasad la
+            última distancia conocida (y que la confianza haga su trabajo), o una distancia muy grande. Y no lo dejéis sin
+            valor: <strong>una variable a la que no le dais valor en un turno se queda con el del turno anterior</strong>, sin
+            avisar.
+          </p>
+        </div>
+      </section>
+
+      <section id="ver" data-corto="Ver el razonamiento">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Ver el razonamiento mientras se juega</h2>
+        </div>
+<div class="codigo"><pre><code>ConsoleFuzzyEngineObserver observer = <span class="k">new</span> ConsoleFuzzyEngineObserver(<span class="s">"MsPacMan"</span>, <span class="s">"MsPacManRules"</span>);
+fuzzyEngine.addObserver(observer);</code></pre></div>
+        <p>
+          El segundo argumento es el nombre del <code>RULEBLOCK</code>. Con él, en cada turno se ven las entradas, las salidas
+          y el grado de cada regla, en el mismo formato que la consola de jFuzzyLogic:
+        </p>
+<pre><code>[MsPacMan] action fired: es.ucm.fdi.ici.c2627.practica4.grupoYY.mspacman.actions.RunAwayAction@5e9f23b4
+***INPUT***
+BLINKYconfidence : 100.0
+BLINKYdistance : 20.0
+…
+***OUTPUT***
+GoToPPill : 5.0
+Runaway : 24.0
+***RULES***
+1	(0.6666666666666666)	if (BLINKYdistance IS near) AND (BLINKYconfidence IS high) then Runaway IS emergency [weight: 1.0]
+…</code></pre>
+        <p>
+          La primera línea es el <code>toString()</code> de la acción. Escribid uno en cada acción (que devuelva su
+          <code>getActionId()</code>, por ejemplo) y la traza se lee mucho mejor.
+        </p>
+      </section>
+
+      <section id="errores" data-corto="Errores típicos">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Errores típicos</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Lo que pasa</th><th scope="col">Por qué, y qué hacer</th></tr></thead>
+            <tbody>
+              <tr><td>Al arrancar sale <code>Can't load file</code>, y luego <code>Error evaluating fuzzy logic</code> en cada turno.</td><td>La ruta del <code>.fcl</code> no existe desde la carpeta en la que se lanza el programa. Comprobad la ruta, y probad el fichero con la consola de jFuzzyLogic.</td></tr>
+              <tr><td><code>No such variable: 'BlinkyDistance'</code>.</td><td>Una clave del mapa del <code>Input</code> no coincide con un nombre de <code>VAR_INPUT</code>. Las mayúsculas cuentan.</td></tr>
+              <tr><td>Un fantasma invisible hace huir a Ms.&nbsp;Pac-Man.</td><td>La distancia −1 fuera de rango, que vale "cerca" con un 1. Ved la <a href="#visibilidad">sección&nbsp;5</a>.</td></tr>
+              <tr><td>La confianza no baja nunca de 95.</td><td>Se calcula la nueva confianza pero no se guarda en el campo, así que cada turno se vuelve a calcular desde 100.</td></tr>
+              <tr><td>Una salida vale siempre lo mismo, pase lo que pase.</td><td>Sólo se activa un término, y su centro de gravedad no depende del grado. Más términos en la escala, o más reglas que la repartan.</td></tr>
+              <tr><td>Ms.&nbsp;Pac-Man se tranquiliza cuando un fantasma se aleja, aunque otro esté encima.</td><td>Reglas de "calma" que deberían exigir que <em>todos</em> estén lejos. La <a href="inferencia-borrosa.html#trampas">primera trampa</a>.</td></tr>
+              <tr><td>Con ciertas distancias, la salida cae de golpe al <code>DEFAULT</code>.</td><td>Un hueco entre términos. Que se solapen.</td></tr>
+              <tr><td>Una regla con <code>OR</code> y <code>AND</code> se activa cuando no debería.</td><td>La precedencia de jFuzzyLogic: de izquierda a derecha. Paréntesis.</td></tr>
+              <tr><td>Con <code>METHOD : MM</code> salen valores absurdos, cerca de 0.</td><td>El error de jFuzzyLogic 3.2 con la media de los máximos. Usad <code>COG</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="comparar" data-corto="Reglas nítidas y borrosas">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Reglas nítidas y reglas borrosas</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col"></th><th scope="col">Jess (Práctica 3)</th><th scope="col">jFuzzyLogic (Práctica 4)</th></tr></thead>
+            <tbody>
+              <tr><td>Qué entra</td><td>Hechos, de cualquier forma: símbolos, números, relaciones.</td><td>Números, uno por variable.</td></tr>
+              <tr><td>Qué sale</td><td>Un hecho <code>ACTION</code> que dice qué hacer.</td><td>Números, uno por variable de salida, que hay que convertir en una acción.</td></tr>
+              <tr><td>Varias reglas a la vez</td><td>Se disparan todas, y se elige por prioridad.</td><td>Se mezclan, cada una con su grado.</td></tr>
+              <tr><td>Razonar por capas</td><td>Sí: reglas que deducen hechos que usan otras.</td><td>No dentro de un bloque: las salidas no alimentan otras reglas. Se puede encadenar en Java, con un bloque detrás de otro.</td></tr>
+              <tr><td>Umbrales</td><td>Bruscos: el comportamiento salta.</td><td>Suaves: el comportamiento cambia poco a poco.</td></tr>
+              <tr><td>Se depura mirando</td><td>Qué reglas se han disparado.</td><td>La curva de control: qué sale para cada entrada.</td></tr>
+              <tr><td>Lo difícil</td><td>Que las prioridades no tapen reglas mal escritas.</td><td>Colocar bien los términos y que las reglas no se contradigan.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          No compiten: resuelven partes distintas del problema. Las reglas de Jess son buenas para <strong>qué</strong> hacer
+          cuando las situaciones son distintas entre sí ("si es comestible, huye"); las borrosas, para <strong>cuánto</strong>
+          cuando la situación cambia de forma continua ("cuánta prisa tengo por huir"). Muchos sistemas reales combinan las
+          dos, y no es raro que en vuestra Práctica&nbsp;4 la mejor decisión salga de unas pocas reglas borrosas bien medidas
+          más un par de condiciones nítidas en Java.
+        </p>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="inferencia-borrosa.html"><span class="pager-l">Anterior</span><span class="pager-t">Inferencia borrosa</span></a>
+        <a class="pager-next" href="index.html#resumen"><span class="pager-l">Siguiente</span><span class="pager-t">Lo que hay que llevarse</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#fcl">El fichero FCL</a></li>
+            <li><a href="#probar">Probar sin jugar</a></li>
+            <li><a href="#motor">El paquete fuzzy</a></li>
+            <li><a href="#acciones">De números a una acción</a></li>
+            <li><a href="#visibilidad">Visibilidad y memoria</a></li>
+            <li><a href="#ver">Ver el razonamiento</a></li>
+            <li><a href="#errores">Errores típicos</a></li>
+            <li><a href="#comparar">Reglas nítidas y borrosas</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html" aria-current="page"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/borroso.js" defer></script>
+</body>
+</html>

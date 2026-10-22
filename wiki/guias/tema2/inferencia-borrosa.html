@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Inferencia borrosa · Tema 2 · ICI</title>
+<meta name="description" content="Cómo razona un sistema borroso: reglas borrosas, modus ponens generalizado, relaciones y composición sup-min, el método de Mamdani en cuatro pasos con el ejemplo de la propina, un banco de pruebas interactivo de FCL, cómo elegir los métodos de activación, acumulación y desdifuminación, y tres trampas de diseño.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>Inferencia borrosa</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 09 · Razonamiento borroso</p>
+    <h1>
+      Inferencia borrosa
+      <span class="thin">De unas medidas a un número, pasando por reglas que se cumplen a medias.</span>
+    </h1>
+    <p class="standfirst">
+      Qué es una regla borrosa y en qué se diferencia de una de Jess, la idea del modus ponens generalizado, cómo se componen relaciones con el sup-min, y el método de Mamdani paso a paso con números de verdad. Después, un banco de pruebas para jugar con reglas y métodos, y tres trampas que os vais a encontrar.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="reglas" data-corto="Reglas borrosas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Reglas borrosas: se cumplen todas, un poco</h2>
+        </div>
+        <p>
+          Una regla borrosa tiene la misma forma que las de Jess, un antecedente y un consecuente, pero escrita con
+          variables lingüísticas:
+        </p>
+<pre class="cuenta">SI la cantidad de CO2 es elevada Y la tendencia es positiva O la visibilidad NO es clara
+ENTONCES la potencia de ventilación es alta</pre>
+        <p>
+          La diferencia está en qué pasa al ejecutarla. En Jess, una regla se cumple o no, y si se cumplen varias hay que
+          <a href="conflictos.html">elegir una</a>. Aquí <strong>todas las reglas se cumplen en algún grado</strong>, entre
+          0 y 1, y en vez de elegir entre ellas <strong>se combinan</strong>: cada una empuja la salida hacia su consecuente
+          con la fuerza de su grado. No hay agenda ni resolución de conflictos; hay una mezcla.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col"></th><th scope="col">Reglas de Jess</th><th scope="col">Reglas borrosas</th></tr></thead>
+            <tbody>
+              <tr><td>Una condición</td><td>Verdadera o falsa.</td><td>Verdadera en un grado entre 0 y 1.</td></tr>
+              <tr><td>Si se cumplen varias</td><td>Se elige una: prioridad, especificidad…</td><td>Se suman sus efectos, cada una con su peso.</td></tr>
+              <tr><td>La salida</td><td>Un hecho: "huir".</td><td>Un número: "huir con urgencia 7,4".</td></tr>
+              <tr><td>Al mover un poco la entrada</td><td>La salida no cambia, o salta.</td><td>La salida cambia un poco.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="modus-ponens" data-corto="Modus ponens generalizado">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">La idea: el modus ponens generalizado</h2>
+        </div>
+        <p>
+          La regla de deducción de toda la vida es el <em>modus ponens</em>: si sé que "A implica B" y sé que A, concluyo B.
+        </p>
+<pre class="cuenta">regla:      si el tomate es rojo, está maduro
+hecho:      el tomate es rojo
+conclusión: el tomate está maduro</pre>
+        <p>
+          El <strong>modus ponens generalizado</strong> lo relaja: si el hecho no es exactamente A sino algo
+          <em>parecido</em>, A′, la conclusión no será exactamente B sino algo parecido, B′.
+        </p>
+<pre class="cuenta">regla:      si el tomate es rojo, está maduro
+hecho:      el tomate es más o menos rojo
+conclusión: el tomate está más o menos maduro</pre>
+        <p>
+          Todo lo que sigue es la maquinaria para calcular ese "más o menos". La forma general se llama <strong>regla
+          composicional de inferencia</strong>, y se apoya en las relaciones borrosas.
+        </p>
+      </section>
+
+      <section id="relaciones" data-corto="Relaciones y sup-min">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Relaciones borrosas y la composición sup-min</h2>
+        </div>
+        <p>
+          Una <strong>relación borrosa</strong> dice en qué grado se relaciona cada elemento de un conjunto con cada uno de
+          otro. Se escribe como una tabla. Por ejemplo, cómo se relaciona el color de una fruta con su madurez (R), y su
+          madurez con su sabor (S):
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">R (color, madurez)</th><th scope="col">verde</th><th scope="col">normal</th><th scope="col">madura</th></tr></thead>
+            <tbody>
+              <tr><td>naranja</td><td>1</td><td>0,5</td><td>0</td></tr>
+              <tr><td>amarillo</td><td>0,3</td><td>1</td><td>0,4</td></tr>
+              <tr><td>rojo</td><td>0</td><td>0,2</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">S (madurez, sabor)</th><th scope="col">amargo</th><th scope="col">insípido</th><th scope="col">dulce</th></tr></thead>
+            <tbody>
+              <tr><td>verde</td><td>1</td><td>0,2</td><td>0</td></tr>
+              <tr><td>normal</td><td>0,7</td><td>1</td><td>0,3</td></tr>
+              <tr><td>madura</td><td>0</td><td>0,7</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          ¿Cómo se relaciona entonces el color con el sabor? La <strong>composición sup-min</strong> responde: para ir de
+          un color a un sabor hay que pasar por alguna madurez; cada camino vale lo que su eslabón más débil (el mínimo), y
+          de todos los caminos nos quedamos con el mejor (el máximo, o supremo). Para amarillo y dulce:
+        </p>
+<pre class="cuenta">T(amarillo, dulce) = max( min(R(amarillo, verde),  S(verde, dulce)),
+                          min(R(amarillo, normal), S(normal, dulce)),
+                          min(R(amarillo, madura), S(madura, dulce)) )
+                   = max( min(0,3; 0),  min(1; 0,3),  min(0,4; 1) )
+                   = max( 0,  0,3,  0,4 )
+                   = 0,4</pre>
+        <p>
+          Haciendo lo mismo con cada pareja sale la tabla entera. El amarillo es sobre todo insípido, y el rojo, dulce:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">T = R ∘ S</th><th scope="col">amargo</th><th scope="col">insípido</th><th scope="col">dulce</th></tr></thead>
+            <tbody>
+              <tr><td>naranja</td><td>1</td><td>0,5</td><td>0,3</td></tr>
+              <tr><td>amarillo</td><td>0,7</td><td>1</td><td>0,4</td></tr>
+              <tr><td>rojo</td><td>0,2</td><td>0,7</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="label">Una regla también es una relación</h3>
+        <p>
+          "Si la temperatura es <em>fría</em>, abre la llave de la calefacción" relaciona temperaturas con aperturas de la
+          llave. Con el método de <strong>Mamdani</strong>, esa relación se construye con el mínimo entre antecedente y
+          consecuente, y aplicar la regla a un hecho es componerlos con sup-min. Con una entrada de 4&nbsp;°C, que es fría en
+          un 0,8, templada en un 0,2 y caliente en un 0, y esta relación:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">R (temperatura, llave)</th><th scope="col">cerrada</th><th scope="col">semiabierta</th><th scope="col">abierta</th></tr></thead>
+            <tbody>
+              <tr><td>fría</td><td>0</td><td>0,4</td><td>0,9</td></tr>
+              <tr><td>templada</td><td>0,3</td><td>0,7</td><td>0,3</td></tr>
+              <tr><td>caliente</td><td>0,8</td><td>0,2</td><td>0</td></tr>
+            </tbody>
+          </table>
+        </div>
+<pre class="cuenta">llave(cerrada)     = max( min(0,8; 0),   min(0,2; 0,3), min(0; 0,8) ) = 0,2
+llave(semiabierta) = max( min(0,8; 0,4), min(0,2; 0,7), min(0; 0,2) ) = 0,4
+llave(abierta)     = max( min(0,8; 0,9), min(0,2; 0,3), min(0; 0)   ) = 0,8</pre>
+        <p>
+          El resultado es otro conjunto borroso: la llave debería estar sobre todo abierta. Para mover la llave hace falta un
+          ángulo, y eso es la <a href="#mamdani">desdifuminación</a>: si cerrada es 0°, semiabierta 45° y abierta 90°, la
+          media ponderada da
+        </p>
+<pre class="cuenta">(0 · 0,2 + 45 · 0,4 + 90 · 0,8) / (0,2 + 0,4 + 0,8)
+  = (0 + 18 + 72) / 1,4
+  = 64,3°</pre>
+      </section>
+
+      <section id="mamdani" data-corto="Mamdani, paso a paso">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Mamdani en cuatro pasos</h2>
+        </div>
+        <p>
+          En la práctica nadie escribe tablas de relación: se escriben reglas, y el motor hace las cuentas. El método de
+          Mamdani, el que usa jFuzzyLogic, tiene cuatro pasos. El ejemplo de siempre, que viene con jFuzzyLogic
+          (<code>tipper.fcl</code>): calcular la propina según el <strong>servicio</strong> y la <strong>comida</strong>, los
+          dos de 0 a 10, con tres reglas.
+        </p>
+<pre class="cuenta">R1: SI el servicio es malo O la comida es rancia     ENTONCES la propina es tacaña
+R2: SI el servicio es bueno                          ENTONCES la propina es normal
+R3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es generosa</pre>
+        <figure class="wide">
+          <figcaption>Los cuatro pasos de Mamdani</figcaption>
+          <svg class="explica dgz2" viewBox="0 0 560 120" role="img" aria-label="Cuatro cajas en fila. Uno, difuminar: los números de entrada se convierten en grados de cada término. Dos, evaluar las reglas: cada antecedente da un grado, con mínimo para AND y máximo para OR. Tres, implicar y agregar: cada regla recorta su consecuente a su grado y los recortes se juntan en un solo conjunto. Cuatro, desdifuminar: el conjunto se reduce a un número, por ejemplo su centro de gravedad.">
+            <style>
+              .dgz2 .b{fill:var(--surface);stroke:var(--maze);stroke-width:1.4}
+              .dgz2 .t{font-family:var(--f-mono);font-size:9.8px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgz2 .s{font-family:var(--f-mono);font-size:8.4px;fill:var(--ink-2);text-anchor:middle}
+              .dgz2 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#z2a)}
+              .dgz2 .n{font-family:var(--f-mono);font-size:8.6px;fill:var(--pill-ink);text-anchor:middle}
+            </style>
+            <defs><marker id="z2a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <text x="20" y="62" class="n">3, 8</text>
+            <path d="M34 58 H44" class="a"/>
+            <rect x="46" y="20" width="110" height="72" rx="5" class="b"/><text x="101" y="40" class="t">1 · DIFUMINAR</text><text x="101" y="58" class="s">número →</text><text x="101" y="70" class="s">grado de cada</text><text x="101" y="82" class="s">término</text>
+            <path d="M156 56 H170" class="a"/>
+            <rect x="172" y="20" width="110" height="72" rx="5" class="b"/><text x="227" y="40" class="t">2 · REGLAS</text><text x="227" y="58" class="s">cada antecedente</text><text x="227" y="70" class="s">da un grado</text><text x="227" y="82" class="s">AND min · OR max</text>
+            <path d="M282 56 H296" class="a"/>
+            <rect x="298" y="20" width="120" height="72" rx="5" class="b"/><text x="358" y="40" class="t">3 · IMPLICAR</text><text x="358" y="52" class="t">Y AGREGAR</text><text x="358" y="70" class="s">recortar cada</text><text x="358" y="82" class="s">consecuente, juntar</text>
+            <path d="M418 56 H432" class="a"/>
+            <rect x="434" y="20" width="110" height="72" rx="5" class="b"/><text x="489" y="40" class="t">4 · DESDIFUMINAR</text><text x="489" y="58" class="s">conjunto →</text><text x="489" y="70" class="s">un número</text><text x="489" y="82" class="s">(centro de gravedad)</text>
+            <text x="489" y="112" class="n">propina 11,7</text>
+          </svg>
+        </figure>
+        <p>
+          Con un servicio de <strong>3</strong> y una comida de <strong>8</strong>, las cuentas son estas. Son las que da
+          jFuzzyLogic, y las que podéis ver en el <a href="#banco">banco de pruebas</a> eligiendo "La propina":
+        </p>
+<pre class="cuenta">1 · difuminar     servicio 3:  malo 0,25   bueno 0,67   excelente 0
+                  comida 8:    rancia 0    deliciosa 0,50
+
+2 · reglas        R1 = max(malo, rancia)        = max(0,25; 0)    = 0,25
+                  R2 = bueno                                      = 0,67
+                  R3 = min(excelente, deliciosa) = min(0; 0,50)   = 0
+
+3 · implicar      "tacaña" recortada a 0,25, "normal" recortada a 0,67, "generosa" a 0
+    y agregar     el máximo de los tres recortes, punto a punto
+
+4 · desdifuminar  centro de gravedad del conjunto agregado = 11,70</pre>
+        <p>
+          Una propina del 11,7&nbsp;%: el servicio regular tira hacia el 15 de "normal", y el poquito de "malo" la baja un
+          poco. Si el servicio pasa a 6, "bueno" vale 1, el resto 0, y sale exactamente 15.
+        </p>
+        <h3 class="label">Las piezas que se pueden cambiar</h3>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Paso</th><th scope="col">En FCL</th><th scope="col">Opciones</th><th scope="col">Qué cambia</th></tr></thead>
+            <tbody>
+              <tr><td>AND / OR</td><td><code>AND : MIN;</code></td><td><code>MIN</code> (y OR = <code>MAX</code>), <code>PROD</code> (y OR = <code>PROBOR</code>)</td><td>Con <code>PROD</code>, las dos condiciones cuentan siempre.</td></tr>
+              <tr><td>Implicación</td><td><code>ACT : MIN;</code></td><td><code>MIN</code> recorta el consecuente; <code>PROD</code> lo encoge sin cambiarle la forma</td><td><code>PROD</code> conserva la forma del término, y suele dar salidas algo más suaves.</td></tr>
+              <tr><td>Agregación</td><td><code>ACCU : MAX;</code></td><td><code>MAX</code>, <code>SUM</code>, <code>PROBOR</code>, <code>BSUM</code></td><td>Con <code>MAX</code>, dos reglas que dicen lo mismo cuentan como una; con <code>SUM</code>, se refuerzan.</td></tr>
+              <tr><td>Desdifuminación</td><td><code>METHOD : COG;</code></td><td><code>COG</code> centro de gravedad; <code>COA</code> centro de área; <code>LM</code>, <code>RM</code> el máximo más a la izquierda o a la derecha</td><td><code>COG</code> mezcla todo, suave; <code>LM</code> y <code>RM</code> se quedan con lo más fuerte, a saltos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Dos detalles de jFuzzyLogic 3.2 que no salen en los libros</span>
+          <ul>
+            <li>Si no escribís <code>ACCU</code>, jFuzzyLogic usa <strong><code>SUM</code></strong>, no <code>MAX</code>.
+              Escribidlo siempre.</li>
+            <li><code>METHOD : MM</code> (media de los máximos) <strong>está mal programado</strong> en la versión que trae
+              el motor: en vez de la media de las posiciones del máximo, devuelve la última dividida entre cuántas hay. En la
+              propina con servicio 3 y comida 8, el máximo es la meseta de 13,35 a 16,65, así que debería dar 15, y da 0,15.
+              No lo uséis.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="banco" data-corto="Banco de pruebas">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Banco de pruebas</h2>
+        </div>
+        <p>
+          El mismo método, entero, con tres ejemplos. El primero es una Ms.&nbsp;Pac-Man que decide cuánta prisa tiene por
+          huir según lo cerca que esté el fantasma más próximo y lo cerca que tenga una píldora: si está cerca de las dos
+          cosas, mejor ir a comérsela. Este banco entiende el mismo FCL que jFuzzyLogic y da las mismas cifras: se ha
+          comprobado con más de cien combinaciones de ejemplos, entradas y métodos.
+        </p>
+        <div class="demo" data-borroso="banco" data-presets="huir propina calma">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Mamdani de principio a fin: entradas, reglas, salida y curva</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este banco necesita JavaScript. Las cuentas de la propina están en la sección anterior.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p class="demo-como">
+          Arriba, cada entrada con sus términos y el grado de cada uno. En medio, las reglas con su grado de activación. Abajo,
+          la salida: los términos en discontinuo, lo que deja cada regla en su color, lo agregado en amarillo y el número
+          final en rojo. Y la <strong>curva de control</strong>: cómo cambia la salida al mover una entrada de punta a punta
+          con las demás quietas. Los botones de la barra reescriben el FCL; también podéis abrirlo y cambiar lo que queráis.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Mirad la curva de control del primer ejemplo: <strong>no tiene escalones</strong>. Un fantasma a 29 pasos da una
+              urgencia de 6,72 y uno a 31, de 6,46. Comparadlo con la regla de Jess de la semana pasada.</li>
+            <li>Bajad <code>ppill</code> a 15: las reglas 1 y 2 se reparten el peso y la urgencia cae a 2,6. Ms.&nbsp;Pac-Man
+              prefiere ir a la píldora.</li>
+            <li>Cambiad <code>METHOD</code> a <code>LM</code> o <code>RM</code> y mirad la curva: aparecen saltos. Volved a
+              <code>COG</code>.</li>
+            <li>Cambiad <code>ACT</code> a <code>PROD</code>: los recortes se convierten en versiones encogidas de cada
+              término.</li>
+            <li>Pasad a <strong>Dos fantasmas que se contradicen</strong> antes de leer la sección siguiente.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="trampas" data-corto="Tres trampas">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Tres trampas de diseño</h2>
+        </div>
+        <p>
+          El tercer ejemplo del banco tiene cuatro reglas que, una a una, parecen razonables: si Blinky está cerca,
+          emergencia; si Sue está cerca, emergencia; si Blinky está lejos, calma; si Sue está lejos, calma. Juntas, se
+          portan mal de tres maneras.
+        </p>
+        <h3 class="label">1 · Reglas que se contradicen</h3>
+        <p>
+          Con Blinky a 20 pasos, la urgencia debería ser alta. Pero mirad lo que pasa al alejar a Sue:
+        </p>
+<pre class="cuenta">Blinky   Sue    huir
+  20     100    20,05
+  20     200    13,53     ← Sue se aleja, y Ms. Pac-Man se tranquiliza</pre>
+        <p>
+          "Sue está lejos" dispara "calma" con fuerza, y el centro de gravedad se queda a medio camino entre la calma y la
+          emergencia. El problema es que "calma" no es una consecuencia de que Sue esté lejos: lo es de que estén lejos
+          <strong>todos</strong>. La regla tiene que decir eso:
+        </p>
+<pre><code>RULE 3 : IF blinky IS lejos AND sue IS lejos THEN huir IS calma;</code></pre>
+        <p>
+          Con esa regla en lugar de las dos de calma, Blinky a 20 da 24,0 esté Sue donde esté. Otra salida, muchas veces
+          mejor, es no pasarle al sistema borroso cuatro distancias sino una: la del fantasma más cercano, calculada en Java.
+        </p>
+        <h3 class="label">2 · Huecos sin reglas</h3>
+        <p>
+          Con los dos fantasmas a 70 pasos, "cerca" acaba en 60 y "lejos" empieza en 90: ningún término vale nada, ninguna
+          regla se activa, y la salida es el <code>DEFAULT</code>, 0. Dos fantasmas a media distancia y Ms.&nbsp;Pac-Man
+          más tranquila que nunca. Los términos tienen que <strong>cubrir todo el rango y solaparse</strong>: aquí faltaba un
+          "media".
+        </p>
+        <h3 class="label">3 · El centro de gravedad dice dónde, no cuánto</h3>
+        <p>
+          Con la regla arreglada, Blinky a 20 pasos activa "emergencia" con un 0,67 y da 24,0. Blinky a 5 la activa con un
+          0,92 y da 24,4. Y Blinky a 55 pasos, que ya casi no está cerca (0,08), sigue dando 22,7. Cuando sólo hay un término activo, recortarlo más alto o más bajo apenas mueve su
+          centro de gravedad: el número que sale dice <strong>hacia qué término</strong> va la salida, no con cuánta fuerza.
+          Eso importa mucho en cuanto se comparan dos salidas entre sí para decidir qué hacer, como en la
+          <a href="borroso-mspacman.html#acciones">página siguiente</a>. Si necesitáis que la salida crezca con la urgencia,
+          dadle términos que cubran la escala de punta a punta (poco, algo, mucho) y reglas que repartan el peso entre ellos.
+        </p>
+        <div class="note mine">
+          <span class="note-label">La lección de las tres</span>
+          <p>
+            Un sistema borroso no se depura regla a regla, porque las reglas no actúan solas: se mezclan. Se depura mirando la
+            <strong>curva de control</strong> (qué sale para cada valor de cada entrada) y preguntándose si tiene sentido de
+            punta a punta. El banco de arriba la dibuja; para vuestro FCL, se puede sacar imprimiendo la salida para una
+            tanda de entradas.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="borroso.html"><span class="pager-l">Anterior</span><span class="pager-t">Conjuntos borrosos</span></a>
+        <a class="pager-next" href="borroso-mspacman.html"><span class="pager-l">Siguiente</span><span class="pager-t">Lógica borrosa en Ms.&nbsp;Pac-Man</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#reglas">Reglas borrosas</a></li>
+            <li><a href="#modus-ponens">Modus ponens generalizado</a></li>
+            <li><a href="#relaciones">Relaciones y sup-min</a></li>
+            <li><a href="#mamdani">Mamdani, paso a paso</a></li>
+            <li><a href="#banco">Banco de pruebas</a></li>
+            <li><a href="#trampas">Tres trampas</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html" aria-current="page"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/borroso.js" defer></script>
+</body>
+</html>

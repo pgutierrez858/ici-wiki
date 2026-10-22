@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Qué es un sistema de reglas · Tema 2 · ICI</title>
+<meta name="description" content="Qué es un sistema de reglas: memoria de trabajo, base de reglas y motor de inferencia; el ciclo reconocer, resolver y actuar; por qué las reglas sólo se hablan a través de los hechos; y dónde se usan, de los sistemas expertos a los videojuegos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>Qué es un sistema de reglas</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 01 · Sistemas de reglas</p>
+    <h1>
+      Qué es un sistema de reglas
+      <span class="thin">Escribir lo que se sabe en piezas sueltas, y dejar que un motor decida cuáles tocan.</span>
+    </h1>
+    <p class="standfirst">
+      De la cadena de <code>if</code> a un montón de reglas sueltas; las tres piezas de cualquier sistema de reglas y el ciclo que las mueve; por qué una regla no puede llamar a otra; y dónde se usa esto de verdad, de un hospital de los años setenta a los diálogos de <em lang="en">Left 4 Dead</em>.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        En la <a href="../tema1/maquinas-estados.html">máquina de estados</a> el conocimiento estaba en las flechas:
+        "de Perseguir se pasa a Huir cuando…". En el <a href="../tema1/arboles-comportamiento.html">árbol de
+        comportamiento</a>, en el orden de las ramas: lo que va más a la izquierda, manda. En los dos casos
+        habéis escrito vosotros <strong>cuándo</strong> se mira cada cosa. Un sistema de reglas da un paso más:
+        escribís piezas sueltas del tipo <em>"si pasa esto, haz aquello"</em>, todas al mismo nivel, sin orden
+        ni flechas, y es un programa ya hecho, el <strong>motor de inferencia</strong>, el que decide en cada
+        momento cuáles se aplican.
+      </p>
+
+      <section id="de-if-a-reglas" data-corto="De los if a las reglas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">De una cadena de <code>if</code> a un montón de reglas</h2>
+        </div>
+        <p>
+          Volvamos al fantasma de siempre. Así se escribía en la Práctica&nbsp;1, como lista de prioridades:
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · el fantasma, con el orden escrito a mano</figcaption>
+          <pre class="pseudo"><b>if</b> <span class="fn">msPacManCercaDePPill</span>() <b>then return</b> <span class="fn">huir</span>()      <i>// lo más urgente, lo primero</i>
+<b>if</b> <span class="fn">soyComestible</span>()        <b>then return</b> <span class="fn">huir</span>()
+<b>return</b> <span class="fn">perseguir</span>()                                  <i>// si no pasa nada de lo anterior</i></pre>
+        </figure>
+        <p>
+          Y así es el mismo conocimiento escrito como reglas, que es lo que vais a hacer en la Práctica&nbsp;3:
+        </p>
+        <figure>
+          <figcaption>Tres reglas sueltas · el orden en que se escriben da igual</figcaption>
+          <pre class="pseudo"><b>regla</b> huir-por-la-PPill   <b>si</b> Ms. Pac-Man está a 30 o menos de una PPill   <b>entonces</b> huir     <i>(prioridad 50)</i>
+<b>regla</b> huir-comestible     <b>si</b> soy comestible                               <b>entonces</b> huir     <i>(prioridad 30)</i>
+<b>regla</b> perseguir           <b>si</b> no soy comestible                            <b>entonces</b> perseguir <i>(prioridad 10)</i></pre>
+        </figure>
+        <p>
+          Parece lo mismo con otras palabras, pero hay tres diferencias que lo cambian todo:
+        </p>
+        <ol>
+          <li>
+            <strong>Cada regla dice entera su condición.</strong> En la cadena de <code>if</code>, "perseguir" no
+            tiene condición: es lo que queda cuando fallan las de arriba, y para saber cuándo persigue el fantasma
+            hay que leer todas las líneas anteriores. La regla <code>perseguir</code> se entiende sola: "si no soy
+            comestible".
+          </li>
+          <li>
+            <strong>Pueden cumplirse varias a la vez.</strong> Un fantasma que no es comestible con Ms.&nbsp;Pac-Man al
+            lado de una píldora cumple <code>huir-por-la-PPill</code> y también <code>perseguir</code>. La cadena de
+            <code>if</code> nunca se entera de la segunda; el motor de reglas, sí, y tiene que
+            <strong>elegir</strong>. A eso se le llama <a href="conflictos.html">resolver el conflicto</a>, y la
+            prioridad de cada regla es una de las formas de hacerlo.
+          </li>
+          <li>
+            <strong>Añadir una regla no obliga a tocar las demás.</strong> Si mañana se os ocurre "si Ms.&nbsp;Pac-Man
+            está a menos de 10 y yo llego antes que ella a la píldora, voy a taparla", es una regla más con su
+            prioridad. No hay que buscar en qué línea de la cadena meterla ni qué <code>else</code> se rompe.
+          </li>
+        </ol>
+        <div class="note trap">
+          <span class="note-label">Esto no es una regla</span>
+          <p>
+            Un <code>if-then-else</code> o un <code>if</code> dentro de otro <code>if</code> no son reglas de
+            producción, aunque se escriban con "si" y "entonces". Una regla de producción tiene un "si" y un
+            "entonces", y nada más: <strong>no hay <em>else</em></strong>. Lo que en un programa sería la rama
+            <code>else</code>, aquí es otra regla con la condición contraria escrita entera.
+          </p>
+        </div>
+      </section>
+
+      <section id="piezas" data-corto="Las tres piezas">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Las tres piezas: hechos, reglas y motor</h2>
+        </div>
+        <p>
+          Cualquier sistema de reglas, desde el motor de Jess que usaréis hasta el que decide si un banco os da
+          una hipoteca, tiene las mismas tres piezas:
+        </p>
+        <figure class="wide">
+          <figcaption>La arquitectura de un sistema de reglas</figcaption>
+          <svg class="explica dgr1" viewBox="0 0 560 250" role="img" aria-label="A la izquierda, la memoria de trabajo con hechos como (BLINKY (edible false)) y (MSPACMAN (mindistancePPill 25)). A la derecha, la base de reglas con tres reglas. En el centro, el motor de inferencia, que lee las dos, compara los patrones de las reglas con los hechos, apunta en la agenda las reglas que se cumplen, elige una y la ejecuta. La ejecución escribe en la memoria de trabajo, añadiendo o quitando hechos, y también puede actuar fuera, por ejemplo devolviendo un movimiento al juego.">
+            <style>
+              .dgr1 .caja{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgr1 .motor{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.5}
+              .dgr1 .ag{fill:color-mix(in srgb,var(--pill) 40%,var(--surface));stroke:var(--pill-ink);stroke-width:1.2}
+              .dgr1 .tt{font-family:var(--f-mono);font-size:10px;font-weight:700;letter-spacing:.08em;fill:var(--ink);text-anchor:middle}
+              .dgr1 .h{font-family:var(--f-mono);font-size:8.6px;fill:var(--ink)}
+              .dgr1 .s{font-family:var(--f-mono);font-size:8.6px;fill:var(--ink-2);text-anchor:middle}
+              .dgr1 .a{fill:none;stroke:var(--ink-3);stroke-width:1.4;marker-end:url(#r1a)}
+              .dgr1 .b{fill:none;stroke:var(--blinky);stroke-width:1.6;marker-end:url(#r1b)}
+            </style>
+            <defs>
+              <marker id="r1a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker>
+              <marker id="r1b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker>
+            </defs>
+            <rect x="8" y="30" width="170" height="150" rx="4" class="caja"/>
+            <text x="93" y="22" class="tt">MEMORIA DE TRABAJO</text>
+            <text x="18" y="54" class="h">(BLINKY (edible false))</text>
+            <text x="18" y="72" class="h">(INKY (edible true))</text>
+            <text x="18" y="90" class="h">(MSPACMAN</text>
+            <text x="18" y="102" class="h">   (mindistancePPill 25))</text>
+            <text x="18" y="124" class="h">(ACTION (id BLINKYchases)</text>
+            <text x="18" y="136" class="h">   (priority 10))</text>
+            <text x="93" y="160" class="s">lo que es verdad ahora</text>
+            <text x="93" y="172" class="s">(los hechos)</text>
+
+            <rect x="382" y="30" width="170" height="150" rx="4" class="caja"/>
+            <text x="467" y="22" class="tt">BASE DE REGLAS</text>
+            <text x="392" y="54" class="h">huir-por-la-PPill</text>
+            <text x="392" y="66" class="h">  si PPill ≤ 30 ⇒ huir</text>
+            <text x="392" y="88" class="h">huir-comestible</text>
+            <text x="392" y="100" class="h">  si comestible ⇒ huir</text>
+            <text x="392" y="122" class="h">perseguir</text>
+            <text x="392" y="134" class="h">  si no comestible ⇒ …</text>
+            <text x="467" y="162" class="s">lo que sabéis del juego</text>
+            <text x="467" y="174" class="s">(las reglas)</text>
+
+            <rect x="212" y="40" width="136" height="132" rx="6" class="motor"/>
+            <text x="280" y="34" class="tt">MOTOR</text>
+            <text x="280" y="62" class="s">1 · comparar patrones</text>
+            <text x="280" y="74" class="s">con hechos</text>
+            <rect x="226" y="86" width="108" height="34" rx="3" class="ag"/>
+            <text x="280" y="100" class="s">AGENDA</text>
+            <text x="280" y="112" class="s">las que se cumplen</text>
+            <text x="280" y="138" class="s">2 · elegir una</text>
+            <text x="280" y="156" class="s">3 · ejecutarla</text>
+
+            <path d="M178 80 H209" class="a"/>
+            <path d="M382 80 H351" class="a"/>
+            <path d="M246 172 C 246 222, 120 232, 100 184" class="b"/>
+            <text x="180" y="236" class="s">añade o quita hechos</text>
+            <path d="M314 172 C 314 214, 380 226, 430 226" class="b"/>
+            <text x="482" y="229" class="s">actúa fuera</text>
+            <text x="482" y="241" class="s">(un movimiento)</text>
+          </svg>
+        </figure>
+        <dl class="gloss">
+          <div><dt>Memoria de trabajo</dt><dd>También se llama <strong>base de hechos</strong>. Es lo que el sistema sabe que es verdad en este momento: "Blinky no es comestible", "Ms.&nbsp;Pac-Man está a 25 de la píldora". Cambia todo el rato: las reglas le añaden hechos y le quitan otros.</dd></div>
+          <div><dt>Base de reglas</dt><dd>También <strong>memoria de producción</strong>. Las reglas, cada una con una parte izquierda (<abbr title="left-hand side">LHS</abbr>, las condiciones) y una derecha (<abbr title="right-hand side">RHS</abbr>, las acciones). Es lo que sabéis del juego, y no cambia mientras se juega.</dd></div>
+          <div><dt>Motor de inferencia</dt><dd>El programa que junta las dos cosas. Ya está escrito y probado (en la práctica es Jess) y vosotros no lo tocáis: sólo le dais hechos y reglas.</dd></div>
+        </dl>
+        <p>
+          La separación es la idea del curso entero, llevada al extremo: <strong>el conocimiento por un lado y el
+          mecanismo por otro</strong>. En la máquina de estados el mecanismo era vuestro <code>FSM.run</code>, con
+          el orden de las transiciones; aquí ni siquiera decidís el orden. Y por eso un experto que no programa
+          puede leer, y a veces escribir, la base de reglas.
+        </p>
+
+        <h3 class="label">Un hecho y una regla, por dentro</h3>
+        <p>
+          Un hecho es un dato con forma. En CLIPS, el lenguaje de Jess, "Pepe tiene 30 años y vive en Zaragoza" se
+          escribe así:
+        </p>
+<pre><code>(Persona (Nombre Pepe) (Edad 30) (Ciudad Zaragoza))</code></pre>
+        <p>
+          Y una regla es un <strong>patrón</strong> que se compara con los hechos. El ejemplo clásico es de
+          medicina, que es de donde viene todo esto:
+        </p>
+        <figure class="wide">
+          <figcaption>Una regla de diagnóstico, con sus partes</figcaption>
+          <svg class="explica dgr2" viewBox="0 0 560 168" role="img" aria-label="La regla: si (Paciente ?p ?edad) y ?edad es menor que 10 y (Síntomas ?p fiebre) y (Síntomas ?p manchas-rojas), entonces añadir (Enfermedad ?p varicela). Las variables ?p y ?edad están marcadas: se rellenan con lo que haya en los hechos, y ?p tiene que valer lo mismo en todos los patrones. Lo demás son constantes que tienen que coincidir tal cual.">
+            <style>
+              .dgr2 .c{font-family:var(--f-mono);font-size:11px;fill:var(--ink)}
+              .dgr2 .k{font-family:var(--f-mono);font-size:11px;font-weight:700;fill:var(--maze)}
+              .dgr2 .v{font-family:var(--f-mono);font-size:11px;font-weight:700;fill:var(--blinky)}
+              .dgr2 .n{font-family:var(--f-mono);font-size:9px;fill:var(--ink-2)}
+              .dgr2 .br{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+              .dgr2 .lado{fill:var(--maze-soft);stroke:none}
+              .dgr2 .lado2{fill:var(--pill-soft);stroke:none}
+            </style>
+            <rect x="6" y="8" width="380" height="96" rx="3" class="lado"/>
+            <rect x="6" y="112" width="380" height="26" rx="3" class="lado2"/>
+            <text x="16" y="28" class="k">si</text>
+            <text x="60" y="28" class="c">(Paciente <tspan class="v">?p</tspan> <tspan class="v">?edad</tspan>)</text>
+            <text x="16" y="50" class="k">y</text>
+            <text x="60" y="50" class="c">(test (&lt; <tspan class="v">?edad</tspan> 10))</text>
+            <text x="16" y="72" class="k">y</text>
+            <text x="60" y="72" class="c">(Síntomas <tspan class="v">?p</tspan> fiebre)</text>
+            <text x="16" y="94" class="k">y</text>
+            <text x="60" y="94" class="c">(Síntomas <tspan class="v">?p</tspan> manchas-rojas)</text>
+            <text x="16" y="130" class="k">⇒</text>
+            <text x="60" y="130" class="c">(assert (Enfermedad <tspan class="v">?p</tspan> varicela))</text>
+            <path d="M396 12 h6 v88 h-6" class="br"/>
+            <text x="410" y="44" class="n">PARTE IZQUIERDA (LHS)</text>
+            <text x="410" y="58" class="n">condiciones: patrones que</text>
+            <text x="410" y="70" class="n">tienen que casar con hechos</text>
+            <path d="M396 114 h6 v22 h-6" class="br"/>
+            <text x="410" y="122" class="n">PARTE DERECHA (RHS)</text>
+            <text x="410" y="134" class="n">lo que se hace si casan</text>
+            <text x="16" y="160" class="n"><tspan class="v">?p ?edad</tspan>  variables: se rellenan con los hechos, y ?p vale lo mismo en todas las líneas</text>
+          </svg>
+        </figure>
+        <p>
+          Con los hechos <code>(Paciente Ana 7)</code>, <code>(Síntomas Ana fiebre)</code> y
+          <code>(Síntomas Ana manchas-rojas)</code>, la regla casa con <code>?p = Ana</code> y
+          <code>?edad = 7</code>, y aserta <code>(Enfermedad Ana varicela)</code>. Si además hubiera
+          <code>(Síntomas Luis fiebre)</code>, no pasaría nada con Luis: <code>?p</code> tiene que valer lo mismo
+          en las tres líneas, y a Luis le faltan las manchas. Lo que no es variable (<code>Paciente</code>,
+          <code>fiebre</code>, el <code>10</code>) es constante y tiene que coincidir letra a letra.
+        </p>
+      </section>
+
+      <section id="ciclo" data-corto="El ciclo del motor">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El ciclo: reconocer, resolver, actuar</h2>
+        </div>
+        <p>
+          El motor no hace más que repetir un bucle de tres pasos hasta que no le queda nada que hacer:
+        </p>
+        <figure>
+          <figcaption>El ciclo de reconocimiento y actuación</figcaption>
+          <svg class="explica dgr3" viewBox="0 0 440 236" role="img" aria-label="Un ciclo de tres pasos en círculo. Reconocer: comparar los patrones de todas las reglas con la memoria de trabajo y apuntar en la agenda las que se cumplen. Resolver el conflicto: de la agenda, elegir una. Actuar: ejecutar su parte derecha, que cambia la memoria de trabajo. Y vuelta a reconocer. Si la agenda está vacía, el motor se para.">
+            <style>
+              .dgr3 .p{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+              .dgr3 .fin{fill:var(--surface-2);stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3}
+              .dgr3 .t{font-family:var(--f-mono);font-size:10.5px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgr3 .s{font-family:var(--f-mono);font-size:8.8px;fill:var(--ink-2);text-anchor:middle}
+              .dgr3 .a{fill:none;stroke:var(--ink-3);stroke-width:1.5;marker-end:url(#r3a)}
+            </style>
+            <defs><marker id="r3a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <rect x="140" y="8" width="160" height="52" rx="8" class="p"/>
+            <text x="220" y="28" class="t">1 · RECONOCER</text>
+            <text x="220" y="42" class="s">¿qué reglas casan con</text>
+            <text x="220" y="53" class="s">los hechos? → agenda</text>
+            <rect x="270" y="130" width="164" height="52" rx="8" class="p"/>
+            <text x="352" y="150" class="t">2 · RESOLVER</text>
+            <text x="352" y="164" class="s">de la agenda,</text>
+            <text x="352" y="175" class="s">elegir una</text>
+            <rect x="6" y="130" width="164" height="52" rx="8" class="p"/>
+            <text x="88" y="150" class="t">3 · ACTUAR</text>
+            <text x="88" y="164" class="s">ejecutar su derecha:</text>
+            <text x="88" y="175" class="s">cambia la memoria</text>
+            <path d="M300 46 C 360 60, 372 96, 360 127" class="a"/>
+            <path d="M270 162 H173" class="a"/>
+            <path d="M80 130 C 70 90, 90 50, 137 38" class="a"/>
+            <rect x="160" y="200" width="120" height="30" rx="6" class="fin"/>
+            <text x="220" y="219" class="s">agenda vacía: parar</text>
+            <path d="M220 60 V196" class="a" stroke-dasharray="3 3"/>
+          </svg>
+        </figure>
+        <figure>
+          <figcaption>Pseudocódigo · el motor de inferencia entero</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">run</span>(<span class="var">reglas</span>, <span class="var">memoria</span>)
+    <b>loop</b>
+        <span class="var">agenda</span> ← { (<span class="var">r</span>, <span class="var">hechos</span>) : la parte izquierda de <span class="var">r</span> casa con esos <span class="var">hechos</span>
+                                y esa pareja no se ha disparado ya }   <i>// reconocer</i>
+        <b>if</b> <span class="var">agenda</span> = ∅ <b>then return</b>
+        (<span class="var">r</span>, <span class="var">hechos</span>) ← <span class="fn">resolverConflicto</span>(<span class="var">agenda</span>)              <i>// resolver</i>
+        <span class="fn">ejecutar</span>(parte derecha de <span class="var">r</span>, <span class="var">hechos</span>, <span class="var">memoria</span>)        <i>// actuar</i>
+    <b>end loop</b>
+<b>end function</b></pre>
+        </figure>
+        <p>
+          Fijaos en el "y esa pareja no se ha disparado ya". Sin esa línea, una regla que se cumple se cumpliría
+          también en la vuelta siguiente, y en la otra, y el motor no pararía nunca. Se llama
+          <strong>refracción</strong>: una regla se dispara <em>una vez</em> con los mismos hechos. Tiene sus
+          trampas, y están en <a href="conflictos.html#refraccion">la página de la agenda</a>.
+        </p>
+        <p>
+          Es el mismo esquema que el bucle de búsqueda del <a href="../tema1/busqueda.html">tema&nbsp;1</a>: allí
+          había una <em>frontera</em> de nodos pendientes y una regla para sacar el siguiente; aquí hay una
+          <em>agenda</em> de reglas pendientes y una estrategia para elegir la siguiente. Lo cuenta la
+          <a href="encadenamiento.html">página siguiente</a> con un ejemplo que podéis seguir paso a paso.
+        </p>
+      </section>
+
+      <section id="independientes" data-corto="Sólo se hablan por los hechos">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Las reglas sólo se hablan a través de los hechos</h2>
+        </div>
+        <p>
+          Una regla no puede llamar a otra, ni saber que existe. La única forma que tiene una regla de influir en
+          otra es <strong>escribir un hecho</strong> que la otra lea. Parece una limitación, y es justo lo que hace
+          que se puedan añadir y quitar reglas sin romper nada. Y permite algo que ni la máquina de estados ni la
+          cadena de <code>if</code> hacían con naturalidad: <strong>razonar por capas</strong>, deduciendo
+          conceptos intermedios que luego usan otras reglas.
+        </p>
+        <figure class="wide">
+          <figcaption>Tres capas de reglas para un fantasma: medir, interpretar, decidir</figcaption>
+          <svg class="explica dgr4" viewBox="0 0 560 196" role="img" aria-label="A la izquierda, los hechos que vienen del juego: distancia de Blinky a Ms. Pac-Man, si es comestible, y la distancia de Ms. Pac-Man a la píldora. En medio, reglas que interpretan y asertan hechos nuevos: (peligro blinky) si no es comestible y está cerca; (trampa) si Ms. Pac-Man está cerca de la píldora y hay peligro. A la derecha, reglas que deciden la acción leyendo esos hechos intermedios: si hay trampa, huir; si hay peligro y no hay trampa, cazar. Ninguna regla llama a otra: todas leen y escriben en la memoria.">
+            <style>
+              .dgr4 .h{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgr4 .i{fill:color-mix(in srgb,var(--maze) 18%,var(--surface));stroke:var(--maze);stroke-width:1.3}
+              .dgr4 .d{fill:color-mix(in srgb,var(--blinky) 14%,var(--surface));stroke:var(--blinky);stroke-width:1.3}
+              .dgr4 .t{font-family:var(--f-mono);font-size:8.8px;fill:var(--ink);text-anchor:middle}
+              .dgr4 .tt{font-family:var(--f-mono);font-size:8.5px;font-weight:700;letter-spacing:.1em;fill:var(--ink-3);text-anchor:middle}
+              .dgr4 .a{fill:none;stroke:var(--ink-3);stroke-width:1.2;marker-end:url(#r4a)}
+            </style>
+            <defs><marker id="r4a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <text x="85" y="14" class="tt">EL JUEGO (Input)</text>
+            <text x="280" y="14" class="tt">INTERPRETAR</text>
+            <text x="475" y="14" class="tt">DECIDIR</text>
+            <rect x="6" y="28" width="158" height="30" rx="4" class="h"/><text x="85" y="47" class="t">(BLINKY (distancia 12))</text>
+            <rect x="6" y="82" width="158" height="30" rx="4" class="h"/><text x="85" y="101" class="t">(BLINKY (edible false))</text>
+            <rect x="6" y="132" width="158" height="38" rx="4" class="h"/><text x="85" y="148" class="t">(MSPACMAN</text><text x="85" y="161" class="t">(mindistancePPill 20))</text>
+            <rect x="204" y="44" width="152" height="40" rx="4" class="i"/><text x="280" y="61" class="t">no comestible y</text><text x="280" y="74" class="t">cerca ⇒ (peligro)</text>
+            <rect x="204" y="118" width="152" height="40" rx="4" class="i"/><text x="280" y="135" class="t">(peligro) y PPill</text><text x="280" y="148" class="t">a ≤ 30 ⇒ (trampa)</text>
+            <rect x="396" y="44" width="158" height="40" rx="4" class="d"/><text x="475" y="61" class="t">(trampa) ⇒</text><text x="475" y="74" class="t">ACTION huir · 60</text>
+            <rect x="396" y="118" width="158" height="40" rx="4" class="d"/><text x="475" y="135" class="t">(peligro), no (trampa)</text><text x="475" y="148" class="t">⇒ ACTION cazar · 40</text>
+            <path d="M164 43 L201 58" class="a"/><path d="M164 97 L201 70" class="a"/>
+            <path d="M280 84 V115" class="a"/><path d="M164 151 L201 140" class="a"/>
+            <path d="M356 132 C 376 110, 380 80, 393 66" class="a"/>
+            <path d="M356 64 C 376 90, 380 120, 393 134" class="a"/>
+            <text x="280" y="186" class="t">ninguna regla llama a otra: todas leen y escriben en la memoria de trabajo</text>
+          </svg>
+        </figure>
+        <p>
+          La regla que decide "huir" no sabe nada de distancias: sólo pregunta si hay <code>(trampa)</code>. Si
+          mañana cambiáis qué significa "trampa" (que también cuente si Inky está cerca), se toca una regla de la
+          capa del medio y las de la derecha no se enteran. Es lo mismo que hacíais en la Práctica&nbsp;2 cuando
+          separabais el <code>Input</code> de las transiciones, pero ahora el razonamiento intermedio también es
+          conocimiento escrito, y no código Java.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Os suena de los árboles</span>
+          <p>
+            Es la <a href="../tema1/arboles-comportamiento.html#pizarra">pizarra</a> de los árboles de
+            comportamiento llevada hasta el final: allí las hojas se pasaban datos a través de una pizarra común;
+            aquí la memoria de trabajo <em>es</em> la pizarra, y es lo único que hay.
+          </p>
+        </div>
+      </section>
+
+      <section id="donde" data-corto="Dónde se usan">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">De dónde vienen y dónde se usan</h2>
+        </div>
+        <p>
+          Los sistemas de reglas son lo que en los años setenta y ochenta se llamaba <strong>sistemas
+          expertos</strong>: programas que hacían el trabajo de un especialista porque alguien había escrito, regla
+          a regla, lo que ese especialista sabía.
+        </p>
+        <figure class="wide">
+          <figcaption>Medio siglo de reglas, en seis paradas</figcaption>
+          <svg class="explica dgr5" viewBox="0 0 560 150" role="img" aria-label="Una línea del tiempo. Años setenta: MYCIN, en Stanford, diagnostica infecciones de la sangre con unas seiscientas reglas. 1979 a 1982: Charles Forgy publica el algoritmo Rete. 1980: XCON configura los ordenadores VAX de DEC. 1985: la NASA crea CLIPS. 1995: Jess lleva CLIPS a Java, en Sandia National Laboratories. 1999: Age of Empires II deja escribir la IA de los rivales con reglas. 2012: Valve explica en la GDC cómo elige con reglas qué frase dicen los personajes de Left 4 Dead.">
+            <style>
+              .dgr5 .lin{stroke:var(--ink-3);stroke-width:1.4}
+              .dgr5 .pt{fill:var(--maze)}
+              .dgr5 .ptj{fill:var(--pill);stroke:var(--pill-ink);stroke-width:1.2}
+              .dgr5 .y{font-family:var(--f-mono);font-size:9.5px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgr5 .n{font-family:var(--f-mono);font-size:8.6px;fill:var(--ink-2);text-anchor:middle}
+            </style>
+            <line x1="20" y1="70" x2="540" y2="70" class="lin"/>
+            <circle cx="40" cy="70" r="5" class="pt"/><text x="40" y="56" class="y">1972–76</text><text x="40" y="88" class="n">MYCIN</text><text x="40" y="99" class="n">medicina</text>
+            <circle cx="118" cy="70" r="5" class="pt"/><text x="118" y="44" class="y">1979–82</text><text x="118" y="32" class="n">Rete, de Forgy</text>
+            <circle cx="160" cy="70" r="5" class="pt"/><text x="168" y="88" class="y">1980</text><text x="168" y="100" class="n">XCON (DEC)</text><text x="168" y="111" class="n">configura VAX</text>
+            <circle cx="236" cy="70" r="5" class="pt"/><text x="236" y="56" class="y">1985</text><text x="236" y="44" class="n">CLIPS (NASA)</text>
+            <circle cx="312" cy="70" r="5" class="pt"/><text x="312" y="88" class="y">1995</text><text x="312" y="100" class="n">Jess (Sandia)</text><text x="312" y="111" class="n">CLIPS en Java</text>
+            <circle cx="396" cy="70" r="5" class="ptj"/><text x="396" y="56" class="y">1999</text><text x="396" y="44" class="n">Age of Empires II</text>
+            <circle cx="505" cy="70" r="5" class="ptj"/><text x="505" y="88" class="y">2012</text><text x="505" y="100" class="n">Valve, GDC:</text><text x="505" y="111" class="n">diálogos de L4D</text>
+            <text x="20" y="140" class="n" style="text-anchor:start">azul: la historia de la técnica · amarillo: videojuegos</text>
+          </svg>
+        </figure>
+        <p>
+          <strong>MYCIN</strong>, en Stanford, recomendaba antibióticos para infecciones de la sangre con unas
+          seiscientas reglas, y lo hacía tan bien como los especialistas en las pruebas de la época. Nunca se usó
+          con pacientes, entre otras cosas porque nadie sabía de quién era la culpa si se equivocaba. <strong>XCON</strong>
+          sí trabajó de verdad: configuraba los pedidos de ordenadores VAX de Digital y le ahorraba a la empresa
+          millones al año. Con él llegó el problema que todavía define estos sistemas: con miles de reglas,
+          <strong>mantenerlas</strong> era más caro que escribirlas.
+        </p>
+        <p>
+          Hoy casi nadie dice "sistema experto", pero las reglas están por todas partes. Seguro que ya habéis usado
+          alguno de estos sin saber que era un sistema de reglas:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col">Dónde</th>
+                <th scope="col">Qué hace con reglas</th>
+                <th scope="col">Qué tiene de sistema de reglas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Bancos y seguros</td>
+                <td>Aprobar un préstamo, calcular una prima, detectar un fraude. Motores como Drools, de Red&nbsp;Hat.</td>
+                <td>Las reglas las escribe y cambia el departamento de riesgos, sin tocar el programa.</td>
+              </tr>
+              <tr>
+                <td>CSS</td>
+                <td>Decidir de qué color sale cada párrafo de esta página.</td>
+                <td>Varias reglas casan con el mismo elemento y gana la más <strong>específica</strong>; si empatan, la última. Es <a href="conflictos.html#analogias">resolución de conflictos</a>.</td>
+              </tr>
+              <tr>
+                <td>Un cortafuegos</td>
+                <td>Dejar pasar o no cada paquete de red.</td>
+                <td>Se aplica la <strong>primera regla</strong> de la lista que casa: el orden es la estrategia.</td>
+              </tr>
+              <tr>
+                <td>El filtro de correo basura</td>
+                <td>Puntuar cada mensaje.</td>
+                <td>Se disparan <strong>todas</strong> las reglas que casan y se suman sus puntos. Muy parecido a lo que hace el motor de la práctica.</td>
+              </tr>
+              <tr>
+                <td><code>make</code></td>
+                <td>Compilar sólo lo que hace falta.</td>
+                <td>Parte del objetivo y va hacia atrás buscando de qué depende: <a href="encadenamiento.html#atras">encadenamiento hacia atrás</a>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Y en los videojuegos</h3>
+        <p>
+          En los juegos, las reglas no son la forma más habitual de mover a un personaje turno a turno: para eso
+          ganan las máquinas de estados y los árboles. Donde sí aparecen es en las decisiones de <strong>alto
+          nivel</strong> y en todo lo que tiene muchas situaciones distintas y pocas respuestas posibles. Dos
+          ejemplos muy conocidos:
+        </p>
+        <ul>
+          <li>
+            <strong><em>Age of Empires&nbsp;II</em></strong> (1999) deja que cualquiera escriba la IA de los rivales
+            en ficheros de texto con un lenguaje que se parece muchísimo a CLIPS. Una regla así entrena aldeanos
+            mientras se pueda:
+<pre><code>(defrule
+    (can-train villager)
+=>
+    (train villager))</code></pre>
+            Hay comunidades enteras escribiendo IAs para ese juego más de veinte años después, y su problema número
+            uno es el mismo que el vuestro: qué regla gana cuando se cumplen varias.
+          </li>
+          <li>
+            <strong>Valve</strong> explicó en la <abbr title="Game Developers Conference">GDC</abbr> de 2012 (Elan
+            Ruskin, <em lang="en">AI-driven Dynamic Dialog</em>) cómo deciden qué frase dice cada superviviente de
+            <em lang="en">Left 4 Dead</em>. El juego reúne hechos del momento (quién habla, qué acaba de pasar, en
+            qué mapa están, cuánta vida le queda) y los compara con miles de reglas escritas por los guionistas. Si
+            casan varias, gana la que tiene <strong>más condiciones</strong>, la más específica: la frase genérica
+            "¡cuidado!" pierde frente a "¡cuidado, Bill, detrás de ti!". Los guionistas añaden frases sin pedirle
+            nada a un programador.
+          </li>
+        </ul>
+      </section>
+
+      <section id="balance" data-corto="Lo que se gana y lo que se paga">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Lo que se gana y lo que se paga</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col">Lo que se gana</th>
+                <th scope="col">Lo que se paga</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Separación total</strong> entre conocimiento y control: el motor es el mismo para un fantasma que para un banco.</td>
+                <td><strong>Se pierde el control del flujo.</strong> No escribís en qué orden se mira cada cosa, así que tampoco lo veis de un vistazo.</td>
+              </tr>
+              <tr>
+                <td><strong>Modularidad.</strong> Cada regla es un trozo de conocimiento que se entiende sola, se añade sola y se quita sola.</td>
+                <td><strong>Interacciones inesperadas.</strong> Dos reglas que por separado son razonables pueden, juntas, dar algo absurdo. Con quince reglas se ve; con quinientas, no.</td>
+              </tr>
+              <tr>
+                <td><strong>Uniformidad.</strong> Todo se escribe igual: si esto, entonces aquello. Lo puede leer alguien que no programa.</td>
+                <td><strong>Adquirir el conocimiento</strong> es lo difícil: saber qué reglas hay que escribir. El motor no os ayuda con eso.</td>
+              </tr>
+              <tr>
+                <td><strong>Natural para situaciones con patrones</strong>: "si pasa esto y esto, haz aquello" es como explica su trabajo un experto.</td>
+                <td><strong>Mal para lo secuencial.</strong> "Primero ve aquí, luego espera, luego vuelve" se escribe mucho mejor como estados o como una secuencia de un árbol.</td>
+              </tr>
+              <tr>
+                <td><strong>Explicaciones.</strong> El motor puede decir qué reglas se dispararon y con qué hechos: "huyo porque se disparó <code>huir-por-la-PPill</code> con <code>(MSPACMAN (mindistancePPill 25))</code>".</td>
+                <td><strong>Depurar es distinto.</strong> No hay una línea donde poner un punto de parada: hay que mirar la memoria y la agenda.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">La pregunta de este bloque</span>
+          <p>
+            En la Práctica&nbsp;2 os pregunté qué ganabais pasando de <code>if</code> a máquina de estados. En la
+            Práctica&nbsp;3 la pregunta es la misma con otro formato: ¿qué cosas de vuestro fantasma se escriben mejor
+            como reglas, y cuáles echaban de menos un estado? Lo comparamos con calma en
+            <a href="comparar.html">la última página del bloque</a>.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="index.html"><span class="pager-l">Anterior</span><span class="pager-t">Índice del tema</span></a>
+        <a class="pager-next" href="encadenamiento.html"><span class="pager-l">Siguiente</span><span class="pager-t">Encadenar reglas</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#de-if-a-reglas">De los if a las reglas</a></li>
+            <li><a href="#piezas">Las tres piezas</a></li>
+            <li><a href="#ciclo">El ciclo del motor</a></li>
+            <li><a href="#independientes">Sólo se hablan por los hechos</a></li>
+            <li><a href="#donde">Dónde se usan</a></li>
+            <li><a href="#balance">Lo que se gana y lo que se paga</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html" aria-current="page"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/reglas.js" defer></script>
+</body>
+</html>

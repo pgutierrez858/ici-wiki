@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Reglas en Ms. Pac-Man · Tema 2 · ICI</title>
+<meta name="description" content="El paquete rules del motor de Ms. Pac-Man pieza a pieza: RulesInput, el fichero .clp, RuleEngine y RulesAction; qué pasa en cada turno, por qué gana el ACTION de más prioridad, cómo recordar cosas entre turnos para tener histéresis, cómo ver las reglas mientras se juega y los errores típicos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>Reglas en Ms. Pac-Man</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 06 · Sistemas de reglas</p>
+    <h1>
+      Reglas en Ms.&nbsp;Pac-Man
+      <span class="thin">El paquete <code>rules</code> del motor, un turno por dentro y cómo darle memoria a un sistema que no la tiene.</span>
+    </h1>
+    <p class="standfirst">
+      Lo que pasa en un turno, de <code>getMove</code> al movimiento: los hechos que escribe el <code>Input</code>, las reglas del <code>.clp</code>, el <code>ACTION</code> que gana y la acción Java que lo ejecuta. Con la plantilla de la práctica leída línea a línea, la forma de recordar cosas entre turnos y los errores que os vais a encontrar.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        Si habéis hecho la Práctica&nbsp;2, la mitad de esto ya os suena: el motor de reglas reutiliza la misma idea de
+        <code>Input</code> y de <code>Action</code> que el paquete <code>fsm</code>. Lo que cambia es quién decide.
+        En la máquina de estados, las transiciones que añadíais con <code>FSM.add</code>; aquí, unas reglas escritas
+        en un fichero aparte, <strong>fuera del código Java</strong>, que Jess lee al arrancar.
+      </p>
+      <div class="note tip">
+        <span class="note-label">Para la Práctica 3</span>
+        <p>
+          Esta página explica las piezas. Montadas en un controlador entero, con siete reglas añadidas de una en
+          una y medidas, están en <a href="../reglas-paso-a-paso.html">Ms.&nbsp;Pac-Man con siete reglas</a>, con su
+          proyecto para descargar. Y para ver qué reglas se disparan mientras se juega, más allá del observador de
+          la <a href="#ver">sección&nbsp;6</a>, en <a href="../depurar-reglas.html">Depurar reglas</a>.
+        </p>
+      </div>
+
+      <section id="turno" data-corto="Un turno por dentro">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Un turno, de principio a fin</h2>
+        </div>
+        <figure class="wide">
+          <figcaption>Lo que pasa en cada llamada a <code>getMove</code>, para un fantasma</figcaption>
+          <svg class="explica dgr10" viewBox="0 0 560 314" role="img" aria-label="Seis pasos de arriba abajo. Uno: GhostsInput lee el Game y devuelve los hechos del turno como cadenas de texto. Dos: RuleEngine.reset vacía la memoria de Jess. Tres: assertFacts aserta las cadenas. Cuatro: run dispara todas las reglas que se cumplen, y cada una aserta un hecho ACTION con su priority. Cinco: findActionFact se queda con el ACTION de priority más alta. Seis: con su id se busca en el mapa la RulesAction de Java, se le pasa el hecho con parseFact y su execute devuelve el MOVE. Los pasos dos a cuatro ocurren dentro de Jess; el resto, en Java.">
+            <style>
+              .dgr10 .j{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+              .dgr10 .r{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.3}
+              .dgr10 .zona{fill:color-mix(in srgb,var(--maze) 7%,var(--surface));stroke:var(--maze);stroke-width:1;stroke-dasharray:5 3}
+              .dgr10 .w{fill:color-mix(in srgb,var(--blinky) 14%,var(--surface));stroke:var(--blinky);stroke-width:1.3}
+              .dgr10 .n{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink-3);text-anchor:middle}
+              .dgr10 .t{font-family:var(--f-mono);font-size:9.2px;fill:var(--ink)}
+              .dgr10 .s{font-family:var(--f-mono);font-size:8.6px;fill:var(--ink-2)}
+              .dgr10 .z{font-family:var(--f-mono);font-size:8.5px;font-weight:700;letter-spacing:.1em;fill:var(--maze)}
+              .dgr10 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#r10a)}
+            </style>
+            <defs><marker id="r10a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <rect x="30" y="56" width="524" height="142" rx="6" class="zona"/>
+            <text x="540" y="72" class="z" style="text-anchor:end">DENTRO DE JESS</text>
+            <circle cx="16" cy="22" r="10" class="j"/><text x="16" y="26" class="n">1</text>
+            <rect x="40" y="6" width="514" height="34" rx="4" class="j"/>
+            <text x="50" y="20" class="t">new GhostsInput(game).getFacts()</text>
+            <text x="50" y="33" class="s">"(BLINKY (edible false))"  "(MSPACMAN (mindistancePPill 25))"  …  cadenas de texto</text>
+            <circle cx="16" cy="96" r="10" class="j"/><text x="16" y="100" class="n">2</text>
+            <rect x="40" y="82" width="160" height="30" rx="4" class="r"/><text x="50" y="101" class="t">engine.reset()</text>
+            <text x="210" y="101" class="s">memoria vacía, más (initial-fact)</text>
+            <circle cx="16" cy="134" r="10" class="j"/><text x="16" y="138" class="n">3</text>
+            <rect x="40" y="120" width="160" height="30" rx="4" class="r"/><text x="50" y="139" class="t">engine.assertFacts(…)</text>
+            <text x="210" y="139" class="s">cada cadena, un hecho</text>
+            <circle cx="16" cy="172" r="10" class="j"/><text x="16" y="176" class="n">4</text>
+            <rect x="40" y="158" width="160" height="22" rx="4" class="r"/><text x="50" y="173" class="t">jess.run()</text>
+            <text x="210" y="166" class="s">se disparan TODAS las que se cumplen:</text>
+            <text x="210" y="178" class="s">(ACTION (id BLINKYchases) (priority 10))</text>
+            <text x="210" y="190" class="s">(ACTION (id BLINKYrunsAway) (priority 50))</text>
+            <circle cx="16" cy="230" r="10" class="j"/><text x="16" y="234" class="n">5</text>
+            <rect x="40" y="214" width="200" height="32" rx="4" class="w"/><text x="50" y="228" class="t">findActionFact()</text><text x="50" y="240" class="s">gana el de priority más alta</text>
+            <text x="250" y="234" class="s">→ (ACTION (id BLINKYrunsAway) (priority 50))</text>
+            <circle cx="16" cy="280" r="10" class="j"/><text x="16" y="284" class="n">6</text>
+            <rect x="40" y="260" width="514" height="46" rx="4" class="j"/>
+            <text x="50" y="275" class="t">map.get("BLINKYrunsAway")  →  RunAwayAction(BLINKY)</text>
+            <text x="50" y="288" class="s">.parseFact(hecho)  lee los slots extra del ACTION, si los hay</text>
+            <text x="50" y="300" class="s">.execute(game)     devuelve el MOVE de este turno</text>
+            <path d="M120 40 V79" class="a"/>
+            <path d="M120 246 V257" class="a"/>
+          </svg>
+        </figure>
+        <p>
+          Un detalle importante del paso&nbsp;2: <strong>en cada turno se vacía la memoria</strong>. Los hechos del
+          turno anterior desaparecen, y las reglas razonan sólo con lo que el <code>Input</code> diga ahora. Como en un
+          árbol de comportamiento sin pizarra, el sistema no se acuerda de nada. Volveremos a esto en
+          <a href="#memoria">la sección&nbsp;5</a>, porque es lo que separa un fantasma de reglas de uno de estados.
+        </p>
+      </section>
+
+      <section id="input" data-corto="RulesInput">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec"><code>RulesInput</code>: el juego, como hechos</h2>
+        </div>
+        <p>
+          Es un <code>Input</code> como el de la Práctica&nbsp;2 (el constructor llama a <code>parseInput()</code>, que
+          lee el <code>Game</code> una vez) con un método más, <code>getFacts()</code>, que devuelve los hechos del turno
+          <strong>como cadenas en sintaxis CLIPS</strong>. Así es el de la plantilla:
+        </p>
+<div class="codigo"><pre><code><span class="k">public class</span> GhostsInput <span class="k">extends</span> RulesInput {
+
+    <span class="k">private boolean</span> BLINKYedible, INKYedible, PINKYedible, SUEedible;
+    <span class="k">private double</span> minPacmanDistancePPill;
+
+    <span class="k">public</span> GhostsInput(Game game) { <span class="k">super</span>(game); }
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> parseInput() {
+        BLINKYedible = game.isGhostEdible(GHOST.BLINKY);
+        <span class="c">// … lo mismo para INKY, PINKY y SUE …</span>
+        <span class="k">int</span> pacman = game.getPacmanCurrentNodeIndex();
+        minPacmanDistancePPill = Double.MAX_VALUE;
+        <span class="k">for</span> (<span class="k">int</span> ppill : game.getPowerPillIndices())
+            minPacmanDistancePPill = Math.min(minPacmanDistancePPill,
+                    game.getDistance(pacman, ppill, DM.PATH));
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> Collection&lt;String&gt; getFacts() {
+        Vector&lt;String&gt; facts = <span class="k">new</span> Vector&lt;&gt;();
+        facts.add(String.format(<span class="s">"(BLINKY (edible %s))"</span>, BLINKYedible));
+        <span class="c">// … INKY, PINKY, SUE …</span>
+        facts.add(String.format(<span class="s">"(MSPACMAN (mindistancePPill %d))"</span>, (<span class="k">int</span>) minPacmanDistancePPill));
+        <span class="k">return</span> facts;
+    }
+}</code></pre></div>
+        <p>
+          Cada cadena tiene que corresponder a una plantilla declarada en el <code>.clp</code>, con los mismos nombres
+          de slot. Java no lo comprueba al compilar: si escribís <code>edibel</code> en un sitio y <code>edible</code> en
+          el otro, os enteráis en la consola cuando ya está la partida en marcha.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Qué meter en los hechos</span>
+          <p>
+            Lo mismo que en la Práctica&nbsp;2: lo que <strong>se mide</strong>, no lo que <strong>se decide</strong>.
+            Distancias, tiempos, "¿llego yo antes?", "¿cuántos fantasmas hay cerca?". Si una pregunta necesita caminos
+            o bucles, calculadla aquí en Java, que es donde se calcula bien, y pasadle a Jess el resultado. Lo que
+            <em>hacer</em> con esas medidas es lo que va en las reglas.
+          </p>
+        </div>
+      </section>
+
+      <section id="clp" data-corto="El fichero de reglas">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El fichero <code>.clp</code>: plantillas, reglas y <code>ACTION</code></h2>
+        </div>
+        <p>
+          Hay un fichero de reglas por fantasma (<code>blinkyrules.clp</code>, <code>inkyrules.clp</code>…), en el
+          mismo paquete que las clases. Cada uno empieza declarando las plantillas de los hechos que aserta el
+          <code>Input</code>, y después la del hecho de salida, <code>ACTION</code>:
+        </p>
+<pre><code><span class="c">; los hechos que aserta GhostsInput</span>
+(deftemplate BLINKY (slot edible (type SYMBOL)))
+(deftemplate INKY   (slot edible (type SYMBOL)))
+(deftemplate PINKY  (slot edible (type SYMBOL)))
+(deftemplate SUE    (slot edible (type SYMBOL)))
+(deftemplate MSPACMAN (slot mindistancePPill (type NUMBER)))
+
+<span class="c">; el hecho de salida: id y priority son obligatorios</span>
+(deftemplate ACTION
+   (slot id) (slot info (default "")) (slot priority (type NUMBER))
+   (slot runawaystrategy (type SYMBOL)))       <span class="c">; un slot extra, para RunAwayAction</span>
+
+(defrule BLINKYrunsAwayMSPACMANclosePPill
+   (MSPACMAN (mindistancePPill ?d)) (test (&lt;= ?d 30))
+   =&gt;
+   (assert (ACTION (id BLINKYrunsAway) (info "MSPacMan cerca PPill") (priority 50)
+                   (runawaystrategy RANDOM))))
+
+(defrule BLINKYrunsAway
+   (BLINKY (edible true))
+   =&gt;
+   (assert (ACTION (id BLINKYrunsAway) (info "Comestible --&gt; huir") (priority 30)
+                   (runawaystrategy CORNER))))
+
+(defrule BLINKYchases
+   (BLINKY (edible false))
+   =&gt;
+   (assert (ACTION (id BLINKYchases) (info "No comestible --&gt; perseguir") (priority 10))))</code></pre>
+        <p>
+          Los slots de <code>ACTION</code> tienen tres papeles:
+        </p>
+        <ul>
+          <li><code>id</code> dice <strong>qué acción Java</strong> ejecutar: es la clave del mapa de acciones.</li>
+          <li><code>priority</code> decide cuál gana cuando se asertan varios. Recordad que <a href="conflictos.html#motor">no
+            es la <code>salience</code></a>: se disparan todas las reglas, y la elección es posterior.</li>
+          <li><code>info</code> y cualquier slot que añadáis (aquí <code>runawaystrategy</code>) son
+            <strong>parámetros</strong>: la acción los lee con <code>parseFact</code>. Así una sola clase
+            <code>RunAwayAction</code> puede huir de varias formas, y es la regla la que dice de cuál.</li>
+        </ul>
+        <p>
+          Fijaos en que <code>BLINKYrunsAway</code> se aserta desde dos reglas con dos prioridades y dos estrategias
+          distintas. Es normal y es útil: "huir" es una acción, pero hay varias <em>razones</em> para huir, cada una con
+          su urgencia.
+        </p>
+      </section>
+
+      <section id="java" data-corto="RuleEngine y RulesAction">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec"><code>RuleEngine</code> y <code>RulesAction</code>: el lado de Java</h2>
+        </div>
+        <p>
+          Una acción es una clase que implementa <code>RulesAction</code>: la <code>execute(Game)</code> de siempre, un
+          <code>getActionId()</code> y un método nuevo, <code>parseFact</code>, que recibe el hecho <code>ACTION</code>
+          ganador para leer sus parámetros:
+        </p>
+<div class="codigo"><pre><code><span class="k">public class</span> RunAwayAction <span class="k">implements</span> RulesAction {
+    <span class="k">enum</span> STRATEGY { RANDOM, CORNER, JAIL }
+    GHOST ghost;
+    STRATEGY runAwayStrategy;
+
+    <span class="k">public</span> RunAwayAction(GHOST ghost) { <span class="k">this</span>.ghost = ghost; }
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> parseFact(Fact actionFact) {
+        <span class="k">try</span> {
+            Value value = actionFact.getSlotValue(<span class="s">"runawaystrategy"</span>);
+            <span class="k">if</span> (value == <span class="k">null</span>) <span class="k">return</span>;
+            runAwayStrategy = STRATEGY.valueOf(value.stringValue(<span class="k">null</span>));
+        } <span class="k">catch</span> (JessException e) { e.printStackTrace(); }
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> MOVE execute(Game game) {
+        <span class="c">// aquí runAwayStrategy dice cómo huir</span>
+        <span class="k">if</span> (!game.doesGhostRequireAction(ghost)) <span class="k">return</span> MOVE.NEUTRAL;
+        <span class="k">return</span> game.getApproximateNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost),
+                game.getPacmanCurrentNodeIndex(), game.getGhostLastMoveMade(ghost), DM.PATH);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> String getActionId() { <span class="k">return</span> ghost + <span class="s">"runsAway"</span>; }
+}</code></pre></div>
+        <p>
+          Y el controlador lo junta todo: un <strong>mapa</strong> de acciones por id, y un <strong>motor por
+          fantasma</strong>, cada uno con su fichero de reglas.
+        </p>
+<div class="codigo"><pre><code><span class="k">public</span> Ghosts() {
+    map = <span class="k">new</span> HashMap&lt;&gt;();
+    map.put(<span class="s">"BLINKYchases"</span>, <span class="k">new</span> ChaseAction(GHOST.BLINKY));
+    map.put(<span class="s">"BLINKYrunsAway"</span>, <span class="k">new</span> RunAwayAction(GHOST.BLINKY));
+    <span class="c">// … las de INKY, PINKY y SUE …</span>
+
+    ghostRuleEngines = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+    <span class="k">for</span> (GHOST ghost : GHOST.values()) {
+        String rulesFile = String.format(<span class="s">"%s%srules.clp"</span>, RULES_PATH, ghost.name().toLowerCase());
+        ghostRuleEngines.put(ghost, <span class="k">new</span> RuleEngine(ghost.name(), rulesFile, map));
+    }
+}
+
+<span class="k">@Override</span>
+<span class="k">public</span> EnumMap&lt;GHOST, MOVE&gt; getMove(Game game, <span class="k">long</span> timeDue) {
+    RulesInput input = <span class="k">new</span> GhostsInput(game);          <span class="c">// paso 1, una vez para los cuatro</span>
+    EnumMap&lt;GHOST, MOVE&gt; result = <span class="k">new</span> EnumMap&lt;&gt;(GHOST.<span class="k">class</span>);
+    <span class="k">for</span> (GHOST ghost : GHOST.values()) {
+        RuleEngine engine = ghostRuleEngines.get(ghost);
+        engine.reset();                                    <span class="c">// paso 2</span>
+        engine.assertFacts(input.getFacts());              <span class="c">// paso 3</span>
+        result.put(ghost, engine.run(game));               <span class="c">// pasos 4 a 6</span>
+    }
+    <span class="k">return</span> result;
+}</code></pre></div>
+        <p>
+          Los cuatro motores comparten el <code>Input</code> (ven los mismos hechos) y el mapa, pero cada uno tiene sus
+          reglas. La ruta del fichero, <code>RULES_PATH</code>, es la del paquete escrita con barras: Eclipse copia el
+          <code>.clp</code> a <code>bin</code> al compilar y Jess lo busca en el <em lang="en">classpath</em>. Si cambiáis
+          el nombre del paquete, cambiad también esa constante.
+        </p>
+        <p>
+          Y esto es todo lo que hace <code>RuleEngine.run</code> después del <code>jess.run()</code>, resumido:
+        </p>
+<div class="codigo"><pre><code><span class="c">// de todos los hechos de la memoria, los ACTION, y de ellos el de priority más alta</span>
+Fact action = <span class="k">null</span>;
+<span class="k">int</span> max = Integer.MIN_VALUE;
+<span class="k">for</span> (Fact f : todosLosHechos)
+    <span class="k">if</span> (f.getName().startsWith(<span class="s">"MAIN::ACTION"</span>) &amp;&amp; f.getSlotValue(<span class="s">"priority"</span>).intValue(<span class="k">null</span>) &gt; max) {
+        action = f;
+        max = f.getSlotValue(<span class="s">"priority"</span>).intValue(<span class="k">null</span>);
+    }
+RulesAction a = map.get(action.getSlotValue(<span class="s">"id"</span>).toString());
+a.parseFact(action);
+<span class="k">return</span> a.execute(game);              <span class="c">// y si algo falla por el camino: MOVE.NEUTRAL</span></code></pre></div>
+        <p>
+          Es un <code>&gt;</code> estricto: con dos <code>ACTION</code> de la misma prioridad gana el primero de la lista,
+          el que se asertó antes. Y si no se aserta ningún <code>ACTION</code>, o salta cualquier excepción, el fantasma
+          devuelve <code>MOVE.NEUTRAL</code> y sigue recto, que es el síntoma de casi todos los errores de la
+          <a href="#errores">sección&nbsp;7</a>.
+        </p>
+      </section>
+
+      <section id="memoria" data-corto="Memoria entre turnos">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Recordar entre turnos: histéresis con reglas</h2>
+        </div>
+        <p>
+          En la <a href="../tema1/maquinas-estados.html#prioridades">Práctica&nbsp;2</a> medimos que un fantasma con un
+          solo umbral (huir a menos de 30 de la píldora, dejar de huir a 30 o más) cambia de idea sin parar cuando
+          Ms.&nbsp;Pac-Man ronda los 30. La máquina lo arreglaba con histéresis porque <em>sabía en qué estado estaba</em>.
+          Las reglas de la plantilla tienen exactamente el problema de la lista de prioridades: como la memoria se vacía
+          en cada turno, no hay forma de escribir "sigue huyendo hasta los 40".
+        </p>
+        <p>
+          La salida es <strong>darle a Jess lo que necesita recordar como un hecho más</strong>. La memoria vive en Java,
+          que es lo que sobrevive entre turnos, y el <code>Input</code> la aserta junto con lo demás. Por ejemplo, la
+          última acción de cada fantasma, que la puede apuntar la propia acción cuando se ejecuta:
+        </p>
+<div class="codigo"><pre><code><span class="c">// una forma de hacerlo: la acción apunta que ha ganado</span>
+<span class="k">public</span> MOVE execute(Game game) {
+    memoria.put(ghost, <span class="s">"runsAway"</span>);      <span class="c">// un EnumMap&lt;GHOST,String&gt; compartido</span>
+    …
+}
+
+<span class="c">// y el Input la convierte en un hecho más</span>
+facts.add(String.format(<span class="s">"(BLINKY (edible %s) (ultima %s))"</span>, BLINKYedible, memoria.get(GHOST.BLINKY)));</code></pre></div>
+<pre><code>(deftemplate BLINKY (slot edible) (slot ultima (default nada)))
+
+<span class="c">; entrar en la huida: a menos de 30</span>
+(defrule BLINKYempiezaAHuir
+   (MSPACMAN (mindistancePPill ?d&amp;:(&lt; ?d 30)))
+   =&gt;
+   (assert (ACTION (id BLINKYrunsAway) (info "entra: PPill a menos de 30") (priority 50))))
+
+<span class="c">; seguir huyendo: si ya huía, hasta los 40</span>
+(defrule BLINKYsigueHuyendo
+   (BLINKY (ultima runsAway))
+   (MSPACMAN (mindistancePPill ?d&amp;:(&lt; ?d 40)))
+   =&gt;
+   (assert (ACTION (id BLINKYrunsAway) (info "sigue: aún a menos de 40") (priority 50))))</code></pre>
+        <p>
+          Con esto, entre 30 y 40 el fantasma hace lo mismo que hizo en el turno anterior, como la máquina de estados.
+          Pero fijaos en lo que ha costado: la memoria la habéis tenido que programar vosotros, en Java, y hacerla llegar
+          como un hecho. En la máquina venía de serie. Es uno de los argumentos de la
+          <a href="comparar.html">comparación final</a>.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Que la memoria no se convierta en una máquina de estados escondida</span>
+          <p>
+            Recordad lo justo para lo que necesitáis: la última acción, un contador de turnos, el último sitio donde se
+            vio a Ms.&nbsp;Pac-Man. Si acabáis con un slot <code>estado</code> y una regla por cada pareja de estados,
+            habéis escrito una máquina de estados en CLIPS, y para eso era mejor la de la Práctica&nbsp;2.
+          </p>
+        </div>
+      </section>
+
+      <section id="ver" data-corto="Ver las reglas jugando">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Ver qué reglas se disparan mientras se juega</h2>
+        </div>
+        <p>
+          Como en el paquete <code>fsm</code>, el motor admite observadores. El de la plantilla escribe en la consola:
+        </p>
+<div class="codigo"><pre><code>ConsoleRuleEngineObserver observer = <span class="k">new</span> ConsoleRuleEngineObserver(GHOST.BLINKY.name(), <span class="k">true</span>);
+ghostRuleEngines.get(GHOST.BLINKY).addObserver(observer);</code></pre></div>
+        <p>
+          Con <code>true</code> como segundo argumento, en cada turno vuelca la memoria de trabajo entera después de
+          <code>run</code> (los hechos del <code>Input</code> y todos los <code>ACTION</code> asertados) y después el que ha
+          ganado. Con <code>false</code>, sólo la última línea:
+        </p>
+<pre><code>***** Rules for BLINKY *****
+(MAIN::initial-fact)
+(MAIN::BLINKY (edible false))
+(MAIN::INKY (edible false))
+(MAIN::PINKY (edible true))
+(MAIN::SUE (edible false))
+(MAIN::MSPACMAN (mindistancePPill 25))
+(MAIN::ACTION (id BLINKYrunsAway) (info "MSPacMan cerca PPill") (priority 50) (runawaystrategy RANDOM))
+(MAIN::ACTION (id BLINKYchases) (info "No comestible --&gt; perseguir") (priority 10) (runawaystrategy nil))
+[BLINKY] action fired: (MAIN::ACTION (id BLINKYrunsAway) (info "MSPacMan cerca PPill") (priority 50) (runawaystrategy RANDOM))</code></pre>
+        <p>
+          Para eso sirve el slot <code>info</code>: en esa traza se lee <em>por qué</em> ganó cada acción. Escribidlo
+          pensando en vosotros dentro de una semana, mirando una partida que ha salido mal. Y activad el observador sólo
+          en el fantasma que estéis depurando: cuatro motores volcando la memoria en cada turno son cientos de líneas por
+          segundo.
+        </p>
+        <p>
+          Para probar una regla concreta sin jugar, lo más rápido es la consola de Jess con unos hechos de prueba, como
+          se cuenta en <a href="clips.html#probar-jess">la página de CLIPS</a>.
+        </p>
+      </section>
+
+      <section id="errores" data-corto="Errores típicos">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Errores típicos</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr><th scope="col">Lo que pasa</th><th scope="col">Por qué, y qué hacer</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>En la consola sale <code>Exception assserting fact</code> y una regla que debería dispararse no se dispara.</td>
+                <td>Un hecho del <code>Input</code> no tiene plantilla en el <code>.clp</code>, o tiene un slot que la plantilla no declara. Jess no lo aserta. Comparad letra a letra la cadena de <code>getFacts</code> con el <code>deftemplate</code>, y recordad que cada fichero de reglas tiene que declarar <em>todas</em> las plantillas de los hechos que se le asertan, también las de los otros fantasmas.</td>
+              </tr>
+              <tr>
+                <td>Una regla con <code>(edible TRUE)</code> no se dispara nunca.</td>
+                <td><code>String.format("%s", true)</code> escribe <code>true</code>, en minúsculas, y para Jess <code>true</code> y <code>TRUE</code> son símbolos distintos. Escribid en las reglas exactamente lo que escribe Java.</td>
+              </tr>
+              <tr>
+                <td>El fantasma se queda recto y en la consola sale <code>Exception executing rules</code>.</td>
+                <td>Lo más probable: el <code>id</code> del <code>ACTION</code> ganador no está en el mapa (una errata, o una acción que no habéis registrado con <code>map.put</code>). También pasa si a un <code>ACTION</code> le falta <code>priority</code>: queda a <code>nil</code> y no se puede comparar.</td>
+              </tr>
+              <tr>
+                <td>Sale <code>Exception loading rules from file</code> al arrancar y ningún fantasma decide.</td>
+                <td>El <code>.clp</code> tiene un error de sintaxis (casi siempre un paréntesis) o la ruta no es la del paquete. Cargadlo en la consola de Jess: el mensaje dice la línea. Y si usáis <code>allowed-symbols</code> o <code>range</code>, quitadlos: <a href="clips.html#hechos">Jess 7.1 no los entiende</a>.</td>
+              </tr>
+              <tr>
+                <td>Un fantasma hace lo que debería hacer otro.</td>
+                <td>Al copiar las reglas de Blinky para Pinky, alguna se ha quedado preguntando por <code>BLINKY</code> o asertando <code>BLINKYchases</code>. El motor de Pinky ejecuta entonces la acción de Blinky, que calcula el movimiento de Blinky, y se lo da a Pinky. Repasad cada fichero buscando el nombre de los otros tres.</td>
+              </tr>
+              <tr>
+                <td>A veces hace una cosa y a veces otra, sin que cambie nada.</td>
+                <td>Dos <code>ACTION</code> con la misma <code>priority</code>: gana el que se asertó antes, que depende del orden de disparo. Dad prioridades distintas a las acciones que pueden coincidir.</td>
+              </tr>
+              <tr>
+                <td>El juego se congela en cuanto se cumple una regla.</td>
+                <td>Una regla que modifica o reaserta lo mismo que la activa: el <a href="conflictos.html#refraccion">bucle de <code>modify</code></a>. Con el <code>reset</code> en cada turno y reglas que sólo asertan <code>ACTION</code>, no debería pasar; si pasa, buscad un <code>modify</code> o un <code>retract</code>.</td>
+              </tr>
+              <tr>
+                <td>Vuestras reglas "funcionan", pero el fantasma oscila entre perseguir y huir.</td>
+                <td>No es un error de Jess: es la falta de memoria de la <a href="#memoria">sección&nbsp;5</a>. Dos umbrales y la última acción como hecho.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="clips.html"><span class="pager-l">Anterior</span><span class="pager-t">CLIPS y Jess</span></a>
+        <a class="pager-next" href="comparar.html"><span class="pager-l">Siguiente</span><span class="pager-t">Reglas, máquinas y árboles</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#turno">Un turno por dentro</a></li>
+            <li><a href="#input">RulesInput</a></li>
+            <li><a href="#clp">El fichero de reglas</a></li>
+            <li><a href="#java">RuleEngine y RulesAction</a></li>
+            <li><a href="#memoria">Memoria entre turnos</a></li>
+            <li><a href="#ver">Ver las reglas jugando</a></li>
+            <li><a href="#errores">Errores típicos</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html" aria-current="page"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/reglas.js" defer></script>
+</body>
+</html>

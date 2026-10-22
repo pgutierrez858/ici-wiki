@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Tema 2 · Reglas y razonamiento borroso · ICI</title>
+<meta name="description" content="Tema 2 de ICI: sistemas de reglas con Jess y razonamiento borroso con jFuzzyLogic, de los hechos y las reglas al método de Mamdani, con ejemplos interactivos y el motor de Ms. Pac-Man como referencia.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Tema 2</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Reglas y razonamiento borroso
+      <span class="thin">Escribir el conocimiento como reglas, primero de sí o no y después por grados.</span>
+    </h1>
+    <p class="standfirst">
+      Los apuntes del segundo tema, en diez páginas cortas. Las siete primeras son los sistemas de reglas, el material
+      de la Práctica&nbsp;3; las tres últimas, el razonamiento borroso de la Práctica&nbsp;4. Van en orden, y las dos
+      partes se apoyan en todo lo que ya sabéis de máquinas de estados y árboles de comportamiento.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Tema</dt>
+      <dd>02<small>Reglas y lógica borrosa</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Prácticas asociadas</dt>
+      <dd>Práctica 3<small>y la Práctica 4</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Antes de leer</dt>
+      <dd><a href="../tema1/maquinas-estados.html">Máquinas de estados</a><small>El <code>Input</code> y las acciones son los mismos</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="reglas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Sistemas de reglas</h2>
+        </div>
+        <p>
+          En vez de escribir en qué orden se comprueban las cosas, se escriben reglas sueltas y un motor decide cuáles se
+          aplican. Qué es eso, cómo funciona el motor por dentro, el lenguaje de Jess y cómo se usa en el simulador.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="que-es.html">
+              <span class="lt">01 · Qué es un sistema de reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 6 secciones</span>
+              <span class="ld">De la cadena de <code>if</code> a las reglas, hechos, reglas y motor, el ciclo reconocer–resolver–actuar, razonar por capas, y dónde se usan: de MYCIN a los diálogos de <em lang="en">Left 4 Dead</em>.</span>
+            </a>
+          </li>
+          <li>
+            <a href="encadenamiento.html">
+              <span class="lt">02 · Encadenar reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplo interactivo</span>
+              <span class="ld">Hacia delante y hacia atrás, paso a paso sobre el mismo grafo de reglas, los palíndromos, y por qué en un juego se va hacia delante.</span>
+            </a>
+          </li>
+          <li>
+            <a href="conflictos.html">
+              <span class="lt">03 · La agenda y los conflictos<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplo interactivo</span>
+              <span class="ld">Orden, prioridad, especificidad y novedad con un mismo fantasma, la refracción y el bucle de <code>modify</code>, y lo que hace el motor de la práctica con la prioridad.</span>
+            </a>
+          </li>
+          <li>
+            <a href="rete.html">
+              <span class="lt">04 · Rete<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplo interactivo</span>
+              <span class="ld">Por qué probarlo todo con todo no escala, la red de nodos alfa y beta por dentro, y lo que cuesta de verdad un turno de vuestro fantasma.</span>
+            </a>
+          </li>
+          <li>
+            <a href="clips.html">
+              <span class="lt">05 · CLIPS y Jess<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con banco de pruebas</span>
+              <span class="ld">Hechos, plantillas, reglas, variables y restricciones, lo que Jess no entiende de CLIPS, un banco para escribir y ejecutar reglas, y cómo probarlas en Eclipse sin jugar.</span>
+            </a>
+          </li>
+          <li>
+            <a href="reglas-mspacman.html">
+              <span class="lt">06 · Reglas en Ms.&nbsp;Pac-Man<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · Práctica 3</span>
+              <span class="ld">El paquete <code>rules</code> del motor: un turno por dentro, <code>RulesInput</code>, el <code>.clp</code>, <code>RuleEngine</code> y <code>RulesAction</code>, histéresis con memoria, el observador y los errores típicos.</span>
+            </a>
+          </li>
+          <li>
+            <a href="comparar.html">
+              <span class="lt">07 · Reglas, máquinas y árboles<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 4 secciones</span>
+              <span class="ld">El mismo fantasma en cuatro formatos, frente a frente, quién usa cada técnica en la industria, y el problema que queda para la lógica borrosa.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="borroso">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Razonamiento borroso</h2>
+        </div>
+        <p>
+          Las mismas reglas, pero con palabras que se cumplen por grados: "si el fantasma está <em>cerca</em>". Qué es un
+          conjunto borroso, cómo razona un sistema con ellos y cómo se usa jFuzzyLogic en el simulador.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="borroso.html">
+              <span class="lt">08 · Conjuntos borrosos<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplos interactivos</span>
+              <span class="ld">El problema de los umbrales, de Zadeh al metro de Sendai y a la IA de utilidad, funciones de pertenencia, variables lingüísticas y AND, OR y NOT por grados.</span>
+            </a>
+          </li>
+          <li>
+            <a href="inferencia-borrosa.html">
+              <span class="lt">09 · Inferencia borrosa<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con banco de pruebas</span>
+              <span class="ld">Reglas borrosas, modus ponens generalizado, composición sup-min, Mamdani paso a paso con la propina, un banco de FCL que da lo mismo que jFuzzyLogic, y tres trampas de diseño.</span>
+            </a>
+          </li>
+          <li>
+            <a href="borroso-mspacman.html">
+              <span class="lt">10 · Lógica borrosa en Ms.&nbsp;Pac-Man<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · Práctica 4</span>
+              <span class="ld">El FCL pieza a pieza, probarlo desde la consola, el paquete <code>fuzzy</code> del motor, cómo convertir salidas en una acción, la visibilidad parcial y los errores típicos.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="resumen">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Lo que hay que llevarse</h2>
+        </div>
+        <ol>
+          <li>Un sistema de reglas tiene tres piezas: la <strong>memoria de trabajo</strong> (los hechos), la <strong>base de reglas</strong> y el <strong>motor</strong>, que repite reconocer, resolver y actuar hasta que la agenda se vacía.</li>
+          <li>Una regla dice entera su condición y no tiene <em>else</em>. Las reglas no se llaman entre sí: sólo se hablan escribiendo hechos, y eso permite razonar por capas.</li>
+          <li>Hacia delante se va de los hechos a las conclusiones; hacia atrás, de una pregunta a lo que la sostiene. Un personaje reacciona, así que en los juegos se va hacia delante.</li>
+          <li>Cuando se cumplen varias reglas hay que elegir, y la estrategia (orden, prioridad, especificidad, novedad) también es conocimiento. No os fiéis de un empate.</li>
+          <li>La <strong>refracción</strong> impide que una regla se dispare dos veces con los mismos hechos, pero un <code>modify</code> crea un hecho nuevo: una regla que no deja de cumplirse después de actuar no para nunca.</li>
+          <li>Rete no recalcula: cada hecho nuevo recorre una red que recuerda lo ya averiguado. En la práctica, un turno de un fantasma cuesta del orden de 12&nbsp;µs.</li>
+          <li>En el motor de Ms.&nbsp;Pac-Man se disparan todas las reglas, cada una aserta un <code>ACTION</code>, y Java se queda con el de <code>priority</code> más alta. La memoria se vacía en cada turno: lo que haya que recordar lo guarda Java y lo aserta como un hecho.</li>
+          <li>Jess 7.1 no es CLIPS en los detalles: no entiende <code>allowed-symbols</code> ni <code>range</code>, y no comprueba <code>type</code>.</li>
+          <li>Un <strong>conjunto borroso</strong> asigna a cada valor un grado de pertenencia entre 0 y 1. Una variable lingüística es una magnitud con unas pocas palabras que la describen, y esas palabras tienen que cubrir todo el rango y solaparse.</li>
+          <li>AND es el mínimo, OR el máximo y NOT es 1&nbsp;−&nbsp;μ. La lógica clásica es el caso en que todo vale 0 o 1.</li>
+          <li><strong>Mamdani</strong> en cuatro pasos: difuminar, evaluar las reglas, recortar y agregar sus consecuentes, y desdifuminar. Las reglas borrosas no compiten: se mezclan.</li>
+          <li>Un sistema borroso se depura mirando su <strong>curva de control</strong>. Las tres trampas son reglas que se contradicen, huecos sin reglas y un centro de gravedad que dice dónde pero no cuánto.</li>
+          <li>En jFuzzyLogic, AND y OR se leen de izquierda a derecha, <code>ACCU</code> vale <code>SUM</code> si no se escribe, y <code>MM</code> está roto: paréntesis, <code>ACCU</code> siempre y <code>COG</code>.</li>
+          <li>Reglas nítidas para decidir <strong>qué</strong> hacer cuando las situaciones son distintas; borrosas para decidir <strong>cuánto</strong> cuando cambian poco a poco.</li>
+        </ol>
+        <div class="note mine">
+          <span class="note-label">Y a continuación</span>
+          <p>
+            Hasta aquí el conocimiento se escribe a mano y se aplica al estado presente. El tema siguiente cambia las dos
+            cosas: en los juegos por turnos se puede <em>simular</em> el futuro, y el conocimiento pasa a estar en la función
+            que evalúa cómo de buena es una posición.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#reglas">Sistemas de reglas</a></li>
+            <li><a href="#borroso">Razonamiento borroso</a></li>
+            <li><a href="#resumen">Lo que hay que llevarse</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

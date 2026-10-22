@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>La agenda y los conflictos · Tema 2 · ICI</title>
+<meta name="description" content="Qué es la agenda de un motor de reglas, las estrategias de resolución de conflictos (orden, prioridad, especificidad, novedad), la refracción y el bucle de modify, con un ejemplo interactivo sobre un fantasma de Ms. Pac-Man y lo que hace el motor de la práctica.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 2</a>
+    <span aria-hidden="true">/</span>
+    <span>La agenda y los conflictos</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 2 · 03 · Sistemas de reglas</p>
+    <h1>
+      La agenda y la resolución de conflictos
+      <span class="thin">Cuando se cumplen varias reglas a la vez, alguien tiene que elegir. Y esa elección también es conocimiento.</span>
+    </h1>
+    <p class="standfirst">
+      Qué es la agenda, las cinco formas clásicas de elegir qué regla se dispara primero, y un fantasma con el que probarlas. Después, la refracción, la trampa de <code>modify</code>, por qué no hay que fiarse de un empate, y qué hacen con todo esto CSS, un cortafuegos y el motor de la práctica.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        En la cadena de <code>if</code> no había conflictos porque el primer <code>if</code> que se cumplía ganaba y
+        los demás ni se miraban. En un sistema de reglas todas las reglas se miran siempre, y es normal que se cumplan
+        varias a la vez. El motor las apunta en la <strong>agenda</strong> (también se dice <em>conjunto
+        conflicto</em>) y, en cada vuelta del ciclo, tiene que elegir <strong>una</strong>. El criterio con el que
+        elige es la <strong>estrategia de resolución de conflictos</strong>.
+      </p>
+
+      <section id="agenda" data-corto="La agenda">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">La agenda: las reglas que esperan turno</h2>
+        </div>
+        <p>
+          Una entrada de la agenda no es una regla: es una <strong>activación</strong>, una regla junto con los hechos
+          concretos que la cumplen. Si la regla "si un fantasma no es comestible, perseguir" casa con Blinky y con
+          Pinky, en la agenda hay dos activaciones de la misma regla, una con cada hecho. Esto es lo que enseña Jess
+          cuando le pedís <code>(watch activations)</code> con el ejemplo de los profesores de la
+          <a href="clips.html#variables">página de CLIPS</a>:
+        </p>
+<pre><code>==> Activation: MAIN::apellidos-iguales :  f-1
+==> Activation: MAIN::buenos-dias :  f-1
+==> Activation: MAIN::buenos-dias :  f-2</code></pre>
+        <p>
+          Dos reglas, tres activaciones: <code>buenos-dias</code> se cumple con los dos profesores. La agenda está
+          <strong>ordenada</strong>: la primera es la que se va a disparar. Disparar una cambia los hechos, y con los
+          hechos cambia la agenda: entran activaciones nuevas y salen las que ya no se cumplen. Por eso no se
+          disparan todas las de la agenda una detrás de otra, sino que se recalcula después de cada disparo.
+        </p>
+      </section>
+
+      <section id="estrategias" data-corto="Cinco estrategias">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Cinco formas de elegir</h2>
+        </div>
+        <ol>
+          <li>
+            <strong>Orden en la base de reglas.</strong> Gana la primera regla del fichero que se cumpla. Es lo más
+            fácil de entender y lo más peligroso: vuelve a ser la cadena de <code>if</code>, y cambiar una regla de
+            sitio cambia el comportamiento sin que nada lo avise.
+          </li>
+          <li>
+            <strong>Prioridad.</strong> Cada regla lleva un número, y gana la de número más alto. En CLIPS y Jess se
+            llama <code>salience</code>. La pone quien escribe las reglas, y es conocimiento de verdad: "huir de la
+            píldora es más urgente que perseguir".
+          </li>
+          <li>
+            <strong>Especificidad.</strong> Gana la regla con <strong>más condiciones</strong>. La idea es que una regla
+            más detallada sabe más del caso concreto: "perseguir" es la regla general, "perseguir si estoy cerca y
+            llego antes a la píldora" es la excepción, y la excepción tiene que ganar a la regla general sin que
+            haya que ponerle una prioridad.
+          </li>
+          <li>
+            <strong>Novedad.</strong> Gana la activación que usa los hechos <strong>más recientes</strong>, porque lo
+            nuevo suele ser lo que importa. Es la estrategia <code>depth</code> de Jess, la que trae por defecto. La
+            contraria, <code>breadth</code>, prefiere lo más antiguo: atiende las cosas por orden de llegada.
+          </li>
+          <li>
+            <strong>Arbitrariedad.</strong> Una cualquiera, al azar. No se usa como estrategia principal, sino para
+            desempatar cuando todo lo demás es igual.
+          </li>
+        </ol>
+        <p>
+          En la práctica se combinan: Jess ordena primero por <code>salience</code> y, a igual prioridad, por novedad
+          (<code>depth</code>) o por antigüedad (<code>breadth</code>). CLIPS tiene alguna más, como
+          <code>complexity</code>, que es la especificidad, o <code>random</code>. Se cambia con
+          <code>(set-strategy breadth)</code>.
+        </p>
+      </section>
+
+      <section id="probar" data-corto="Pruébalas con un fantasma">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Las cuatro, con el mismo fantasma</h2>
+        </div>
+        <p>
+          Seis reglas para un fantasma, escritas en el orden en que se le fueron ocurriendo a alguien. Mover los
+          controles cambia los hechos del turno; cambiar la estrategia cambia quién gana. Fijaos en que <strong>las
+          reglas no cambian</strong>: con los mismos hechos, el fantasma hace cosas distintas según cómo se resuelva el
+          conflicto.
+        </p>
+        <div class="demo" data-reglas="conflicto">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Seis reglas, una agenda y cuatro formas de elegir</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Las estrategias están contadas en la lista de arriba.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <ul>
+            <li>Con los valores de partida se cumplen <code>perseguir</code>, <code>emboscar</code> y
+              <code>huir-ppill</code>. <strong>Orden</strong> elige <code>perseguir</code> porque es la primera del
+              fichero, y es justo la menos interesante: la regla general tapa a todas las demás.</li>
+            <li><strong>Especificidad</strong> elige <code>emboscar</code>, la que tiene dos condiciones. Pulsad
+              <em>Llego antes a la PPill</em>: entra <code>a-por-ella</code>, con cuatro, y gana ella.</li>
+            <li><strong>Prioridad</strong> hace lo que diga el número. Si os parece mal lo que elige, el error no es
+              de la estrategia: es del número que alguien le puso a la regla.</li>
+            <li><strong>Recencia</strong> parece elegir bien, pero por casualidad: con el motor de la práctica, que
+              borra la memoria en cada turno, "el hecho más reciente" sólo quiere decir "el que vuestro
+              <code>Input</code> aserta más tarde". Cambiar el orden de dos líneas de Java cambiaría el
+              comportamiento. No os fiéis de esta.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="refraccion" data-corto="Refracción y bucles">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Refracción, y el bucle de <code>modify</code></h2>
+        </div>
+        <p>
+          La <strong>refracción</strong> es la regla que impide que el motor se quede disparando siempre lo mismo:
+          una activación, la misma regla con los mismos hechos, se dispara una sola vez. Si los hechos siguen ahí, la
+          regla se sigue cumpliendo, pero ya no vuelve a la agenda.
+        </p>
+        <p>
+          Lo delicado es qué cuenta como "los mismos hechos". Cuando una regla <strong>modifica</strong> un hecho con
+          <code>modify</code>, Jess lo trata como un hecho nuevo, aunque conserve el número. Si la regla que lo modifica
+          sigue casando con el hecho modificado, se vuelve a activar, lo vuelve a modificar, y así para siempre:
+        </p>
+<pre><code>(deftemplate fantasma (slot nombre) (slot peligro (default 0)))
+(deffacts f (fantasma (nombre blinky)))
+
+(defrule sube-el-peligro
+   ?f &lt;- (fantasma (peligro ?p))
+   =&gt;
+   (printout t "peligro " ?p crlf)
+   (modify ?f (peligro (+ ?p 1))))</code></pre>
+<pre><code>Jess&gt; (reset)
+Jess&gt; (run 5)
+peligro 0
+peligro 1
+peligro 2
+peligro 3
+peligro 4</code></pre>
+        <p>
+          Con <code>(run)</code> a secas no termina nunca. En el juego, eso es el controlador que se cuelga y pierde
+          el turno. La solución es que la regla <strong>deje de cumplirse</strong> después de actuar: añadirle una
+          condición que el <code>modify</code> rompa. Es lo que hace la regla del ejemplo clásico, que sólo casa con
+          personas <em>solteras</em> y las cambia a <em>casadas</em>:
+        </p>
+<pre><code>(defrule casa-mayores-25
+   ?p &lt;- (persona (nombre ?nombre) (edad ?edad) (estado soltero))   <span class="c">; ← esta condición</span>
+   (test (&gt;= ?edad 25))
+   =&gt;
+   (modify ?p (estado casado))                                      <span class="c">; ← la rompe</span>
+   (printout t ?nombre " tiene " ?edad " años" crlf))</code></pre>
+        <p>
+          Podéis probar las dos en el <a href="clips.html#banco">banco de pruebas</a>, paso a paso.
+        </p>
+
+        <h3 class="label">No os fiéis de un empate</h3>
+        <p>
+          Si dos activaciones empatan en todo (misma prioridad, hechos igual de recientes), el orden lo decide un
+          detalle interno del motor: cómo ha montado su red. Tres reglas idénticas sobre el mismo hecho, escritas en
+          el orden <code>r1</code>, <code>r2</code>, <code>r3</code>, se disparan en Jess al revés, <code>r3</code>
+          primero; con otras reglas, otro orden. Si vuestro fantasma depende de cuál de dos reglas empatadas va
+          antes, funciona por suerte. Cuando el orden importa, decidlo vosotros con una prioridad o con una condición
+          más.
+        </p>
+      </section>
+
+      <section id="analogias" data-corto="Fuera de la IA">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">La misma pregunta, fuera de la IA</h2>
+        </div>
+        <p>
+          Cualquier sistema donde varias reglas pueden aplicarse a la vez ha tenido que resolver esto, y casi todos
+          han acabado en alguna de las estrategias de arriba:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr><th scope="col">Sistema</th><th scope="col">Cómo elige</th><th scope="col">La estrategia</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CSS</td><td>Gana el selector más específico (<code>#menu a</code> le gana a <code>a</code>); si empatan, el último que se escribió. <code>!important</code> se salta todo.</td><td>Especificidad, y orden para desempatar. <code>!important</code> es una <code>salience</code>.</td></tr>
+              <tr><td>Un cortafuegos</td><td>Se aplica la primera regla de la lista que casa con el paquete.</td><td>Orden en la base.</td></tr>
+              <tr><td>El filtro de correo basura</td><td>No elige: se aplican todas las que casan y se suman sus puntos.</td><td>Ninguna: no hay conflicto.</td></tr>
+              <tr><td>Los diálogos de Valve</td><td>Gana la regla con más condiciones, y la regla ganadora no da una frase sino varias, de las que se elige una al azar para que los personajes no repitan siempre lo mismo.</td><td>Especificidad, y arbitrariedad dentro de la ganadora.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Lo de Valve es un buen ejemplo de que la estrategia no es un detalle técnico: que gane la más específica y
+          que después se sortee la frase son dos decisiones de diseño, las que hacen que el juego no suene a máquina.
+        </p>
+      </section>
+
+      <section id="motor" data-corto="Y en la práctica">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Lo que hace el motor de la práctica</h2>
+        </div>
+        <p>
+          El motor de reglas de Ms.&nbsp;Pac-Man hace algo que conviene tener claro desde ya, porque cambia cómo hay
+          que pensar las prioridades: <strong>deja que se disparen todas</strong>. Las reglas no mueven al fantasma
+          directamente; cada una aserta un hecho <code>ACTION</code> con un campo <code>priority</code>. Jess
+          ejecuta hasta vaciar la agenda, y después el código Java del motor recorre los <code>ACTION</code> que han
+          quedado en la memoria y se queda con el de prioridad más alta.
+        </p>
+        <figure class="wide">
+          <figcaption>Dos formas de resolver el conflicto: dentro del motor o después</figcaption>
+          <svg class="explica dgr8" viewBox="0 0 560 150" role="img" aria-label="Arriba, Jess con salience: de la agenda se dispara primero la regla de prioridad más alta. Abajo, el motor de la práctica: se disparan todas las reglas que se cumplen, cada una aserta un ACTION con su priority, y al final Java elige el ACTION de priority más alta, aquí el de 50, huir.">
+            <style>
+              .dgr8 .b{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.1}
+              .dgr8 .w{fill:color-mix(in srgb,var(--blinky) 16%,var(--surface));stroke:var(--blinky);stroke-width:1.4}
+              .dgr8 .j{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.3}
+              .dgr8 .t{font-family:var(--f-mono);font-size:8.4px;fill:var(--ink);text-anchor:middle}
+              .dgr8 .tt{font-family:var(--f-mono);font-size:8.5px;font-weight:700;letter-spacing:.1em;fill:var(--ink-3)}
+              .dgr8 .a{fill:none;stroke:var(--ink-3);stroke-width:1.2;marker-end:url(#r8a)}
+            </style>
+            <defs><marker id="r8a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker></defs>
+            <text x="6" y="14" class="tt">CON SALIENCE · ELIGE JESS, ANTES DE DISPARAR</text>
+            <rect x="6" y="22" width="150" height="36" rx="4" class="b"/><text x="81" y="37" class="t">agenda: huir (50),</text><text x="81" y="50" class="t">perseguir (10)</text>
+            <path d="M156 40 H190" class="a"/>
+            <rect x="192" y="22" width="120" height="36" rx="4" class="w"/><text x="252" y="44" class="t">dispara huir</text>
+            <path d="M312 40 H346" class="a"/>
+            <rect x="348" y="22" width="206" height="36" rx="4" class="b"/><text x="451" y="37" class="t">y luego perseguir, si sigue</text><text x="451" y="50" class="t">cumpliéndose: se disparan las dos</text>
+            <text x="6" y="88" class="tt">EN LA PRÁCTICA · SE DISPARAN TODAS, Y ELIGE JAVA AL FINAL</text>
+            <rect x="6" y="96" width="150" height="46" rx="4" class="b"/><text x="81" y="114" class="t">se disparan las dos:</text><text x="81" y="128" class="t">cada una aserta un ACTION</text>
+            <path d="M156 119 H174" class="a"/>
+            <rect x="176" y="96" width="210" height="46" rx="4" class="b"/><text x="281" y="114" class="t">(ACTION (id huir) (priority 50))</text><text x="281" y="130" class="t">(ACTION (id perseguir) (priority 10))</text>
+            <path d="M386 119 H404" class="a"/>
+            <rect x="406" y="96" width="148" height="46" rx="4" class="j"/><text x="480" y="114" class="t">findActionFact():</text><text x="480" y="128" class="t">gana priority 50 → huir</text>
+          </svg>
+        </figure>
+        <p>
+          Eso tiene tres consecuencias:
+        </p>
+        <ul>
+          <li><strong><code>priority</code> no es <code>salience</code>.</strong> La <code>salience</code> ordena los
+            disparos dentro de Jess; el <code>priority</code> del <code>ACTION</code> elige el movimiento después. Como
+            al final se disparan todas, la <code>salience</code> sólo os servirá si unas reglas dependen de lo que
+            hagan otras.</li>
+          <li><strong>Todo <code>ACTION</code> necesita su <code>priority</code></strong>, y dos acciones con la misma
+            prioridad son un empate que gana la que se asertó antes, que es justo lo que acabamos de decir que no hay
+            que dejar al azar.</li>
+          <li><strong>La resolución de conflictos es vuestra</strong>, escrita en números. Es la estrategia de
+            prioridad, con todo lo bueno (es explícita) y todo lo malo: si ponéis las prioridades sin pensar, habréis
+            reconstruido la cadena de <code>if</code> con más ceremonia.</li>
+        </ul>
+        <div class="note trap">
+          <span class="note-label">El síntoma de un mal reparto de prioridades</span>
+          <p>
+            Si para que vuestro fantasma haga lo correcto tenéis que ir subiendo y bajando números a cada partida,
+            las reglas tienen las condiciones demasiado flojas. La salida casi nunca es otro número: es añadir la
+            condición que falta para que la regla deje de cumplirse cuando no toca. Las prioridades deben decidir
+            entre reglas que <em>pueden</em> cumplirse a la vez con razón, no tapar reglas mal escritas.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 2">
+        <a class="pager-prev" href="encadenamiento.html"><span class="pager-l">Anterior</span><span class="pager-t">Encadenar reglas</span></a>
+        <a class="pager-next" href="rete.html"><span class="pager-l">Siguiente</span><span class="pager-t">Rete</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#agenda">La agenda</a></li>
+            <li><a href="#estrategias">Cinco estrategias</a></li>
+            <li><a href="#probar">Pruébalas con un fantasma</a></li>
+            <li><a href="#refraccion">Refracción y bucles</a></li>
+            <li><a href="#analogias">Fuera de la IA</a></li>
+            <li><a href="#motor">Y en la práctica</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 2</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
+            <li><a href="encadenamiento.html"><span>02</span>Encadenar reglas</a></li>
+            <li><a href="conflictos.html" aria-current="page"><span>03</span>La agenda y los conflictos</a></li>
+            <li><a href="rete.html"><span>04</span>Rete</a></li>
+            <li><a href="clips.html"><span>05</span>CLIPS y Jess</a></li>
+            <li><a href="reglas-mspacman.html"><span>06</span>Reglas en Ms.&nbsp;Pac-Man</a></li>
+            <li><a href="comparar.html"><span>07</span>Reglas, máquinas y árboles</a></li>
+            <li><a href="borroso.html"><span>08</span>Conjuntos borrosos</a></li>
+            <li><a href="inferencia-borrosa.html"><span>09</span>Inferencia borrosa</a></li>
+            <li><a href="borroso-mspacman.html"><span>10</span>Lógica borrosa en Ms.&nbsp;Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/reglas.js" defer></script>
+</body>
+</html>
