@@ -84,18 +84,19 @@
         <p>
           Todo el código de esta página, y el de las guías para <a href="depurar-reglas.html">depurar</a> y
           <a href="comparar-versiones.html">comparar versiones</a>, está en un proyecto de Eclipse listo para
-          importar, junto con los <strong>rivales de referencia</strong> contra los que medir: los dos fantasmas de
-          la Práctica&nbsp;0 y los tres rivales de la Práctica&nbsp;1, que traen fantasmas y Ms.&nbsp;Pac-Man.
+          importar, junto con los <strong>rivales de referencia</strong> contra los que medir (los dos fantasmas de
+          la Práctica&nbsp;0 y los tres rivales de la Práctica&nbsp;1) y con el propio <strong>simulador</strong>,
+          <code>MsPacManEngine</code>: un zip, dos proyectos, y a trabajar.
         </p>
         <ul class="links">
           <li>
             <a href="../recursos/ICI-Practica3.zip" download>
               <span class="lt"><code>ICI-Practica3.zip</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Proyecto de Eclipse · 42&nbsp;kB</span>
+              <span class="lm">Dos proyectos de Eclipse · 6,3&nbsp;MB</span>
               <span class="ld">
-                La Ms.&nbsp;Pac-Man de esta página en sus dos versiones, el esqueleto de los fantasmas, la traza de
-                reglas, el probador de casos, el banco para comparar versiones y los rivales. Compila sólo con
-                <code>MsPacManEngine</code> al lado.
+                <code>MsPacManEngine</code>, el simulador de siempre, y <code>Practica3</code>: la Ms.&nbsp;Pac-Man
+                de esta página en sus dos versiones, el esqueleto de los fantasmas, la traza de reglas, el probador
+                de casos, el banco para comparar versiones y los rivales.
               </span>
             </a>
           </li>
@@ -105,11 +106,22 @@
           <div class="step-body">
             <h3 class="label">Importarlo</h3>
             <p>
-              Descomprimidlo junto a <code>MsPacManEngine</code> y
-              <span class="path">File &gt; Import &gt; General &gt; Existing Projects into Workspace</span>, como el
-              de la <a href="eclipse.html">Práctica&nbsp;0</a>. Los rivales están en <code>lib/</code> y ya van en
-              el <em>Build Path</em>. El proyecto se llama <code>Practica3</code>; si ya tenéis uno con ese nombre,
-              cambiad el <code>&lt;name&gt;</code> de su <code>.project</code> antes de importarlo.
+              Igual que el de la <a href="eclipse.html#importar">Práctica&nbsp;0</a>, pero con un solo zip:
+            </p>
+            <ol>
+              <li>Descomprimidlo en una carpeta estable, fuera del <em>workspace</em> de Eclipse.</li>
+              <li><span class="path">File &gt; Import… &gt; General &gt; Existing Projects into Workspace</span>, y <kbd>Next</kbd>.</li>
+              <li>En <strong>Select root directory</strong>, la carpeta donde lo habéis descomprimido. Eclipse encuentra los dos proyectos.</li>
+              <li>Marcad <strong><code>MsPacManEngine</code> y <code>Practica3</code></strong>, y también <strong>"Copy projects into workspace"</strong>. <kbd>Finish</kbd>.</li>
+              <li>Clic derecho sobre <code>MsPacManEngine</code>, <span class="path">Maven &gt; Update Project…</span> (<kbd>Alt</kbd>+<kbd>F5</kbd>) con <strong>"Force Update of Snapshots/Releases"</strong> marcado. Necesita Internet, y la primera vez tarda unos minutos.</li>
+            </ol>
+            <p>
+              Cuando acabe Maven desaparecen las marcas rojas. Los rivales están en <code>Practica3/lib/</code> y ya
+              van en el <em>Build Path</em>. Si ya teníais <code>MsPacManEngine</code> de otra práctica, Eclipse lo
+              muestra en gris porque ya existe: importad sólo <code>Practica3</code>, y el paso de Maven ya lo
+              hicisteis. Y si ya tenéis un proyecto llamado <code>Practica3</code>, cambiad el
+              <code>&lt;name&gt;</code> de su <code>.project</code> antes de importar. Lo que puede salir mal, y cómo
+              salir de ello, está en la <a href="eclipse.html">guía de Eclipse</a>.
             </p>
           </div>
         </div>
