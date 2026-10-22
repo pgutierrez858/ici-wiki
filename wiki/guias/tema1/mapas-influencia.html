@@ -76,17 +76,17 @@
           <h2 class="sec">Qué es un mapa de influencia</h2>
         </div>
         <p>
-          La idea viene de los juegos de estrategia. En vez de escribir reglas sobre cada unidad —«si hay
-          un enemigo a menos de tanto, retírate»—, se pinta sobre el mapa un número en cada casilla que dice
+          La idea viene de los juegos de estrategia. En vez de escribir reglas sobre cada unidad ("si hay
+          un enemigo a menos de tanto, retírate"), se pinta sobre el mapa un número en cada casilla que dice
           cuánto <em>pesa</em> allí cada cosa: cerca de un ejército enemigo, mucho peligro; cerca de un
           recurso, mucho interés. Cada unidad <strong>irradia</strong> su influencia alrededor, la influencia
           se va apagando con la distancia, y la decisión ya no mira a las unidades: mira el mapa. ¿Dónde
           atacar? Donde el mapa diga que el enemigo es débil. ¿Por dónde ir? Por donde el peligro sea bajo.
         </p>
         <p>
-          En Ms.&nbsp;Pac-Man el mapa es el propio laberinto, y las «casillas» son sus nodos. A cada nodo se
-          le da un número por cada cosa que importa —comida, perseguidores, fantasmas comestibles, píldoras de
-          poder— y luego se mezclan en uno solo. Ese número se puede leer de dos formas, que son la misma con
+          En Ms.&nbsp;Pac-Man el mapa es el propio laberinto, y las "casillas" son sus nodos. A cada nodo se
+          le da un número por cada cosa que importa (comida, perseguidores, fantasmas comestibles, píldoras de
+          poder) y luego se mezclan en uno solo. Ese número se puede leer de dos formas, que son la misma con
           el signo cambiado:
         </p>
         <ul>
@@ -243,10 +243,10 @@ muy bueno          U =  1,5   1 − 1,5    = −0,5  → 0,2</pre>
         </p>
         <p>
           Y lo que el modelo <em>no</em> hace, a propósito, para que se vea entero: la píldora de poder
-          atrae siempre con el mismo peso, aunque comérsela sólo rinde cuando hay perseguidores cerca —la
+          atrae siempre con el mismo peso, aunque comérsela sólo rinde cuando hay perseguidores cerca (la
           <a href="estrategias.html#tres-formas">función de evaluación</a> de estrategias le cambia el signo
-          según la situación—, y un fantasma comestible atrae aunque no dé tiempo a alcanzarlo —la cuenta
-          está en <a href="estrategias.html#alcanzar-comestible">¿me da tiempo a comérmelo?</a>—. Las dos
+          según la situación), y un fantasma comestible atrae aunque no dé tiempo a alcanzarlo (la cuenta
+          está en <a href="estrategias.html#alcanzar-comestible">¿me da tiempo a comérmelo?</a>). Las dos
           cosas se pueden meter en el mapa, y el <a href="#controlador">controlador en Java</a> de más abajo
           es una versión aún más reducida que dice en qué se aparta de éste.
         </p>
@@ -451,7 +451,7 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
           Mirad el panel de la amenaza: no es un círculo alrededor del fantasma, es una mancha con la forma
           de los pasillos. Y mirad el total. El pasillo de en medio queda en rojo y <strong>parte el
           laberinto en dos</strong>, así que cualquier búsqueda de coste mínimo que use este mapa va a dar
-          el rodeo sin que nadie haya escrito en ninguna parte «no pases por ahí». Ahí está la gracia de la
+          el rodeo sin que nadie haya escrito en ninguna parte "no pases por ahí". Ahí está la gracia de la
           técnica: el conocimiento no está en el código que decide, está en el mapa que se le da.
         </p>
         <div class="note mine">
@@ -459,8 +459,8 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
           <p>
             Lo único que cambia es el signo. Donde la utilidad sube, entrar sale barato:
 <code>coste(c) = máx(costeMínimo, base − U(c))</code>, la línea de <code>decidir</code> que se explica al principio de la página. Se usa una forma u otra según lo que venga
-            detrás: si la decisión la va a tomar una <strong>búsqueda de coste mínimo</strong> —la de
-            <a href="busqueda.html#ciegas">coste uniforme</a>, sin tocar una línea— hacen falta costes; si la va a tomar un
+            detrás: si la decisión la va a tomar una <strong>búsqueda de coste mínimo</strong> (la de
+            <a href="busqueda.html#ciegas">coste uniforme</a>, sin tocar una línea) hacen falta costes; si la va a tomar un
             <strong>máximo</strong> sobre las salidas, hace falta utilidad. El suelo del coste no es un
             detalle: sin él, una zona muy buena saldría gratis y la distancia dejaría de contar.
           </p>
@@ -482,13 +482,13 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
           juegos de pesos con nombre para comparar deprisa. Con <em>Ver</em> se mira una capa sola en vez de
           la suma, que es la única forma de entender de dónde sale una mancha; con <em>Números</em>, el
           valor exacto de cada casilla. Y <em>Jugar</em> repite la decisión turno a turno: no es el juego
-          —los fantasmas de aquí persiguen por el camino más corto y pierden un turno de cada tres—, pero
+          (los fantasmas de aquí persiguen por el camino más corto y pierden un turno de cada tres), pero
           basta para ver a dónde lleva decidir así cien veces seguidas.
         </p>
         <p>
           El ejemplo trae también las otras dos formas de decidir de
-          <a href="estrategias.html#tres-formas">estrategias algorítmicas</a> —reglas con prioridad y función
-          de evaluación— sobre la misma escena, para compararlas con el mapa, y lo que cambia entre ellas no es sólo
+          <a href="estrategias.html#tres-formas">estrategias algorítmicas</a> (reglas con prioridad y función
+          de evaluación) sobre la misma escena, para compararlas con el mapa, y lo que cambia entre ellas no es sólo
           el resultado: es <strong>qué se toca para afinarlas</strong>. Al pasar a las reglas, la barra de
           pesos desaparece de la pantalla, porque allí no pinta nada.
         </p>
@@ -535,7 +535,7 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
         <div class="note tip">
           <span class="note-label">El horizonte, y por qué hace falta</span>
           <p>
-            Con el mapa pintado, la decisión más corta sería «vete a la casilla vecina que más valga». Eso
+            Con el mapa pintado, la decisión más corta sería "vete a la casilla vecina que más valga". Eso
             se atasca en cuanto hay un <strong>máximo local</strong>: un cruce que es mejor que sus cuatro
             vecinas y peor que media docena de sitios a seis pasos, y ahí se queda oscilando. Por eso el
             ejemplo mira primero <em>la mejor casilla dentro de un horizonte</em> y después va hasta ella
@@ -577,8 +577,8 @@ una sola anchura, con las 220 ya en la cola                1 293 nodos</pre>
           <p>
             Ninguna de las tres decide bien si los datos que recibe están mal. Una función de evaluación con
             un término de amenaza calculado con la distancia sin <code>lastMove</code> elige mal con mucha
-            elegancia. El trabajo de verdad está en las funciones que contestan <a href="estrategias.html#llego-antes">«¿llego yo antes?»</a>,
-            «¿cuántas píldoras hay por aquí?» y «¿me da tiempo?». Lo de encima es la parte fácil.
+            elegancia. El trabajo de verdad está en las funciones que contestan <a href="estrategias.html#llego-antes">"¿llego yo antes?"</a>,
+            "¿cuántas píldoras hay por aquí?" y "¿me da tiempo?". Lo de encima es la parte fácil.
           </p>
         </div>
       </section>
@@ -769,8 +769,8 @@ una sola anchura, con las 220 ya en la cola                1 293 nodos</pre>
           </svg>
         </figure>
         <p>
-          Fijaos en lo que no aparece en el diagrama: ninguna caja pregunta «¿hay un fantasma cerca?» ni
-          «¿me conviene la píldora de poder?». Todo eso tiene que salir de los números del mapa. Si sale bien,
+          Fijaos en lo que no aparece en el diagrama: ninguna caja pregunta "¿hay un fantasma cerca?" ni
+          "¿me conviene la píldora de poder?". Todo eso tiene que salir de los números del mapa. Si sale bien,
           es mérito de las capas; si sale mal, también es culpa suya, y ahí es donde se mira.
         </p>
       </section>
@@ -783,8 +783,8 @@ una sola anchura, con las 220 ya en la cola                1 293 nodos</pre>
         <p>
           Una capa es un <code>double[]</code> con una casilla por nodo, indexado por el mismo índice de nodo
           que usa el motor. Nada de mapas ni de objetos por nodo: el motor ya numera los nodos de 0 a
-          n&nbsp;−&nbsp;1, y todo lo que os da —<code>getActivePillsIndices</code>,
-          <code>getGhostCurrentNodeIndex</code>, <code>getNeighbouringNodes</code>— son índices de esos.
+          n&nbsp;−&nbsp;1, y todo lo que os da (<code>getActivePillsIndices</code>,
+          <code>getGhostCurrentNodeIndex</code>, <code>getNeighbouringNodes</code>) son índices de esos.
           Leer lo que vale un nodo es leer una posición de un <em>array</em>.
         </p>
         <p>
@@ -841,8 +841,8 @@ una sola anchura, con las 220 ya en la cola                1 293 nodos</pre>
           <p>
             El ejecutor os pasa en cada <em>tick</em> un <code>game.copy()</code> nuevo. Guardaros una
             referencia al <code>Game</code> de un <em>tick</em> para usarla en el siguiente no da error, pero
-            os deja mirando una partida que ya no existe. Lo que tiene que durar entre <em>ticks</em> —las
-            capas, la tabla de vecinos, la clave— vive en el controlador, no en el juego.
+            os deja mirando una partida que ya no existe. Lo que tiene que durar entre <em>ticks</em> (las
+            capas, la tabla de vecinos, la clave) vive en el controlador, no en el juego.
           </p>
         </div>
       </section>
@@ -1237,8 +1237,8 @@ abajo      1 × 0,810  −  6 × 0,430  +  2 × 0,444  =  0,810 − 2,580 + 0,88
         </div>
         <p>
           En un pasillo no hay nada que decidir, y en este motor eso es literal. <code>Game.correctPacManDir</code>
-          rechaza el giro de 180°, y si el movimiento que devolvéis no vale —<code>NEUTRAL</code>,
-          <code>null</code>, una pared o darse la vuelta—, Ms.&nbsp;Pac-Man sigue con el último que hizo; y si
+          rechaza el giro de 180°, y si el movimiento que devolvéis no vale (<code>NEUTRAL</code>,
+          <code>null</code>, una pared o darse la vuelta), Ms.&nbsp;Pac-Man sigue con el último que hizo; y si
           por ahí hay pared, como en una esquina, toma la primera salida que no sea volver. Así que fuera de los cruces el controlador devuelve
           <code>NEUTRAL</code> sin pintar nada. En las partidas de la tabla, Ms.&nbsp;Pac-Man estaba en un cruce
           en el 4,6&#8239;% de las llamadas: el resto es gratis.
@@ -1291,7 +1291,7 @@ abajo      peor de  −0,88  −0,55  −0,21                  =  −0,88    ←
 
         <h3 class="label">El máximo local, y por qué aquí no atasca</h3>
         <p>
-          La nota del horizonte avisaba de que «vete a la vecina que más valga» se atasca en máximos locales.
+          La nota del horizonte avisaba de que "vete a la vecina que más valga" se atasca en máximos locales.
           Este controlador los esquiva por tres lados, y conviene saber cuáles para no creerse que es
           inmune:
         </p>
@@ -1693,7 +1693,7 @@ más recorrer los tramos                        2 o 3 pasillos hasta el cruce si
           siguiente la clave ha cambiado. En 200 partidas contadas, 100 contra el grupo&nbsp;01 y 100 contra
           <code>GhostsRandom</code>, la comida se repintó en 19&#8239;094 de
           32&#8239;853 llamadas en cruce: <strong>el 58&#8239;%</strong>. La caché se lleva el 42&#8239;%
-          restante, que no está mal, pero no es el «sólo cuando te comes una píldora» de la nota. Con este
+          restante, que no está mal, pero no es el "sólo cuando te comes una píldora" de la nota. Con este
           presupuesto da igual; si algún día pintáis capas caras de verdad, es lo primero que hay que
           medir.
         </p>
@@ -1977,7 +1977,7 @@ más recorrer los tramos                        2 o 3 pasillos hasta el cruce si
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

@@ -82,7 +82,7 @@
           <h2 class="sec">Por qué la regla voraz no basta</h2>
         </div>
         <p>
-          «Huye del fantasma más cercano» es la primera idea de todo el mundo, y es la que se escribe en el
+          "Huye del fantasma más cercano" es la primera idea de todo el mundo, y es la que se escribe en el
           ejercicio 2 de la <a href="../../practicas/practica-0.html">Práctica&nbsp;0</a>. Falla siempre, pero
           conviene ver <em>por qué</em> falla, porque el motivo no es el que suele contarse.
         </p>
@@ -91,7 +91,7 @@
           <p>
             Merece la pena comprobarlo en los datos del propio motor, porque cambia el problema: en los
             cuatro laberintos <strong>no hay un solo nodo con una única salida</strong>. El primero tiene
-            1&#8239;293 nodos: uno es la cárcel, 1&#8239;254 son pasillo —dos salidas—, 32 son cruces de tres
+            1&#8239;293 nodos: uno es la cárcel, 1&#8239;254 son pasillo (dos salidas), 32 son cruces de tres
             y 6 son cruces de cuatro. El laberinto entero es una malla de bucles, y el callejón sin salida
             del dibujo de toda la vida <strong>no existe</strong>.
           </p>
@@ -168,8 +168,8 @@
           De aquí salen los dos arreglos, y ninguno de los dos es cambiar la fórmula de la distancia:
           <strong>mirar a todas las amenazas</strong> en vez de sólo a la más cercana, y <strong>mirar más
           lejos de un paso</strong>. Lo segundo no es una preferencia: si al entrar en un pasillo te
-          comprometes a salir por el otro extremo, la pregunta no puede ser «¿qué nodo me aleja más?», tiene
-          que ser «¿qué hay al final de ese pasillo, y quién llega antes?». Y eso, en este laberinto, tiene
+          comprometes a salir por el otro extremo, la pregunta no puede ser "¿qué nodo me aleja más?", tiene
+          que ser "¿qué hay al final de ese pasillo, y quién llega antes?". Y eso, en este laberinto, tiene
           una unidad natural.
         </p>
       </section>
@@ -207,7 +207,7 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
           <span class="note-label">Devolver <code>null</code> es legítimo</span>
           <p>
             Si tu <code>getMove</code> devuelve <code>null</code>, el motor lo descarta y el personaje sigue
-            recto. Eso convierte «decidir sólo en los cruces» en una línea:
+            recto. Eso convierte "decidir sólo en los cruces" en una línea:
           </p>
 <pre><code><span class="k">if</span> (!game.isJunction(game.getPacmanCurrentNodeIndex())) <span class="k">return null</span>;</code></pre>
           <p>
@@ -338,8 +338,8 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
         <p>
           Y aquí es donde vuelve la <a href="busqueda.html#ciegas">búsqueda en anchura</a>, con una sola modificación: no
           expande cualquier vecino, sino sólo los que caen dentro del árbol de movimientos seguros. Con eso,
-          una sola pasada contesta «¿cuál es la píldora alcanzable más cercana <em>sin morir por el
-          camino</em>, y qué dirección me lleva a ella?».
+          una sola pasada contesta "¿cuál es la píldora alcanzable más cercana <em>sin morir por el
+          camino</em>, y qué dirección me lleva a ella?".
         </p>
         <figure>
           <figcaption>Pseudocódigo · anchura restringida al espacio seguro</figcaption>
@@ -439,8 +439,8 @@ total       d · (1 + 1/2 + 1/4 + …)
         </div>
         <p>
           Con las piezas de esta página, la forma natural de escribir la decisión es una <strong>lista de
-          prioridades</strong> —el <code>getMove</code> de la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>
-          está escrito así—: comprueba esto, si se cumple haz aquello, y si no sigue bajando. Es la forma más fácil de leer y de defender, y es la que
+          prioridades</strong> (el <code>getMove</code> de la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>
+          está escrito así): comprueba esto, si se cumple haz aquello, y si no sigue bajando. Es la forma más fácil de leer y de defender, y es la que
           se supone en esta asignatura. Pero no es la única, y conviene conocer las otras dos porque resuelven
           bien lo que la lista resuelve mal.
         </p>
@@ -514,14 +514,14 @@ total       d · (1 + 1/2 + 1/4 + …)
         </figure>
         <p>
           Fijaos en el término de la píldora de poder: es el mismo peso con el signo cambiado según la
-          situación. Premio si hay dos o más fantasmas cerca —es el momento de gastarla—, castigo si no lo
-          hay —pasar por encima sin necesidad son 3&#8239;000 puntos tirados—. Un solo término bien pensado
+          situación. Premio si hay dos o más fantasmas cerca (es el momento de gastarla), castigo si no lo
+          hay (pasar por encima sin necesidad son 3&#8239;000 puntos tirados). Un solo término bien pensado
           sustituye a media docena de <code>if</code>.
         </p>
         <p>
           El <strong>mapa de costes</strong> da un paso más y saca la decisión de la función: en vez de
-          puntuar las salidas, pinta un coste sobre cada nodo del laberinto —caro cerca de un perseguidor,
-          barato cerca de la comida— y deja que una búsqueda de coste mínimo, la de <a href="busqueda.html#ciegas">coste uniforme</a>, conteste
+          puntuar las salidas, pinta un coste sobre cada nodo del laberinto (caro cerca de un perseguidor,
+          barato cerca de la comida) y deja que una búsqueda de coste mínimo, la de <a href="busqueda.html#ciegas">coste uniforme</a>, conteste
           sola. Es la misma idea que los <em lang="en">influence maps</em> de los juegos de estrategia.
         </p>
         <figure>
@@ -536,12 +536,12 @@ total       d · (1 + 1/2 + 1/4 + …)
         </figure>
         <p>
           <em>U</em> es una suma con pesos de varias <strong>capas</strong>, una por cada cosa que importa
-          —comida, perseguidores, fantasmas comestibles, píldoras de poder, cuántas salidas tiene cada
-          nodo—, y cada capa dice lo cerca que se está de esa cosa, contando por los pasillos.
+          (comida, perseguidores, fantasmas comestibles, píldoras de poder, cuántas salidas tiene cada
+          nodo), y cada capa dice lo cerca que se está de esa cosa, contando por los pasillos.
         </p>
         <p>
-          Cómo se pinta cada capa —cuánto pesa, hasta dónde llega cada fuente y cómo se juntan
-          varias— es una técnica con nombre propio, los <strong>mapas de influencia</strong>, y tiene su
+          Cómo se pinta cada capa (cuánto pesa, hasta dónde llega cada fuente y cómo se juntan
+          varias) es una técnica con nombre propio, los <strong>mapas de influencia</strong>, y tiene su
           página: <a href="mapas-influencia.html">Mapas de influencia</a>, con un controlador completo de
           Ms.&nbsp;Pac-Man que decide sólo así.
         </p>
@@ -599,7 +599,7 @@ total       d · (1 + 1/2 + 1/4 + …)
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

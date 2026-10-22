@@ -107,15 +107,15 @@
             Si tienes curiosidad por saber con qué partes, abre un terminal
             (<span class="path">cmd</span> en Windows, <span class="path">Terminal</span> en macOS o Linux)
             y ejecuta <code>java -version</code>. Si responde con una versión 21 o mayor, ya tienes un Java
-            aprovechable. Si en cambio dice <em>«command not found»</em> o
-            <em>«Unable to locate a Java Runtime»</em>, como en la captura, no hay que hacer nada especial:
+            aprovechable. Si en cambio dice <em>"command not found"</em> o
+            <em>"Unable to locate a Java Runtime"</em>, como en la captura, no hay que hacer nada especial:
             el instalador de Eclipse lo resuelve en el paso&nbsp;2.
           </p>
         </div>
         <figure class="wide">
           <figcaption>Terminal de macOS · no hay ningún Java instalado</figcaption>
           <img class="shot crop" src="../assets/img/java-not-found.png" width="889" height="190" loading="lazy"
-               alt="Ventana de Terminal en macOS: al ejecutar «java -v» responde «The operation couldn&#39;t be completed. Unable to locate a Java Runtime. Please visit http://www.java.com for information on installing Java.»">
+               alt="Ventana de Terminal en macOS: al ejecutar &quot;java -v&quot; responde &quot;The operation couldn&#39;t be completed. Unable to locate a Java Runtime. Please visit http://www.java.com for information on installing Java.&quot;">
         </figure>
       </section>
 
@@ -126,12 +126,12 @@
           <p>
             Ve a <a href="https://eclipseide.org/">eclipseide.org</a>,
             descarga el instalador y, en la lista de paquetes, elige
-            <strong>«Eclipse IDE for Java Developers»</strong>. Es el más pequeño de los que nos sirven e
+            <strong>"Eclipse IDE for Java Developers"</strong>. Es el más pequeño de los que nos sirven e
             incluye lo único que necesitamos además del editor de Java: el soporte de Maven
             (<em>m2e</em>), con el que el simulador resuelve sus dependencias.
           </p>
           <p>
-            «Eclipse IDE for Enterprise Java and Web Developers» también funciona, pero descarga bastante
+            "Eclipse IDE for Enterprise Java and Web Developers" también funciona, pero descarga bastante
             más de lo necesario. Cualquier versión de los últimos dos años vale; si te dan a elegir, coge
             la más reciente.
           </p>
@@ -253,7 +253,7 @@
               Marca los dos, <strong><code>MsPacManEngine</code> y <code>Practica0</code></strong>.
             </li>
             <li>
-              Marca también <strong>«Copy projects into workspace»</strong> y pulsa <kbd>Finish</kbd>.
+              Marca también <strong>"Copy projects into workspace"</strong> y pulsa <kbd>Finish</kbd>.
             </li>
           </ol>
           <div class="note tip">
@@ -286,7 +286,7 @@
           <p>Haz clic derecho sobre <strong>MsPacManEngine</strong> y elige:</p>
           <ol>
             <li><span class="path">Maven &gt; Update Project…</span> (o <kbd>Alt</kbd>+<kbd>F5</kbd>)</li>
-            <li>Marca <strong>«Force Update of Snapshots/Releases»</strong>.</li>
+            <li>Marca <strong>"Force Update of Snapshots/Releases"</strong>.</li>
             <li><kbd>OK</kbd>, y espera. La primera vez puede tardar varios minutos.</li>
           </ol>
           <div class="note trap">
@@ -294,7 +294,7 @@
             <p>
               Este paso descarga de repositorios públicos. Hazlo con una conexión estable y, si estás en
               una red con proxy o cortafuegos restrictivo, mejor desde casa o con los datos del móvil. Un
-              <em>«Missing artifact&nbsp;…»</em> casi siempre significa que la descarga no llegó a
+              <em>"Missing artifact&nbsp;…"</em> casi siempre significa que la descarga no llegó a
               completarse: repite el <em>Update Project</em>.
             </p>
           </div>
@@ -302,14 +302,14 @@
           <h3>La versión de Java del proyecto</h3>
           <p>
             El <code>pom.xml</code> del motor está escrito para Java&nbsp;8, así que verás avisos del tipo
-            <em>«source value 8 is obsolete»</em>. Son <strong>avisos, no errores</strong>: el proyecto
+            <em>"source value 8 is obsolete"</em>. Son <strong>avisos, no errores</strong>: el proyecto
             compila y funciona igual, y puedes ignorarlos mientras trabajemos con este motor.
           </p>
           <p>
             Solo si tu JDK se niega a compilar con ese nivel, cosa que puede pasar con las versiones más
             nuevas, haz clic derecho en el proyecto,
             <span class="path">Properties &gt; Java Compiler</span>, desmarca
-            <strong>«Use compliance from execution environment»</strong> y pon
+            <strong>"Use compliance from execution environment"</strong> y pon
             <strong>21</strong> en <em>Compiler compliance level</em>.
           </p>
         </div>
@@ -369,8 +369,8 @@
           <h3 class="label">Si necesitas crear el proyecto desde cero</h3>
           <ol>
             <li><span class="path">File &gt; New &gt; Java Project</span>, nombre <code>Practica0</code>.</li>
-            <li>En <em>JRE</em>, deja <strong>«Use default JRE»</strong> (tu JDK 21).</li>
-            <li>Desmarca <em>«Create module-info.java file»</em> si te lo ofrece: este proyecto no usa módulos.</li>
+            <li>En <em>JRE</em>, deja <strong>"Use default JRE"</strong> (tu JDK 21).</li>
+            <li>Desmarca <em>"Create module-info.java file"</em> si te lo ofrece: este proyecto no usa módulos.</li>
             <li>Una vez creado, añade <code>MsPacManEngine</code> en <em>Java Build Path &gt; Projects</em>.</li>
           </ol>
 
@@ -463,7 +463,7 @@
             </thead>
             <tbody>
               <tr>
-                <td><em>«Unable to locate a Java Runtime»</em>, o Eclipse no arranca</td>
+                <td><em>"Unable to locate a Java Runtime"</em>, o Eclipse no arranca</td>
                 <td>La arquitectura de Eclipse no es la de tu máquina, o no llegó a configurar ningún Java. Repasa el paso 1 vigilando x64 frente a aarch64, y el paso 2.</td>
               </tr>
               <tr>
@@ -471,7 +471,7 @@
                 <td>Tu proyecto no referencia al motor. Paso 6: <span class="path">Java Build Path &gt; Projects</span> debe incluir <code>MsPacManEngine</code>.</td>
               </tr>
               <tr>
-                <td><em>«Missing artifact es.ucm.fdi.gaia:jCOLIBRI:jar:3.2»</em> u otro artefacto</td>
+                <td><em>"Missing artifact es.ucm.fdi.gaia:jCOLIBRI:jar:3.2"</em> u otro artefacto</td>
                 <td>Descarga de Maven incompleta. <span class="path">Maven &gt; Update Project</span> con <em>Force Update</em> y conexión estable.</td>
               </tr>
               <tr>
@@ -479,7 +479,7 @@
                 <td>Estado de compilación desactualizado. <span class="path">Project &gt; Clean…</span> y, si persiste, <em>Update Project</em> de Maven.</td>
               </tr>
               <tr>
-                <td><em>«source value 8 is obsolete»</em> y avisos parecidos</td>
+                <td><em>"source value 8 is obsolete"</em> y avisos parecidos</td>
                 <td>Nada que arreglar: son avisos del nivel de compilación del motor. Si te molestan, el final del paso 4 explica cómo subirlo a 21.</td>
               </tr>
               <tr>
@@ -506,7 +506,7 @@
           <p>
             Escríbeme a <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> con tres cosas: tu sistema
             operativo, la salida de <code>java -version</code> y el texto completo del error, copiado y
-            pegado. Con eso se resuelve en un correo; con «no me funciona Eclipse», en cinco.
+            pegado. Con eso se resuelve en un correo; con "no me funciona Eclipse", en cinco.
           </p>
         </div>
       </section>
@@ -599,7 +599,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

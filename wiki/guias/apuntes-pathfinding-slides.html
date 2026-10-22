@@ -135,7 +135,7 @@
         <div class="stack">
           <ul>
             <li>Puntos interconectados, a mano o sacados de las esquinas <strong>convexas</strong>: las que sobresalen al suelo libre, por donde una ruta dobla.</li>
-            <li>Una arista significa: «de aquí se llega hasta ahí».</li>
+            <li>Una arista significa: "de aquí se llega hasta ahí".</li>
             <li>El NPC va al punto más cercano a su origen y busca hasta el más cercano al destino.</li>
           </ul>
         </div>
@@ -580,7 +580,7 @@
         <h2>Cuidado: asume que puedes darte la vuelta</h2>
         <p class="lede">
           Es la distancia óptima <strong>en el grafo</strong>, pero ni Ms. Pac-Man ni los fantasmas pueden
-          invertir el sentido. La tabla dirá «a tres pasos» cuando hay que dar la vuelta a la manzana.
+          invertir el sentido. La tabla dirá "a tres pasos" cuando hay que dar la vuelta a la manzana.
         </p>
 <pre><code><span class="c">// Sin lastMoveMade: lectura de tabla. Óptima, pero no exacta para el juego.</span>
 <span class="k">int</span>[] camino = game.getShortestPath(desde, hasta);
@@ -641,7 +641,7 @@ open.add(start);
           </table>
         </div>
         <p class="lede">
-          El nombre engaña: ninguna calcula nada «aproximado». Se separan cuando el camino corto desde el
+          El nombre engaña: ninguna calcula nada "aproximado". Se separan cuando el camino corto desde el
           vecino pasaría por el nodo del que vienes.
         </p>
       </section>
@@ -654,7 +654,7 @@ open.add(start);
 
       <section class="slide s-figure" id="d38">
         <span class="slide-num">Parte 5 · 38</span>
-        <h2>Por qué «huir del más cercano» falla</h2>
+        <h2>Por qué "huir del más cercano" falla</h2>
         <figure>
           <figcaption>Las dos salidas ganan exactamente un nodo: la regla no las distingue</figcaption>
           <svg class="diag dgs38" viewBox="0 0 470 210" role="img" aria-label="Ms. Pac-Man en un cruce con un fantasma rojo acercándose por la izquierda a seis nodos. Del cruce salen dos caminos que se alejan de él: hacia arriba, por donde baja un segundo fantasma, y hacia la derecha, despejado. Los dos ganan exactamente un nodo, así que la regla de huir del más cercano no puede distinguirlos.">
@@ -737,7 +737,7 @@ open.add(start);
         <span class="slide-num">Parte 5 · 41</span>
         <h2>La pregunta que ordena todo</h2>
         <figure>
-          <figcaption>«¿Llego yo antes?» se mide al mismo punto, no de uno a otro</figcaption>
+          <figcaption>"¿Llego yo antes?" se mide al mismo punto, no de uno a otro</figcaption>
           <svg class="diag dgs41" viewBox="0 0 470 176" role="img" aria-label="Un cruce en el centro. Ms. Pac-Man está a nueve pasos por la izquierda y un fantasma a seis pasos por arriba: el fantasma llega antes al cruce, así que ese tramo no es seguro.">
             <style>
               .dgs41 .pas{fill:none;stroke:var(--surface-2);stroke-width:22;stroke-linecap:round}
@@ -765,7 +765,7 @@ open.add(start);
             <text x="235" y="164" class="t">llega él antes: el tramo no es seguro</text>
           </svg>
         </figure>
-        <p class="foot">No es «¿a qué distancia está el fantasma?». Es «¿quién llega antes <strong>ahí</strong>?».</p>
+        <p class="foot">No es "¿a qué distancia está el fantasma?". Es "¿quién llega antes <strong>ahí</strong>?".</p>
       </section>
 
       <section class="slide s-code" id="d42">
@@ -921,7 +921,7 @@ open.add(start);
             </tbody>
           </table>
         </div>
-        <p class="lede">Las tres dependen de lo mismo: que «¿llego yo antes?» esté bien medido.</p>
+        <p class="lede">Las tres dependen de lo mismo: que "¿llego yo antes?" esté bien medido.</p>
       </section>
 
       <section class="slide s-code" id="d49">
@@ -1165,8 +1165,8 @@ open.add(start);
     GameView.addLines (game, Color.CYAN,   miNodo, fantasmaQueMePreocupa);
 }</code></pre>
         <p class="lede">
-          Cuando veas en pantalla los tramos que tu controlador da por cerrados, los errores de «¿llego yo
-          antes?» se hacen obvios en dos partidas. Sin eso, no. <strong>Y el interruptor es
+          Cuando veas en pantalla los tramos que tu controlador da por cerrados, los errores de "¿llego yo
+          antes?" se hacen obvios en dos partidas. Sin eso, no. <strong>Y el interruptor es
           obligatorio</strong>: sin ventana, lo que se pinta se acumula en dos listas estáticas que no vacía
           nadie, y en una corrección de miles de partidas eso se come la memoria.
         </p>
@@ -1217,7 +1217,7 @@ open.add(start);
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

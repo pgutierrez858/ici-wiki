@@ -734,11 +734,11 @@
     // El tercer número de cada arista es un multiplicador de coste: 1 es
     // terreno normal y 3 es terreno lento. Las dos filas de abajo son lentas,
     // y son justamente por donde tira la heurística, que apunta al destino en
-    // línea recta. Así el camino que «parece» directo es el caro.
+    // línea recta. Así el camino que "parece" directo es el caro.
     // El tercer número de cada arista es un multiplicador de coste: 1 es terreno
     // normal y 4, terreno lento. Sólo se embarra la fila de abajo, que es
     // precisamente por donde tira la heurística: en línea recta de una esquina
-    // a la otra. Así el camino que «parece» directo es el caro, y el resto del
+    // a la otra. Así el camino que "parece" directo es el caro, y el resto del
     // grafo conserva costes iguales a la distancia, que es lo que mantiene la
     // heurística apretada y hace que se note lo que se ahorra de mirar.
     for (j = 0; j < FILAS; j++) {
@@ -991,7 +991,7 @@
   // Un laberinto de juguete de 16 x 10 casillas: 20 unidades de lado, así que
   // ocupa el mismo lienzo que el resto de los ejemplos. Es de bucles y sin
   // callejones, como los cuatro del juego de verdad, para que la capa de
-  // salidas diga algo más que «aquí se acaba el mundo».
+  // salidas diga algo más que "aquí se acaba el mundo".
   var IW = 16, IH = 10, IC = W / 16;
   var LAB = [
     '################',
@@ -1427,7 +1427,7 @@
     return e;
   }
   // El sitio que ha elegido la decisión. Va en verde y no en la diana roja del
-  // resto de los ejemplos: en este el rojo ya significa «aquí te comen», y
+  // resto de los ejemplos: en este el rojo ya significa "aquí te comen", y
   // marcar de rojo el mejor sitio del mapa diría justo lo contrario.
   function imarcaMeta(g, p) {
     g.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 6.5, class: 'dm-inf-meta' }));
@@ -2743,7 +2743,7 @@
     }
 
     // El estado de la búsqueda en el paso que se esté mirando. El paso -1 es
-    // «antes de la primera vuelta»: la frontera sólo tiene la salida.
+    // "antes de la primera vuelta": la frontera sólo tiene la salida.
     function estadoGrafo() {
       var r = redActual();
       if (!r) return null;
@@ -3096,7 +3096,7 @@
             (par.particion === 'rejilla' ? ' de ' + par.lado : '') + ' · ' +
             plural(descomp.red.nodos.length, 'nodo', 'nodos') + ' · ' + NOMBRE_ALGORITMO[par.algoritmo];
         if (aviso) return t + ' — ' + aviso;
-        if (!resultado) return t + (paraLector ? '' : ' · pulsa «Calcular la ruta»');
+        if (!resultado) return t + (paraLector ? '' : ' · pulsa "Calcular la ruta"');
         if (resultado.falla) return t + ' — ' + resultado.falla;
         return t + ' · ' + resultado.explorados + ' nodos explorados · ruta de ' +
                resultado.largo + ' unidades en ' +
@@ -3110,7 +3110,7 @@
              : (par.modo === 'anchura' ? 'anchura' : 'profundidad')) +
             ' de ' + nombreNodo(esc.a) + ' a ' + nombreNodo(esc.b);
         if (aviso) return t + ' — ' + aviso;
-        if (!resultado) return t + (paraLector ? '' : ' · pulsa «Calcular la ruta»');
+        if (!resultado) return t + (paraLector ? '' : ' · pulsa "Calcular la ruta"');
         if (resultado.falla) return t + ' — ' + resultado.falla;
         var cam = esAstar
           ? ' · camino de ' + plural(resultado.camino.length - 1, 'arista', 'aristas')
@@ -3137,7 +3137,7 @@
         t = 'esta escena no se ha podido triangular';
       }
       if (aviso) return t + ' — ' + aviso;
-      if (!resultado) return t + (paraLector ? '' : ' · pulsa «Calcular la ruta»');
+      if (!resultado) return t + (paraLector ? '' : ' · pulsa "Calcular la ruta"');
       if (resultado.falla) return t + ' — ' + resultado.falla;
       var largo = Math.round(largoDe(resultado.pts));
       if (tipo === 'waypoints') {

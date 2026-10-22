@@ -74,7 +74,7 @@
         En la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a> el comportamiento vive dentro de
         <code>getMove</code>: una cadena de <code>if</code> que se recorre entera en cada turno. Funciona, y en
         la Práctica&nbsp;2 lo vais a reescribir. No porque la cadena esté mal, sino porque mezcla dos cosas que
-        conviene tener separadas: <strong>lo que sabéis del juego</strong> —cuándo huir, cuándo cazar— y
+        conviene tener separadas: <strong>lo que sabéis del juego</strong> (cuándo huir, cuándo cazar) y
         <strong>el mecanismo</strong> que decide cuál de esas cosas toca ahora. Una máquina de estados pone lo
         primero en clases pequeñas con nombre y deja lo segundo al motor.
       </p>
@@ -85,7 +85,7 @@
           <h2 class="sec">Por qué los <code>if</code> anidados no escalan</h2>
         </div>
         <p>
-          Este es un controlador de fantasmas escrito a la manera «algorítmica»: para cada
+          Este es un controlador de fantasmas escrito a la manera "algorítmica": para cada
           fantasma que tiene que decidir, huye si es comestible o si Ms.&nbsp;Pac-Man está cerca de una píldora
           de poder; si no, la persigue casi siempre, y de vez en cuando se mueve al azar para no ser previsible.
         </p>
@@ -108,7 +108,7 @@
         </figure>
         <p>
           Con tres ramas se lee de un vistazo. El problema llega con la décima. Cada comportamiento nuevo
-          —cortar el paso en un cruce, proteger una píldora, esperar a que los otros cierren la pinza— es otra
+          (cortar el paso en un cruce, proteger una píldora, esperar a que los otros cierren la pinza) es otra
           rama, y cada rama necesita saber en qué situación se activa <em>y en qué situación deja de
           hacerlo</em>. Como el árbol se recorre desde arriba en cada turno, esa segunda parte no se escribe en
           ningún sitio: sale sola del orden de las ramas y de las condiciones de todas las que van delante. Para
@@ -116,14 +116,14 @@
           cabeza.
         </p>
         <figure class="narrow">
-          <figcaption>«Lo que ven los demás / lo que ves tú» · imagen de J.&nbsp;A. Recio-García</figcaption>
+          <figcaption>"Lo que ven los demás / lo que ves tú" · imagen de J.&nbsp;A. Recio-García</figcaption>
           <img class="shot" src="../../assets/img/fsm-espagueti.jpg" width="700" height="367" loading="lazy"
-               alt="Dos círculos sobre fondo negro. El de la izquierda, titulado «What others see», es una interfaz con una nube discontinua dentro rotulada «Magic». El de la derecha, «What you see», es un plato de espaguetis con tomate: el código por dentro.">
+               alt="Dos círculos sobre fondo negro. El de la izquierda, titulado &quot;What others see&quot;, es una interfaz con una nube discontinua dentro rotulada &quot;Magic&quot;. El de la derecha, &quot;What you see&quot;, es un plato de espaguetis con tomate: el código por dentro.">
         </figure>
         <p>
           Desde fuera, el fantasma parece listo; desde dentro, es un plato de espaguetis. La salida no es
-          escribir mejor los <code>if</code>, es cambiar la unidad con la que se piensa: en vez de «qué hago en
-          esta situación», <strong>«en qué modo estoy, y qué me haría cambiar de modo»</strong>.
+          escribir mejor los <code>if</code>, es cambiar la unidad con la que se piensa: en vez de "qué hago en
+          esta situación", <strong>"en qué modo estoy, y qué me haría cambiar de modo"</strong>.
         </p>
       </section>
 
@@ -137,7 +137,7 @@
         </p>
         <ul>
           <li>Un conjunto finito de <strong>estados</strong>. Cada uno es un comportamiento completo:
-            «perseguir», «huir». Mientras se está en él, se hace lo mismo.</li>
+            "perseguir", "huir". Mientras se está en él, se hace lo mismo.</li>
           <li>Un conjunto de <strong>transiciones</strong>, cada una con un estado de origen, uno de destino y
             una <strong>condición</strong> (la guarda) que dice cuándo se cruza.</li>
           <li>Un <strong>estado inicial</strong>.</li>
@@ -228,7 +228,7 @@
           </svg>
         </figure>
         <p>
-          Fijaos en lo que ha pasado con la pregunta «¿por qué hace esto?». Ahora tiene dos respuestas
+          Fijaos en lo que ha pasado con la pregunta "¿por qué hace esto?". Ahora tiene dos respuestas
           separadas, y las dos están escritas: <em>está huyendo</em> porque es el estado actual, y <em>ha
           empezado a huir</em> porque se cumplió la guarda de esa flecha. Y fijaos también en que las dos flechas
           entre Perseguir y Huir no tienen por qué ser la misma condición negada: se entra en Huir por una cosa
@@ -287,7 +287,7 @@
           Funciona, y es la máquina del diagrama: seis <code>if</code>, uno por flecha. Pero el grafo está
           desperdigado. Para saber qué puede pasar estando en Huir hay que leer la cadena entera y quedarse con
           los <code>if</code> que empiezan por <code>estado = HUIR</code>; la prioridad entre flechas es el orden
-          en que alguien las escribió, y si «me han comido» fuese después de «ya no soy comestible», el fantasma
+          en que alguien las escribió, y si "me han comido" fuese después de "ya no soy comestible", el fantasma
           comido, que ya no es comestible, podría salir hacia Perseguir en vez de volver al centro. Y añadir
           un estado obliga a tocar el <code>switch</code> y a repasar cada <code>if</code> por si también tiene
           que salir de él. Es la cadena de antes con otra forma.
@@ -345,21 +345,21 @@ comido -&gt; EN_EL_CENTRO
 penalización terminada -&gt; PERSEGUIR</code></pre>
         <p>
           Ahora el grafo está en un sitio, y se lee como el dibujo. Fijaos en la segunda línea de la salida: un
-          evento que no sale del estado actual —«comido» mientras persigue— no hace nada, y eso no hay que
+          evento que no sale del estado actual ("comido" mientras persigue) no hace nada, y eso no hay que
           programarlo. Pero esta máquina funciona con <strong>eventos</strong>: alguien tiene que decirle
-          «comido». Los juegos están llenos de eventos (colisiones, daño, disparadores, fin de animación), pero
+          "comido". Los juegos están llenos de eventos (colisiones, daño, disparadores, fin de animación), pero
           el controlador de Ms.&nbsp;Pac-Man no recibe ninguno: en cada turno le llega el <code>Game</code> y
           tiene que <strong>consultarlo</strong>. Lo más parecido son preguntas como
           <code>wasPacManEaten()</code>, que valen <code>true</code> durante un turno. Y hay condiciones que no
-          son eventos en ningún juego: «Ms.&nbsp;Pac-Man está cerca de la PPill» no ocurre en un instante, es
+          son eventos en ningún juego: "Ms.&nbsp;Pac-Man está cerca de la PPill" no ocurre en un instante, es
           algo que se cumple o no cada vez que se mira. Y la tabla no sabe qué hacer en cada estado: eso sigue siendo
           un <code>switch</code> en otra parte.
         </p>
         <h3 class="label">3 · Con objetos: estados, guardas y acciones como clases</h3>
         <p>
           La tercera versión convierte cada pieza en un objeto. Una interfaz
-          <code>FSM</code> con <code>getState()</code> y <code>doIt(Input in)</code> —«haz lo que toque y pasa al
-          siguiente estado según la entrada»— y una interfaz <code>StateEngine</code> para construirla:
+          <code>FSM</code> con <code>getState()</code> y <code>doIt(Input in)</code> ("haz lo que toque y pasa al
+          siguiente estado según la entrada") y una interfaz <code>StateEngine</code> para construirla:
         </p>
         <figure>
           <figcaption>Pseudocódigo · la interfaz para construir la máquina, resumida</figcaption>
@@ -425,7 +425,7 @@ penalización terminada -&gt; PERSEGUIR</code></pre>
           En <a href="estrategias.html#tres-formas">Estrategias algorítmicas</a> la decisión se escribía como una
           <strong>lista de prioridades</strong>: comprueba esto; si se cumple, haz aquello; si no, sigue bajando.
           Es lo que vais a entregar en la Práctica&nbsp;1. Pasarla a máquina de estados es casi mecánico: cada
-          «haz aquello» es un estado, y cada condición que lleva a él es una transición.
+          "haz aquello" es un estado, y cada condición que lleva a él es una transición.
         </p>
         <figure>
           <figcaption>Pseudocódigo · un fantasma de la Práctica 1, como lista de prioridades</figcaption>
@@ -441,7 +441,7 @@ penalización terminada -&gt; PERSEGUIR</code></pre>
           que se añaden las transiciones. Hasta aquí las dos versiones hacen lo mismo. La diferencia está en lo
           que la lista <strong>no puede</strong> hacer: la lista no tiene memoria. Cada turno decide desde cero,
           así que la condición para dejar de huir es, por fuerza, la contraria de la condición para empezar:
-          «a 30 o más de la píldora». La máquina sí recuerda en qué estado está, y por eso puede usar dos
+          "a 30 o más de la píldora". La máquina sí recuerda en qué estado está, y por eso puede usar dos
           umbrales distintos.
         </p>
         <h3 class="label">Histéresis: entrar por un umbral, salir por otro</h3>
@@ -473,7 +473,7 @@ entrar  salir
         <div class="note mine">
           <span class="note-label">Lo que cambia y lo que no de la Práctica 1 a la 2</span>
           <p>
-            Las funciones que medían —la distancia a la píldora, «¿llego yo antes?», los movimientos seguros—
+            Las funciones que medían (la distancia a la píldora, "¿llego yo antes?", los movimientos seguros)
             no cambian: pasan a ser el <code>Input</code> y las condiciones de las transiciones. Lo que decidía
             con ellas, el <code>getMove</code>, desaparece: ahora lo decide el grafo. Si vuestras funciones de la
             Práctica&nbsp;1 medían bien, la Práctica&nbsp;2 es reorganizar; si no, la máquina hereda los mismos
@@ -504,7 +504,7 @@ entrar  salir
                alt="Vista cenital de un nivel naranja con una rejilla, dos cajas que sirven de cobertura y dos soldados. Encima, recuadros azules con los estados de la IA: STAY COVER, PEEK COVER, SNEAKING, RUNNING y otra vez STAY COVER, SNEAKING y RUNNING camino del enemigo, y MELEE al llegar. Junto a la primera caja, RELOAD, SMOKE y unos puntos suspensivos. Flechas grises unen los estados siguiendo el camino.">
         </figure>
         <p>
-          Plano, cada cobertura repite los mismos estados y cada tramo repite «correr o agachado». Si los
+          Plano, cada cobertura repite los mismos estados y cada tramo repite "correr o agachado". Si los
           agrupamos, cada grupo es un <strong>superestado</strong>: por fuera se comporta como un estado más, con
           sus flechas de entrada y salida, y por dentro es otra máquina.
         </p>
@@ -517,7 +517,7 @@ entrar  salir
           Eso es una <strong>máquina de estados jerárquica</strong> (HFSM). Resuelve dos cosas. La primera,
           <strong>reutilizar transiciones</strong>: los estados que comparten las mismas flechas de salida se
           meten en un superestado y la flecha se dibuja una vez, desde el grupo. La segunda, dar sitio al
-          objetivo: el nivel de arriba dice «voy de esta cobertura a la siguiente», y el de abajo, cómo. Y los
+          objetivo: el nivel de arriba dice "voy de esta cobertura a la siguiente", y el de abajo, cómo. Y los
           niveles se pueden anidar tanto como haga falta.
         </p>
         <figure class="wide">
@@ -525,13 +525,13 @@ entrar  salir
           <img class="shot" src="../../assets/img/fsm-hfsm-esquema.jpg" width="1100" height="644" loading="lazy"
                alt="Esquema abstracto de una máquina jerárquica. Estados como rectángulos grises unidos por flechas; varios de ellos encerrados en recuadros de colores, y algunos de esos recuadros dentro de otros mayores. Las flechas salen tanto de estados sueltos como de los bordes de los recuadros.">
         </figure>
-        <h3 class="label">La transición «desde cualquier estado»</h3>
+        <h3 class="label">La transición "desde cualquier estado"</h3>
         <p>
           El caso más frecuente en Ms.&nbsp;Pac-Man es el que más flechas repite. Cuando se comen a un fantasma o
           muere Ms.&nbsp;Pac-Man, el fantasma vuelve a la cárcel <em>esté en el estado que esté</em>. En una
           máquina plana eso es una flecha idéntica desde cada estado del laberinto; con cuatro estados son cuatro,
-          con diez son diez, y el día que añadís el undécimo os olvidáis de ponérsela. Un superestado «En el
-          laberinto» la deja en una.
+          con diez son diez, y el día que añadís el undécimo os olvidáis de ponérsela. Un superestado "En el
+          laberinto" la deja en una.
         </p>
         <figure class="wide">
           <figcaption>La misma condición: cuatro flechas en plano, una en jerárquica</figcaption>
@@ -575,11 +575,11 @@ entrar  salir
         </figure>
         <h3 class="label">Cuando todo depende de todo</h3>
         <p>
-          Un solo «desde cualquier estado» todavía se dibuja. El problema llega cuando son varias las
+          Un solo "desde cualquier estado" todavía se dibuja. El problema llega cuando son varias las
           condiciones que atraviesan la máquina entera. Pensad en una Ms.&nbsp;Pac-Man sencilla: sin poder,
           alterna entre comer pills, ir a por una píldora de poder y huir; con poder, entre cazar fantasmas y
-          comer sin miedo; y si la matan, reaparece. Seis estados. En plano, «se ha comido la PPill» sale de los
-          tres estados sin poder, «se acabó el poder» de los dos con poder y «muere» de cinco.
+          comer sin miedo; y si la matan, reaparece. Seis estados. En plano, "se ha comido la PPill" sale de los
+          tres estados sin poder, "se acabó el poder" de los dos con poder y "muere" de cinco.
         </p>
         <figure class="wide">
           <figcaption>En plano: seis estados y diecinueve flechas; cada color es una condición repetida</figcaption>
@@ -643,7 +643,7 @@ entrar  salir
         </p>
         <p>
           Los colores dicen cómo agruparla. Los estados que comparten una flecha de salida van juntos: los tres
-          sin poder en un superestado, los dos con poder en otro, y los dos grupos dentro de «Viva», que es
+          sin poder en un superestado, los dos con poder en otro, y los dos grupos dentro de "Viva", que es
           desde donde se muere.
         </p>
         <figure class="wide">
@@ -848,20 +848,20 @@ entrar  salir
         </p>
         <ul>
           <li>
-            <strong>Un estado sólo tiene un padre.</strong> Huir ya vive en «Sin poder», así que en «Con poder»
+            <strong>Un estado sólo tiene un padre.</strong> Huir ya vive en "Sin poder", así que en "Con poder"
             hace falta otro, con sus propias flechas de entrada y de salida, que repiten condiciones que ya
             estaban escritas. La acción se reutiliza, porque es la misma clase; lo que se copia es el cableado,
             y las dos copias hay que mantenerlas iguales a mano.
           </li>
           <li>
             <strong>Salir por el borde lleva al estado inicial.</strong> Si el poder se acaba mientras huye, la
-            flecha del borde la deja en «Comer pills», con el fantasma encima. Hace falta una flecha que
+            flecha del borde la deja en "Comer pills", con el fantasma encima. Hace falta una flecha que
             atraviese los dos bordes hasta el Huir de fuera y que se compruebe antes que la del borde. La
             jerarquía servía para no tener que mirar dentro de los grupos, y aquí obliga a mirar.
           </li>
           <li>
-            <strong>Las secuencias siguen costando.</strong> «Ve al cruce, espera a que llegue el otro, cierra»
-            es fácil de decir y pesado de escribir como estados: cada paso necesita una transición de «acabado»
+            <strong>Las secuencias siguen costando.</strong> "Ve al cruce, espera a que llegue el otro, cierra"
+            es fácil de decir y pesado de escribir como estados: cada paso necesita una transición de "acabado"
             hacia el siguiente, y además una de salida por cada forma en que ese paso puede fallar, que casi
             nunca son las mismas para todos los pasos y por eso no se pueden subir al borde.
           </li>
@@ -870,8 +870,8 @@ entrar  salir
           Los tres tienen la misma raíz: en una máquina, cada comportamiento está en un sitio, y para cambiar de
           comportamiento hay que ir de un sitio a otro por una flecha. Los
           <a href="arboles-comportamiento.html">árboles de comportamiento</a>, el siguiente apunte, quitan los
-          sitios. En cada turno se decide otra vez desde la raíz, así que «huir si hay un fantasma peligroso
-          cerca» se escribe una vez, arriba del todo, y vale con poder y sin él; y una secuencia es un nodo que
+          sitios. En cada turno se decide otra vez desde la raíz, así que "huir si hay un fantasma peligroso
+          cerca" se escribe una vez, arriba del todo, y vale con poder y sin él; y una secuencia es un nodo que
           ejecuta sus hijos en orden y falla en cuanto falla uno, sin una flecha por paso.
         </p>
       </section>
@@ -1067,8 +1067,8 @@ entrar  salir
           Es un <strong>método plantilla</strong>: el constructor guarda el juego y llama a
           <code>parseInput()</code>, que escribís vosotros. Ahí se calcula todo lo que las transiciones van a
           consultar, y se guarda en atributos. El <code>Input</code> se crea una vez al principio de cada turno y
-          se pasa a todas las máquinas; las transiciones sólo leen. Eso tiene dos ventajas: lo caro —una
-          distancia por camino, un recorrido de tramos— se calcula una vez aunque lo consulten diez transiciones
+          se pasa a todas las máquinas; las transiciones sólo leen. Eso tiene dos ventajas: lo caro (una
+          distancia por camino, un recorrido de tramos) se calcula una vez aunque lo consulten diez transiciones
           de cuatro fantasmas, y todas deciden sobre la misma foto del juego.
         </p>
         <p>
@@ -1132,7 +1132,7 @@ entrar  salir
             de poder del laberinto, comidas o no. Con eso, un fantasma sigue huyendo cada vez que
             Ms.&nbsp;Pac-Man pasa cerca de una esquina donde <em>hubo</em> una píldora. Las que quedan son
             <code>game.getActivePowerPillsIndices()</code>. Y si no queda ninguna, la distancia se queda en
-            <code>Double.MAX_VALUE</code>: «lejísimos», que es lo que tiene que decir.
+            <code>Double.MAX_VALUE</code>: "lejísimos", que es lo que tiene que decir.
           </p>
         </div>
       </section>
@@ -1195,8 +1195,8 @@ entrar  salir
             hacemos una vez en el controlador, y un fantasma que no aparece en el <code>EnumMap</code> de la
             respuesta sigue por donde iba.</li>
           <li><strong>Ms.&nbsp;Pac-Man puede devolver <code>null</code>.</strong> El motor lo descarta y sigue
-            recto, igual que cuando pide un giro imposible. Es la forma honesta de decir «esta acción no tiene nada
-            que hacer ahora», por ejemplo ir a por una píldora de poder cuando ya no queda ninguna.</li>
+            recto, igual que cuando pide un giro imposible. Es la forma honesta de decir "esta acción no tiene nada
+            que hacer ahora", por ejemplo ir a por una píldora de poder cuando ya no queda ninguna.</li>
         </ul>
         <div class="note trap">
           <span class="note-label">Nunca guardéis el <code>Game</code> en un atributo</span>
@@ -1204,7 +1204,7 @@ entrar  salir
             En cada turno el <code>Executor</code> os pasa una <strong>copia nueva</strong> del juego. Una acción
             que guarda la de un turno para usarla en el siguiente decide sobre un juego que ya no existe: los
             fantasmas no se mueven, las píldoras no desaparecen. En los atributos de una acción va lo que la
-            distingue de otras —qué fantasma, qué radio—; el juego llega siempre como parámetro de
+            distingue de otras (qué fantasma, qué radio); el juego llega siempre como parámetro de
             <code>execute</code>.
           </p>
         </div>
@@ -1356,7 +1356,7 @@ entrar  salir
   YaEnInterseccionTransition</code></pre>
         <p>
           Aquí se ve bien lo que funciona y lo que no. Los nombres son condiciones que se leen solas
-          —<code>LlegaAInterseccionAntesQueMsPacMan</code>, <code>NingunCaminoSeguro</code>— y por eso el
+          (<code>LlegaAInterseccionAntesQueMsPacMan</code>, <code>NingunCaminoSeguro</code>) y por eso el
           diagrama se entiende. Las parejas como <code>MsPacManCercaPP</code> y <code>MsPacManNoCercaPP</code>
           son justo el sitio donde poner dos umbrales distintos. Y las familias numeradas otra vez piden un
           parámetro: una <code>EstaEnInterseccionTransition(int cruce)</code> en lugar de cinco copias, que es
@@ -1447,7 +1447,7 @@ entrar  salir
           <li><strong>El orden de <code>add()</code> es la prioridad.</strong> Las transiciones de un estado se
             evalúan en el orden en que se añadieron, y la primera que devuelve <code>true</code> gana; las de
             detrás ni se miran. Si dos pueden cumplirse a la vez, la más específica o la más urgente va primero.
-            En el ejemplo, «a la cárcel» se añade antes que «peligro»: un fantasma al que se acaban de comer no
+            En el ejemplo, "a la cárcel" se añade antes que "peligro": un fantasma al que se acaban de comer no
             tiene que plantearse si huye.</li>
           <li><strong>Como mucho un cambio por turno y por máquina.</strong> Después de cambiar no se vuelven a
             mirar las transiciones del destino hasta el turno siguiente. Si el destino es un estado compuesto, la
@@ -1560,7 +1560,7 @@ entrar  salir
           </svg>
         </figure>
         <p>
-          «MsPacMan muere» y «comido» son la misma condición —el fantasma está en la cárcel— vista desde dos
+          "MsPacMan muere" y "comido" son la misma condición (el fantasma está en la cárcel) vista desde dos
           estados: si muere Ms.&nbsp;Pac-Man o se pasa de nivel, el motor devuelve a los cuatro fantasmas a la
           cárcel, y si se comen a uno, sólo a ese. Por eso es una sola clase con el nombre como parámetro: cada flecha necesita el suyo.
           El <code>Input</code> ya está en la <a href="#input">sección&nbsp;7</a>, la acción de perseguir en la
@@ -1754,7 +1754,7 @@ entrar  salir
           necesita la suya: uno puede estar huyendo mientras otro sale de la cárcel. Por eso el bucle crea una
           <code>FSM</code> nueva, con estados y transiciones nuevos, para cada uno; los objetos llevan dentro el
           <code>GHOST</code> y no se pueden compartir. Una única máquina para los cuatro sólo tiene sentido si es
-          una decisión de equipo —«atacamos», «defendemos la píldora»— y cada fantasma deduce su papel a partir
+          una decisión de equipo ("atacamos", "defendemos la píldora") y cada fantasma deduce su papel a partir
           de ella; ahí sí es una sola, pero no sustituye a la de cada uno.
         </p>
         <p>
@@ -1816,7 +1816,7 @@ entrar  salir
           Con esas treinta líneas la jerarquía sale sola. Por fuera, el estado compuesto es un estado más: la
           máquina de fuera evalúa sus transiciones de salida <strong>antes</strong> de dejarle ejecutar, así que
           una flecha que sale del superestado se comprueba en cada turno esté donde esté la máquina de dentro.
-          Es la transición «desde cualquier estado» de la <a href="#jerarquicas">sección&nbsp;5</a>, gratis. Y al
+          Es la transición "desde cualquier estado" de la <a href="#jerarquicas">sección&nbsp;5</a>, gratis. Y al
           salir, <code>stop()</code> reinicia la de dentro: la próxima vez que se entre, empieza por su estado
           inicial. El motor no guarda historia; si la necesitáis, es otra implementación de <code>State</code>.
         </p>
@@ -1916,7 +1916,7 @@ entrar  salir
         </p>
         <p>
           El <code>Input</code> guarda, para cada fantasma que puede comérsela, cuántos pasos le faltan para
-          llegar hasta ella —medidos desde el fantasma y respetando que no puede darse la vuelta—, y ofrece dos
+          llegar hasta ella (medidos desde el fantasma y respetando que no puede darse la vuelta), y ofrece dos
           consultas sobre eso:
         </p>
         <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.mspacman;
@@ -2090,7 +2090,7 @@ FSM reset to initial State: Píldora cercana
           El formato es <code>[máquina] origen &gt;&gt; transición &gt;&gt; destino</code>, con los
           <code>toString()</code> de los estados y de las transiciones: por eso tienen que decir algo. La tercera
           línea es el <code>stop()</code> del compuesto reiniciando la máquina de dentro al salir de Comer. Los
-          avisos de reinicio y de «lista» no llevan el nombre de la máquina, así que con varias hay que
+          avisos de reinicio y de "lista" no llevan el nombre de la máquina, así que con varias hay que
           deducirlo por el estado.
         </p>
         <h3 class="label"><code>GraphFSMObserver</code></h3>
@@ -2106,12 +2106,12 @@ FSM reset to initial State: Píldora cercana
         <figure class="wide">
           <figcaption>La máquina de Sue, con la transición que acaba de cruzar · imagen de J.&nbsp;A. Recio-García</figcaption>
           <img class="shot" src="../../assets/img/fsm-observador-sue.jpg" width="1200" height="580" loading="lazy"
-               alt="Ventana de GraphFSMObserver con un grafo de dos nodos, SUEchases arriba a la izquierda, en azul claro porque es el activo, y SUErunsAway abajo a la derecha. Entre ellos, dos flechas grises de SUEchases a SUErunsAway y una flecha azul de vuelta, rotulada «Ghost not edible and MsPacman far PPill», que es la transición que se acaba de cruzar.">
+               alt="Ventana de GraphFSMObserver con un grafo de dos nodos, SUEchases arriba a la izquierda, en azul claro porque es el activo, y SUErunsAway abajo a la derecha. Entre ellos, dos flechas grises de SUEchases a SUErunsAway y una flecha azul de vuelta, rotulada &quot;Ghost not edible and MsPacman far PPill&quot;, que es la transición que se acaba de cruzar.">
         </figure>
         <div class="note trap">
           <span class="note-label">Las ventanas, detrás de un interruptor</span>
           <p>
-            Sin pantalla —que es como se corren las evaluaciones— crear una ventana lanza
+            Sin pantalla (que es como se corren las evaluaciones) crear una ventana lanza
             <code>java.awt.HeadlessException</code>, y el controlador no llega a construirse. Por eso en el
             ejemplo el observador gráfico está detrás de la constante <code>DEBUG</code>, igual que los dibujos
             de <code>GameView</code> en <a href="predecir-coordinar.html#ver-lo-que-piensa">Predecir, coordinar
@@ -2193,18 +2193,18 @@ Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7,
         <figure class="wide">
           <figcaption>Fantasmas con dos superestados y notas al pie · imagen de J.&nbsp;A. Recio-García</figcaption>
           <img class="shot" src="../../assets/img/fsm-diseno-fantasmas.jpg" width="1100" height="777" loading="lazy"
-               alt="Diagrama a mano titulado «fsm ghosts». Estados en elipses: perseguir, proteger, proteger fantasma comestible y esperar a salir. Un superestado huir con sacrificio eficiente, buscar cuadrante sin power pill y huida eficiente; otro, al que se entra cuando la power pill no está activa, con movimientos aleatorios, buscar zona pills cercanas y recorrer power pills activas. Flechas rotuladas como «mspacman cerca», «comestible, mspacman se acerca», «comido», «sale» o «no comestible, power pill activa». Abajo, tres notas al pie con asteriscos que precisan qué significan algunas condiciones.">
+               alt="Diagrama a mano titulado &quot;fsm ghosts&quot;. Estados en elipses: perseguir, proteger, proteger fantasma comestible y esperar a salir. Un superestado huir con sacrificio eficiente, buscar cuadrante sin power pill y huida eficiente; otro, al que se entra cuando la power pill no está activa, con movimientos aleatorios, buscar zona pills cercanas y recorrer power pills activas. Flechas rotuladas como &quot;mspacman cerca&quot;, &quot;comestible, mspacman se acerca&quot;, &quot;comido&quot;, &quot;sale&quot; o &quot;no comestible, power pill activa&quot;. Abajo, tres notas al pie con asteriscos que precisan qué significan algunas condiciones.">
         </figure>
         <p>
-          Lo mejor de este son las notas al pie. «Huida eficiente» o «haya un radio entre Ms.&nbsp;Pac-Man y los
-          fantasmas» no se pueden programar tal cual, y el grupo lo sabía: cada asterisco dice qué significa. Eso
+          Lo mejor de este son las notas al pie. "Huida eficiente" o "haya un radio entre Ms.&nbsp;Pac-Man y los
+          fantasmas" no se pueden programar tal cual, y el grupo lo sabía: cada asterisco dice qué significa. Eso
           es lo que hay que hacer con cada palabra vaga del diagrama, hasta que cada flecha sea una expresión que
           se pueda calcular con el <code>Input</code>.
         </p>
         <figure class="wide">
           <figcaption>Ms. Pac-Man con cuatro superestados · imagen de J.&nbsp;A. Recio-García</figcaption>
           <img class="shot" src="../../assets/img/fsm-diseno-mspacman.jpg" width="1600" height="1200" loading="lazy"
-               alt="Diagrama hecho en una tableta. Cuatro superestados: ATACAR, con atacar fantasma cercano y atacar fantasma cerca de power pill; PILLS, con recoger pills cercanas, buscar power pill y recoger pills en zonas óptimas; HUIR, con huir zona segura, huir hacia power pill y huir hacia túnel; y ESQUIVAR, con ir hacia zona cercana a power pill y meterse por el túnel. Entre superestados, flechas rotuladas: «al menos 2 fantasmas comidos», «come PowerPill», «acaba PowerPill», «2 fantasmas no comestibles», «fantasma en el mismo cuadrante (máx 2 fantasmas)» y «3 o más fantasmas no comestibles». Las flechas de dentro de cada superestado no llevan rótulo.">
+               alt="Diagrama hecho en una tableta. Cuatro superestados: ATACAR, con atacar fantasma cercano y atacar fantasma cerca de power pill; PILLS, con recoger pills cercanas, buscar power pill y recoger pills en zonas óptimas; HUIR, con huir zona segura, huir hacia power pill y huir hacia túnel; y ESQUIVAR, con ir hacia zona cercana a power pill y meterse por el túnel. Entre superestados, flechas rotuladas: &quot;al menos 2 fantasmas comidos&quot;, &quot;come PowerPill&quot;, &quot;acaba PowerPill&quot;, &quot;2 fantasmas no comestibles&quot;, &quot;fantasma en el mismo cuadrante (máx 2 fantasmas)&quot; y &quot;3 o más fantasmas no comestibles&quot;. Las flechas de dentro de cada superestado no llevan rótulo.">
         </figure>
         <p>
           La estructura de arriba es buena: cuatro modos, y todas las flechas entre modos con una condición
@@ -2216,32 +2216,32 @@ Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7,
         <figure class="wide">
           <figcaption>Fantasmas con un superestado Perseguir que reparte cruces · imagen de J.&nbsp;A. Recio-García</figcaption>
           <img class="shot" src="../../assets/img/fsm-diseno-perseguir.jpg" width="1600" height="857" loading="lazy"
-               alt="Diagrama con cajas rectangulares, titulado GHOSTS. A la izquierda, el superestado PERSEGUIR por dentro: un estado DEFAULT en el centro con flechas de ida y vuelta a IR A INTERSECCIÓN 1, 2 y 3, IR A CAZAR, DIRECTO y HUIR, rotuladas como «si no está ocupada la intersección 1», «si está en una intersección» o «llega a la intersección de Ms. Pac-Man antes que él». A la derecha, el nivel de fuera: PERSEGUIR como estado compuesto, IR HACIA GHOST COMESTIBLE, HUIR DE MSPACMAN y HUIR DE POWER PILL, con flechas como «es comestible y Ms. Pac-Man está muy cerca» o «deja de ser comestible», y dos flechas que vuelven al mismo estado: «todavía es comestible» y «sigue cerca».">
+               alt="Diagrama con cajas rectangulares, titulado GHOSTS. A la izquierda, el superestado PERSEGUIR por dentro: un estado DEFAULT en el centro con flechas de ida y vuelta a IR A INTERSECCIÓN 1, 2 y 3, IR A CAZAR, DIRECTO y HUIR, rotuladas como &quot;si no está ocupada la intersección 1&quot;, &quot;si está en una intersección&quot; o &quot;llega a la intersección de Ms. Pac-Man antes que él&quot;. A la derecha, el nivel de fuera: PERSEGUIR como estado compuesto, IR HACIA GHOST COMESTIBLE, HUIR DE MSPACMAN y HUIR DE POWER PILL, con flechas como &quot;es comestible y Ms. Pac-Man está muy cerca&quot; o &quot;deja de ser comestible&quot;, y dos flechas que vuelven al mismo estado: &quot;todavía es comestible&quot; y &quot;sigue cerca&quot;.">
         </figure>
         <p>
           Este casa con el catálogo de acciones de la <a href="#acciones">sección&nbsp;8</a>: las mismas
           <code>IrAInterseccion</code> 1, 2 y 3, el mismo <code>IrACazar</code>, el mismo <code>Directo</code>.
           El estado <em>Default</em> en el centro hace de distribuidor: cada vez que un fantasma llega a un cruce
           vuelve a él, y desde él se reparte el siguiente cruce libre. Es una forma legítima de coordinar sin
-          mensajes. Sobran las dos flechas que vuelven al mismo estado, «todavía es comestible» y «sigue cerca»:
+          mensajes. Sobran las dos flechas que vuelven al mismo estado, "todavía es comestible" y "sigue cerca":
           quedarse es lo que pasa cuando no se cumple ninguna, y en este motor una flecha a sí mismo no es
           gratis, porque llama a <code>stop()</code>, y en un estado compuesto eso lo reinicia en cada turno.
         </p>
         <figure class="wide">
           <figcaption>Ms. Pac-Man en tres modos, Estándar, Ataque y Defensa · imagen de J.&nbsp;A. Recio-García</figcaption>
           <img class="shot" src="../../assets/img/fsm-diseno-ataque-defensa.jpg" width="1600" height="880" loading="lazy"
-               alt="Diagrama con cajas redondeadas azules. Tres superestados: Estándar, con buscar camino óptimo, buscar zona mejor y comer últimas pills; Ataque, con buscar camino óptimo hacia comestibles, comestibles pero dispersos y comestibles y juntos; y Defensa, con huir, ir a por PowerPills, buscar camino sin fantasmas y buscar cuadrante vacío con PowerPill. Aparte, un estado Empezar mapa. Flechas rotuladas entre todos ellos, por ejemplo «hay al menos un fantasma comestible cercano / PPill comida», «no merece la pena comer fantasmas (lejos, poca puntuación, poco tiempo...)», «fantasmas cerca», «PowerPill bloqueada» y «cambio de nivel», que vuelve a Empezar mapa.">
+               alt="Diagrama con cajas redondeadas azules. Tres superestados: Estándar, con buscar camino óptimo, buscar zona mejor y comer últimas pills; Ataque, con buscar camino óptimo hacia comestibles, comestibles pero dispersos y comestibles y juntos; y Defensa, con huir, ir a por PowerPills, buscar camino sin fantasmas y buscar cuadrante vacío con PowerPill. Aparte, un estado Empezar mapa. Flechas rotuladas entre todos ellos, por ejemplo &quot;hay al menos un fantasma comestible cercano / PPill comida&quot;, &quot;no merece la pena comer fantasmas (lejos, poca puntuación, poco tiempo...)&quot;, &quot;fantasmas cerca&quot;, &quot;PowerPill bloqueada&quot; y &quot;cambio de nivel&quot;, que vuelve a Empezar mapa.">
         </figure>
         <p>
           El más completo de los cuatro: todos los niveles tienen sus flechas rotuladas, hay un estado para el
-          principio de cada nivel y una transición «cambio de nivel» que vuelve a él. Lo que queda por hacer es lo
-          de siempre: «fantasmas cerca», «distancia media», «no merece la pena» tienen que convertirse en
+          principio de cada nivel y una transición "cambio de nivel" que vuelve a él. Lo que queda por hacer es lo
+          de siempre: "fantasmas cerca", "distancia media", "no merece la pena" tienen que convertirse en
           números, y esos números en parámetros del constructor de la transición, para poder probar varios.
         </p>
         <h3 class="label">Antes de programar, comprobad el diagrama</h3>
         <ul>
           <li>Cada flecha tiene una condición que se puede calcular con lo que hay en el <code>Input</code>.</li>
-          <li>Cada palabra vaga —cerca, lejos, merece la pena— tiene un número, y las parejas de entrar y salir
+          <li>Cada palabra vaga (cerca, lejos, merece la pena) tiene un número, y las parejas de entrar y salir
             tienen dos.</li>
           <li>Cada estado con varias flechas de salida dice en qué orden se miran.</li>
           <li>Las flechas que se repiten desde varios estados están agrupadas en un superestado.</li>
@@ -2406,7 +2406,7 @@ Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7,
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

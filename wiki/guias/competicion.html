@@ -102,7 +102,7 @@
         <p>
           El <code>Executor</code> tiene muchos métodos para lanzar partidas, pero en la práctica sólo se
           usan tres, y cada uno contesta a una pregunta distinta. Confundirlos es la causa número uno de
-          «pero si a mí me iba bien».
+          "pero si a mí me iba bien".
         </p>
         <div class="table-scroll">
           <table>
@@ -209,7 +209,7 @@
         </div>
         <h3 class="label">¿La mejora es real? Tres cuentas</h3>
         <p>
-          Vuestra media no es «lo que vale» vuestro controlador: es lo que han dado <em>esas</em> partidas.
+          Vuestra media no es "lo que vale" vuestro controlador: es lo que han dado <em>esas</em> partidas.
           Si repetís el mismo experimento con otras tantas, sale un número distinto. Estas son las tres
           cuentas que hay que hacer antes de quedarse con un cambio, con un ejemplo real de principio a fin.
         </p>
@@ -233,7 +233,7 @@
               partida</strong>. Y
               las medias, como cualquier otra cosa que se mide, también se separan unas de otras: si
               lanzarais el experimento entero muchas veces, cada tanda de 100 partidas os daría una media
-              distinta. Se separan mucho menos que las partidas sueltas —para eso se promedia—, pero se
+              distinta. Se separan mucho menos que las partidas sueltas (para eso se promedia), pero se
               separan. Y a esa dispersión, la <em>de las medias</em>, es a la que se le llama
               <strong>error típico</strong>:
             </p>
@@ -243,8 +243,8 @@
             </div>
             <p>
               Conviene leer esa igualdad despacio, porque es la que contesta a la pregunta obvia: el error
-              típico <strong>es</strong> una desviación típica. No es una media, ni se comporta «como si»
-              fuera nada: es la desviación típica de otra cosa —de las medias en vez de las partidas—, y por
+              típico <strong>es</strong> una desviación típica. No es una media, ni se comporta "como si"
+              fuera nada: es la desviación típica de otra cosa (de las medias en vez de las partidas), y por
               eso se le aplican las mismas reglas que a cualquier desviación típica.
             </p>
             <p>
@@ -296,8 +296,8 @@
               Si la cuenta no os dice nada, la intuición es esta: al promediar <em>n</em> partidas los
               errores de unas cancelan a los de otras. Si todos apuntaran en la misma dirección, promediar no
               serviría de nada; si se cancelaran del todo, quedaría cero. Como son al azar, el error de la
-              suma no crece como <em>n</em> sino como √<em>n</em> —cien pasos en direcciones aleatorias te
-              dejan a diez del origen, no a cien—, y al dividir la suma entre <em>n</em> queda σ/√<em>n</em>.
+              suma no crece como <em>n</em> sino como √<em>n</em> (cien pasos en direcciones aleatorias te
+              dejan a diez del origen, no a cien), y al dividir la suma entre <em>n</em> queda σ/√<em>n</em>.
             </p>
             <div class="note tip">
               <span class="note-label">Y esto se vio en el concurso de la Práctica 0</span>
@@ -317,7 +317,7 @@
             </div>
             <p>
               Las partidas bailan ±2&#8239;100; vuestra media de cien baila ±210. O sea que ese
-              3&#8239;850 es en realidad «3&#8239;850, más o menos 210». No hace falta calcularlo a mano: es
+              3&#8239;850 es en realidad "3&#8239;850, más o menos 210". No hace falta calcularlo a mano: es
               lo que devuelve <code>getStandardError()</code>.
             </p>
             <p>
@@ -337,8 +337,8 @@
               mayoría y una cola larga hacia arriba cuando la píldora de poder sale bien.
             </p>
             <p>
-              Y ahí es donde encaja todo: la desviación típica <em>de esa campana</em> —la campana de las
-              medias, no la de las partidas— es exactamente el error típico. Por eso la regla del 68 y el 95,
+              Y ahí es donde encaja todo: la desviación típica <em>de esa campana</em> (la campana de las
+              medias, no la de las partidas) es exactamente el error típico. Por eso la regla del 68 y el 95,
               que es una regla sobre desviaciones típicas, se lee directamente con él.
             </p>
             <div class="note tip">
@@ -376,8 +376,8 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
           <div class="step-body">
             <h4>Si la diferencia cabe dentro del margen, no es una mejora</h4>
             <p>
-              Ahora cambiáis <strong>una sola cosa</strong> —por ejemplo, la distancia a partir de la cual
-              dais por peligroso a un fantasma, que pasa de 50 a 60 nodos—, volvéis a medir con otras 100
+              Ahora cambiáis <strong>una sola cosa</strong> (por ejemplo, la distancia a partir de la cual
+              dais por peligroso a un fantasma, que pasa de 50 a 60 nodos), volvéis a medir con otras 100
               partidas y os sale <strong>3&#8239;980</strong>. Habéis ganado 130 puntos. ¿Os lo quedáis?
             </p>
             <p>
@@ -404,7 +404,7 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
                   <tr>
                     <td class="num-col">2</td>
                     <td><code>Var(−B) = (−1)<sup>2</sup> · Var(B) = Var(B)</code></td>
-                    <td>Es la <strong>regla 3</strong> de la tabla de antes —multiplicar por una constante multiplica la varianza por su cuadrado— con la constante igual a −1. Y como (−1)<sup>2</sup> = 1, la varianza se queda igual: <strong>restar dispersa exactamente lo mismo que sumar</strong>.</td>
+                    <td>Es la <strong>regla 3</strong> de la tabla de antes (multiplicar por una constante multiplica la varianza por su cuadrado) con la constante igual a −1. Y como (−1)<sup>2</sup> = 1, la varianza se queda igual: <strong>restar dispersa exactamente lo mismo que sumar</strong>.</td>
                   </tr>
                   <tr>
                     <td class="num-col">3</td>
@@ -570,8 +570,8 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
               <p>
                 Medir barato sólo detecta mejoras grandes. Con 100 partidas, que es lo que vais a lanzar
                 mientras trabajáis, <strong>cualquier cosa por debajo de 600 puntos es invisible</strong>. Así
-                que id a por los cambios que mueven la media cientos de puntos —comer la píldora de poder
-                cuando toca, dejar de meterse en tramos cerrados— y no gastéis la tarde moviendo una
+                que id a por los cambios que mueven la media cientos de puntos (comer la píldora de poder
+                cuando toca, dejar de meterse en tramos cerrados) y no gastéis la tarde moviendo una
                 constante de 50 a 52 a ver si sube: para demostrar una mejora de 50 puntos harían falta más
                 de 14&#8239;000 partidas por versión.
               </p>
@@ -741,7 +741,7 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
           <p>
             Cuando vuestro controlador lanza una excepción, <code>runExperiment</code> la captura, imprime la
             traza, <strong>descarta esa partida y la vuelve a jugar</strong> con otra semilla hasta completar
-            las 300. O sea que un fallo ocasional no baja la media —sólo cuentan las partidas que terminan—,
+            las 300. O sea que un fallo ocasional no baja la media (sólo cuentan las partidas que terminan),
             pero un fallo <em>sistemático</em> deja al evaluador dando vueltas para siempre en esa casilla y
             cuelga el concurso entero.
           </p>
@@ -757,7 +757,7 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
             Antes de cada partida el motor llama a <code>preCompute(String opponent)</code> y os pasa
             <strong>el nombre de la clase del rival</strong>. Está ahí por la Práctica&nbsp;6, donde hace
             falta cargar la base de casos. Usarlo para cambiar de comportamiento según quién esté enfrente
-            —y muy en particular para que vuestros fantasmas se dejen comer por vuestra Ms.&nbsp;Pac-Man— es
+            (y muy en particular para que vuestros fantasmas se dejen comer por vuestra Ms.&nbsp;Pac-Man) es
             hacer trampa, se ve leyendo el código y deja los dos controladores fuera del concurso.
           </p>
         </div>
@@ -814,7 +814,7 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
             <p>
               En Ms.&nbsp;Pac-Man gana <strong>la media más alta</strong>. En fantasmas gana <strong>la más
               baja</strong>: vuestro trabajo es que la gente no puntúe. Es literalmente el mismo número
-              leído al revés, y por eso no hace falta inventarse una métrica de «cuánto dañan»: la
+              leído al revés, y por eso no hace falta inventarse una métrica de "cuánto dañan": la
               puntuación del rival ya lo es.
             </p>
           </div>
@@ -906,8 +906,12 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
                 <td>Queda fuera del concurso y se lleva <strong>0 en su ranking</strong>. Y no entra en la escala: no sirve de suelo para subir a los demás.</td>
               </tr>
               <tr>
-                <td>Un controlador falla en algunas partidas</td>
-                <td>Esas partidas se repiten, así que sólo cuentan las que terminan. Si falla siempre, es el caso anterior.</td>
+                <td>La entrega llega tarde</td>
+                <td>Desde 12 horas de retraso, el grupo queda fuera del concurso con sus dos controladores. Está en <a href="../practicas/index.html#reglas">las reglas de entrega</a>.</td>
+              </tr>
+              <tr>
+                <td>Un controlador lanza excepciones</td>
+                <td>Desde la Práctica&nbsp;2, <strong>queda descalificado</strong>, como si no jugara, aunque sólo falle en unas pocas partidas: el concurso juega en paralelo y no repite partidas para tapar un fallo. El otro controlador del grupo juega con normalidad. En la Práctica&nbsp;1 esas partidas se repetían; <a href="../practicas/practica-2-resultados.html#descalificados">aquí</a> está por qué ya no.</td>
               </tr>
               <tr>
                 <td>Dos medias iguales</td>
@@ -995,8 +999,8 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
         <p>
           A partir de ahí, <code>medidas.log</code> aparece en la carpeta del proyecto y se abre como
           cualquier CSV. Dos avisos: el fichero se <strong>sobrescribe</strong> en cada ejecución, y esto es
-          para un experimento vuestro, no para el concurso —el evaluador se construye su propio
-          <code>Executor</code> y ahí no hay dónde enganchar un <code>peek</code>—.
+          para un experimento vuestro, no para el concurso (el evaluador se construye su propio
+          <code>Executor</code> y ahí no hay dónde enganchar un <code>peek</code>).
         </p>
         <div class="note trap">
           <span class="note-label">El <code>System.out.println</code> dentro de <code>getMove</code></span>
@@ -1051,13 +1055,13 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
             un experimento sin ventana no repinta nunca, así que las listas crecen turno a turno y no las
             vacía nadie. Y no vale con que no haya ventana: el interruptor del propio motor,
             <code>GameView.isVisible</code>, nace a <code>true</code> y no lo pone a <code>false</code> nadie
-            —podéis buscarlo—.
+            (podéis buscarlo).
           </p>
           <p>
             En una partida suelta da igual. En las decenas de miles de partidas de un concurso,
             <strong>se acaba la memoria y se cae la ejecución entera</strong>, la vuestra y la de todos los
             demás. Pasó con las entregas de la Práctica&nbsp;0 la primera vez que se lanzó el concurso con 100
-            partidas por emparejamiento. Por eso «apagad la depuración» está en la lista de comprobación de la
+            partidas por emparejamiento. Por eso "apagad la depuración" está en la lista de comprobación de la
             entrega, y por eso el interruptor tiene que envolver <em>la llamada</em>, no ir por dentro.
           </p>
         </div>
@@ -1079,7 +1083,7 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
         <p>
           <code>runGame</code> admite un <code>GameObserver</code>, al que el motor avisa de cada movimiento
           indicando además <strong>si se tomó en un cruce</strong>. Es la forma limpia de contar cosas
-          —cuántas decisiones reales tomáis, cuántas veces devolvéis <code>null</code>— sin meter contadores
+          (cuántas decisiones reales tomáis, cuántas veces devolvéis <code>null</code>) sin meter contadores
           dentro del controlador:
         </p>
         <div class="codigo"><pre><code>executor.runGame(pacMan, ghosts, <span class="n">40</span>, <span class="k">new</span> GameObserver() {
@@ -1104,7 +1108,7 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
               </tr>
               <tr>
                 <td>Se queda quieto al final del nivel y la partida se agota</td>
-                <td>El criterio de seguridad ha cerrado todas las salidas y no hay caso de escape. Falta la excepción de «quedan cuatro píldoras».</td>
+                <td>El criterio de seguridad ha cerrado todas las salidas y no hay caso de escape. Falta la excepción de "quedan cuatro píldoras".</td>
               </tr>
               <tr>
                 <td>La media es buena pero el mínimo es 0</td>
@@ -1209,8 +1213,8 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
             Proyecto nuevo con <code>MsPacManEngine</code> en el <em>Build Path</em>, los dos archivos en
             <code>src</code>, vuestras clases en las dos listas de <code>config.properties</code>, y
             <span class="path">Run As &gt; Java Application</span> sobre <code>Concurso.java</code>. El CSV
-            aparece en la carpeta del proyecto —hay que refrescar con <kbd>F5</kbd> para verlo desde
-            Eclipse—.
+            aparece en la carpeta del proyecto (hay que refrescar con <kbd>F5</kbd> para verlo desde
+            Eclipse).
           </p>
         </div>
       </section>
@@ -1263,7 +1267,7 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

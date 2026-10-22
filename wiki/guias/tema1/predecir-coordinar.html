@@ -92,8 +92,8 @@
             varios fantasmas: si no sabes por cuál va a salir, cubre todas.
           </li>
           <li>
-            <strong>Coincidir en el tiempo.</strong> Expandir dos anchuras a la vez —la de Ms.&nbsp;Pac-Man y
-            la del fantasma— anotando no sólo <em>qué</em> nodos alcanza cada uno sino <strong>en qué
+            <strong>Coincidir en el tiempo.</strong> Expandir dos anchuras a la vez (la de Ms.&nbsp;Pac-Man y
+            la del fantasma) anotando no sólo <em>qué</em> nodos alcanza cada uno sino <strong>en qué
             turno</strong>. Un nodo al que los dos llegan en el mismo turno, y de frente, es una
             interceptación. Uno al que llega antes el fantasma pero por detrás, no: se lo come por la espalda
             y no pasa nada.
@@ -166,8 +166,8 @@
           comunicar, es <em>repartir</em>.
         </p>
         <p>
-          El reparto más directo es una asignación: se calculan los sitios que hay que cubrir —los cruces por
-          los que Ms.&nbsp;Pac-Man puede pasar— y se le da uno distinto a cada fantasma, el más cercano que
+          El reparto más directo es una asignación: se calculan los sitios que hay que cubrir (los cruces por
+          los que Ms.&nbsp;Pac-Man puede pasar) y se le da uno distinto a cada fantasma, el más cercano que
           quede libre. Es el algoritmo voraz de asignación, y con cuatro agentes y cuatro objetivos no hace
           falta nada mejor.
         </p>
@@ -247,7 +247,7 @@
         </div>
         <p>
           De la media velocidad salen las dos reglas que hay que escribir, y ninguna de las dos es
-          «persíguelo si está cerca»:
+          "persíguelo si está cerca":
         </p>
         <div class="table-scroll">
           <table>
@@ -295,8 +295,8 @@
           <code>runGame</code> y <code>runExperiment</code>, que son el modo de clase y el de corrección, el
           motor llama a tu método y <strong>se queda esperando</strong>: nadie lo corta, y un cálculo de
           200&nbsp;ms se usa entero. Lo único que pagas es reloj. Y como además <strong>no hace falta
-          devolver un movimiento en cada turno</strong> —si devuelves <code>null</code> el motor sigue
-          recto—, lo sensato es no repartir el presupuesto a partes iguales: gastar en los cruces, que son
+          devolver un movimiento en cada turno</strong> (si devuelves <code>null</code> el motor sigue
+          recto), lo sensato es no repartir el presupuesto a partes iguales: gastar en los cruces, que son
           uno de cada diez turnos, y no gastar nada en los pasillos.
         </p>
         <p>
@@ -336,7 +336,7 @@
 }</code></pre></div>
         <p>
           Cuando veas en pantalla los tramos que tu controlador considera cerrados, los errores de la
-          función <a href="estrategias.html#llego-antes">«¿llego yo antes?»</a> se hacen obvios en dos partidas. Sin eso, no.
+          función <a href="estrategias.html#llego-antes">"¿llego yo antes?"</a> se hacen obvios en dos partidas. Sin eso, no.
         </p>
         <div class="note trap">
           <span class="note-label">El interruptor es obligatorio, no una costumbre</span>
@@ -344,7 +344,7 @@
             <code>addPoints</code> y <code>addLines</code> no dibujan: apuntan lo que habría que dibujar en
             dos listas <code>static</code> que sólo se vacían cuando se repinta la ventana. Sin ventana no se
             vacían nunca, y el interruptor del motor que debería evitarlo
-            —<code>GameView.isVisible</code>— nace a <code>true</code> y no lo cambia nadie. En una partida
+            (<code>GameView.isVisible</code>) nace a <code>true</code> y no lo cambia nadie. En una partida
             da igual; en las miles de partidas de una corrección, la memoria se acaba y se cae todo.
           </p>
         </div>
@@ -400,7 +400,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

@@ -794,7 +794,7 @@
               </tr>
               <tr>
                 <td><code>int getClosestNodeIndexFromNodeIndex(int, int[], DM)</code></td>
-                <td>De una lista de nodos, el más cercano. Sirve para «la píldora más próxima».</td>
+                <td>De una lista de nodos, el más cercano. Sirve para "la píldora más próxima".</td>
               </tr>
               <tr>
                 <td><code>int getFarthestNodeIndexFromNodeIndex(int, int[], DM)</code></td>
@@ -947,7 +947,7 @@
           </table>
         </div>
         <p>
-          Lo importante de esa tabla es que la salida por defecto es «seguir recto», no «pararse»:
+          Lo importante de esa tabla es que la salida por defecto es "seguir recto", no "pararse":
           Ms.&nbsp;Pac-Man no se queda quieta por una decisión tuya, ni siquiera devolviendo
           <code>MOVE.NEUTRAL</code>.
         </p>
@@ -1057,7 +1057,7 @@
           <p>
             Ese <code>-1</code> es un índice de nodo que no existe, pero si lo pasas a otro método casi
             ninguno protesta. <code>getShortestPathDistance(algo, -1)</code> devuelve <strong>0</strong>,
-            que en tu código se lee como «ya estoy encima del objetivo», y
+            que en tu código se lee como "ya estoy encima del objetivo", y
             <code>getNextMoveAwayFromTarget</code> con un <code>-1</code> devuelve
             <code>MOVE.NEUTRAL</code>. El resultado típico es un personaje que se queda quieto o que
             persigue algo que no está donde crees, sin un solo error en la consola. Y no es coherente entre
@@ -1080,7 +1080,7 @@
         <div class="note tip">
           <span class="note-label">Recorrer los vecinos sin sorpresas</span>
           <p>
-            Si lo que quieres es «prueba todos los movimientos que puedo hacer», recorre
+            Si lo que quieres es "prueba todos los movimientos que puedo hacer", recorre
             <code>getPossibleMoves(nodo, ultimoMovimiento)</code> y saca el vecino de cada uno con
             <code>getNeighbour</code>: así los movimientos vienen ya filtrados y ninguna llamada te puede
             devolver <code>-1</code>.
@@ -1135,7 +1135,7 @@
           </table>
         </div>
         <div class="note trap">
-          <span class="note-label">«Es un cruce» y «tengo que elegir» no son lo mismo</span>
+          <span class="note-label">"Es un cruce" y "tengo que elegir" no son lo mismo</span>
           <p>
             El patrón habitual es decidir sólo cuando hay algo que decidir, y repetir el movimiento el resto
             del tiempo. Si ese filtro lo escribes con <code>isJunction(nodo)</code>, te estás fiando de un
@@ -1164,8 +1164,8 @@
           forma de preguntar. Los métodos de arriba siguen existiendo, pero pueden devolverte datos
           inesperados, y no siempre del mismo tipo: la posición de un fantasma que no ves vale
           <code>-1</code>, pero su último movimiento vale <code>null</code>, y lo mismo
-          <code>isGhostEdible</code>, que devuelve <code>Boolean</code> justamente para poder decir «no lo
-          sé». Antes de usar un valor, comprueba que el objeto por el que preguntas es observable.
+          <code>isGhostEdible</code>, que devuelve <code>Boolean</code> justamente para poder decir "no lo
+          sé". Antes de usar un valor, comprueba que el objeto por el que preguntas es observable.
         </p>
         <p>
           Ojo también con <code>getPacmanCurrentNodeIndex()</code>: en un controlador de fantasmas con
@@ -1347,7 +1347,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 9 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

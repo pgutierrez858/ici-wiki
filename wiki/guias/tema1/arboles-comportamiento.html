@@ -103,16 +103,16 @@
           <li>
             <strong>Más escalables, mantenibles y versátiles.</strong> Añadir un comportamiento es añadir
             una rama en la posición que marca su prioridad; no hay que decidir cómo se sale de ella hacia
-            cada uno de los demás, porque no se «sale»: en el turno siguiente se vuelve a decidir.
+            cada uno de los demás, porque no se "sale": en el turno siguiente se vuelve a decidir.
           </li>
           <li>
-            <strong>Tareas sencillas, más reutilizables.</strong> Cada hoja hace una sola cosa —«¿soy
-            comestible?», «huir»— y la complejidad sale de <strong>combinarlas</strong>, no de hacerlas
+            <strong>Tareas sencillas, más reutilizables.</strong> Cada hoja hace una sola cosa ("¿soy
+            comestible?", "huir") y la complejidad sale de <strong>combinarlas</strong>, no de hacerlas
             listas.
           </li>
           <li>
             <strong>Sub-árboles reutilizables</strong> entre comportamientos y personajes: la rama de huir
-            es la misma para los cuatro fantasmas, y la de «comer la píldora más cercana» puede colgar de
+            es la misma para los cuatro fantasmas, y la de "comer la píldora más cercana" puede colgar de
             varios sitios del árbol de Ms.&nbsp;Pac-Man.
           </li>
           <li>
@@ -182,7 +182,7 @@
         </figure>
         <p>
           Los estados son tres. <code>SUCCESS</code> y <code>FAILURE</code> son lo esperable: la tarea ha
-          salido bien o no. <code>RUNNING</code> es «todavía no he terminado», y la sección siguiente explica
+          salido bien o no. <code>RUNNING</code> es "todavía no he terminado", y la sección siguiente explica
           por qué hace falta. En los diagramas de esta página los nodos y los estados se dibujan así:
         </p>
         <figure>
@@ -267,7 +267,7 @@
         <p>
           <code>RUNNING</code> existe porque hay acciones que no caben en un tick: una animación, andar hasta
           un punto con A*, recargar. Sin él, una acción que acaba de empezar tendría que contestar ya si ha
-          salido bien, y no lo sabe. Con él contesta «sigo», el padre deja de mirar a los hermanos que
+          salido bien, y no lo sabe. Con él contesta "sigo", el padre deja de mirar a los hermanos que
           vienen detrás, y en el tick siguiente se vuelve a entrar <strong>desde la raíz</strong>: si nada
           por encima ha cambiado, el camino vuelve a llegar a la misma acción, que continúa.
         </p>
@@ -394,16 +394,16 @@
         <h3 class="label">Acción</h3>
         <p>
           Las acciones <strong>modifican el estado del juego</strong>: ejecutan una animación, cambian el
-          estado del personaje —salud, nivel de alerta—, lo desplazan, con o sin A*, o reproducen un sonido.
+          estado del personaje (salud, nivel de alerta), lo desplazan, con o sin A*, o reproducen un sonido.
           Hacen falta <strong>relativamente muchas</strong>, así que interesa que sean
-          <strong>parametrizables</strong>: no «ir a la cocina» e «ir al salón», sino «ir a» con el destino
+          <strong>parametrizables</strong>: no "ir a la cocina" e "ir al salón", sino "ir a" con el destino
           como parámetro. El <code>ChaseAction</code> del proyecto de ejemplo ya lo es: recibe el fantasma
           en el constructor y sirve para los cuatro.
         </p>
         <p>
           Normalmente una acción tiene éxito, pero algunas <strong>pueden fallar</strong>, y es importante
-          que lo digan: «ir a un lugar» no falla nunca… salvo que no se encuentre camino. En Ms.&nbsp;Pac-Man
-          el fallo típico es no tener objetivo: «ir a la píldora más cercana» cuando ya no queda ninguna. Si
+          que lo digan: "ir a un lugar" no falla nunca… salvo que no se encuentre camino. En Ms.&nbsp;Pac-Man
+          el fallo típico es no tener objetivo: "ir a la píldora más cercana" cuando ya no queda ninguna. Si
           esa acción devuelve éxito igualmente, el selector que la contiene no probará la alternativa.
         </p>
         <h3 class="label">Condición</h3>
@@ -416,7 +416,7 @@
         </p>
         <p>
           También se puede hacer que una condición <strong>se quede ejecutando</strong>, devolviendo
-          <code>RUNNING</code> mientras falle —«espera a que»— o mientras se cumpla —«mientras». Con eso, y
+          <code>RUNNING</code> mientras falle ("espera a que") o mientras se cumpla ("mientras"). Con eso, y
           con los compuestos de la sección siguiente, salen todas las estructuras de control de siempre:
         </p>
         <div class="table-scroll">
@@ -684,7 +684,7 @@
         <p>
           Son nodos internos con <strong>un solo hijo</strong>, y cambian cuándo se ejecuta ese hijo o qué
           se devuelve con lo que devuelve él. Los dos más comunes son el <strong>inversor</strong>,
-          que devuelve lo contrario que su hijo, un «not», y el <strong>supresor</strong>, que devuelve el
+          que devuelve lo contrario que su hijo, un "not", y el <strong>supresor</strong>, que devuelve el
           valor deseado venga lo que venga del hijo.
         </p>
         <figure class="narrow">
@@ -693,8 +693,8 @@
                alt="Un árbol sobre fondo oscuro. La raíz es una secuencia con dos hijos: un decorador verde, Repeat, y la acción Esconderse. Debajo del decorador hay un selector con dos hijos: una secuencia con la condición ¿Tengo munición? y la acción Disparar, y la acción Recargar.">
         </figure>
         <p>
-          El árbol de la imagen se lee de arriba abajo: primero, repetir el combate —disparar mientras haya
-          munición y, si no, recargar— y, después, esconderse. Cuándo acaba de repetir depende del decorador:
+          El árbol de la imagen se lee de arriba abajo: primero, repetir el combate (disparar mientras haya
+          munición y, si no, recargar) y, después, esconderse. Cuándo acaba de repetir depende del decorador:
           un número de veces, o hasta que el hijo falle. Los habituales:
         </p>
         <div class="table-scroll">
@@ -710,7 +710,7 @@
               <tr>
                 <td>Inversor (<em lang="en">Inverter</em>, no)</td>
                 <td>Lo contrario del hijo; <code>RUNNING</code> se queda como está.</td>
-                <td>«Si <em>no</em> hay ya fantasmas comestibles», sin escribir una condición nueva.</td>
+                <td>"Si <em>no</em> hay ya fantasmas comestibles", sin escribir una condición nueva.</td>
               </tr>
               <tr>
                 <td>Siempre éxito (<em lang="en">Succeeder</em>, <em lang="en">Supress</em>)</td>
@@ -730,7 +730,7 @@
               <tr>
                 <td>Hasta que falle (<em lang="en">UntilFail</em>)</td>
                 <td><code>RUNNING</code> mientras el hijo salga bien.</td>
-                <td>El «while» de la sección anterior.</td>
+                <td>El "while" de la sección anterior.</td>
               </tr>
               <tr>
                 <td>Enfriamiento (<em lang="en">Cooldown</em>)</td>
@@ -755,8 +755,8 @@
           Ejecuta <strong>todos</strong> sus hijos en el mismo tick, y lo que devuelve lo fija su
           <strong>política</strong>: con éxito cuando tienen éxito todos o cuando lo tiene uno, y con fallo
           cuando falla uno o cuando fallan todos. Mientras no se decida, devuelve <code>RUNNING</code>. Su uso
-          clásico es una acción larga junto a una condición que la vigila: «ir a por el fantasma» en paralelo
-          con «¿sigue siendo comestible?», con la política de fallar en cuanto falle uno.
+          clásico es una acción larga junto a una condición que la vigila: "ir a por el fantasma" en paralelo
+          con "¿sigue siendo comestible?", con la política de fallar en cuanto falle uno.
         </p>
         <p>
           En Ms.&nbsp;Pac-Man hay que usarlo con cuidado por una razón muy concreta: cada turno se devuelve
@@ -965,7 +965,7 @@
           <strong>selector de prioridad</strong> cuyos hijos van guardados por una condición: de noche,
           dormir; con el objetivo cerca, disparar o acercarse; y si no, <code>AlwaysTrue</code> y deambular,
           que es la rama por defecto. En la paleta de abajo están los compuestos y decoradores de esta página
-          —paralelo, secuencia, selector, versiones aleatorias, <em>Not</em>, <em>Repeat</em>—, y el
+          (paralelo, secuencia, selector, versiones aleatorias, <em>Not</em>, <em>Repeat</em>), y el
           inspector de la derecha enseña dos cosas: la descripción de <code>Shoot</code> dice que
           <strong>no termina nunca</strong> (un <code>RUNNING</code> perpetuo, que sólo interrumpe una rama de
           más prioridad), y cada parámetro de entrada se marca como <code>CONSTANT</code> o como
@@ -980,8 +980,8 @@
           Unreal lo lleva más lejos. El árbol está atado a una <strong>pizarra</strong>
           (<em lang="en">blackboard</em>), <code>FollowerBlackBoard</code>: una memoria compartida con claves
           como <code>TargetToFollow</code> o <code>HomeLocation</code>. Los decoradores azules son
-          condiciones sobre esas claves —<code>isTargetSet</code>: «TargetToFollow is Set»—; las tareas moradas
-          las leen o las escriben —<code>SetTargetNull</code> borra el objetivo—; y el
+          condiciones sobre esas claves (<code>isTargetSet</code>: "TargetToFollow is Set"); las tareas moradas
+          las leen o las escriben (<code>SetTargetNull</code> borra el objetivo); y el
           <strong>servicio</strong> verde, <code>AgroCheck</code>, se ejecuta cada 0,5&nbsp;s y es el que
           mira el mundo y apunta en la pizarra a quién seguir. Además, Unreal no recorre el árbol desde la
           raíz en cada fotograma: es dirigido por eventos, y un decorador con <em lang="en">aborts</em>
@@ -1077,7 +1077,7 @@
         <p>
           Para pasarla a árbol hay una receta que funciona casi siempre. Cada estado se convierte en una
           <strong>rama</strong>: una secuencia con una condición de guarda y la acción del estado. La guarda
-          contesta «¿cuándo debería estar en este estado?», y se saca de las transiciones que <em>entran</em>
+          contesta "¿cuándo debería estar en este estado?", y se saca de las transiciones que <em>entran</em>
           en él. Las ramas cuelgan de un selector raíz <strong>por orden de prioridad</strong>, y la última,
           el comportamiento por defecto, va sin condición.
         </p>
@@ -1164,8 +1164,8 @@
           El orden no es arbitrario. <em>Encerrado</em> va primero porque en la cárcel no se decide nada.
           <em>Huir</em> va antes que <em>aleatorio</em> porque un fantasma comestible huye aunque
           Ms.&nbsp;Pac-Man acabe de morir. Y <em>perseguir</em> va al final, sin guarda, porque es lo que se
-          hace cuando no pasa nada de lo anterior. Las transiciones de vuelta desaparecen: «no comestible y
-          Ms.&nbsp;Pac-Man lejos de una PPill» ya no hace falta escribirla, porque es justo lo que pasa
+          hace cuando no pasa nada de lo anterior. Las transiciones de vuelta desaparecen: "no comestible y
+          Ms.&nbsp;Pac-Man lejos de una PPill" ya no hace falta escribirla, porque es justo lo que pasa
           cuando la guarda de <em>huir</em> falla.
         </p>
         <p>
@@ -1175,9 +1175,600 @@
           porque estaba en ese estado; el árbol necesita memoria. Se apunta el turno de la muerte en un campo
           del controlador, y la guarda pregunta si han pasado menos de 150 turnos. Y hay otro detalle del
           motor: tras una muerte, Ms.&nbsp;Pac-Man reaparece en el acto y los fantasmas vuelven a la cárcel,
-          de la que salen a los 40, 60, 80 y 100 turnos en el primer nivel. La transición «reaparece» del
+          de la que salen a los 40, 60, 80 y 100 turnos en el primer nivel. La transición "reaparece" del
           diagrama no tiene equivalente directo, así que la ventana de 150 es una decisión nuestra: da a cada
           fantasma entre 50 y 110 turnos de despiste al salir.
+        </p>
+        <p>
+          Cuál de los tres conviene, y cuánto cuesta cada uno, se ve mejor con dos ejemplos escritos en los
+          tres formatos, en la <a href="#comparar">sección siguiente</a>.
+        </p>
+</section>
+
+      <section id="comparar">
+        <div class="sec-head">
+          <span class="num">10</span>
+          <h2 class="sec">Tres formatos, dos ejemplos</h2>
+        </div>
+        <p>
+          Una máquina de estados, una jerárquica y un árbol pueden describir el mismo comportamiento con las
+          mismas acciones y las mismas condiciones. Lo que cambia es <strong>dónde se escribe cuándo toca cada
+          cosa</strong>: en las flechas, en las flechas y en los bordes de los grupos, o en el orden de las ramas.
+          Eso decide qué cuesta escribir, qué cuesta cambiar y qué hay que recordar a mano. Los dos ejemplos que
+          siguen salen al revés a propósito: en el primero la máquina encaja sola, y en el segundo el árbol gana
+          con claridad.
+        </p>
+
+        <h3 class="label">Ejemplo 1 · El guardia de un juego de sigilo</h3>
+        <p>
+          Patrulla su ruta. Si oye un ruido, va a mirar, y si en cinco segundos no encuentra nada, vuelve a
+          patrullar. Si ve al jugador, lo persigue, y si lo tiene a tiro, ataca. Si lo pierde de vista, lo busca
+          diez segundos donde lo vio por última vez y, si no lo encuentra, vuelve a la ruta.
+        </p>
+        <p>
+          Son cinco modos que <strong>duran</strong> y que cambian por <strong>sucesos</strong>: oír, ver,
+          perder de vista, que pase el tiempo. Es el caso para el que se inventaron las máquinas, y el diagrama
+          sale casi dictado:
+        </p>
+        <figure class="wide">
+          <figcaption>Máquina de estados: cinco estados y nueve flechas; "lo ve" sale de tres</figcaption>
+        <svg class="explica dgb8" viewBox="0 0 520 275" role="img" aria-label="Máquina de estados del guardia, con cinco estados. Patrullar, el inicial, pasa a Investigar si oye un ruido, e Investigar vuelve a Patrullar tras 5 segundos sin nada. Tres flechas rojas iguales, lo ve, llevan a Perseguir desde Investigar, desde Patrullar y desde Buscar. Perseguir pasa a Atacar si lo tiene a tiro y Atacar vuelve a Perseguir cuando está fuera de tiro. Perseguir pasa a Buscar si lo pierde de vista, y Buscar vuelve a Patrullar tras 10 segundos sin verlo.">
+        <style>
+          .dgb8 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+          .dgb8 .sn{font-family:var(--f-mono);font-size:10.5px;font-weight:700;fill:var(--ink);text-anchor:middle}
+          .dgb8 .tl{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+          .dgb8 .tlm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+          .dgb8 .tle{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:end}
+          .dgb8 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+          .dgb8 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+          .dgb8 .ini{fill:var(--ink)}
+          .dgb8 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#dgb8a)}
+          .dgb8 .m{fill:none;stroke:var(--blinky);stroke-width:1.6;marker-end:url(#dgb8m)}
+          .dgb8 .p{fill:none;stroke:var(--pill-ink);stroke-width:1.6;marker-end:url(#dgb8p)}
+          .dgb8 .q{fill:none;stroke:var(--inky);stroke-width:1.6;marker-end:url(#dgb8q)}
+          .dgb8 .sw{stroke-width:3;stroke-linecap:round}
+        </style>
+        <defs><marker id="dgb8a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker><marker id="dgb8m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker><marker id="dgb8p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker><marker id="dgb8q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--inky)"/></marker></defs>
+        <rect x="20" y="30" width="110" height="30" rx="15.0" class="st"/><text x="75.0" y="48.5" class="sn">Investigar</text>
+        <rect x="20" y="220" width="110" height="30" rx="15.0" class="st"/><text x="75.0" y="238.5" class="sn">Patrullar</text>
+        <circle cx="11" cy="235" r="3.5" class="ini"/><path d="M14 235 H19" class="a"/>
+        <rect x="230" y="30" width="110" height="30" rx="15.0" class="st"/><text x="285.0" y="48.5" class="sn">Perseguir</text>
+        <rect x="400" y="30" width="100" height="30" rx="15.0" class="st"/><text x="450.0" y="48.5" class="sn">Atacar</text>
+        <rect x="230" y="220" width="110" height="30" rx="15.0" class="st"/><text x="285.0" y="238.5" class="sn">Buscar</text>
+        <path d="M60 220 V62" class="a"/>
+        <text x="54" y="136" class="tle">oye un</text>
+        <text x="54" y="148" class="tle">ruido</text>
+        <path d="M92 60 V218" class="a"/>
+        <text x="98" y="136" class="tl">5 s sin</text>
+        <text x="98" y="148" class="tl">nada</text>
+        <path d="M130 45 H228" class="m"/>
+        <text x="179" y="38" class="tlm">lo ve</text>
+        <path d="M118 221 L248 62" class="m"/>
+        <text x="196" y="160" class="tl">lo ve</text>
+        <path d="M272 220 V62" class="m"/>
+        <text x="266" y="136" class="tle">lo ve</text>
+        <path d="M304 60 V218" class="a"/>
+        <text x="310" y="136" class="tl">lo pierde</text>
+        <text x="310" y="148" class="tl">de vista</text>
+        <path d="M340 39 H398" class="a"/>
+        <text x="370" y="24" class="tlm">a tiro</text>
+        <path d="M400 52 H342" class="a"/>
+        <text x="370" y="76" class="tlm">fuera de tiro</text>
+        <path d="M230 235 H132" class="a"/>
+        <text x="181" y="264" class="tlm">10 s sin verlo</text>
+        </svg>
+        </figure>
+        <p>
+          Se lee bien, y cada flecha dice por qué se cambia. Los temporizadores tampoco cuestan: "5 s sin nada"
+          y "10 s sin verlo" cuentan desde que se entró en el estado, y eso es una acción de entrada que apunta
+          el instante, como el <code>EstadoConEntrada</code> de <a href="maquinas-estados.html#run">las
+          máquinas de estados</a>. Lo único que se repite es "lo ve", que sale de los tres estados en los que el
+          guardia no está luchando.
+        </p>
+        <p>
+          Agrupar ayuda, aunque menos de lo que parece. <em>Calma</em> reúne patrullar e investigar, y
+          <em>Alerta</em> todo lo que pasa desde que lo ve. Buscar tiene que ir en Alerta y no en Calma: al
+          cruzar el borde de un grupo se entra por su estado inicial, y el de Calma es patrullar.
+        </p>
+        <figure class="wide">
+          <figcaption>Jerárquica: dos grupos y ocho flechas; "lo ve" queda en dos</figcaption>
+        <svg class="explica dgb9" viewBox="0 0 520 270" role="img" aria-label="El guardia como máquina jerárquica. El grupo Calma, el inicial, contiene Patrullar, su inicial, e Investigar, con las flechas oye un ruido y 5 segundos sin nada. El grupo Alerta contiene Perseguir, su inicial, Atacar y Buscar: a tiro y fuera de tiro entre Perseguir y Atacar, lo pierde de vista de Perseguir a Buscar y una flecha roja, lo ve, de Buscar a Perseguir. Entre los grupos, una flecha roja, lo ve, del borde de Calma al de Alerta, y otra, 10 segundos sin verlo, del borde de Alerta al de Calma.">
+        <style>
+          .dgb9 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+          .dgb9 .sn{font-family:var(--f-mono);font-size:10.5px;font-weight:700;fill:var(--ink);text-anchor:middle}
+          .dgb9 .tl{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+          .dgb9 .tlm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+          .dgb9 .tle{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:end}
+          .dgb9 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+          .dgb9 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+          .dgb9 .ini{fill:var(--ink)}
+          .dgb9 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#dgb9a)}
+          .dgb9 .m{fill:none;stroke:var(--blinky);stroke-width:1.6;marker-end:url(#dgb9m)}
+          .dgb9 .p{fill:none;stroke:var(--pill-ink);stroke-width:1.6;marker-end:url(#dgb9p)}
+          .dgb9 .q{fill:none;stroke:var(--inky);stroke-width:1.6;marker-end:url(#dgb9q)}
+          .dgb9 .sw{stroke-width:3;stroke-linecap:round}
+        </style>
+        <defs><marker id="dgb9a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker><marker id="dgb9m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker><marker id="dgb9p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker><marker id="dgb9q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--inky)"/></marker></defs>
+        <rect x="10" y="14" width="160" height="246" rx="12" class="cp"/>
+        <text x="22" y="30" class="ct">CALMA</text>
+        <circle cx="12" cy="8" r="3.5" class="ini"/><path d="M15 9 L20 13" class="a"/>
+        <rect x="240" y="14" width="270" height="246" rx="12" class="cp"/>
+        <text x="252" y="30" class="ct">ALERTA</text>
+        <rect x="40" y="50" width="110" height="30" rx="15.0" class="st"/><text x="95.0" y="68.5" class="sn">Patrullar</text>
+        <circle cx="31" cy="65" r="3.5" class="ini"/><path d="M34 65 H39" class="a"/>
+        <rect x="40" y="205" width="110" height="30" rx="15.0" class="st"/><text x="95.0" y="223.5" class="sn">Investigar</text>
+        <path d="M80 80 V203" class="a"/>
+        <text x="74" y="138" class="tle">oye un</text>
+        <text x="74" y="150" class="tle">ruido</text>
+        <path d="M112 205 V82" class="a"/>
+        <text x="118" y="138" class="tl">5 s sin</text>
+        <text x="118" y="150" class="tl">nada</text>
+        <rect x="265" y="50" width="110" height="30" rx="15.0" class="st"/><text x="320.0" y="68.5" class="sn">Perseguir</text>
+        <circle cx="256" cy="65" r="3.5" class="ini"/><path d="M259 65 H264" class="a"/>
+        <rect x="400" y="50" width="95" height="30" rx="15.0" class="st"/><text x="447.5" y="68.5" class="sn">Atacar</text>
+        <rect x="265" y="205" width="110" height="30" rx="15.0" class="st"/><text x="320.0" y="223.5" class="sn">Buscar</text>
+        <path d="M375 59 H398" class="a"/>
+        <text x="388" y="44" class="tlm">a tiro</text>
+        <path d="M400 72 H377" class="a"/>
+        <text x="410" y="96" class="tlm">fuera de tiro</text>
+        <path d="M335 80 V203" class="a"/>
+        <text x="341" y="138" class="tl">lo pierde</text>
+        <text x="341" y="150" class="tl">de vista</text>
+        <path d="M303 205 V82" class="m"/>
+        <text x="297" y="144" class="tle">lo ve</text>
+        <path d="M170 100 H238" class="m"/>
+        <text x="205" y="93" class="tlm">lo ve</text>
+        <path d="M240 180 H172" class="a"/>
+        <text x="205" y="196" class="tlm">10 s sin</text>
+        <text x="205" y="207" class="tlm">verlo</text>
+        </svg>
+        </figure>
+        <p>
+          "10 s sin verlo" sale del borde de Alerta y se comprueba en sus tres estados, pero sólo puede cumplirse
+          en Buscar, porque persiguiendo o atacando lo está viendo. Es el truco habitual de las jerárquicas:
+          subir una flecha al borde cuando su condición sólo puede darse en un sitio. "Lo ve" sigue apareciendo
+          dos veces, una para entrar en Alerta y otra para volver de Buscar a Perseguir.
+        </p>
+        <p>
+          Como árbol, cada modo es una rama con su guarda, y las ramas van en orden de prioridad:
+        </p>
+        <figure class="wide">
+          <figcaption>Árbol: cuatro ramas por prioridad y ninguna flecha</figcaption>
+        <svg class="explica dgb10" viewBox="0 0 506.9 322.0" role="img" aria-label="El guardia como árbol. La raíz es un selector con cuatro ramas por prioridad. 1, combate: la condición ¿lo ve? y un selector ¿cómo? que ataca si lo tiene a tiro y si no persigue. 2, buscar: ¿perdido hace menos de 10 segundos? e ir donde lo vio. 3, investigar: ¿ruido hace menos de 5 segundos? e ir al ruido. 4, patrullar, sin condición.">
+        <style>
+          .dgb10 .cmp{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+          .dgb10 .gl{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--maze)}
+          .dgb10 .dec{fill:var(--surface);stroke:var(--inky);stroke-width:1.5}
+          .dgb10 .cnd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+          .dgb10 .act{fill:var(--surface-2);stroke:var(--ink-2);stroke-width:1.2}
+          .dgb10 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+          .dgb10 .s{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+          .dgb10 .e{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+          .dgb10 .off{opacity:.5}
+          .dgb10 .off rect,.dgb10 .off polygon{stroke-dasharray:4 3}
+          .dgb10 .ok{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--ok)}
+          .dgb10 .bad{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--bad)}
+          .dgb10 .run{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink)}
+          .dgb10 .nc{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+          .dgb10 .nt{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--maze);text-anchor:middle}
+        </style>
+        <path d="M253.5 28.0 C253.5 51.0 43.1 51.0 43.1 74.0" class="e"/>
+        <circle cx="43.1" cy="61.0" r="8" class="nc"/>
+        <text x="43.1" y="64.0" class="nt">1</text>
+        <path d="M253.5 28.0 C253.5 51.0 176.2 51.0 176.2 74.0" class="e"/>
+        <circle cx="176.2" cy="61.0" r="8" class="nc"/>
+        <text x="176.2" y="64.0" class="nt">2</text>
+        <path d="M253.5 28.0 C253.5 51.0 340.6 51.0 340.6 74.0" class="e"/>
+        <circle cx="340.6" cy="61.0" r="8" class="nc"/>
+        <text x="340.6" y="64.0" class="nt">3</text>
+        <path d="M253.5 28.0 C253.5 51.0 464.8 51.0 464.8 74.0" class="e"/>
+        <circle cx="464.8" cy="61.0" r="8" class="nc"/>
+        <text x="464.8" y="64.0" class="nt">4</text>
+        <path d="M14.0 96.0 V119.0 H22.0" class="e"/>
+        <path d="M14.0 96.0 V153.0 H22.0" class="e"/>
+        <path d="M30.0 164.0 V187.0 H38.0" class="e"/>
+        <path d="M30.0 164.0 V289.0 H38.0" class="e"/>
+        <path d="M46.0 198.0 V221.0 H54.0" class="e"/>
+        <path d="M46.0 198.0 V255.0 H54.0" class="e"/>
+        <rect x="6.0" y="74.0" width="74.1" height="22" rx="3" class="cmp"/>
+        <text x="14.0" y="89.5" class="gl">→</text>
+        <text x="30.0" y="88.5" class="t">combate</text>
+        <rect x="22.0" y="108.0" width="60.1" height="22" rx="11.0" class="cnd"/>
+        <text x="52.1" y="122.5" class="t" text-anchor="middle">¿lo ve?</text>
+        <rect x="22.0" y="142.0" width="68.1" height="22" rx="3" class="cmp"/>
+        <text x="30.0" y="157.5" class="gl">?</text>
+        <text x="46.0" y="156.5" class="t">¿cómo?</text>
+        <rect x="38.0" y="176.0" width="26.0" height="22" rx="3" class="cmp"/>
+        <text x="51.0" y="191.5" class="gl" text-anchor="middle">→</text>
+        <rect x="54.0" y="210.0" width="66.2" height="22" rx="11.0" class="cnd"/>
+        <text x="87.1" y="224.5" class="t" text-anchor="middle">¿a tiro?</text>
+        <rect x="54.0" y="244.0" width="54.1" height="22" rx="5.0" class="act"/>
+        <text x="81.1" y="258.5" class="t" text-anchor="middle">atacar</text>
+        <rect x="38.0" y="278.0" width="72.2" height="22" rx="5.0" class="act"/>
+        <text x="74.1" y="292.5" class="t" text-anchor="middle">perseguir</text>
+        <path d="M150.2 96.0 V119.0 H158.2" class="e"/>
+        <path d="M150.2 96.0 V153.0 H158.2" class="e"/>
+        <rect x="142.2" y="74.0" width="68.1" height="22" rx="3" class="cmp"/>
+        <text x="150.2" y="89.5" class="gl">→</text>
+        <text x="166.2" y="88.5" class="t">buscar</text>
+        <rect x="158.2" y="108.0" width="114.3" height="22" rx="11.0" class="cnd"/>
+        <text x="215.3" y="122.5" class="t" text-anchor="middle">¿perdido &lt; 10 s?</text>
+        <rect x="158.2" y="142.0" width="108.3" height="22" rx="5.0" class="act"/>
+        <text x="212.3" y="156.5" class="t" text-anchor="middle">ir donde lo vio</text>
+        <path d="M302.5 96.0 V119.0 H310.5" class="e"/>
+        <path d="M302.5 96.0 V153.0 H310.5" class="e"/>
+        <rect x="294.5" y="74.0" width="92.2" height="22" rx="3" class="cmp"/>
+        <text x="302.5" y="89.5" class="gl">→</text>
+        <text x="318.5" y="88.5" class="t">investigar</text>
+        <rect x="310.5" y="108.0" width="96.3" height="22" rx="11.0" class="cnd"/>
+        <text x="358.6" y="122.5" class="t" text-anchor="middle">¿ruido &lt; 5 s?</text>
+        <rect x="310.5" y="142.0" width="84.2" height="22" rx="5.0" class="act"/>
+        <text x="352.6" y="156.5" class="t" text-anchor="middle">ir al ruido</text>
+        <rect x="428.7" y="74.0" width="72.2" height="22" rx="5.0" class="act"/>
+        <text x="464.8" y="88.5" class="t" text-anchor="middle">patrullar</text>
+        <rect x="216.4" y="6.0" width="74.1" height="22" rx="3" class="cmp"/>
+        <text x="224.4" y="21.5" class="gl">?</text>
+        <text x="240.4" y="20.5" class="t">guardia</text><text x="253.5" y="314.0" class="s" text-anchor="middle">las dos guardas del medio leen la pizarra: cuándo lo vio y cuándo sonó el ruido</text>
+        </svg>
+        </figure>
+        <p>
+          Las flechas desaparecen, pero dos guardas preguntan por el pasado: <em>¿perdido hace menos de 10
+          s?</em> y <em>¿ruido hace menos de 5 s?</em>. La máquina lo sabía por estar en Buscar o en
+          Investigar. El árbol lo tiene que tener <strong>apuntado en la pizarra</strong>, y alguien tiene que
+          apuntarlo antes de cada tick, que es el papel del servicio de Unreal o del <code>parseInput()</code>
+          del motor:
+        </p>
+        <figure>
+          <figcaption>Pseudocódigo · lo que el árbol del guardia necesita recordar</figcaption>
+          <pre class="pseudo"><b>function</b> <span class="fn">percibir</span>(<span class="var">pizarra</span>)                 <i>// antes de cada tick</i>
+    <b>if</b> <span class="fn">veoAlJugador</span>() <b>then</b>
+        <span class="var">pizarra</span>.dóndeLoVi ← <span class="fn">posiciónDelJugador</span>()
+        <span class="var">pizarra</span>.cuándoLoVi ← <span class="fn">ahora</span>()
+    <b>if</b> <span class="fn">oigoUnRuido</span>() <b>then</b>
+        <span class="var">pizarra</span>.dóndeSonó ← <span class="fn">posiciónDelRuido</span>()
+        <span class="var">pizarra</span>.cuándoSonó ← <span class="fn">ahora</span>()
+<b>end function</b>
+
+<i>// las dos guardas sólo leen</i>
+¿perdido &lt; 10 s?  ≡  <b>not</b> <span class="fn">veoAlJugador</span>() <b>and</b> <span class="fn">ahora</span>() − <span class="var">pizarra</span>.cuándoLoVi &lt; 10
+¿ruido &lt; 5 s?     ≡  <span class="fn">ahora</span>() − <span class="var">pizarra</span>.cuándoSonó &lt; 5</pre>
+        </figure>
+        <p>
+          A cambio, el árbol deja escrita una decisión que en la máquina estaba escondida. ¿Qué hace el guardia
+          si oye un ruido mientras busca? En la máquina, nada, porque nadie dibujó la flecha de Buscar a
+          Investigar. En el árbol, nada, porque <em>buscar</em> va antes que <em>investigar</em>. Hacen lo mismo,
+          pero en el árbol se ve, y se cambia moviendo una rama.
+        </p>
+
+        <h3 class="label">Ejemplo 2 · Ms.&nbsp;Pac-Man, con poder y sin él</h3>
+        <p>
+          La lista de prioridades. Si un fantasma que puede comérsela está cerca, escapar: hacia una píldora de
+          poder si llega antes que él y todavía no hay comestibles, y si no, huyendo. Si no hay peligro y hay un
+          comestible al alcance, cazarlo. Y si no, comer pills. Escapar va primero <strong>con poder y sin
+          él</strong>: un fantasma que sale de la cárcel no es comestible aunque a Ms.&nbsp;Pac-Man le quede
+          poder, que es justo lo que rompía la jerárquica de <a href="maquinas-estados.html#jerarquicas">las
+          máquinas de estados</a>.
+        </p>
+        <p>
+          Aquí no hay modos que duren: hay una lista que se revisa entera cada turno. Pasada tal cual a una
+          máquina plana, cada estado necesita una flecha hacia cada estado al que pueda tener que ir, y cada
+          flecha lleva <strong>la guarda entera de su destino</strong>, prioridades incluidas:
+        </p>
+        <figure class="wide">
+          <figcaption>Máquina plana: cuatro estados y once flechas; el color es el destino, y con él la guarda</figcaption>
+        <svg class="explica dgb11" viewBox="0 0 500 350" role="img" aria-label="Ms. Pac-Man como máquina plana, con cuatro estados en cuadrado: Comer pills, el inicial, Cazar, Huir e Ir a PPill, y once flechas entre ellos, varias cruzándose en el centro. El color de cada flecha es su destino. Rojas, a Huir, tres: peligro y no llega antes a una PPill. Amarillas, a Ir a PPill, dos: peligro, llega antes y no hay comestibles. Azules, a Cazar, tres: sin peligro y comestible al alcance. Grises, a Comer pills, tres: sin peligro y nada al alcance.">
+        <style>
+          .dgb11 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+          .dgb11 .sn{font-family:var(--f-mono);font-size:10.5px;font-weight:700;fill:var(--ink);text-anchor:middle}
+          .dgb11 .tl{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+          .dgb11 .tlm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+          .dgb11 .tle{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:end}
+          .dgb11 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+          .dgb11 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+          .dgb11 .ini{fill:var(--ink)}
+          .dgb11 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#dgb11a)}
+          .dgb11 .m{fill:none;stroke:var(--blinky);stroke-width:1.6;marker-end:url(#dgb11m)}
+          .dgb11 .p{fill:none;stroke:var(--pill-ink);stroke-width:1.6;marker-end:url(#dgb11p)}
+          .dgb11 .q{fill:none;stroke:var(--inky);stroke-width:1.6;marker-end:url(#dgb11q)}
+          .dgb11 .sw{stroke-width:3;stroke-linecap:round}
+        </style>
+        <defs><marker id="dgb11a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker><marker id="dgb11m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker><marker id="dgb11p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker><marker id="dgb11q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--inky)"/></marker></defs>
+        <rect x="40" y="30" width="120" height="30" rx="15.0" class="st"/><text x="100.0" y="48.5" class="sn">Comer pills</text>
+        <circle cx="31" cy="45" r="3.5" class="ini"/><path d="M34 45 H39" class="a"/>
+        <rect x="340" y="30" width="120" height="30" rx="15.0" class="st"/><text x="400.0" y="48.5" class="sn">Cazar</text>
+        <rect x="40" y="220" width="120" height="30" rx="15.0" class="st"/><text x="100.0" y="238.5" class="sn">Huir</text>
+        <rect x="340" y="220" width="120" height="30" rx="15.0" class="st"/><text x="400.0" y="238.5" class="sn">Ir a PPill</text>
+        <path d="M160 39 H338" class="q"/>
+        <path d="M340 52 H162" class="a"/>
+        <path d="M88 60 V218" class="m"/>
+        <path d="M112 220 V62" class="a"/>
+        <path d="M160 229 H338" class="p"/>
+        <path d="M340 242 H162" class="m"/>
+        <path d="M400 220 V62" class="q"/>
+        <path d="M150 60 L352 216" class="p"/>
+        <path d="M366 220 L164 64" class="a"/>
+        <path d="M350 60 L148 216" class="m"/>
+        <path d="M134 220 L336 64" class="q"/>
+        <path d="M40 287 H66" class="m sw" style="marker-end:none"/>
+        <text x="76" y="290" class="tl">a Huir: peligro y no llega antes a una PPill · 3 flechas</text>
+        <path d="M40 303 H66" class="p sw" style="marker-end:none"/>
+        <text x="76" y="306" class="tl">a Ir a PPill: peligro, llega antes y no hay comestibles · 2 flechas</text>
+        <path d="M40 319 H66" class="q sw" style="marker-end:none"/>
+        <text x="76" y="322" class="tl">a Cazar: sin peligro y comestible al alcance · 3 flechas</text>
+        <path d="M40 335 H66" class="a sw" style="marker-end:none"/>
+        <text x="76" y="338" class="tl">a Comer pills: sin peligro y nada al alcance · 3 flechas</text>
+        </svg>
+        </figure>
+        <p>
+          "Sin peligro" está escrito en seis flechas, y una prioridad nueva, ir a por la fruta pongamos, obliga a
+          repasarlas todas. En Java son once <code>add</code>, y cada una lleva su propio objeto con nombre,
+          porque el observador no dibuja dos flechas con el mismo <code>toString()</code> en la misma máquina.
+          Las acciones y las transiciones se dan por escritas: una clase de transición por destino, con su
+          guarda.
+        </p>
+        <div class="codigo"><pre><code>SimpleState comer = <span class="k">new</span> SimpleState(<span class="k">new</span> ComerPillsAction());
+SimpleState cazar = <span class="k">new</span> SimpleState(<span class="k">new</span> CazarAction());
+SimpleState huir  = <span class="k">new</span> SimpleState(<span class="k">new</span> HuirAction());
+SimpleState ppill = <span class="k">new</span> SimpleState(<span class="k">new</span> IrAPPillAction());
+
+<span class="c">// Cada guarda lleva la lista de prioridades entera, así que se excluyen entre sí</span>
+<span class="c">// y el orden de add() da igual. El parámetro sólo da nombre a la flecha.</span>
+fsm = <span class="k">new</span> FSM(<span class="s">"MsPacMan"</span>);
+fsm.add(comer, <span class="k">new</span> AHuirTransition(<span class="s">"comer"</span>),  huir);
+fsm.add(comer, <span class="k">new</span> APPillTransition(<span class="s">"comer"</span>), ppill);
+fsm.add(comer, <span class="k">new</span> ACazarTransition(<span class="s">"comer"</span>), cazar);
+fsm.add(cazar, <span class="k">new</span> AHuirTransition(<span class="s">"cazar"</span>),  huir);
+fsm.add(cazar, <span class="k">new</span> AComerTransition(<span class="s">"cazar"</span>), comer);
+fsm.add(huir,  <span class="k">new</span> APPillTransition(<span class="s">"huir"</span>),  ppill);
+fsm.add(huir,  <span class="k">new</span> ACazarTransition(<span class="s">"huir"</span>),  cazar);
+fsm.add(huir,  <span class="k">new</span> AComerTransition(<span class="s">"huir"</span>),  comer);
+fsm.add(ppill, <span class="k">new</span> AHuirTransition(<span class="s">"ppill"</span>),  huir);
+fsm.add(ppill, <span class="k">new</span> ACazarTransition(<span class="s">"ppill"</span>), cazar);
+fsm.add(ppill, <span class="k">new</span> AComerTransition(<span class="s">"ppill"</span>), comer);
+fsm.ready(comer);</code></pre></div>
+        <p>
+          Los colores dicen cómo agruparla. Las flechas a Huir y a Ir a PPill empiezan las dos por "peligro", y
+          las de Cazar y Comer por "sin peligro": dos grupos, <em>Peligro</em> y <em>Tranquila</em>, y el
+          peligro se comprueba una vez, en el borde. Dentro de cada grupo queda una decisión pequeña:
+        </p>
+        <figure>
+          <figcaption>Jerárquica: seis flechas, cada condición una vez, y la de fuera con dos umbrales</figcaption>
+        <svg class="explica dgb12" viewBox="0 0 350 292" role="img" aria-label="Ms. Pac-Man como máquina jerárquica, con dos grupos. Tranquila, el inicial, contiene Comer pills, su inicial, y Cazar, con las flechas comestible al alcance y nada al alcance. Peligro contiene Huir, su inicial, e Ir a PPill, con las flechas llega antes a la PPill y ya no llega antes. Entre los grupos, una flecha roja de Tranquila a Peligro, fantasma a menos de 20, y otra de vuelta, ninguno a menos de 30.">
+        <style>
+          .dgb12 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+          .dgb12 .sn{font-family:var(--f-mono);font-size:10.5px;font-weight:700;fill:var(--ink);text-anchor:middle}
+          .dgb12 .tl{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2)}
+          .dgb12 .tlm{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:middle}
+          .dgb12 .tle{font-family:var(--f-mono);font-size:9.5px;fill:var(--ink-2);text-anchor:end}
+          .dgb12 .cp{fill:var(--maze-soft);stroke:var(--maze);stroke-width:1.2;stroke-dasharray:5 3}
+          .dgb12 .ct{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.08em;fill:var(--maze)}
+          .dgb12 .ini{fill:var(--ink)}
+          .dgb12 .a{fill:none;stroke:var(--ink-3);stroke-width:1.3;marker-end:url(#dgb12a)}
+          .dgb12 .m{fill:none;stroke:var(--blinky);stroke-width:1.6;marker-end:url(#dgb12m)}
+          .dgb12 .p{fill:none;stroke:var(--pill-ink);stroke-width:1.6;marker-end:url(#dgb12p)}
+          .dgb12 .q{fill:none;stroke:var(--inky);stroke-width:1.6;marker-end:url(#dgb12q)}
+          .dgb12 .sw{stroke-width:3;stroke-linecap:round}
+        </style>
+        <defs><marker id="dgb12a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/></marker><marker id="dgb12m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--blinky)"/></marker><marker id="dgb12p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--pill-ink)"/></marker><marker id="dgb12q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--inky)"/></marker></defs>
+        <rect x="10" y="14" width="330" height="100" rx="12" class="cp"/>
+        <text x="22" y="30" class="ct">TRANQUILA</text>
+        <circle cx="12" cy="8" r="3.5" class="ini"/><path d="M15 9 L20 13" class="a"/>
+        <rect x="40" y="52" width="100" height="30" rx="15.0" class="st"/><text x="90.0" y="70.5" class="sn">Comer pills</text>
+        <circle cx="31" cy="67" r="3.5" class="ini"/><path d="M34 67 H39" class="a"/>
+        <rect x="220" y="52" width="100" height="30" rx="15.0" class="st"/><text x="270.0" y="70.5" class="sn">Cazar</text>
+        <path d="M140 61 H218" class="a"/>
+        <text x="180" y="46" class="tlm">comestible al alcance</text>
+        <path d="M220 74 H142" class="a"/>
+        <text x="180" y="100" class="tlm">nada al alcance</text>
+        <rect x="10" y="184" width="330" height="100" rx="12" class="cp"/>
+        <text x="22" y="200" class="ct">PELIGRO</text>
+        <rect x="40" y="222" width="100" height="30" rx="15.0" class="st"/><text x="90.0" y="240.5" class="sn">Huir</text>
+        <circle cx="31" cy="237" r="3.5" class="ini"/><path d="M34 237 H39" class="a"/>
+        <rect x="220" y="222" width="100" height="30" rx="15.0" class="st"/><text x="270.0" y="240.5" class="sn">Ir a PPill</text>
+        <path d="M140 231 H218" class="a"/>
+        <text x="180" y="216" class="tlm">llega antes a la PPill</text>
+        <path d="M220 244 H142" class="a"/>
+        <text x="180" y="270" class="tlm">ya no llega antes</text>
+        <path d="M120 114 V182" class="m"/>
+        <text x="114" y="146" class="tle">fantasma</text>
+        <text x="114" y="158" class="tle">a &lt; 20</text>
+        <path d="M230 184 V116" class="a"/>
+        <text x="236" y="146" class="tl">ninguno</text>
+        <text x="236" y="158" class="tl">a &lt; 30</text>
+        </svg>
+        </figure>
+        <p>
+          Sale mucho mejor: seis flechas, ninguna condición repetida, y la histéresis gratis, porque se entra en
+          Peligro con un fantasma a menos de 20 pasos y no se sale hasta que no queda ninguno a menos de 30. Al
+          cruzar a un grupo, su máquina arranca en el estado inicial y da su propio paso en el mismo turno: si al
+          entrar en Peligro llega antes a la PPill, va a por ella sin perder un turno huyendo. Es el
+          <code>CompoundState</code> del <a href="maquinas-estados.html#ejemplo-compuesto">estado compuesto de
+          Ms.&nbsp;Pac-Man</a>, dos veces, con las mismas transiciones de amenaza:
+        </p>
+        <div class="codigo"><pre><code><span class="c">// Dentro de Peligro: huir, o ir a la PPill si llega antes y no hay comestibles</span>
+peligro = <span class="k">new</span> FSM(<span class="s">"Peligro"</span>);
+SimpleState huir  = <span class="k">new</span> SimpleState(<span class="k">new</span> HuirAction());
+SimpleState ppill = <span class="k">new</span> SimpleState(<span class="k">new</span> IrAPPillAction());
+peligro.add(huir,  <span class="k">new</span> LlegaAntesTransition(),   ppill);
+peligro.add(ppill, <span class="k">new</span> YaNoLlegaTransition(),    huir);
+peligro.ready(huir);
+
+<span class="c">// Dentro de Tranquila: comer, o cazar si hay un comestible al alcance</span>
+tranquila = <span class="k">new</span> FSM(<span class="s">"Tranquila"</span>);
+SimpleState comer = <span class="k">new</span> SimpleState(<span class="k">new</span> ComerPillsAction());
+SimpleState cazar = <span class="k">new</span> SimpleState(<span class="k">new</span> CazarAction());
+tranquila.add(comer, <span class="k">new</span> PresaAlAlcanceTransition(), cazar);
+tranquila.add(cazar, <span class="k">new</span> SinPresaTransition(),       comer);
+tranquila.ready(comer);
+
+<span class="c">// Fuera, dos estados compuestos y el peligro con dos umbrales</span>
+CompoundState tranquilaState = <span class="k">new</span> CompoundState(<span class="s">"Tranquila"</span>, tranquila);
+CompoundState peligroState   = <span class="k">new</span> CompoundState(<span class="s">"Peligro"</span>, peligro);
+fsm = <span class="k">new</span> FSM(<span class="s">"MsPacMan"</span>);
+fsm.add(tranquilaState, <span class="k">new</span> AmenazaCercaTransition(20), peligroState);
+fsm.add(peligroState,   <span class="k">new</span> AmenazaLejosTransition(30), tranquilaState);
+fsm.ready(tranquilaState);</code></pre></div>
+        <p>
+          Las tres máquinas son atributos del controlador, porque <code>preCompute</code> tiene que reiniciar las tres:
+          <code>reset()</code> de la de fuera no llega a las de dentro.
+        </p>
+        <p>
+          Y el árbol es la lista de prioridades dibujada:
+        </p>
+        <figure class="wide">
+          <figcaption>Árbol: la lista de prioridades, tal cual</figcaption>
+        <svg class="explica dgb13" viewBox="0 0 533.1 374.0" role="img" aria-label="Ms. Pac-Man como árbol. La raíz es un selector con tres ramas por prioridad. 1, escapar: la condición ¿peligro? y un selector ¿cómo? con dos maneras, ir a la PPill si no hay ya comestibles y llega antes, o huir. 2, cazar: ¿comestible al alcance? e ir a por él. 3, comer píldoras, sin condición.">
+        <style>
+          .dgb13 .cmp{fill:var(--surface);stroke:var(--maze);stroke-width:1.5}
+          .dgb13 .gl{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--maze)}
+          .dgb13 .dec{fill:var(--surface);stroke:var(--inky);stroke-width:1.5}
+          .dgb13 .cnd{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.2}
+          .dgb13 .act{fill:var(--surface-2);stroke:var(--ink-2);stroke-width:1.2}
+          .dgb13 .t{font-family:var(--f-mono);font-size:10px;fill:var(--ink)}
+          .dgb13 .s{font-family:var(--f-mono);font-size:10px;fill:var(--ink-2)}
+          .dgb13 .e{fill:none;stroke:var(--ink-3);stroke-width:1.2}
+          .dgb13 .off{opacity:.5}
+          .dgb13 .off rect,.dgb13 .off polygon{stroke-dasharray:4 3}
+          .dgb13 .ok{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--ok)}
+          .dgb13 .bad{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--bad)}
+          .dgb13 .run{font-family:var(--f-mono);font-size:13px;font-weight:700;fill:var(--pill-ink)}
+          .dgb13 .nc{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
+          .dgb13 .nt{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--maze);text-anchor:middle}
+        </style>
+        <path d="M266.6 28.0 C266.6 51.0 43.1 51.0 43.1 74.0" class="e"/>
+        <circle cx="43.1" cy="61.0" r="8" class="nc"/>
+        <text x="43.1" y="64.0" class="nt">1</text>
+        <path d="M266.6 28.0 C266.6 51.0 261.4 51.0 261.4 74.0" class="e"/>
+        <circle cx="261.4" cy="61.0" r="8" class="nc"/>
+        <text x="261.4" y="64.0" class="nt">2</text>
+        <path d="M266.6 28.0 C266.6 51.0 476.0 51.0 476.0 74.0" class="e"/>
+        <circle cx="476.0" cy="61.0" r="8" class="nc"/>
+        <text x="476.0" y="64.0" class="nt">3</text>
+        <path d="M14.0 96.0 V119.0 H22.0" class="e"/>
+        <path d="M14.0 96.0 V153.0 H22.0" class="e"/>
+        <path d="M30.0 164.0 V187.0 H38.0" class="e"/>
+        <path d="M30.0 164.0 V357.0 H38.0" class="e"/>
+        <path d="M46.0 198.0 V221.0 H54.0" class="e"/>
+        <path d="M46.0 198.0 V289.0 H54.0" class="e"/>
+        <path d="M46.0 198.0 V323.0 H54.0" class="e"/>
+        <path d="M62.0 232.0 V255.0 H70.0" class="e"/>
+        <rect x="6.0" y="74.0" width="74.1" height="22" rx="3" class="cmp"/>
+        <text x="14.0" y="89.5" class="gl">→</text>
+        <text x="30.0" y="88.5" class="t">escapar</text>
+        <rect x="22.0" y="108.0" width="72.2" height="22" rx="11.0" class="cnd"/>
+        <text x="58.1" y="122.5" class="t" text-anchor="middle">¿peligro?</text>
+        <rect x="22.0" y="142.0" width="68.1" height="22" rx="3" class="cmp"/>
+        <text x="30.0" y="157.5" class="gl">?</text>
+        <text x="46.0" y="156.5" class="t">¿cómo?</text>
+        <rect x="38.0" y="176.0" width="92.2" height="22" rx="3" class="cmp"/>
+        <text x="46.0" y="191.5" class="gl">→</text>
+        <text x="62.0" y="190.5" class="t">a la PPill</text>
+        <polygon points="54.0,221.0 63.0,210.0 83.0,210.0 92.0,221.0 83.0,232.0 63.0,232.0" class="dec"/>
+        <text x="73.0" y="224.5" class="t" text-anchor="middle">no</text>
+        <rect x="70.0" y="244.0" width="138.4" height="22" rx="11.0" class="cnd"/>
+        <text x="139.2" y="258.5" class="t" text-anchor="middle">¿ya hay comestibles?</text>
+        <rect x="54.0" y="278.0" width="96.3" height="22" rx="11.0" class="cnd"/>
+        <text x="102.1" y="292.5" class="t" text-anchor="middle">¿llega antes?</text>
+        <rect x="54.0" y="312.0" width="96.3" height="22" rx="5.0" class="act"/>
+        <text x="102.1" y="326.5" class="t" text-anchor="middle">ir a la PPill</text>
+        <rect x="38.0" y="346.0" width="42.1" height="22" rx="5.0" class="act"/>
+        <text x="59.0" y="360.5" class="t" text-anchor="middle">huir</text>
+        <path d="M238.4 96.0 V119.0 H246.4" class="e"/>
+        <path d="M238.4 96.0 V153.0 H246.4" class="e"/>
+        <rect x="230.4" y="74.0" width="62.1" height="22" rx="3" class="cmp"/>
+        <text x="238.4" y="89.5" class="gl">→</text>
+        <text x="254.4" y="88.5" class="t">cazar</text>
+        <rect x="246.4" y="108.0" width="156.5" height="22" rx="11.0" class="cnd"/>
+        <text x="324.6" y="122.5" class="t" text-anchor="middle">¿comestible al alcance?</text>
+        <rect x="246.4" y="142.0" width="84.2" height="22" rx="5.0" class="act"/>
+        <text x="288.5" y="156.5" class="t" text-anchor="middle">ir a por él</text>
+        <rect x="424.9" y="74.0" width="102.3" height="22" rx="5.0" class="act"/>
+        <text x="476.0" y="88.5" class="t" text-anchor="middle">comer píldoras</text>
+        <rect x="217.5" y="6.0" width="98.2" height="22" rx="3" class="cmp"/>
+        <text x="225.5" y="21.5" class="gl">?</text>
+        <text x="241.5" y="20.5" class="t">ms. pac-man</text>
+        </svg>
+        </figure>
+
+        <p>
+          Es el árbol de Ms.&nbsp;Pac-Man de la <a href="#controladores">sección&nbsp;12</a> con las dos primeras
+          ramas cambiadas de sitio: en Java, mover un bloque. Una prioridad nueva sería otra rama en su sitio, sin
+          tocar las demás. Lo que el árbol no trae es la histéresis de la jerárquica. Con un solo umbral, un
+          fantasma que ronda los 20 pasos hace que <em>escapar</em> gane un turno sí y otro no, el
+          <a href="#tick">parpadeo de la sección&nbsp;03</a>. Se arregla con memoria, y aquí la memoria puede vivir
+          en el propio nodo, como en el enfriamiento:
+        </p>
+        <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
+
+<span class="k">import</span> java.util.function.ToIntFunction;
+
+<span class="k">import</span> es.ucm.fdi.ici.Input;
+
+<span class="c">/** Se cumple por debajo de enter, y sigue cumpliéndose hasta llegar a exit. */</span>
+<span class="k">public</span> <span class="k">class</span> Hysteresis&lt;I <span class="k">extends</span> Input&gt; <span class="k">extends</span> Node {
+
+    <span class="k">private</span> <span class="k">final</span> ToIntFunction&lt;I&gt; value;
+    <span class="k">private</span> <span class="k">final</span> <span class="k">int</span> enter, exit;
+    <span class="k">private</span> <span class="k">boolean</span> inside = <span class="k">false</span>;     <span class="c">// memoria: si se cumplía la última vez</span>
+
+    <span class="k">public</span> Hysteresis(String name, ToIntFunction&lt;I&gt; value, <span class="k">int</span> enter, <span class="k">int</span> exit) {
+        <span class="k">super</span>(name);
+        <span class="k">this</span>.value = value;
+        <span class="k">this</span>.enter = enter;
+        <span class="k">this</span>.exit = exit;
+    }
+
+    <span class="c">@Override</span>
+    <span class="c">@SuppressWarnings("unchecked")</span>
+    <span class="k">protected</span> Status run(Blackboard bb) {
+        <span class="k">int</span> v = value.applyAsInt((I) bb.in);
+        inside = v &lt; (inside ? exit : enter);   <span class="c">// dentro, hasta exit; fuera, desde enter</span>
+        <span class="k">return</span> inside ? Status.SUCCESS : Status.FAILURE;
+    }
+}</code></pre></div>
+        <p>
+          En el árbol sustituye a la condición de peligro, y lo demás no cambia:
+        </p>
+        <div class="codigo"><pre><code><span class="k">new</span> Sequence(<span class="s">"escapar"</span>,
+    <span class="k">new</span> Hysteresis&lt;MsPacManInput&gt;(<span class="s">"¿perseguidor cerca?"</span>, in -&gt; in.dangerDistance, DANGER, <span class="n">30</span>),
+    <span class="k">new</span> Selector(<span class="s">"¿cómo?"</span>, ...))</code></pre></div>
+        <p>
+          Un nodo así sólo se acuerda cuando se visita. Aquí va bien porque es la guarda de la primera rama y se
+          mira en todos los ticks. Debajo de una rama que a veces no se visita, se quedaría con un valor viejo.
+          Es lo mismo que pasa con el enfriamiento, y la razón de que cada personaje necesite su propio árbol. El
+          árbol de esta sección, con <code>Hysteresis</code>, está compilado contra el motor y probado en cien
+          partidas sin ventana contra los fantasmas de la sección&nbsp;12.
+        </p>
+
+        <h3 class="label">Lo que cuesta cada uno</h3>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Máquina de estados</th>
+                <th scope="col">Jerárquica</th>
+                <th scope="col">Árbol de comportamiento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>El guardia</td>
+                <td>5 estados y 9 flechas; "lo ve" en 3. Los temporizadores, en acciones de entrada.</td>
+                <td>2 grupos y 8 flechas; "lo ve" en 2. Buscar tiene que ir en Alerta.</td>
+                <td>4 ramas y ninguna flecha; 2 instantes apuntados en la pizarra.</td>
+              </tr>
+              <tr>
+                <td>Ms.&nbsp;Pac-Man</td>
+                <td>4 estados y 11 flechas; "sin peligro" en 6.</td>
+                <td>2 grupos y 6 flechas, ninguna condición repetida; histéresis gratis.</td>
+                <td>3 ramas y ninguna flecha; un nodo con memoria para la histéresis.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Y en general, para cualquier personaje:
         </p>
         <div class="table-scroll">
           <table class="ancha">
@@ -1232,9 +1823,22 @@
                 <td>Las transiciones cruzan de un grupo a otro.</td>
                 <td>Hace falta historia: parpadea o hay que llenarlo de memoria.</td>
               </tr>
+              <tr>
+                <td>Juegos donde encaja</td>
+                <td>Enemigos de pocos modos: los fantasmas del arcade, un jefe por fases, un guardia de sigilo.</td>
+                <td>Personajes cuyos modos se agrupan: fuera y dentro de combate, con poder y sin él.</td>
+                <td>Muchos comportamientos con prioridades que crecen: shooters, mundos abiertos, lo que se edita en Unity o Unreal.</td>
+              </tr>
             </tbody>
           </table>
         </div>
+        <p>
+          La regla que sale de los dos ejemplos: si el personaje tiene pocos modos que duran y se cambia de uno a
+          otro por sucesos, la máquina es lo natural y lo que el árbol ahorra en flechas lo paga en memoria. Si lo
+          que hay es una lista de prioridades que se revisa entera cada turno y que va a crecer, el árbol la
+          escribe tal cual, y la jerárquica es el punto intermedio mientras cada comportamiento quepa en un solo
+          grupo.
+        </p>
         <p>
           No son excluyentes, y en los juegos se mezclan: un estado de una máquina puede ejecutar un árbol, y
           una hoja de un árbol puede ser una pequeña máquina de estados que se acuerda de en qué fase está.
@@ -1243,7 +1847,7 @@
 
       <section id="java">
         <div class="sec-head">
-          <span class="num">10</span>
+          <span class="num">11</span>
           <h2 class="sec">Un árbol mínimo en Java</h2>
         </div>
         <p>
@@ -1475,7 +2079,7 @@
           del motor, la misma que pondríais en un <code>SimpleState</code>, así que <code>ChaseAction</code> y
           <code>RunAwayAction</code> del ejemplo se usan sin tocarlas. El segundo recibe una lambda que lee
           directamente vuestro <code>Input</code>. Y si la acción devuelve <code>null</code>, la hoja
-          <strong>falla</strong>: es la forma de decir «no he sabido decidir» y dejar que el selector de
+          <strong>falla</strong>: es la forma de decir "no he sabido decidir" y dejar que el selector de
           encima pruebe otra cosa.
         </p>
         <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.bt;
@@ -1514,7 +2118,7 @@
 
       <section id="controladores">
         <div class="sec-head">
-          <span class="num">11</span>
+          <span class="num">12</span>
           <h2 class="sec">Los fantasmas y Ms.&nbsp;Pac-Man con árboles</h2>
         </div>
         <h3 class="label">GhostsInput</h3>
@@ -1658,8 +2262,8 @@
         <h3 class="label">MsPacManInput y MsPacMan</h3>
         <p>
           El árbol de la <a href="#traza">traza</a>. El <code>Input</code> busca de una vez la píldora y la
-          píldora de poder más cercanas, el perseguidor más cercano —midiendo lo que tarda <em>él</em> en
-          llegar, sin darse la vuelta— y el comestible más cercano. Los campos son públicos para que las lambdas
+          píldora de poder más cercanas, el perseguidor más cercano (midiendo lo que tarda <em>él</em> en
+          llegar, sin darse la vuelta) y el comestible más cercano. Los campos son públicos para que las lambdas
           del árbol se lean sin una línea de <em>getters</em>.
         </p>
         <div class="codigo"><pre><code><span class="k">package</span> es.ucm.fdi.ici.c2627.practica2.grupoYY.mspacman;
@@ -1785,7 +2389,7 @@
 
       <section id="depurar">
         <div class="sec-head">
-          <span class="num">12</span>
+          <span class="num">13</span>
           <h2 class="sec">Depurar: el camino de cada tick</h2>
         </div>
         <p>
@@ -1838,7 +2442,7 @@ fantasma BLINKY  SUCCESS
           Imprimir cada tick de una partida entera son miles de líneas. Para verla de lejos, lo útil es
           quedarse con la <strong>rama de primer nivel que tuvo éxito</strong> en cada turno y agrupar los
           turnos seguidos. Así se encontró el parpadeo de la <a href="#tick">sección&nbsp;03</a>: un
-          controlador sano da tramos largos —52 turnos comiendo, 83 escapando, 53 comiendo, 156 cazando…— y
+          controlador sano da tramos largos (52 turnos comiendo, 83 escapando, 53 comiendo, 156 cazando…) y
           uno que parpadea da una ristra de tramos de un turno.
         </p>
         <div class="note tip">
@@ -1854,7 +2458,7 @@ fantasma BLINKY  SUCCESS
 
       <section id="errores">
         <div class="sec-head">
-          <span class="num">13</span>
+          <span class="num">14</span>
           <h2 class="sec">Errores típicos</h2>
         </div>
         <div class="table-scroll">
@@ -1910,7 +2514,7 @@ fantasma BLINKY  SUCCESS
               <tr>
                 <td>Traducir la máquina de estados copiando las transiciones como condiciones.</td>
                 <td>Guardas imposibles de leer que dependen de sucesos ya pasados.</td>
-                <td>Una guarda por estado, sacada de «cuándo debería estar aquí», y memoria para los sucesos.</td>
+                <td>Una guarda por estado, sacada de "cuándo debería estar aquí", y memoria para los sucesos.</td>
               </tr>
             </tbody>
           </table>
@@ -1939,6 +2543,7 @@ fantasma BLINKY  SUCCESS
             <li><a href="#traza">Un tick, paso a paso</a></li>
             <li><a href="#pizarra">La pizarra</a></li>
             <li><a href="#de-fsm">De la FSM al árbol</a></li>
+            <li><a href="#comparar">Tres formatos, dos ejemplos</a></li>
             <li><a href="#java">Un árbol en Java</a></li>
             <li><a href="#controladores">Fantasmas y Ms.&nbsp;Pac-Man</a></li>
             <li><a href="#depurar">Depurar</a></li>
@@ -1976,7 +2581,7 @@ fantasma BLINKY  SUCCESS
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 8 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
