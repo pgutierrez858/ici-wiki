@@ -61,9 +61,9 @@
     </h1>
     <p class="standfirst">
       El objetivo de esta práctica es implementar los comportamientos de Ms.&nbsp;Pac-Man y de los
-      fantasmas mediante <strong>máquinas de estados jerárquicas</strong>. Pero lo que de verdad se
-      evalúa no es la máquina que entreguéis al final: es <strong>cómo llegáis a ella</strong>. Un diseño
-      pensado antes de programar, unas versiones medidas una contra otra, y un diario corto que lo
+      fantasmas mediante <strong>máquinas de estados jerárquicas</strong>. En la nota pesa más
+      <strong>cómo llegáis</strong> a la máquina que la máquina que entreguéis al final: un diseño
+      pensado antes de programar, unas versiones medidas una contra otra y un diario corto que lo
       cuente.
     </p>
     <div class="byline">
@@ -219,8 +219,8 @@
           <div class="step-body">
             <h3 class="label">Las acciones</h3>
             <p>
-              Todo lo que queréis que sepa hacer cada personaje, con una frase por acción: «ir a la píldora
-              más cercana por un camino seguro», «ir al cruce al que va a llegar Ms.&nbsp;Pac-Man». Todavía
+              Todo lo que queréis que sepa hacer cada personaje, con una frase por acción: "ir a la píldora
+              más cercana por un camino seguro", "ir al cruce al que va a llegar Ms.&nbsp;Pac-Man". Todavía
               sin pensar cuándo. Las acciones son los verbos de la máquina, y si falta una, ningún diagrama
               lo arregla.
             </p>
@@ -232,8 +232,8 @@
             <h3 class="label">Las transiciones</h3>
             <p>
               Las condiciones que hacen cambiar de acción, cada una como algo que se pueda
-              <strong>calcular</strong>: no «hay un fantasma cerca», sino «algún fantasma no comestible está a
-              menos de 25 nodos por camino». Cada palabra vaga, un número. Y si una condición tiene ida y
+              <strong>calcular</strong>: no "hay un fantasma cerca", sino "algún fantasma no comestible está a
+              menos de 25 nodos por camino". Cada palabra vaga, un número. Y si una condición tiene ida y
               vuelta, dos números, uno para entrar y otro para salir: es la
               <a href="../guias/tema1/maquinas-estados.html#prioridades">histéresis</a> de los apuntes.
             </p>
@@ -247,8 +247,8 @@
               Ahora sí, el diagrama: los estados, las flechas con su transición, el estado inicial de cada
               máquina, en qué orden se miran las flechas que salen de un mismo estado, y qué estados se
               agrupan en un compuesto porque comparten salidas. Antes de darlo por bueno, pasadle la lista
-              <a href="../guias/tema1/maquinas-estados.html#disenar">«Antes de programar, comprobad el
-              diagrama»</a> de los apuntes.
+              <a href="../guias/tema1/maquinas-estados.html#disenar">"Antes de programar, comprobad el
+              diagrama"</a> de los apuntes.
             </p>
           </div>
         </div>
@@ -290,7 +290,7 @@
             <h3 class="label">v0: el diseño, tal cual</h3>
             <p>
               La primera versión implementa el diseño que enviasteis, con el <em>feedback</em> aplicado y
-              sin «mejoras» de por medio. Es vuestra línea base: todo lo que venga después se compara con
+              sin "mejoras" de por medio. Es vuestra línea base: todo lo que venga después se compara con
               ella.
             </p>
           </div>
@@ -303,8 +303,8 @@
               Al menos tres, y <strong>siempre los mismos</strong> de aquí al final, con las mismas partidas
               por rival: si cambiáis de rival a mitad, las versiones dejan de poder compararse. Buenos
               candidatos: los fantasmas o la Ms.&nbsp;Pac-Man de la <a href="practica-0.html">Práctica&nbsp;0</a>,
-              <strong>vuestros propios controladores de la Práctica&nbsp;1</strong> —¿juega mejor la máquina
-              que el código a mano?—, los de cursos anteriores y los de otros grupos, compilados. Todos
+              <strong>vuestros propios controladores de la Práctica&nbsp;1</strong> (¿juega mejor la máquina
+              que el código a mano?), los de cursos anteriores y los de otros grupos, compilados. Todos
               están en <a href="../guias/competicion.html#rivales">Contra quién probar</a>.
             </p>
           </div>
@@ -428,6 +428,12 @@ real   si |D| &gt; 2 · ET_D</code></pre>
           Y la regla de bolsillo, para hacerla de cabeza: <strong>creedla sólo si la diferencia pasa de
           3 veces el mayor de los dos errores típicos</strong>. Es un poco más exigente que la cuenta de
           arriba, así que por ahí no os vais a creer una mejora que no existe.
+        </p>
+        <p>
+          Tomad las dos cuentas como orientación: no se exigen en la entrega. La forma recomendada de comparar
+          dos versiones es jugarlas contra el mismo grupo fijo de rivales y con las mismas partidas, es decir,
+          con las mismas semillas. Eso lo hace el banco <code>Comparar</code>, que además saca la cuenta solo:
+          está en <a href="../guias/comparar-versiones.html">Comparar versiones</a>.
         </p>
         <p>
           Un ejemplo con números. La <code>v0</code> hace 1&#8239;830&nbsp;±&nbsp;39 puntos contra un rival y
@@ -598,11 +604,11 @@ rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre
         <ul class="check" data-guardar="p2-diseno">
           <li>Lista de acciones de Ms.&nbsp;Pac-Man, una frase cada una.</li>
           <li>Lista de acciones de los fantasmas, una frase cada una.</li>
-          <li>Cada transición es una condición que se calcula con el <code>Input</code>, con un número donde decía «cerca» o «lejos».</li>
+          <li>Cada transición es una condición que se calcula con el <code>Input</code>, con un número donde decía "cerca" o "lejos".</li>
           <li>Las condiciones de ida y vuelta tienen dos umbrales, uno para entrar y otro para salir.</li>
           <li>El diagrama: estados, flechas con su transición, estado inicial de cada máquina y orden de las flechas.</li>
           <li>Al menos 10 estados simples en cada comportamiento, sin contar los compuestos.</li>
-          <li>Pasada la lista «Antes de programar, comprobad el diagrama» de los apuntes.</li>
+          <li>Pasada la lista "Antes de programar, comprobad el diagrama" de los apuntes.</li>
           <li>El diario recoge las acciones, las transiciones y el diseño, con los <em>prompts</em> si hubo IA.</li>
           <li>Diseño y diario subidos al Campus Virtual.</li>
         </ul>
@@ -624,7 +630,7 @@ rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre
           <li>Si hubo IA, el <em>prompt</em> está en el diario, escrito con el cambio ya decidido.</li>
           <li>Versión nueva en su propia clase, sin tocar la anterior.</li>
           <li>Medida contra los mismos rivales, con las mismas partidas.</li>
-          <li>Comparada con la anterior: <code>D</code>, <code>ET_D</code> y si |<code>D</code>| &gt; 2 · <code>ET_D</code>.</li>
+          <li>Comparada con la anterior: <code>D</code> y <code>ET_D</code>, con |<code>D</code>| &gt; 2 · <code>ET_D</code> como orientación.</li>
           <li>Entrada del diario cerrada: se queda o se descarta, y por qué.</li>
         </ul>
 
@@ -739,7 +745,7 @@ rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

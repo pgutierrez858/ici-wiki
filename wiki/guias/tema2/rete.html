@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Rete · Tema 2 · ICI</title>
+<title>Rete · Tema 3 · ICI</title>
 <meta name="description" content="El algoritmo Rete explicado con dibujos: por qué comparar todas las reglas con todos los hechos en cada ciclo no escala, la red de nodos alfa y beta, un ejemplo interactivo que cuenta las comprobaciones, y lo que cuesta de verdad un turno del motor de la práctica.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,19 +51,19 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 2</a>
+    <a href="index.html">Temas 3 y 4</a>
     <span aria-hidden="true">/</span>
     <span>Rete</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 2 · 04 · Sistemas de reglas</p>
+    <p class="tema-when">Tema 3 · 04 · Sistemas de reglas</p>
     <h1>
       Rete: por qué el motor no se ahoga
       <span class="thin">En vez de que cada regla busque sus hechos, que cada hecho nuevo busque sus reglas.</span>
     </h1>
     <p class="standfirst">
-      Comparar todas las reglas con todos los hechos en cada vuelta del ciclo sale carísimo. Rete, el algoritmo que llevan dentro CLIPS, Jess y Drools, se ahorra casi todo ese trabajo con dos observaciones sencillas. Una red que podéis ver por dentro y una medida de lo que cuesta un turno de vuestro fantasma.
+      Comparar todas las reglas con todos los hechos en cada vuelta del ciclo sale carísimo. Rete, el algoritmo que llevan dentro CLIPS, Jess y Drools, se ahorra casi todo ese trabajo con dos observaciones sencillas. Aquí podéis ver la red por dentro y lo que cuesta un turno de vuestro fantasma.
     </p>
   </header>
 
@@ -104,7 +104,7 @@ y otra vez después de cada disparo</pre>
             "el fantasma no es comestible", no hace falta comprobarlo diez veces.</li>
         </ul>
         <p>
-          De ahí sale la idea que le da la vuelta al problema: <strong>en vez de que cada regla busque qué hechos la
+          De ahí sale la idea de Rete: <strong>en vez de que cada regla busque qué hechos la
           cumplen, cada hecho nuevo busca a qué reglas afecta</strong>, y el motor recuerda todo lo que ya había
           averiguado.
         </p>
@@ -157,7 +157,7 @@ y otra vez después de cada disparo</pre>
         </dl>
         <p>
           Cuando entra un hecho nuevo, sólo se hace el trabajo que ese hecho puede cambiar: pasar por los filtros alfa,
-          y en los cruces a los que llega, compararlo con lo que ya está guardado <em>al otro lado</em>. Nada más.
+          y en los cruces a los que llega, compararlo con lo que ya está guardado <em>al otro lado</em>.
           Cuando se retira un hecho, recorre el mismo camino borrando lo que había dejado. Esa es la redundancia
           temporal aprovechada: lo que se averiguó en vueltas anteriores está en las memorias y no se repite.
         </p>
@@ -238,13 +238,12 @@ margen                                     unas 800 veces</pre>
           <p>
             Rete es la razón de que los sistemas de reglas sean viables con miles de reglas, y la idea (no recalcular,
             propagar sólo lo que cambia) reaparece por todas partes: en las hojas de cálculo, en los sistemas de
-            compilación incremental y en cómo React decide qué partes de una página volver a pintar. Os la vais a
-            volver a encontrar.
+            compilación incremental y en cómo React decide qué partes de una página volver a pintar.
           </p>
         </div>
       </section>
 
-      <nav class="pager" aria-label="Páginas del tema 2">
+      <nav class="pager" aria-label="Páginas de los temas 3 y 4">
         <a class="pager-prev" href="conflictos.html"><span class="pager-l">Anterior</span><span class="pager-t">La agenda y los conflictos</span></a>
         <a class="pager-next" href="clips.html"><span class="pager-l">Siguiente</span><span class="pager-t">CLIPS y Jess</span></a>
       </nav>
@@ -262,7 +261,7 @@ margen                                     unas 800 veces</pre>
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 2</h2>
+          <h2 id="del-tema">Temas 3 y 4</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
@@ -293,7 +292,7 @@ margen                                     unas 800 veces</pre>
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

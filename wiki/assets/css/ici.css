@@ -2400,6 +2400,55 @@ figure.lab-uno { max-width: 17rem; }
 .bz-barra { display: inline-block; vertical-align: middle; height: .5rem; max-width: 3.5rem; margin-right: .4rem; background: var(--pill); outline: 1px solid var(--pill-ink); }
 .bz-grado { font-variant-numeric: tabular-nums; }
 
+/* Una relación construida con el mínimo, como tabla de cruce: los valores de
+   la fila a la izquierda, en azul; los de la columna arriba, en naranja; dentro,
+   el menor de los dos. Sin las mayúsculas de las cabeceras normales, que aquí
+   harían pasar los valores por títulos. */
+.table-scroll:has(> .tabla-min) { display: inline-block; max-width: 100%; vertical-align: top; }
+.tabla-min { min-width: 0; width: auto; font-variant-numeric: tabular-nums; }
+.tabla-min th, .tabla-min td { text-align: center; vertical-align: middle; padding: .45rem 1rem; border-bottom: 1px solid var(--line-soft); }
+.tabla-min th { font-family: var(--f-mono); font-size: .74rem; font-weight: 500; color: var(--ink-2); text-transform: none; letter-spacing: 0; }
+.tabla-min th b { display: block; margin-top: .1rem; font-size: .8rem; font-weight: 700; }
+.tabla-min .m-col { background: color-mix(in srgb, var(--clyde) 12%, var(--surface)); border-bottom: 2px solid var(--clyde); }
+.tabla-min .m-col b { color: var(--clyde); }
+.tabla-min .m-fila { background: var(--maze-soft); border-right: 2px solid var(--maze); text-align: left; }
+.tabla-min .m-fila b { color: var(--maze); }
+.tabla-min .esq { font-family: var(--f-mono); font-size: .7rem; color: var(--ink-3); border-right: 2px solid var(--maze); border-bottom: 2px solid var(--clyde); }
+.tabla-min td { font-family: var(--f-mono); font-size: .84rem; }
+.tabla-min .usa { box-shadow: inset 0 0 0 2px var(--pill-ink); }
+.tabla-min td.ej { background: var(--pill-soft); box-shadow: inset 0 0 0 2px var(--pill-ink); font-weight: 700; }
+
+/* La composición sup-min: las tablas en fila, la de la izquierda con su fila
+   marcada, la del medio con su columna, y en las dos el camino que gana. */
+.bz-comp { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem .7rem; padding: .8rem .9rem; }
+.bz-mat { min-width: 0; max-width: 100%; overflow-x: auto; }
+.bz-mat-nom { margin: 0 0 .25rem; font-family: var(--f-mono); font-size: .66rem; letter-spacing: .06em; color: var(--ink-2); max-width: none; }
+.bz-mat table { min-width: 0; width: auto; font-family: var(--f-mono); font-size: .74rem; background: var(--surface); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.bz-mat th, .bz-mat td { padding: .28rem .5rem; border-bottom: 1px solid var(--line-soft); text-align: center; white-space: nowrap; }
+.bz-mat thead th { font-weight: 500; color: var(--ink-2); text-transform: none; letter-spacing: 0; font-size: .74rem; }
+.bz-mat tbody th { font-weight: 500; text-align: left; color: var(--ink-2); }
+.bz-mat td.fila, .bz-mat td.col { background: color-mix(in srgb, var(--maze) 10%, var(--surface)); }
+.bz-mat td.mejor { background: var(--pill-soft); box-shadow: inset 0 0 0 1.5px var(--pill-ink); font-weight: 700; }
+.bz-mat td.sel { padding: 0; }
+.bz-mat td.fuera { color: var(--ink-3); }
+.bz-mat td.bz-hecho { font-weight: 700; border-right: 1px solid var(--line); }
+.bz-mat td.bz-dato { font-weight: 700; }
+.bz-mat td.bz-fria { color: var(--maze); background: var(--maze-soft); }
+.bz-mat td.bz-abierta { color: var(--clyde); background: color-mix(in srgb, var(--clyde) 12%, var(--surface)); }
+.bz-mat tr.bz-dato-fila th, .bz-mat tr.bz-dato-fila td { border-bottom: 1.5px solid var(--ink-3); }
+.bz-mat tr.bz-sup th, .bz-mat tr.bz-sup td { border-top: 1.5px solid var(--ink-3); font-weight: 700; color: var(--ink); }
+.bz-celda { font: inherit; color: var(--ink); background: none; border: 0; padding: .28rem .5rem; width: 100%; cursor: pointer; }
+.bz-celda:hover { background: var(--surface-2); }
+.bz-celda[aria-pressed="true"] { background: var(--pill); color: var(--ink); font-weight: 700; }
+.bz-celda:focus-visible { outline: 2px solid var(--maze); outline-offset: -2px; }
+.bz-op { font-family: var(--f-mono); font-size: 1.1rem; color: var(--ink-3); }
+.bz-par { display: flex; align-items: center; gap: .7rem; min-width: 0; }
+.bz-caminos { margin: 0; padding: .6rem .9rem; border-top: 1px solid var(--line-soft); background: var(--surface); font-size: .74rem; line-height: 1.7; overflow-x: auto; white-space: pre; font-variant-numeric: tabular-nums; }
+.bz-barras { max-width: 15rem; }
+.bz-barra-ab { fill: none; stroke: var(--maze); stroke-width: 1.4; stroke-dasharray: 3 2; }
+.bz-fulcro { fill: var(--blinky); }
+.bz-meseta { stroke: var(--blinky); stroke-width: 2.4; stroke-dasharray: 5 3; }
+
 @media (max-width: 560px) {
   .demo-campo input[type="range"] { width: 4.5rem; }
   .demo-bar { padding: .5rem .6rem; }

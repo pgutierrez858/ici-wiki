@@ -286,8 +286,8 @@
               </table>
             </div>
             <p>
-              O sea que <strong>la raíz no sale de ninguna parte especial</strong>: sale de que todo el
-              camino hay que hacerlo en varianzas, porque es lo único que se puede sumar, y al final hay que
+              O sea que la raíz sale de que <strong>todo el camino hay que hacerlo en
+              varianzas</strong>, porque es lo único que se puede sumar, y al final hay que
               volver. Y de ahí la consecuencia cara: como el error típico va con √<em>n</em>,
               <strong>partirlo por la mitad cuesta cuatro veces más partidas</strong>, y dividirlo por diez,
               cien veces más.
@@ -349,8 +349,7 @@
                 seguidas el <em>mismo</em> experimento de 100 partidas, meted las veinte medias en un
                 <code>Stats</code> como si cada una fuera una observación, y pedidle su desviación típica:
                 <strong>tiene que parecerse al error típico que os anunciaba cada tanda por
-                separado</strong>. Ahí está la demostración de que la división por √<em>n</em> dice la
-                verdad.
+                separado</strong>.
               </p>
               <pre><code>Stats resumen = <span class="k">new</span> Stats(<span class="s">"las 20 medias"</span>);
 
@@ -399,7 +398,7 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
                   <tr>
                     <td class="num-col">1</td>
                     <td><code>D = A − B</code></td>
-                    <td>Con <code>A</code> la media nueva y <code>B</code> la vieja. Lo que hay que medir no es ninguna de las dos por separado: es esta resta, que es una cantidad con su propia dispersión.</td>
+                    <td>Con <code>A</code> la media nueva y <code>B</code> la vieja. Lo que hay que medir es esta resta, que es una cantidad con su propia dispersión.</td>
                   </tr>
                   <tr>
                     <td class="num-col">2</td>
@@ -433,7 +432,7 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
               &nbsp;=&nbsp; √2 × 210 &nbsp;=&nbsp; <strong>297</strong>
             </div>
             <p>
-              Mirad el número, que es la mitad de la explicación: sumando los dos márgenes saldría 420, y el
+              Mirad el número: sumando los dos márgenes saldría 420, y el
               de verdad es <strong>297</strong>. Combinar dos errores independientes sale más barato que
               temerse lo peor. Y sí, la fórmula tiene la forma de la hipotenusa de un triángulo rectángulo y a
               mucha gente le sirve para acordarse, pero el motivo no tiene nada de geométrico: es,
@@ -475,7 +474,7 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
                 correlacionan un <strong>0,98</strong>. Quien puntúa más, varía más.
               </p>
               <p>
-                Y eso es justo lo que salva el atajo donde hace falta. Dos versiones que puntúan parecido
+                Y eso salva el atajo donde hace falta. Dos versiones que puntúan parecido
                 tienen errores típicos parecidos: entre los catorce primeros de aquella tabla, dos vecinos
                 nunca se separan más de un 23&#8239;%. Y cuando los errores típicos sí se separan de verdad
                 es porque las medias también lo han hecho, y entonces no hace falta ninguna prueba para ver
@@ -561,7 +560,7 @@ System.out.println(<span class="s">"Desviación típica de las 20 medias: "</spa
                   <tr><td class="num-col">100</td><td class="num-col">200</td><td class="num-col">600</td><td>El mínimo para trabajar.</td></tr>
                   <tr><td class="num-col">300</td><td class="num-col">115</td><td class="num-col">345</td><td>Lo que usa el concurso en cada casilla.</td></tr>
                   <tr><td class="num-col">1&#8239;000</td><td class="num-col">63</td><td class="num-col">190</td><td>Para afinar constantes al final.</td></tr>
-                  <tr><td class="num-col">3&#8239;900</td><td class="num-col">32</td><td class="num-col">96</td><td>Las que juega cada controlador en el concurso entero.</td></tr>
+                  <tr><td class="num-col">3&#8239;900</td><td class="num-col">32</td><td class="num-col">96</td><td>Las que jugaba cada controlador en el concurso entero el curso pasado, con trece grupos. Este curso han sido entre 4&#8239;200 y 5&#8239;100, y la mejora mínima sale parecida: unos 90 puntos.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -737,22 +736,26 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
           </p>
         </div>
         <div class="note trap">
-          <span class="note-label">2 · Una excepción no resta: repite la partida</span>
+          <span class="note-label">2 · Una excepción descalifica, aunque sea una</span>
           <p>
             Cuando vuestro controlador lanza una excepción, <code>runExperiment</code> la captura, imprime la
-            traza, <strong>descarta esa partida y la vuelve a jugar</strong> con otra semilla hasta completar
-            las 300. O sea que un fallo ocasional no baja la media (sólo cuentan las partidas que terminan),
-            pero un fallo <em>sistemático</em> deja al evaluador dando vueltas para siempre en esa casilla y
-            cuelga el concurso entero.
+            traza, descarta esa partida y la vuelve a jugar con otra semilla, así que la media no baja y es fácil
+            no enterarse.
+            En el concurso, desde la Práctica&nbsp;2, <strong>un controlador que lanza excepciones queda
+            descalificado</strong> aunque sólo falle en unas pocas partidas: se lleva 0 en su ranking y no
+            entra en la escala. Cuenta también lo que sólo falla cuando se juegan varias partidas a la vez,
+            como un atributo <code>static</code> que comparten todas. El otro controlador del grupo juega con
+            normalidad. Está en <a href="#punto-extra">la letra pequeña</a>.
           </p>
           <p>
             Antes de entregar: 300 partidas seguidas contra varios rivales, con la consola a la vista y sin
-            una sola traza. Si aparece una, es un <code>camino[0]</code> sin comprobar la longitud, o un
-            fantasma en la cárcel al que le habéis pedido la distancia.
+            una sola traza, y otra tanda con el evaluador en paralelo, que es como juega el concurso. Si
+            aparece una, es un <code>camino[0]</code> sin comprobar la longitud, un fantasma en la cárcel al
+            que le habéis pedido la distancia o algo guardado en <code>static</code>.
           </p>
         </div>
         <div class="note trap">
-          <span class="note-label">3 · No se juega contra el rival, se juega contra el juego</span>
+          <span class="note-label">3 · Jugar igual contra cualquier rival</span>
           <p>
             Antes de cada partida el motor llama a <code>preCompute(String opponent)</code> y os pasa
             <strong>el nombre de la clase del rival</strong>. Está ahí por la Práctica&nbsp;6, donde hace
@@ -802,8 +805,8 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
               La puntuación de una <strong>Ms.&nbsp;Pac-Man</strong> es la media de su fila: lo que saca, de
               media, contra los fantasmas de todo el curso. La de unos <strong>fantasmas</strong> es la media
               de su columna: lo que dejan sacar, de media, a las Ms.&nbsp;Pac-Man de todo el curso. Como
-              todas las casillas tienen las mismas 300 partidas, es exactamente la media de las 3&#8239;900
-              partidas de ese controlador.
+              todas las casillas tienen las mismas 300 partidas, es exactamente la media de todas las
+              partidas de ese controlador (3&#8239;900 con trece grupos, 5&#8239;100 en la Práctica&nbsp;1 de este curso).
             </p>
           </div>
         </div>
@@ -824,7 +827,7 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
           <p>
             Porque todos juegan contra exactamente el mismo campo. Si a alguien le tocan fantasmas duros,
             le tocan a todos; si un grupo entrega unos fantasmas que no persiguen, ese regalo se lo reparten
-            las trece Ms.&nbsp;Pac-Man por igual. Con la matriz completa, la media de la fila es una
+            todas las Ms.&nbsp;Pac-Man por igual. Con la matriz completa, la media de la fila es una
             comparación limpia y no hace falta corregir nada.
           </p>
         </div>
@@ -889,8 +892,8 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
           <p>
             Comparad las dos tablas. Los <strong>segundos</strong> fantasmas se llevan el medio punto entero
             porque quedaron a quince puntos del primero: en la práctica empataron. La <strong>segunda</strong>
-            Ms.&nbsp;Pac-Man se lleva 0,19 porque la primera le sacó casi el doble. No es una nota por
-            posición en la lista, es una nota por lo cerca que quedasteis del mejor, y eso es deliberado:
+            Ms.&nbsp;Pac-Man se lleva 0,19 porque la primera le sacó casi el doble. La nota va por lo cerca
+            que quedasteis del mejor, y eso es deliberado:
             quedar segundo a un palmo vale casi tanto como ganar, y quedar segundo a media tabla de
             distancia, no.
           </p>
@@ -1043,12 +1046,12 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
     GameView.addLines (game, Color.CYAN,   miNodo, nodoDelFantasmaQueMePreocupa);
 }</code></pre></div>
         <p>
-          Lo importante no es pintar el camino bueno: es pintar <strong>lo que has descartado</strong>. Un
+          Lo importante no es pintar el camino bueno: es pintar <strong>lo que el controlador ha descartado</strong>. Un
           controlador que se queda encerrado sin motivo aparente os lo explica solo en cuanto veis de rojo los
           tres tramos que ha dado por cerrados.
         </p>
         <div class="note trap">
-          <span class="note-label">Dejarlo encendido tumba la corrección, y no es una exageración</span>
+          <span class="note-label">Dejarlo encendido tumba la corrección</span>
           <p>
             <code>GameView.addPoints</code> y <code>addLines</code> no dibujan: <strong>apuntan</strong> lo que
             hay que dibujar en dos listas <code>static</code>, y el motor las vacía al repintar la ventana. En
@@ -1267,7 +1270,7 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

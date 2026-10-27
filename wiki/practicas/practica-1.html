@@ -123,8 +123,8 @@
         <p>
           Siendo una primera aproximación al diseño de los comportamientos, no se espera una implementación
           exhaustiva. Por eso se fija un <strong>máximo de 500 líneas de código por cada
-          comportamiento</strong>. El límite no está para castigar: está para que la solución tenga que ser
-          <em>elegida</em> en vez de acumulada, que es exactamente la habilidad que se evalúa.
+          comportamiento</strong>. Con ese límite la solución tiene que ser <em>elegida</em> en vez de
+          acumulada, que es exactamente la habilidad que se evalúa.
         </p>
         <div class="note trap">
           <span class="note-label">Nada de aprendizaje ni de persistencia</span>
@@ -135,15 +135,15 @@
             <code>Game</code> que recibe en ese turno y de lo que tú hayas escrito a mano.
           </p>
           <p>
-            Guardar estado <em>dentro</em> de la partida sí vale: el último movimiento, un contador, un objetivo
-            que estás siguiendo: eso no es aprender, es recordar.
+            Guardar estado <em>dentro</em> de la partida sí vale (el último movimiento, un contador, un
+            objetivo que estás siguiendo): eso no es aprender, es recordar.
           </p>
         </div>
         <div class="note tip">
           <span class="note-label">Antes de empezar</span>
           <p>
             Lee los apuntes del tema:
-            <a href="../guias/tema1/index.html"><strong>Tema 1 · IA para videojuegos</strong></a>. Están
+            <a href="../guias/tema1/index.html"><strong>Tema 2 · IA para videojuegos</strong></a>. Están
             escritos para esta práctica, y las páginas de
             <a href="../guias/tema1/astar-mspacman.html">A* en Ms.&nbsp;Pac-Man</a> y de
             <a href="../guias/tema1/estrategias.html">estrategias algorítmicas</a> son directamente el
@@ -179,9 +179,8 @@
         </p>
         <h3 class="label">El presupuesto de 40 ms, con precisión</h3>
         <p>
-          Esto genera bastante confusión, así que conviene dejarlo claro de una vez, porque cambia lo que
-          tiene sentido programar. <strong>Hay dos formas muy distintas de ejecutar una partida</strong>, y
-          el reloj sólo existe en una de ellas.
+          <strong>Hay dos formas muy distintas de ejecutar una partida</strong>, y el reloj sólo existe en
+          una de ellas. Saber en cuál estás cambia lo que tiene sentido programar.
         </p>
         <div class="table-scroll">
           <table>
@@ -235,7 +234,7 @@
         </p>
         <ol>
           <li>Si el movimiento es <strong>legal</strong> en ese nodo y no es dar media vuelta, se usa.</li>
-          <li>Si no lo es —<code>null</code>, ilegal, o un giro de 180°—, <strong>se sigue en la dirección que llevabas</strong>.</li>
+          <li>Si no lo es (<code>null</code>, ilegal o un giro de 180°), <strong>se sigue en la dirección que llevabas</strong>.</li>
           <li>Si tampoco se puede seguir recto, el motor elige por ti cualquier salida legal que no sea retroceder.</li>
           <li>Y si no hay ninguna, <code>NEUTRAL</code>: te quedas quieto.</li>
         </ol>
@@ -253,14 +252,14 @@
             única excepción del juego es el fantasma al que le cae encima una píldora de poder.
           </p>
           <p>
-            La segunda: en un cruce, <strong>«no decidir» no es neutral</strong>. Es «sigo recto», que es una
+            La segunda: en un cruce, <strong>"no decidir" no es neutral</strong>. Es "sigo recto", que es una
             de las opciones, y muchas veces la mala.
           </p>
         </div>
 
         <h3 class="label">Sí, puedes gastar 200 ms en un cruce</h3>
         <p>
-          Que es justo lo que hay que hacer. El trabajo no está repartido por igual entre los 4000 turnos:
+          El trabajo no está repartido por igual entre los 4000 turnos:
           en un pasillo no hay nada que decidir y en un cruce hay que decidirlo todo. Así que concentra el
           presupuesto donde sirve:
         </p>
@@ -274,18 +273,26 @@
         </figure>
         <p>
           En el modo con el que se corrige eso es legal y no cuesta nada más que reloj. Lo único que se paga
-          es el tiempo de la corrección, y conviene no olvidarlo: como en un laberinto sólo uno de cada diez
-          turnos es un cruce, un controlador que gaste 200&nbsp;ms en cada decisión convierte una partida de
-          4000 turnos en un minuto y medio largo, y la corrección son muchas partidas. Con 20&nbsp;ms por
-          cruce ni se nota.
+          es el tiempo de la corrección, y conviene no olvidarlo: en una partida Ms.&nbsp;Pac-Man pisa un cruce
+          más o menos uno de cada veinte turnos, y un controlador que gaste 200&nbsp;ms en cada decisión
+          alarga así una partida de 4000 turnos:
+        </p>
+        <figure>
+          <figcaption>Cuánto reloj cuesta</figcaption>
+          <pre class="pseudo">4000 turnos / 20 = 200 cruces
+200 cruces × 200 ms = 40 000 ms
+40 000 ms = 40 s por partida</pre>
+        </figure>
+        <p>
+          Y la corrección son muchas partidas. Con 20&nbsp;ms por cruce ni se nota.
         </p>
         <div class="note tip">
           <span class="note-label">Y si además quieres que aguante el modo con reloj</span>
           <p>
             La clase <code>Controller</code> te deja el campo <code>lastMove</code> como
             <code>protected</code>, y el comentario del propio motor dice para qué:
-            <em lang="en">«You can set this directly in your getMove() method to save an immediate
-            response»</em>. Es el patrón <em lang="en">anytime</em> del que habla el tema 5: apunta enseguida
+            <em lang="en">"You can set this directly in your getMove() method to save an immediate
+            response"</em>. Es el patrón <em lang="en">anytime</em> del que habla el tema 5: apunta enseguida
             un movimiento decente, sigue calculando, y ve mejorándolo.
           </p>
 <pre><code><span class="c">@Override</span>
@@ -361,7 +368,7 @@
           <h2 class="sec">Qué se espera: el repertorio</h2>
         </div>
         <p>
-          Esta es la parte que el enunciado clásico no decía, y conviene decirla. No se trata de encadenar
+          No se trata de encadenar
           condicionales sobre <code>getShortestPathDistance</code> hasta que la cosa más o menos funcione.
           Lo que distingue una práctica notable de una de sobresaliente es <strong>qué preguntas se hace el
           controlador antes de decidir</strong>, y son estas.
@@ -385,7 +392,7 @@
                 <td>Recorrer el pasillo hasta el siguiente cruce anotando lo que hay por él (píldoras, píldora de poder, fantasmas) en vez de mirar nodo a nodo.</td>
               </tr>
               <tr>
-                <td><strong>«¿Llego yo antes?»</strong></td>
+                <td><strong>"¿Llego yo antes?"</strong></td>
                 <td>Comparar tu distancia a un cruce con la de cada fantasma <em>a ese mismo cruce</em>, con un margen. Es la diferencia entre huir y ponerse a salvo.</td>
               </tr>
               <tr>
@@ -567,7 +574,7 @@
         <div class="note mine">
           <span class="note-label">Los umbrales, en un sitio</span>
           <p>
-            Todos los números que aparecen en este enunciado (cuándo está «cerca» un fantasma, cuántos
+            Todos los números que aparecen en este enunciado (cuándo está "cerca" un fantasma, cuántos
             hacen falta para ir a por la píldora, cuánta holgura se deja al comparar distancias) son
             decisiones de diseño que hay que <strong>afinar jugando</strong>. Sácalos a una clase de
             constantes con nombres y un comentario cada uno. Se nota en la nota de calidad de código, y
@@ -616,7 +623,7 @@
           <p>
             Entre la mejor Ms.&nbsp;Pac-Man y la peor hay un factor de <strong>casi cuatro</strong>; entre los
             mejores fantasmas y los peores, de <strong>menos de dos</strong>. Unos fantasmas decentes salen
-            con poco esfuerzo —perseguir ya funciona— y una Ms.&nbsp;Pac-Man decente no. Ahí es donde se
+            con poco esfuerzo (perseguir ya funciona) y una Ms.&nbsp;Pac-Man decente no. Ahí es donde se
             separan las notas, y es donde conviene gastar las tardes.
           </p>
           <p>
@@ -649,7 +656,7 @@
               </tr>
               <tr>
                 <td><strong>Mapa de costes sobre el laberinto</strong></td>
-                <td>Repartir un coste por nodo —caro alrededor de un perseguidor, barato alrededor de la comida y de los fantasmas comestibles, y la píldora de poder cara o barata según haga falta— y dejar que una búsqueda de coste mínimo decida sola. La decisión deja de ser un <code>if</code> y pasa a ser el mapa.</td>
+                <td>Repartir un coste por nodo (caro alrededor de un perseguidor, barato alrededor de la comida y de los fantasmas comestibles, y la píldora de poder cara o barata según haga falta) y dejar que una búsqueda de coste mínimo decida sola. La decisión deja de ser un <code>if</code> y pasa a ser el mapa.</td>
               </tr>
               <tr>
                 <td><strong>Juzgar el camino, no el destino</strong></td>
@@ -694,7 +701,7 @@
               </tr>
               <tr>
                 <td><strong>Papeles como puestos, no como identidades</strong></td>
-                <td>El papel de «cazador» no es de Blinky: es del fantasma que ahora mismo esté más cerca. Reasignarlos cada turno, con un cupo máximo por papel, hace que la formación se mantenga aunque los fantasmas se mezclen.</td>
+                <td>El papel de "cazador" no es de Blinky: es del fantasma que ahora mismo esté más cerca. Reasignarlos cada turno, con un cupo máximo por papel, hace que la formación se mantenga aunque los fantasmas se mezclen.</td>
               </tr>
               <tr>
                 <td><strong>Repartirse los cruces</strong></td>
@@ -759,7 +766,7 @@
               </tr>
               <tr>
                 <td><strong>Medir sin el último movimiento</strong></td>
-                <td>La distancia sin <code>lastMove</code> deja que el fantasma se dé la vuelta, que es justo lo que no puede hacer. Sale un «llego antes» que es mentira, y se paga en los cruces.</td>
+                <td>La distancia sin <code>lastMove</code> deja que el fantasma se dé la vuelta, que es justo lo que no puede hacer. Sale un "llego antes" que es mentira, y se paga en los cruces.</td>
               </tr>
               <tr>
                 <td><strong>Dejar la depuración encendida</strong></td>
@@ -775,7 +782,7 @@
               </tr>
               <tr>
                 <td><strong>No mirar nunca el tiempo comestible</strong></td>
-                <td>Ni para dejar de perseguir a un fantasma que va a dejar de serlo por el camino, ni —del otro lado— para dejar de huir cuando ya no hace falta.</td>
+                <td>Ni para dejar de perseguir a un fantasma que va a dejar de serlo por el camino, ni, del otro lado, para dejar de huir cuando ya no hace falta.</td>
               </tr>
             </tbody>
           </table>
@@ -814,8 +821,8 @@
             <h3 class="label">Una técnica cada vez</h3>
             <p>
               Meted <strong>una sola</strong> de las técnicas de la sección anterior, volved a medir, y
-              quedáosla sólo si la media sube. Suena lento y es lo contrario: evita las tardes enteras
-              persiguiendo una mejora que en realidad era ruido de una partida.
+              quedáosla sólo si la media sube. Suena lento, pero os ahorra tardes enteras persiguiendo
+              una mejora que en realidad era ruido de una partida.
             </p>
           </div>
         </div>
@@ -825,8 +832,8 @@
             <h3 class="label">Mirar, no suponer</h3>
             <p>
               Cuando algo vaya mal, poned el <code>DEBUG</code> a <code>true</code> y ved la partida
-              despacio, con <code>runGame(pacman, ghosts, 60)</code>. Los errores de la función «¿llego yo
-              antes?» son invisibles en el código y obvios en pantalla.
+              despacio, con <code>runGame(pacman, ghosts, 60)</code>. Los errores de la función "¿llego yo
+              antes?" son invisibles en el código y obvios en pantalla.
             </p>
           </div>
         </div>
@@ -972,7 +979,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

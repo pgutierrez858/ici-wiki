@@ -71,9 +71,9 @@
     <main>
 
       <p>
-        Esta página da por leídas dos de los apuntes: <a href="tema2/clips.html">CLIPS y Jess</a>, para la
+        Antes de esta guía, leed dos páginas de los apuntes: <a href="tema2/clips.html">CLIPS y Jess</a>, para la
         sintaxis, y <a href="tema2/reglas-mspacman.html">Reglas en Ms.&nbsp;Pac-Man</a>, para el paquete
-        <code>rules</code> del motor. Aquí no se explica qué es un <code>RulesInput</code>: se usa.
+        <code>rules</code> del motor. Aquí se usa <code>RulesInput</code> sin volver a explicar qué es.
       </p>
 
       <section id="proyecto">
@@ -472,8 +472,8 @@
             <p>
               <strong>Al medirla:</strong> tampoco se nota, y la <a href="depurar-reglas.html#resumen">traza</a> dice
               por qué: en tres partidas contra los agresivos se dispara 40 veces, frente a las 7&#8239;260 de
-              <code>huir</code>. Una regla que casi nunca se cumple no puede cambiar mucho, por buena idea que sea.
-              Antes de darle vueltas a si está bien, hay que mirar si se dispara.
+              <code>huir</code>. Una regla que casi nunca se cumple no puede cambiar mucho, por buena idea que sea,
+              así que antes de darle vueltas a si está bien, mirad si se dispara.
             </p>
           </div>
         </div>
@@ -547,9 +547,8 @@ FIRE 3 MAIN::comer f-1</code></pre>
    (assert (ACTION (id perseguir) (fantasma ?g) (priority 85)
                    (info (str-cat "R7: rematar a " ?g)))))</code></pre>
             <p>
-              La idea parece buena: con un comestible a menos de 10 nodos, comérselo vale más que huir. Su
-              <code>priority 85</code> la deja entre <code>huir</code> (80) y <code>aLaPPill</code> (90), que es
-              justo lo que dice esa frase.
+              La idea parece buena: con un comestible a menos de 10 nodos, comérselo vale más que huir. Por eso
+              lleva <code>priority 85</code>, entre <code>huir</code> (80) y <code>aLaPPill</code> (90).
             </p>
             <p>
               <strong>Al medirla:</strong> no cambia nada, ni repitiendo la medida con otras partidas. Así que
@@ -750,7 +749,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
           <h2 class="sec">Seguir con Ms.&nbsp;Pac-Man</h2>
         </div>
         <p>
-          Siete reglas, y tres de ellas no se notan: este controlador es un punto de partida, no una solución. Si
+          Siete reglas, y tres de ellas no se notan: este controlador es sólo un punto de partida. Si
           lo veis jugar un rato con <code>VerPartida</code>, sus fallos saltan a la vista:
         </p>
         <div class="table-scroll">
@@ -820,15 +819,15 @@ FIRE 3 MAIN::comer f-1</code></pre>
           </li>
           <li>
             <strong>Y cada versión, medida.</strong> Un cambio por versión, contra los mismos rivales, como en la
-            Práctica&nbsp;2. Ya habéis visto en la tabla de arriba cuántas ideas buenas no se notan.
+            Práctica&nbsp;2. Ya habéis visto en los siete pasos cuántas ideas buenas no se notan.
           </li>
         </ul>
         <div class="note mine">
           <span class="note-label">Qué hace que una base de reglas sea más rica</span>
           <p>
             Para llegar a las 15 reglas que pide la práctica no sirve copiar una regla cambiando el número. Lo que
-            de verdad usa lo que tiene un sistema de reglas, y lo que más se nota al leerlo, son las cosas que han
-            ido apareciendo en esta página: hechos intermedios que encadenan reglas, memoria entre turnos,
+            aprovecha un sistema de reglas, y lo que más se nota al leer la base, son las cosas que han ido
+            apareciendo en esta página: hechos intermedios que encadenan reglas, memoria entre turnos,
             <code>not</code>, variables que relacionan varios hechos, acciones con parámetros y
             <code>salience</code> sólo donde hace falta y con su porqué.
           </p>
@@ -1008,7 +1007,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>A* en Ms. Pac-Man · Tema 1 · ICI</title>
+<title>A* en Ms. Pac-Man · Tema 2 · ICI</title>
 <meta name="description" content="Las distancias y los caminos del laberinto vienen precalculados. Aquí está qué método usar para cada cosa, por qué la versión sin lastMove miente, y cómo pasar de una distancia a un movimiento.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 1</a>
+    <a href="index.html">Tema 2</a>
     <span aria-hidden="true">/</span>
     <span>A* en Ms.&nbsp;Pac-Man</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 1 · 04 · Buscar caminos</p>
+    <p class="tema-when">Tema 2 · 04 · Buscar caminos</p>
     <h1>
       A* en Ms.&nbsp;Pac-Man
       <span class="thin">Lo que el motor ya trae hecho, y la trampa de darse la vuelta.</span>
@@ -76,8 +76,7 @@
           <h2 class="sec">A* en Ms. Pac-Man: ya está hecho</h2>
         </div>
         <p>
-          Esta es la parte que cambia la práctica. En el simulador, el
-          <strong>A* está precalculado</strong>. El laberinto no cambia nunca, así que al cargarlo el motor
+          En el simulador, el <strong>A* está precalculado</strong>, y eso cambia la práctica. El laberinto no cambia nunca, así que al cargarlo el motor
           computa de una vez todas las distancias entre todos los pares de nodos y las guarda en una tabla.
           Preguntar por una distancia es leer una posición de un <em>array</em>.
         </p>
@@ -163,7 +162,7 @@ open.add(start);
 
         <h3 class="label">De la distancia al movimiento</h3>
         <p>
-          El motor no sólo te da caminos: te da directamente el siguiente movimiento. Y la implementación es
+          Además de caminos, el motor te da directamente el siguiente movimiento. Y la implementación es
           tan corta que conviene verla, porque explica sus dos defectos:
         </p>
         <div class="codigo"><pre><code><span class="c">// pacman.game.Game</span>
@@ -183,11 +182,13 @@ open.add(start);
         <ul>
           <li>
             Es <strong>voraz de un solo paso</strong>: mira los vecinos, se queda con el que está más cerca
-            del objetivo, y ya. No hay búsqueda, no hay plan, no hay memoria.
+            del objetivo, y ya, sin buscar más allá ni recordar nada.
           </li>
           <li>
-            Y en la versión <code>getApproximateNextMove…</code>, que es idéntica salvo que recorre
-            <code>allNeighbourhoods.get(lastMoveMade)</code>, se descarta además el vecino del que vienes.
+            Y <strong>no sabe por dónde vienes</strong>: recorre todos los vecinos, también el del que
+            vienes, así que puede proponerte dar la vuelta. La versión <code>getApproximateNextMove…</code>,
+            idéntica salvo que recorre <code>allNeighbourhoods.get(lastMoveMade)</code>, descarta ese vecino,
+            pero sigue midiendo con una distancia que no sabe por dónde has llegado.
           </li>
         </ul>
         <div class="table-scroll">
@@ -208,7 +209,7 @@ open.add(start);
         </p>
       </section>
 
-      <nav class="pager" aria-label="Páginas del tema 1">
+      <nav class="pager" aria-label="Páginas del tema 2">
         <a class="pager-prev" href="astar.html"><span class="pager-l">Anterior</span><span class="pager-t">Heurísticas y A*</span></a>
         <a class="pager-next" href="estrategias.html"><span class="pager-l">Siguiente</span><span class="pager-t">Estrategias algorítmicas</span></a>
       </nav>
@@ -224,7 +225,7 @@ open.add(start);
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 1</h2>
+          <h2 id="del-tema">Tema 2</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
@@ -254,7 +255,7 @@ open.add(start);
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

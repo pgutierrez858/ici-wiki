@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Qué es un sistema de reglas · Tema 2 · ICI</title>
+<title>Qué es un sistema de reglas · Tema 3 · ICI</title>
 <meta name="description" content="Qué es un sistema de reglas: memoria de trabajo, base de reglas y motor de inferencia; el ciclo reconocer, resolver y actuar; por qué las reglas sólo se hablan a través de los hechos; y dónde se usan, de los sistemas expertos a los videojuegos.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 2</a>
+    <a href="index.html">Temas 3 y 4</a>
     <span aria-hidden="true">/</span>
     <span>Qué es un sistema de reglas</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 2 · 01 · Sistemas de reglas</p>
+    <p class="tema-when">Tema 3 · 01 · Sistemas de reglas</p>
     <h1>
       Qué es un sistema de reglas
       <span class="thin">Escribir lo que se sabe en piezas sueltas, y dejar que un motor decida cuáles tocan.</span>
@@ -103,7 +103,7 @@
 <b>regla</b> perseguir           <b>si</b> no soy comestible                            <b>entonces</b> perseguir <i>(prioridad 10)</i></pre>
         </figure>
         <p>
-          Parece lo mismo con otras palabras, pero hay tres diferencias que lo cambian todo:
+          Parece lo mismo con otras palabras, pero hay tres diferencias:
         </p>
         <ol>
           <li>
@@ -209,8 +209,8 @@
           <div><dt>Motor de inferencia</dt><dd>El programa que junta las dos cosas. Ya está escrito y probado (en la práctica es Jess) y vosotros no lo tocáis: sólo le dais hechos y reglas.</dd></div>
         </dl>
         <p>
-          La separación es la idea del curso entero, llevada al extremo: <strong>el conocimiento por un lado y el
-          mecanismo por otro</strong>. En la máquina de estados el mecanismo era vuestro <code>FSM.run</code>, con
+          Separar <strong>el conocimiento por un lado y el mecanismo por otro</strong> es lo que venimos haciendo
+          todo el curso, y aquí se lleva más lejos. En la máquina de estados el mecanismo era vuestro <code>FSM.run</code>, con
           el orden de las transiciones; aquí ni siquiera decidís el orden. Y por eso un experto que no programa
           puede leer, y a veces escribir, la base de reglas.
         </p>
@@ -327,7 +327,7 @@
           trampas, y están en <a href="conflictos.html#refraccion">la página de la agenda</a>.
         </p>
         <p>
-          Es el mismo esquema que el bucle de búsqueda del <a href="../tema1/busqueda.html">tema&nbsp;1</a>: allí
+          Es el mismo esquema que el bucle de búsqueda del <a href="../tema1/busqueda.html">tema&nbsp;2</a>: allí
           había una <em>frontera</em> de nodos pendientes y una regla para sacar el siguiente; aquí hay una
           <em>agenda</em> de reglas pendientes y una estrategia para elegir la siguiente. Lo cuenta la
           <a href="encadenamiento.html">página siguiente</a> con un ejemplo que podéis seguir paso a paso.
@@ -341,8 +341,8 @@
         </div>
         <p>
           Una regla no puede llamar a otra, ni saber que existe. La única forma que tiene una regla de influir en
-          otra es <strong>escribir un hecho</strong> que la otra lea. Parece una limitación, y es justo lo que hace
-          que se puedan añadir y quitar reglas sin romper nada. Y permite algo que ni la máquina de estados ni la
+          otra es <strong>escribir un hecho</strong> que la otra lea. Gracias a eso se pueden añadir y quitar
+          reglas sin romper nada. Y permite algo que ni la máquina de estados ni la
           cadena de <code>if</code> hacían con naturalidad: <strong>razonar por capas</strong>, deduciendo
           conceptos intermedios que luego usan otras reglas.
         </p>
@@ -428,7 +428,7 @@
           seiscientas reglas, y lo hacía tan bien como los especialistas en las pruebas de la época. Nunca se usó
           con pacientes, entre otras cosas porque nadie sabía de quién era la culpa si se equivocaba. <strong>XCON</strong>
           sí trabajó de verdad: configuraba los pedidos de ordenadores VAX de Digital y le ahorraba a la empresa
-          millones al año. Con él llegó el problema que todavía define estos sistemas: con miles de reglas,
+          millones al año. Con él llegó el problema que estos sistemas siguen teniendo hoy: con miles de reglas,
           <strong>mantenerlas</strong> era más caro que escribirlas.
         </p>
         <p>
@@ -553,7 +553,7 @@
         </div>
       </section>
 
-      <nav class="pager" aria-label="Páginas del tema 2">
+      <nav class="pager" aria-label="Páginas de los temas 3 y 4">
         <a class="pager-prev" href="index.html"><span class="pager-l">Anterior</span><span class="pager-t">Índice del tema</span></a>
         <a class="pager-next" href="encadenamiento.html"><span class="pager-l">Siguiente</span><span class="pager-t">Encadenar reglas</span></a>
       </nav>
@@ -574,7 +574,7 @@
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 2</h2>
+          <h2 id="del-tema">Temas 3 y 4</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="que-es.html" aria-current="page"><span>01</span>Qué es un sistema de reglas</a></li>
@@ -605,7 +605,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

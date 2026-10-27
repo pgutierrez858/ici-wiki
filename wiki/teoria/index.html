@@ -58,7 +58,7 @@
       <span class="thin">Los temas del curso y el vocabulario de cada uno.</span>
     </h1>
     <p class="standfirst">
-      Esta página funciona como mapa: por cada tema, para qué sirve, a qué práctica va asociado y los
+      Esta página es un mapa: por cada tema, para qué sirve, a qué práctica va asociado y los
       conceptos que hay que tener claros, definidos en una línea. El desarrollo completo de cada concepto se
       publica en esta sección junto con la práctica que lo usa.
     </p>
@@ -76,7 +76,7 @@
           <a href="../practicas/practica-0.html">Práctica 0 · Tutorial</a> · 7&#8239;–&#8239;20 sep
         </p>
         <p>
-          El tema que sostiene todos los demás. Un sistema basado en conocimiento separa lo que el sistema
+          Es el tema en el que se apoyan todos los demás. Un sistema basado en conocimiento separa lo que el sistema
           <em>sabe</em> de lo que el sistema <em>hace</em> con lo que sabe: la base de conocimiento por un
           lado, el motor que razona sobre ella por otro. Toda la asignatura consiste en decidir qué va en la
           base de conocimiento y en qué formato.
@@ -117,7 +117,7 @@
           <div><dt>Comportamiento de dirección</dt><dd>Regla local de movimiento (perseguir, huir, interceptar, patrullar) que se calcula cada tick a partir del estado.</dd></div>
           <div><dt>Toma de decisiones</dt><dd>Elegir <em>qué</em> hacer, en un nivel por encima de <em>cómo</em> moverse: la decisión escoge el comportamiento, el comportamiento escoge la dirección.</dd></div>
           <div><dt>Máquina de estados finita (FSM)</dt><dd>Conjunto de estados, uno activo cada vez, y transiciones etiquetadas con la condición que las dispara. Cada estado encapsula un comportamiento.</dd></div>
-          <div><dt>Transición</dt><dd>Condición sobre el estado del juego que hace pasar de un estado a otro: «fantasma cerca y no comestible», «se acabó el tiempo de píldora».</dd></div>
+          <div><dt>Transición</dt><dd>Condición sobre el estado del juego que hace pasar de un estado a otro: "fantasma cerca y no comestible", "se acabó el tiempo de píldora".</dd></div>
           <div><dt>FSM jerárquica</dt><dd>Estados que contienen máquinas de estados. Evita la explosión de transiciones cuando el número de estados crece.</dd></div>
           <div><dt>Histéresis</dt><dd>Margen deliberado entre la condición que entra a un estado y la que sale de él, para que el personaje no oscile entre dos estados en ticks consecutivos.</dd></div>
           <div><dt>Coordinación</dt><dd>Los cuatro fantasmas son cuatro agentes con un objetivo común: repartirse cuadrantes, cortar escapatorias, no perseguir todos lo mismo.</dd></div>
@@ -130,12 +130,12 @@
           <h2 class="sec">Sistemas de reglas</h2>
         </div>
         <p class="tema-when">
-          <a href="../practicas/index.html#bloques">Práctica 3</a> · 19 oct&#8239;–&#8239;1 nov
+          <a href="../practicas/practica-3.html">Práctica 3 · Sistemas de reglas</a> · 19 oct&#8239;–&#8239;1 nov
         </p>
         <p>
           Conocimiento declarativo: en vez de escribir el orden en que se comprueban las cosas, escribes
           las reglas y el motor decide cuáles se aplican. Se gana legibilidad y se pierde el control del
-          flujo, que es exactamente el intercambio que hay que entender.
+          flujo, y ese intercambio es lo que hay que entender.
         </p>
         <figure class="wide">
           <figcaption>Jess disparando reglas mientras se juega la partida</figcaption>
@@ -163,20 +163,20 @@
           <a href="../practicas/index.html#bloques">Práctica 4</a> · 2&#8239;–&#8239;15 nov
         </p>
         <p>
-          «El fantasma está cerca» no es verdadero ni falso: es verdadero en cierto grado. La lógica
+          "El fantasma está cerca" no es verdadero ni falso: es verdadero en cierto grado. La lógica
           borrosa permite escribir reglas con el vocabulario con el que de verdad piensa un jugador y
           obtener decisiones suaves en vez de saltos bruscos en un umbral.
         </p>
         <figure class="wide">
           <figcaption>Las reglas borrosas y su grado de cumplimiento, tick a tick</figcaption>
           <img class="shot" src="../assets/img/logica-borrosa.jpg" width="1500" height="846" loading="lazy"
-               alt="A la izquierda la salida del motor borroso: las distancias y confianzas de cada fantasma como entrada, el valor de runAway como salida, y doce reglas del tipo «si la distancia de Blinky es cerca y la confianza es alta, entonces runAway es emergency» con su grado de activación. A la derecha la partida en marcha.">
+               alt="A la izquierda la salida del motor borroso: las distancias y confianzas de cada fantasma como entrada, el valor de runAway como salida, y doce reglas del tipo &quot;si la distancia de Blinky es cerca y la confianza es alta, entonces runAway es emergency&quot; con su grado de activación. A la derecha la partida en marcha.">
         </figure>
         <dl class="gloss">
           <div><dt>Conjunto borroso</dt><dd>Conjunto en el que la pertenencia es un grado entre 0 y 1 en vez de un sí o un no.</dd></div>
           <div><dt>Función de pertenencia</dt><dd>La curva que asigna ese grado a cada valor de la variable: triangular, trapezoidal, gaussiana.</dd></div>
           <div><dt>Variable lingüística</dt><dd>Variable cuyos valores son palabras, como una distancia que puede ser <em>cerca</em>, <em>media</em> o <em>lejos</em>, cada una con su función de pertenencia.</dd></div>
-          <div><dt>Regla borrosa</dt><dd>Regla escrita sobre variables lingüísticas: «si la distancia es <em>cerca</em> y el fantasma es <em>no comestible</em>, la amenaza es <em>alta</em>».</dd></div>
+          <div><dt>Regla borrosa</dt><dd>Regla escrita sobre variables lingüísticas: "si la distancia es <em>cerca</em> y el fantasma es <em>no comestible</em>, la amenaza es <em>alta</em>".</dd></div>
           <div><dt>Difuminación</dt><dd>Convertir las magnitudes numéricas del juego en grados de pertenencia. La entrada del sistema borroso.</dd></div>
           <div><dt>Inferencia (Mamdani)</dt><dd>Combinar el grado de cumplimiento de cada regla para obtener un conjunto borroso de salida.</dd></div>
           <div><dt>Desdifuminación</dt><dd>Reducir ese conjunto de salida a un número con el que actuar: centro de gravedad, media de máximos.</dd></div>
@@ -198,7 +198,7 @@
           función que evalúa lo buena que es una posición y a cómo se poda el árbol.
         </p>
         <dl class="gloss">
-          <div><dt>Modelo <em>forward</em></dt><dd>Capacidad de preguntarle al juego «si hago esta jugada, ¿cómo queda el estado?» sin jugarla de verdad. Sin él no hay búsqueda.</dd></div>
+          <div><dt>Modelo <em>forward</em></dt><dd>Capacidad de preguntarle al juego "si hago esta jugada, ¿cómo queda el estado?" sin jugarla de verdad. Sin él no hay búsqueda.</dd></div>
           <div><dt>Árbol de juego</dt><dd>Nodos que son estados y aristas que son jugadas, alternando el turno de cada jugador.</dd></div>
           <div><dt>Minimax</dt><dd>Elegir la jugada que maximiza tu resultado suponiendo que el adversario elige siempre la que te lo minimiza.</dd></div>
           <div><dt>Poda alfa-beta</dt><dd>Descartar ramas que no pueden cambiar la decisión final. Mismo resultado que minimax explorando mucho menos.</dd></div>
@@ -249,7 +249,7 @@
           Código Secreto · 14&#8239;–&#8239;20 dic
         </p>
         <p>
-          El bloque que rompe la regla del curso. Cuando el tablero son palabras, escribir el conocimiento a
+          Este bloque rompe la regla del curso. Cuando el tablero son palabras, escribir el conocimiento a
           mano no llega: hay que medir significado, y eso hoy sale de modelos entrenados sobre muchísimo
           texto. Sirve para ver por dentro las técnicas del otro lado de la Inteligencia Artificial y para
           entender qué se gana y qué se pierde al cambiar de lado.
@@ -320,7 +320,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

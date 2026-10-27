@@ -835,12 +835,305 @@
       b3.appendChild(opciones('Ejemplo', lista.map(function (p) { return [FCL[p].txt, p]; }), actual, function (v) { actual = v; ponTexto(v); carga(false); }));
       d.controls.appendChild(b3);
     }
-    ed.addEventListener('input', function () { aviso.textContent = 'Has cambiado el FCL: pulsad "Cargar el FCL".'; });
+    ed.addEventListener('input', function () { aviso.textContent = 'Habéis cambiado el FCL: pulsad "Cargar el FCL".'; });
     ponTexto(actual);
     carga(false);
   }
 
-  var CREA = { variable: creaVariable, operaciones: creaOperaciones, banco: creaBanco };
+  /* ---------- 4 · la composición sup-min, casilla a casilla ---------- */
+
+  // Grados con los decimales justos y coma: 0, 0,5, 0,15, 1.
+  function g(x) { return String(Math.round(x * 100) / 100).replace('.', ','); }
+
+  function tablaMat(nom, filas, cols, celda) {
+    var caja = el('div', 'bz-mat');
+    caja.appendChild(el('p', 'bz-mat-nom', nom));
+    var t = el('table'), th = el('thead'), tr = el('tr');
+    tr.appendChild(el('th'));
+    cols.forEach(function (c) { var h = el('th', null, c); h.scope = 'col'; tr.appendChild(h); });
+    th.appendChild(tr); t.appendChild(th);
+    var tb = el('tbody');
+    filas.forEach(function (f, i) {
+      var r = el('tr'), h = el('th', null, f); h.scope = 'row'; r.appendChild(h);
+      cols.forEach(function (c, j) { r.appendChild(celda(i, j)); });
+      tb.appendChild(r);
+    });
+    t.appendChild(tb); caja.appendChild(t);
+    return caja;
+  }
+
+  function creaSupmin(nodo) {
+    var d = prepara(nodo);
+    var EJ = {
+      frutas: { txt: 'Color, madurez, sabor', res: 'T = R ∘ S',
+        A: { nom: 'R (color, madurez)', filas: ['naranja', 'amarillo', 'rojo'], cols: ['verde', 'normal', 'madura'], v: [[1, .5, 0], [.3, 1, .4], [0, .2, 1]] },
+        B: { nom: 'S (madurez, sabor)', filas: ['verde', 'normal', 'madura'], cols: ['amargo', 'insípido', 'dulce'], v: [[1, .2, 0], [.7, 1, .3], [0, .7, 1]] },
+        f: 'T', sel: [1, 2] },
+      llave: { txt: 'El hecho de 4 °C y la llave', res: 'llave′ = A′ ∘ R',
+        A: { nom: 'A′ (el hecho)', filas: ['4 °C'], cols: ['fría', 'templada', 'caliente'], v: [[.8, .2, 0]] },
+        B: { nom: 'R (temperatura, llave)', filas: ['fría', 'templada', 'caliente'], cols: ['cerrada', 'semiabierta', 'abierta'], v: [[0, .4, .9], [.3, .7, .3], [.8, .2, 0]] },
+        f: 'llave′', sel: [0, 2] }
+    };
+    var ej = 'frutas', op = 'min', sel = EJ.frutas.sel.slice();
+    var OP = { min: function (a, b) { return Math.min(a, b); }, prod: function (a, b) { return a * b; } };
+    function pinta() {
+      var E = EJ[ej], A = E.A, B = E.B, f = OP[op];
+      var n = A.cols.length, i = sel[0], j = sel[1];
+      function vale(r, c) { var m = 0; for (var k = 0; k < n; k++) m = Math.max(m, f(A.v[r][k], B.v[k][c])); return m; }
+      var caminos = [], mejor = 0;
+      for (var k = 0; k < n; k++) { caminos.push(f(A.v[i][k], B.v[k][j])); mejor = Math.max(mejor, caminos[k]); }
+      var ganan = caminos.map(function (v) { return v === mejor && mejor > 0; });
+      d.stage.innerHTML = '';
+      var rej = el('div', 'bz-comp');
+      rej.appendChild(tablaMat(A.nom, A.filas, A.cols, function (r, c) {
+        var td = el('td', null, g(A.v[r][c]));
+        if (r === i) td.className = ganan[c] ? 'fila mejor' : 'fila';
+        return td;
+      }));
+      var g2 = el('div', 'bz-par'); g2.appendChild(el('span', 'bz-op', '∘')); rej.appendChild(g2);
+      g2.appendChild(tablaMat(B.nom, B.filas, B.cols, function (r, c) {
+        var td = el('td', null, g(B.v[r][c]));
+        if (c === j) td.className = ganan[r] ? 'col mejor' : 'col';
+        return td;
+      }));
+      var g3 = el('div', 'bz-par'); g3.appendChild(el('span', 'bz-op', '=')); rej.appendChild(g3);
+      g3.appendChild(tablaMat(E.res, A.filas, B.cols, function (r, c) {
+        var td = el('td');
+        var b = el('button', 'bz-celda', g(vale(r, c))); b.type = 'button';
+        b.setAttribute('aria-pressed', String(r === i && c === j));
+        b.setAttribute('aria-label', E.f + '(' + A.filas[r] + ', ' + B.cols[c] + ') = ' + g(vale(r, c)));
+        b.onclick = function () { sel = [r, c]; pinta(); };
+        td.appendChild(b);
+        if (r === i && c === j) td.className = 'sel';
+        return td;
+      }));
+      d.stage.appendChild(rej);
+      var L = A.cols.map(function (m, k) {
+        var a = g(A.v[i][k]), b = g(B.v[k][j]);
+        var cuenta = op === 'min' ? 'min(' + a + '; ' + b + ')' : a + ' · ' + b;
+        return { txt: 'vía ' + m + ':', cuenta: cuenta, v: caminos[k], gana: ganan[k] };
+      });
+      var w1 = Math.max.apply(null, L.map(function (x) { return x.txt.length; }));
+      var w2 = Math.max.apply(null, L.map(function (x) { return x.cuenta.length; }));
+      function pad(s, w) { while (s.length < w) s += ' '; return s; }
+      var lineas = L.map(function (x) { return pad(x.txt, w1) + '  ' + pad(x.cuenta, w2) + '  = ' + g(x.v) + (x.gana ? '   ← el mayor' : ''); });
+      lineas.push(E.f + '(' + A.filas[i] + ', ' + B.cols[j] + ') = max(' + caminos.map(g).join('; ') + ') = ' + g(mejor));
+      d.stage.appendChild(el('pre', 'bz-caminos', lineas.join('\n')));
+      var por = A.cols.filter(function (m, k) { return ganan[k]; });
+      var cuantoVale = op === 'min' ? 'su eslabón más débil' : 'el producto de sus dos eslabones';
+      d.read.textContent = mejor === 0
+        ? E.f + '(' + A.filas[i] + ', ' + B.cols[j] + ') = 0: ningún camino tiene los dos eslabones por encima de 0.'
+        : E.f + '(' + A.filas[i] + ', ' + B.cols[j] + ') = ' + g(mejor) + '. Cada camino vale ' + cuantoVale + ', y el mejor pasa por ' + por.join(' y ') + '.';
+    }
+    var b1 = barra('demo-bar-play');
+    b1.appendChild(opciones('Ejemplo', [[EJ.frutas.txt, 'frutas'], [EJ.llave.txt, 'llave']], ej, function (v) { ej = v; sel = EJ[v].sel.slice(); pinta(); }));
+    var b2 = barra('demo-bar-play');
+    b2.appendChild(opciones('Composición', [['sup-min', 'min'], ['sup-producto', 'prod']], op, function (v) { op = v; pinta(); }));
+    b2.appendChild(el('span', 'demo-tag', 'Pulsad una casilla del resultado'));
+    d.controls.appendChild(b1); d.controls.appendChild(b2);
+    pinta();
+  }
+
+  /* ---------- 5 · componer con la relación de Mamdani es recortar ---------- */
+
+  function creaRecorte(nodo) {
+    var d = prepara(nodo);
+    var temps = [0, 4, 8, 12, 16, 20], fria = [1, .8, .6, .4, .2, 0];   // fría := (0, 1) (20, 0)
+    var pos = ['0°', '45°', '90°'], abierta = [0, .5, 1];
+    var modo = 'exacto', x = 4;
+    function hecho(t) { var dt = Math.abs(t - x); return modo === 'exacto' ? (dt === 0 ? 1 : 0) : (dt === 0 ? 1 : dt === 4 ? .5 : 0); }
+    function pinta() {
+      var Ap = temps.map(hecho);
+      var R = temps.map(function (t, i) { return abierta.map(function (a) { return Math.min(fria[i], a); }); });
+      var Bp = pos.map(function (p, c) { var m = 0; temps.forEach(function (t, i) { m = Math.max(m, Math.min(Ap[i], R[i][c])); }); return m; });
+      var alfa = 0; temps.forEach(function (t, i) { alfa = Math.max(alfa, Math.min(Ap[i], fria[i])); });
+      d.stage.innerHTML = '';
+      var rej = el('div', 'bz-comp');
+      var cols = ['fría(t)', 'A′(t)'].concat(pos.map(function (p) { return 'llave ' + p; }));
+      var caja = tablaMat('R = min(fría, abierta), con el hecho A′ al lado', temps.map(function (t) { return t + ' °C'; }), cols, function (i, c) {
+        var td;
+        if (c === 0) td = el('td', 'bz-dato bz-fria', g(fria[i]));
+        else if (c === 1) td = el('td', 'bz-hecho', g(Ap[i]));
+        else {
+          var v = Math.min(Ap[i], R[i][c - 2]);
+          td = el('td', null, g(R[i][c - 2]));
+          if (Ap[i] > 0) td.className = (v === Bp[c - 2] && v > 0) ? 'fila mejor' : 'fila';
+        }
+        if (Ap[i] === 0) td.className = (td.className ? td.className + ' ' : '') + 'fuera';
+        return td;
+      });
+      var tb = caja.querySelector('tbody');
+      // "abierta" depende de la columna: va en una fila propia, encima de R.
+      var fa = el('tr', 'bz-dato-fila'), ha = el('th', null, 'abierta(p)'); ha.scope = 'row';
+      fa.appendChild(ha); fa.appendChild(el('td')); fa.appendChild(el('td'));
+      abierta.forEach(function (a) { fa.appendChild(el('td', 'bz-dato bz-abierta', g(a))); });
+      tb.insertBefore(fa, tb.firstChild);
+      var tr = el('tr', 'bz-sup'), h = el('th', null, 'llave′ = sup'); h.scope = 'row';
+      tr.appendChild(h); tr.appendChild(el('td')); tr.appendChild(el('td'));
+      Bp.forEach(function (v) { tr.appendChild(el('td', null, g(v))); });
+      tb.appendChild(tr);
+      rej.appendChild(caja);
+      // Las barras: "abierta" entera, la llave′ encima y la línea del grado de la regla.
+      var W = 220, H = 150, base = 120, alto = 96;
+      var s = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'demo-svg bz-svg bz-barras', role: 'img',
+        'aria-label': 'Barras de la llave: abierta vale 0, 0,5 y 1; la llave′ vale ' + Bp.map(g).join(', ') + '; el grado de la regla es ' + g(alfa) + '.' });
+      s.appendChild(sv('line', { x1: 14, y1: base, x2: W - 6, y2: base, class: 'bz-eje' }));
+      pos.forEach(function (p, c) {
+        var cx = 50 + c * 64;
+        s.appendChild(sv('rect', { x: cx - 18, y: base - abierta[c] * alto, width: 36, height: abierta[c] * alto, class: 'bz-barra-ab' }));
+        if (Bp[c] > 0) s.appendChild(sv('rect', { x: cx - 18, y: base - Bp[c] * alto, width: 36, height: Bp[c] * alto, class: 'bz-res' }));
+        s.appendChild(sv('text', { x: cx, y: base + 13, class: 'bz-n' }, p));
+        s.appendChild(sv('text', { x: cx, y: base - Math.max(abierta[c], Bp[c]) * alto - 4, class: 'bz-n' }, g(Bp[c])));
+      });
+      var ya = base - alfa * alto;
+      s.appendChild(sv('line', { x1: 14, y1: ya, x2: W - 6, y2: ya, class: 'bz-x' }));
+      s.appendChild(sv('text', { x: 40, y: ya - 4, class: 'bz-n' }, 'grado ' + g(alfa)));
+      var fig = el('div', 'bz-mat');
+      fig.appendChild(el('p', 'bz-mat-nom', 'abierta (contorno) y llave′ (relleno)'));
+      fig.appendChild(s);
+      rej.appendChild(fig);
+      d.stage.appendChild(rej);
+      var vivas = temps.map(function (t, i) { return i; }).filter(function (i) { return Ap[i] > 0; });
+      var lineas = ['grado de la regla = max( ' + vivas.map(function (i) { return 'min(' + g(Ap[i]) + '; ' + g(fria[i]) + ')'; }).join(', ') + ' ) = ' + g(alfa)];
+      pos.forEach(function (p, c) {
+        lineas.push(pad('llave′(' + p + ')', 17) + ' = max( ' + vivas.map(function (i) { return 'min(' + g(Ap[i]) + '; ' + g(R[i][c]) + ')'; }).join(', ') + ' ) = ' + g(Bp[c]));
+      });
+      lineas.push(pad('min(' + g(alfa) + '; abierta)', 17) + ' = (' + abierta.map(function (a) { return g(Math.min(alfa, a)); }).join('; ') + ')   ← lo mismo');
+      d.stage.appendChild(el('pre', 'bz-caminos', lineas.join('\n')));
+      var nom = (modo === 'exacto' ? 'Exactamente ' : 'Unos ') + x + ' °C';
+      var exacta = fria[temps.indexOf(x)];
+      var txt;
+      if (alfa === 0) txt = nom + ' no se solapa con "fría": la regla no se dispara y la llave′ vale 0 en todo.';
+      else if (modo === 'exacto') txt = nom + ': la regla se cumple en fría(' + x + ' °C) = ' + g(alfa) + ', y la llave′ es "abierta" recortada a ' + g(alfa) + '.';
+      else txt = nom + ': el hecho y "fría" se solapan como mucho en ' + g(alfa) + ', así que la llave′ es "abierta" recortada a ' + g(alfa) + (exacta !== alfa ? '. Con exactamente ' + x + ' °C sería ' + g(exacta) + '.' : '.');
+      d.read.textContent = txt;
+    }
+    function pad(s, w) { while (s.length < w) s += ' '; return s; }
+    var b1 = barra('demo-bar-play');
+    b1.appendChild(opciones('El hecho', [['exactamente', 'exacto'], ['unos', 'unos']], modo, function (v) { modo = v; pinta(); }));
+    var b2 = barra();
+    b2.appendChild(deslizador('Temperatura (°C)', 0, 20, 4, x, function (v) { x = v; pinta(); }));
+    d.controls.appendChild(b1); d.controls.appendChild(b2);
+    pinta();
+  }
+
+  /* ---------- 6 · desdifuminar: de una forma a un número ---------- */
+
+  function creaDesdifuminar(nodo) {
+    var d = prepara(nodo);
+    var u = [0, 30], N = 30000, paso = (u[1] - u[0]) / N;
+    var TER = [
+      { nom: 'tacaña', t: { tipo: 'trian', a: 0, b: 5, c: 10 }, pico: 5 },
+      { nom: 'normal', t: { tipo: 'trian', a: 10, b: 15, c: 20 }, pico: 15 },
+      { nom: 'generosa', t: { tipo: 'trian', a: 20, b: 25, c: 30 }, pico: 25 }
+    ];
+    var grado = [0.25, 2 / 3, 0], met = 'COG';   // 2/3 es lo que vale "bueno" con servicio 3
+    var NOM = { COG: 'centro de gravedad', COA: 'centro de área', MM: 'media de los máximos', LM: 'máximo más a la izquierda', RM: 'máximo más a la derecha' };
+    var L = lienzo(560, 280, { l: 30, r: 12, t: 26, b: 92 });
+    L.svg.setAttribute('aria-label', 'Los tres términos de la propina, el conjunto agregado relleno y una línea vertical en el número que da el método elegido.');
+    d.stage.appendChild(L.svg);
+    var cuenta = el('pre', 'bz-caminos');
+    d.stage.appendChild(cuenta);
+    function calcula() {
+      var v = new Float64Array(N + 1), s = 0, sx = 0, mx = 0;
+      for (var i = 0; i <= N; i++) {
+        var x = u[0] + i * paso, m = 0;
+        for (var k = 0; k < 3; k++) m = Math.max(m, Math.min(grado[k], API.mu(TER[k].t, x)));
+        v[i] = m; s += m; sx += m * x; if (m > mx) mx = m;
+      }
+      var r = { v: v, area: s * paso, mx: mx };
+      if (s <= 0) return r;
+      r.COG = sx / s;
+      var acc = 0; for (i = 0; i <= N; i++) { acc += v[i]; if (acc >= s / 2) { r.COA = u[0] + i * paso; break; } }
+      var lm = null, rm = null, sm = 0, nm = 0;
+      for (i = 0; i <= N; i++) if (v[i] >= mx - 1e-9) { var xx = u[0] + i * paso; if (lm === null) lm = xx; rm = xx; sm += xx; nm++; }
+      r.LM = lm; r.RM = rm; r.MM = sm / nm;
+      r.izq = acc;
+      return r;
+    }
+    function pinta() {
+      var r = calcula();
+      L.svg.innerHTML = '';
+      // Eje propio, de 5 en 5, con las cifras bajas para que el triángulo del equilibrio no las tape.
+      var y0 = L.py(0);
+      L.svg.appendChild(sv('line', { x1: L.m.l, y1: y0, x2: L.W - L.m.r, y2: y0, class: 'bz-eje' }));
+      L.svg.appendChild(sv('line', { x1: L.m.l, y1: y0, x2: L.m.l, y2: L.py(1), class: 'bz-eje' }));
+      L.svg.appendChild(sv('text', { x: L.m.l - 4, y: L.py(1) + 3, class: 'bz-n', style: 'text-anchor:end' }, '1'));
+      for (var t = 0; t <= 30; t += 5) L.svg.appendChild(sv('text', { x: L.px(t, u), y: y0 + 24, class: 'bz-n' }, String(t)));
+      L.svg.appendChild(sv('text', { x: L.W - L.m.r, y: y0 + 36, class: 'bz-n', style: 'text-anchor:end' }, 'propina (%)'));
+      var vis = new Float64Array(3000);
+      for (var i = 0; i < 3000; i++) vis[i] = r.v[i * 10];
+      if (met === 'COA' && r.area > 0) {
+        var izq = new Float64Array(3000);
+        for (i = 0; i < 3000; i++) izq[i] = (u[0] + i * 10 * paso) <= r.COA ? vis[i] : 0;
+        area(L, u, vis, 'bz-agregado');
+        area(L, u, izq, 'bz-recorte bz-t0');
+      } else area(L, u, vis, 'bz-agregado');
+      TER.forEach(function (T, k) {
+        curva(L, u, function (x) { return API.mu(T.t, x); }, 'bz-curva bz-fina ' + COLORES[k]);
+        L.svg.appendChild(sv('text', { x: L.px(T.pico, u), y: L.m.t - 8, class: 'bz-v ' + COLORES[k] }, T.nom));
+      });
+      if (r.area <= 0) {
+        cuenta.textContent = 'Ninguna regla activa: el conjunto agregado está vacío.\nNo hay nada que desdifuminar, y sale el DEFAULT del FCL.';
+        d.read.textContent = 'Con las tres reglas a 0 no hay forma: jFuzzyLogic devuelve el DEFAULT.';
+        return;
+      }
+      // Los cinco métodos, marcados en la base; el elegido, con su línea entera.
+      ['COG', 'COA', 'MM', 'LM', 'RM'].forEach(function (m, j) {
+        var px = L.px(r[m], u);
+        if (m === met) {
+          L.svg.appendChild(sv('line', { x1: px, y1: y0, x2: px, y2: L.py(1) - 2, class: 'bz-salida-x' }));
+          L.svg.appendChild(sv('path', { d: 'M' + px + ' ' + (y0 + 1) + ' l-6 11 h12 z', class: 'bz-fulcro' }));
+        }
+        L.svg.appendChild(sv('line', { x1: px, y1: y0 + 40 + j * 10, x2: px, y2: y0 + 44 + j * 10, class: 'bz-eje' }));
+        L.svg.appendChild(sv('text', { x: px + 4, y: y0 + 47 + j * 10, class: m === met ? 'bz-v bz-salida-t' : 'bz-n', style: 'text-anchor:start' }, m + ' ' + f2(r[m])));
+      });
+      if (met === 'MM' || met === 'LM' || met === 'RM') {
+        L.svg.appendChild(sv('line', { x1: L.px(r.LM, u), y1: L.py(r.mx), x2: L.px(r.RM, u), y2: L.py(r.mx), class: 'bz-meseta' }));
+      }
+      var lin = [];
+      if (met === 'COG') {
+        var A = 0, AX = 0, w = 0;
+        TER.forEach(function (T, k) { if (grado[k] > 0) w = Math.max(w, ('"' + T.nom + '" recortada a').length); });
+        TER.forEach(function (T, k) {
+          if (grado[k] <= 0) return;
+          var h = grado[k], a = 10 * h * (1 - h / 2);
+          A += a; AX += a * T.pico;
+          var cab = '"' + T.nom + '" recortada a'; while (cab.length < w) cab += ' ';
+          lin.push(cab + ' ' + f2(h) + ':  área = 10 · ' + f2(h) + ' · (1 − ' + f2(h) + '/2) = ' + f2(a) + '   centro ' + T.pico);
+        });
+        lin.push('');
+        lin.push('COG = suma de área · centro / suma de áreas');
+        lin.push('    = ' + f2(AX) + ' / ' + f2(A));
+        lin.push('    = ' + f2(r.COG));
+      } else if (met === 'COA') {
+        lin.push('área total            = ' + f2(r.area));
+        lin.push('la mitad              = ' + f2(r.area / 2));
+        lin.push('COA, donde se llega a la mitad desde la izquierda = ' + f2(r.COA));
+        lin.push('(la parte sombreada a la izquierda de la línea es la mitad del área)');
+      } else {
+        lin.push('altura máxima del conjunto = ' + f2(r.mx));
+        lin.push('zona a esa altura          = de ' + f2(r.LM) + ' a ' + f2(r.RM));
+        if (met === 'MM') lin.push('MM = (' + f2(r.LM) + ' + ' + f2(r.RM) + ') / 2 = ' + f2(r.MM) + (Math.abs((r.LM + r.RM) / 2 - r.MM) > 0.01 ? '   (media de todos los puntos a esa altura: ' + f2(r.MM) + ')' : ''));
+        else if (met === 'LM') lin.push('LM = el primer punto a esa altura = ' + f2(r.LM));
+        else lin.push('RM = el último punto a esa altura = ' + f2(r.RM));
+      }
+      cuenta.textContent = lin.join('\n');
+      var otros = ['COG', 'COA', 'MM', 'LM', 'RM'].filter(function (m) { return m !== met; }).map(function (m) { return m + ' ' + f2(r[m]); }).join(', ');
+      d.read.textContent = met + ' (' + NOM[met] + ') = ' + f2(r[met]) + '. Los demás darían: ' + otros + '.';
+    }
+    var b1 = barra('demo-bar-play');
+    b1.appendChild(opciones('Método', [['COG', 'COG'], ['COA', 'COA'], ['MM', 'MM'], ['LM', 'LM'], ['RM', 'RM']], met, function (v) { met = v; pinta(); }));
+    d.controls.appendChild(b1);
+    TER.forEach(function (T, k) {
+      var b = barra();
+      b.appendChild(deslizador('Grado de "' + T.nom + '"', 0, 1, 0.01, grado[k], function (v) { grado[k] = v; pinta(); }));
+      d.controls.appendChild(b);
+    });
+    pinta();
+  }
+
+  var CREA = { variable: creaVariable, operaciones: creaOperaciones, banco: creaBanco, supmin: creaSupmin, recorte: creaRecorte, desdifuminar: creaDesdifuminar };
   Array.prototype.forEach.call(document.querySelectorAll('[data-borroso]'), function (n) {
     var f = CREA[n.getAttribute('data-borroso')];
     if (!f) return;

@@ -835,7 +835,7 @@
           </table>
         </div>
         <figure class="narrow">
-          <figcaption>Por qué importa: aquí las dos métricas no dicen lo mismo</figcaption>
+          <figcaption>Un cruce en el que las dos métricas no dicen lo mismo</figcaption>
           <svg class="explica dgm1" viewBox="0 0 420 250" role="img" aria-label="Fragmento de laberinto: Ms. Pac-Man está en un cruce y el objetivo queda arriba a la derecha. Hacia arriba sale un pasillo que acaba dando toda la vuelta, pero en línea recta parece el camino más corto, así que la métrica euclídea elige ese movimiento. El camino de verdad va hacia la derecha y sube por el otro pasillo.">
             <style>
               .dgm1 .pasillo{fill:none;stroke:var(--surface-2);stroke-width:17;stroke-linecap:round}
@@ -1199,7 +1199,7 @@
         </p>
         <h3>El mapa no se esconde, el estado sí</h3>
         <p>
-          Esta distinción evita bastante confusión. El <strong>mapa</strong> es fijo y lo puedes pedir
+          El <strong>mapa</strong> es fijo y lo puedes pedir
           completo también con visibilidad parcial: qué nodos hay, dónde están las píldoras, dónde están los
           cruces. Lo que se esconde es el <strong>estado</strong> de la partida: si esa píldora sigue ahí, o
           por dónde anda ahora un fantasma.
@@ -1211,13 +1211,13 @@
               <tr><td><code>getPowerPillIndices()</code></td><td>Los cuatro nodos con píldora de poder del mapa, se vean o no, y estén comidas o no.</td></tr>
               <tr><td><code>getPillIndices()</code></td><td>Igual, con las 220 normales.</td></tr>
               <tr><td><code>getJunctionIndices()</code></td><td>Todos los cruces del mapa.</td></tr>
-              <tr><td><code>getActivePowerPillsIndices()</code></td><td>Sólo las que además <em>ves</em> y siguen sin comer. Puede venir vacío sin que quede ninguna cerca.</td></tr>
+              <tr><td><code>getActivePowerPillsIndices()</code></td><td>Sólo las que además <em>ves</em> y siguen sin comer. Puede venir vacío aunque queden píldoras de poder sin comer, si no ves ninguna.</td></tr>
             </tbody>
           </table>
         </div>
         <p>
-          Y aquí está la respuesta a la pregunta obvia: un número de nodo <strong>ya es</strong> una posición.
-          Con ese índice tienes todo lo que necesitas sin haber visto nada:
+          Un número de nodo <strong>ya es</strong> una posición, así que
+          con ese índice tienes todo lo que necesitas sin haber visto nada:
           <code>getShortestPathDistance(miNodo, nodoDeLaPildora)</code> te dice a qué distancia queda,
           <code>getNextMoveTowardsTarget</code> te lleva hasta ahí, y
           <code>getNodeXCood</code>/<code>getNodeYCood</code> te dan sus coordenadas si las necesitas para
@@ -1347,7 +1347,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

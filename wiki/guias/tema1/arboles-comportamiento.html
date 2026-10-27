@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Árboles de comportamiento · Tema 1 · ICI</title>
+<title>Árboles de comportamiento · Tema 2 · ICI</title>
 <meta name="description" content="Qué es un árbol de comportamiento, cómo se recorre desde la raíz en cada turno, secuencia, selector, decoradores y pizarra, cómo pasar a árbol la máquina de estados de los fantasmas, y un árbol mínimo en Java que funciona con el motor de Ms. Pac-Man.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 1</a>
+    <a href="index.html">Tema 2</a>
     <span aria-hidden="true">/</span>
     <span>Árboles de comportamiento</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 1 · 09 · Organizar el comportamiento</p>
+    <p class="tema-when">Tema 2 · 09 · Organizar el comportamiento</p>
     <h1>
       Árboles de comportamiento
       <span class="thin">Tareas pequeñas que se combinan en un árbol que se recorre en cada turno.</span>
@@ -351,8 +351,7 @@
           entero en cada turno</strong>.
         </p>
         <p>
-          Eso tiene una consecuencia que conviene tener muy clara, porque es la diferencia de fondo con la
-          máquina de estados. La máquina, en cada turno, sólo mira <strong>las transiciones que salen del
+          Aquí está la diferencia de fondo con la máquina de estados. La máquina, en cada turno, sólo mira <strong>las transiciones que salen del
           estado actual</strong>: <code>FSM.run</code> recorre las salidas de <code>current</code> y, si
           ninguna se cumple, sigue ejecutando el mismo estado. Un fantasma en <em>Huir</em> sigue huyendo
           hasta que se cumple una transición que alguien escribió. El árbol, en cambio, <strong>vuelve a
@@ -639,7 +638,7 @@
           </table>
         </div>
         <p>
-          La última fila es la que hay que recordar: <code>RUNNING</code> corta en los dos. Un hijo que no
+          La última fila es la que tenéis que recordar: <code>RUNNING</code> corta en los dos. Un hijo que no
           ha terminado no ha fallado ni ha salido bien, así que no tiene sentido seguir con sus hermanos. En
           pseudocódigo, los dos nodos son el mismo bucle con la condición de corte cambiada:
         </p>
@@ -759,7 +758,7 @@
           con "¿sigue siendo comestible?", con la política de fallar en cuanto falle uno.
         </p>
         <p>
-          En Ms.&nbsp;Pac-Man hay que usarlo con cuidado por una razón muy concreta: cada turno se devuelve
+          En Ms.&nbsp;Pac-Man tenéis que usarlo con cuidado por una razón muy concreta: cada turno se devuelve
           <strong>un solo movimiento</strong>. Dos acciones en paralelo escriben las dos su dirección y gana la
           última. Y como aquí las acciones duran un turno, la vigilancia sale gratis: una secuencia con la
           condición delante ya se comprueba en cada tick.
@@ -1030,7 +1029,7 @@
             inicializadores de campo de la subclase se ejecutan <strong>después</strong> de que vuelva
             <code>super(game)</code>. Si escribís <code>private int distancia = 0;</code>,
             <code>parseInput()</code> rellena el campo y el inicializador lo vuelve a poner a cero justo
-            después. Los campos de un <code>Input</code> se declaran sin valor y se crean dentro de
+            después. Declarad los campos de un <code>Input</code> sin valor y cread los objetos dentro de
             <code>parseInput()</code>.
           </p>
         </div>
@@ -1180,7 +1179,7 @@
           fantasma entre 50 y 110 turnos de despiste al salir.
         </p>
         <p>
-          Cuál de los tres conviene, y cuánto cuesta cada uno, se ve mejor con dos ejemplos escritos en los
+          Cuál conviene entre la máquina, la máquina jerárquica y el árbol, y cuánto cuesta cada uno, se ve mejor con dos ejemplos escritos en los
           tres formatos, en la <a href="#comparar">sección siguiente</a>.
         </p>
 </section>
@@ -2522,7 +2521,7 @@ fantasma BLINKY  SUCCESS
       </section>
 
 
-      <nav class="pager" aria-label="Páginas del tema 1">
+      <nav class="pager" aria-label="Páginas del tema 2">
         <a class="pager-prev" href="maquinas-estados.html"><span class="pager-l">Anterior</span><span class="pager-t">Máquinas de estados</span></a>
         <a class="pager-next" href="index.html#resumen"><span class="pager-l">Siguiente</span><span class="pager-t">Lo que hay que llevarse</span></a>
       </nav>
@@ -2551,7 +2550,7 @@ fantasma BLINKY  SUCCESS
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 1</h2>
+          <h2 id="del-tema">Tema 2</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
@@ -2581,7 +2580,7 @@ fantasma BLINKY  SUCCESS
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

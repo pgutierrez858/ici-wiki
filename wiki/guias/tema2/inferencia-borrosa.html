@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Inferencia borrosa · Tema 2 · ICI</title>
+<title>Inferencia borrosa · Tema 4 · ICI</title>
 <meta name="description" content="Cómo razona un sistema borroso: reglas borrosas, modus ponens generalizado, relaciones y composición sup-min, el método de Mamdani en cuatro pasos con el ejemplo de la propina, un banco de pruebas interactivo de FCL, cómo elegir los métodos de activación, acumulación y desdifuminación, y tres trampas de diseño.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 2</a>
+    <a href="index.html">Temas 3 y 4</a>
     <span aria-hidden="true">/</span>
     <span>Inferencia borrosa</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 2 · 09 · Razonamiento borroso</p>
+    <p class="tema-when">Tema 4 · 09 · Razonamiento borroso</p>
     <h1>
       Inferencia borrosa
       <span class="thin">De unas medidas a un número, pasando por reglas que se cumplen a medias.</span>
@@ -84,7 +84,7 @@ ENTONCES la potencia de ventilación es alta</pre>
           La diferencia está en qué pasa al ejecutarla. En Jess, una regla se cumple o no, y si se cumplen varias hay que
           <a href="conflictos.html">elegir una</a>. Aquí <strong>todas las reglas se cumplen en algún grado</strong>, entre
           0 y 1, y en vez de elegir entre ellas <strong>se combinan</strong>: cada una empuja la salida hacia su consecuente
-          con la fuerza de su grado. No hay agenda ni resolución de conflictos; hay una mezcla.
+          con la fuerza de su grado, sin agenda ni resolución de conflictos.
         </p>
         <div class="table-scroll">
           <table class="ancha">
@@ -105,7 +105,8 @@ ENTONCES la potencia de ventilación es alta</pre>
           <h2 class="sec">La idea: el modus ponens generalizado</h2>
         </div>
         <p>
-          La regla de deducción de toda la vida es el <em>modus ponens</em>: si sé que "A implica B" y sé que A, concluyo B.
+          La regla de deducción de toda la vida es el <em>modus ponens</em>. Con A y B dos afirmaciones cualesquiera (A, "el tomate es rojo"; B, "está maduro"):
+          si sé que "A implica B" y sé que A, concluyo B.
         </p>
 <pre class="cuenta">regla:      si el tomate es rojo, está maduro
 hecho:      el tomate es rojo
@@ -130,8 +131,11 @@ conclusión: el tomate está más o menos maduro</pre>
         </div>
         <p>
           Una <strong>relación borrosa</strong> dice en qué grado se relaciona cada elemento de un conjunto con cada uno de
-          otro. Se escribe como una tabla. Por ejemplo, cómo se relaciona el color de una fruta con su madurez (R), y su
-          madurez con su sabor (S):
+          otro. Es un conjunto borroso cuyos elementos son parejas, y se escribe como una tabla. Una relación de las de
+          siempre es el caso en el que la tabla sólo tiene ceros y unos. El ejemplo de esta sección son dos tablas: la que
+          llamamos <strong>R</strong> relaciona el color de una fruta con su madurez, y la que llamamos <strong>S</strong>,
+          su madurez con su sabor. Cada casilla se nombra con la letra de la tabla y su fila y columna entre paréntesis:
+          R(naranja, verde) = 1 se lee "en R, el naranja va con verde en grado 1".
         </p>
         <div class="table-scroll">
           <table>
@@ -153,10 +157,77 @@ conclusión: el tomate está más o menos maduro</pre>
             </tbody>
           </table>
         </div>
+
+        <h3 class="label">La pregunta: ¿cómo va el color con el sabor?</h3>
         <p>
-          ¿Cómo se relaciona entonces el color con el sabor? La <strong>composición sup-min</strong> responde: para ir de
-          un color a un sabor hay que pasar por alguna madurez; cada camino vale lo que su eslabón más débil (el mínimo), y
-          de todos los caminos nos quedamos con el mejor (el máximo, o supremo). Para amarillo y dulce:
+          Ninguna de las dos tablas lo dice: hay que pasar por la madurez. Pensadlo primero sin grados, con relaciones de
+          ceros y unos. Un color va con un sabor si hay alguna madurez que vaya con ese color y con ese sabor a la vez.
+          Escrito con letras, donde <strong>c</strong> es un color, <strong>s</strong> un sabor y <strong>m</strong> una
+          madurez:
+        </p>
+<pre class="cuenta">c va con s   si   existe alguna m  tal que   (c va con m)  Y  (m va con s)</pre>
+        <p>
+          La composición sup-min es esta misma frase con las operaciones borrosas de la
+          <a href="borroso.html#operaciones">página anterior</a>. El "Y" se hace con el <strong>mínimo</strong>, como el AND:
+          un camino de color a sabor vale lo que su eslabón más débil. El "existe alguna" es un O entre todas las madureces
+          posibles, y se hace con el <strong>máximo</strong>: con un camino basta, así que gana el mejor.
+        </p>
+        <p>
+          Llamamos <strong>T</strong> a la tabla que buscamos, la que relaciona cada color con cada sabor: T(c, s) es el
+          grado en que el color c va con el sabor s. Y <strong>M</strong> es el conjunto de todas las madureces (verde,
+          normal y madura); "m ∈ M" se lee "m recorre M", una madurez detrás de otra.
+        </p>
+<pre class="cuenta">T(c, s)  =   sup    min( R(c, m), S(m, s) )
+           m ∈ M
+
+min:  cuánto valen a la vez los dos eslabones de un camino
+sup:  el mejor de todos los caminos, uno por cada m</pre>
+        <p>
+          "Sup" es el <strong>supremo</strong>: el máximo, con un matiz para cuando m recorre un intervalo continuo, como
+          todas las temperaturas entre 0 y 40 °C. Ahí puede que ningún valor llegue a alcanzar el tope, y el supremo es ese
+          tope. Con tablas como estas, sup y max son lo mismo, y por eso los libros también la llaman
+          <strong>composición max-min</strong>.
+        </p>
+
+        <h3 class="label">Caminos y eslabones</h3>
+        <p>
+          Para la casilla de amarillo y dulce hay tres caminos, uno por cada madurez. Cada flecha lleva su grado: las de la
+          izquierda salen de la fila de amarillo en R, y las de la derecha de la columna de dulce en S.
+        </p>
+        <figure class="wide">
+          <figcaption>T(amarillo, dulce): tres caminos, y gana el que tiene el eslabón débil más fuerte</figcaption>
+          <svg class="explica dgz5" viewBox="0 0 560 196" role="img" aria-label="Amarillo a la izquierda y dulce a la derecha, unidos por tres caminos que pasan por verde, normal y madura. Por verde, los eslabones valen 0,3 y 0, y el camino vale 0. Por normal, 1 y 0,3, y vale 0,3. Por madura, 0,4 y 1, y vale 0,4, que es el mayor: T(amarillo, dulce) = 0,4.">
+            <style>
+              .dgz5 .b{fill:var(--surface);stroke:var(--maze);stroke-width:1.4}
+              .dgz5 .bb{fill:var(--pill-soft);stroke:var(--pill-ink);stroke-width:1.8}
+              .dgz5 .t{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgz5 .w{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--maze);text-anchor:middle}
+              .dgz5 .wb{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--pill-ink);text-anchor:middle}
+              .dgz5 .s{font-family:var(--f-mono);font-size:8.6px;fill:var(--ink-2);text-anchor:middle}
+              .dgz5 .sb{font-family:var(--f-mono);font-size:8.6px;font-weight:700;fill:var(--pill-ink);text-anchor:middle}
+              .dgz5 .e{fill:none;stroke:var(--ink-3);stroke-width:1.3}
+              .dgz5 .eb{fill:none;stroke:var(--pill-ink);stroke-width:2.6}
+            </style>
+            <path d="M116 95 L232 35" class="e"/><path d="M328 35 L444 95" class="e"/>
+            <path d="M116 95 L232 95" class="e"/><path d="M328 95 L444 95" class="e"/>
+            <path d="M116 95 L232 155" class="eb"/><path d="M328 155 L444 95" class="eb"/>
+            <rect x="20" y="82" width="96" height="26" rx="5" class="b"/><text x="68" y="99" class="t">amarillo</text>
+            <rect x="232" y="22" width="96" height="26" rx="5" class="b"/><text x="280" y="39" class="t">verde</text>
+            <rect x="232" y="82" width="96" height="26" rx="5" class="b"/><text x="280" y="99" class="t">normal</text>
+            <rect x="232" y="142" width="96" height="26" rx="5" class="bb"/><text x="280" y="159" class="t">madura</text>
+            <rect x="444" y="82" width="96" height="26" rx="5" class="bb"/><text x="492" y="99" class="t">dulce</text>
+            <text x="166" y="56" class="w">0,3</text><text x="394" y="56" class="w">0</text>
+            <text x="174" y="89" class="w">1</text><text x="386" y="89" class="w">0,3</text>
+            <text x="164" y="146" class="wb">0,4</text><text x="396" y="146" class="wb">1</text>
+            <text x="280" y="62" class="s">min(0,3; 0) = 0</text>
+            <text x="280" y="122" class="s">min(1; 0,3) = 0,3</text>
+            <text x="280" y="183" class="sb">min(0,4; 1) = 0,4</text>
+            <text x="492" y="126" class="s">max(0; 0,3; 0,4)</text>
+            <text x="492" y="140" class="sb">= 0,4</text>
+          </svg>
+        </figure>
+        <p>
+          Escrito como cuenta, con la fila de amarillo en R y la columna de dulce en S emparejadas por la madurez:
         </p>
 <pre class="cuenta">T(amarillo, dulce) = max( min(R(amarillo, verde),  S(verde, dulce)),
                           min(R(amarillo, normal), S(normal, dulce)),
@@ -165,7 +236,23 @@ conclusión: el tomate está más o menos maduro</pre>
                    = max( 0,  0,3,  0,4 )
                    = 0,4</pre>
         <p>
-          Haciendo lo mismo con cada pareja sale la tabla entera. El amarillo es sobre todo insípido, y el rojo, dulce:
+          Los caminos no se suman ni se promedian. Que haya tres caminos flojos no hace uno fuerte: amarillo va con dulce en
+          0,4 porque su mejor camino, el de madura, vale 0,4. El de normal tiene un eslabón a 1, y no sirve de nada porque el
+          otro está en 0,3.
+        </p>
+
+        <h3 class="label">La tabla entera, como un producto de matrices</h3>
+        <p>
+          Si habéis multiplicado matrices, ya sabéis recorrerla. La casilla de la fila c y la columna s de T sale de la fila c
+          de R y la columna s de S, emparejadas elemento a elemento. Lo único que cambia son las dos operaciones:
+        </p>
+<pre class="cuenta">producto de matrices:   T(c, s) =  suma sobre m de  R(c, m) · S(m, s)
+composición sup-min:    T(c, s) =  max sobre m de   min( R(c, m), S(m, s) )</pre>
+        <p>
+          De ahí sale también la condición de forma: las columnas de R y las filas de S tienen que ser el mismo conjunto, en
+          el mismo orden (aquí, verde, normal y madura), y T tiene las filas de R y las columnas de S. Haciendo lo mismo con
+          las nueve casillas sale la tabla entera, que se escribe <strong>T = R ∘ S</strong>: el símbolo ∘ se lee
+          "compuesta con". El amarillo es sobre todo insípido, y el rojo, dulce:
         </p>
         <div class="table-scroll">
           <table>
@@ -177,12 +264,86 @@ conclusión: el tomate está más o menos maduro</pre>
             </tbody>
           </table>
         </div>
-        <h3 class="label">Una regla también es una relación</h3>
+        <div class="demo" data-borroso="supmin">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>La composición, casilla a casilla</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Las tablas y la cuenta de amarillo y dulce están justo encima.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Pulsad <strong>amarillo e insípido</strong>: da 1, porque el camino por normal tiene los dos eslabones a 1.</li>
+            <li>Pulsad <strong>rojo y amargo</strong>: da 0,2. El único camino que no vale 0 es el de normal, y su eslabón
+              débil es R(rojo, normal) = 0,2.</li>
+            <li>Cambiad a <strong>sup-producto</strong>, la otra composición que vais a ver en los libros: cada camino vale el
+              producto de sus eslabones en vez del menor. Naranja y dulce baja de 0,3 a 0,15, porque 0,5 · 0,3 = 0,15. En un
+              camino con un eslabón a 1, las dos dan lo mismo.</li>
+          </ul>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Los tres errores de hacerla a mano</span>
+          <ul>
+            <li><strong>Tomar el máximo de más.</strong> El máximo es sólo entre los caminos de esa casilla, uno por cada
+              elemento del medio. No es el máximo de la fila de R ni el de toda la tabla.</li>
+            <li><strong>Dar la vuelta a las operaciones.</strong> Primero el mínimo de cada pareja, luego el máximo de esos
+              mínimos. Al revés (el mínimo de los máximos) es otra cuenta y da otros números: para amarillo y dulce saldría
+              min(0,3; 1; 1) = 0,3.</li>
+            <li><strong>Emparejar mal.</strong> R(c, m) va con S(m, s) del mismo m. La fila de R se lee en horizontal y la
+              columna de S en vertical, como al multiplicar matrices.</li>
+          </ul>
+        </div>
+
+        <h3 class="label" id="hecho">Un hecho se compone igual</h3>
         <p>
-          "Si la temperatura es <em>fría</em>, abre la llave de la calefacción" relaciona temperaturas con aperturas de la
-          llave. Con el método de <strong>Mamdani</strong>, esa relación se construye con el mínimo entre antecedente y
-          consecuente, y aplicar la regla a un hecho es componerlos con sup-min. Con una entrada de 4&nbsp;°C, que es fría en
-          un 0,8, templada en un 0,2 y caliente en un 0, y esta relación:
+          Hasta aquí se componían dos relaciones. Para razonar hay que componer un <strong>hecho</strong> con una regla, y un
+          hecho también es un conjunto borroso: una relación con una sola fila.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Qué es A′, y por qué lleva tilde</span>
+          <p>
+            Es la notación del <a href="#modus-ponens">modus ponens generalizado</a>. En una regla "si A entonces B", A es el
+            antecedente ("la temperatura es fría") y B el consecuente ("la llave está abierta"). <strong>A′</strong>, que se
+            lee "A prima", es <strong>el hecho</strong>: lo que sabéis ahora de la temperatura, escrito como conjunto borroso.
+            La tilde avisa de que se parece a A, pero no tiene por qué ser A. <strong>B′</strong> es lo que se concluye, y se
+            parece a B; aquí lo llamamos <strong>llave′</strong>, el grado de cada posición de la llave.
+          </p>
+          <p>
+            A′(t) es el grado en que cada valor t de la temperatura encaja con lo que sabéis. En esta página aparece de tres
+            formas, según lo que sepáis y según cómo se mida la temperatura:
+          </p>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Lo que sabéis</th><th scope="col">t recorre</th><th scope="col">A′(t)</th></tr></thead>
+            <tbody>
+              <tr><td>Hace 4&nbsp;°C, dicho con etiquetas</td><td>fría, templada, caliente</td><td>0,8, 0,2 y 0: lo que da difuminar 4&nbsp;°C</td></tr>
+              <tr><td>Hace exactamente 4&nbsp;°C</td><td>0, 4, 8… 20&nbsp;°C</td><td>1 en 4&nbsp;°C, 0 en el resto: un pico</td></tr>
+              <tr><td>Hace unos 16&nbsp;°C</td><td>0, 4, 8… 20&nbsp;°C</td><td>0,5, 1 y 0,5 en 12, 16 y 20&nbsp;°C: un triángulo</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          La primera es la de la llave, justo aquí debajo, con la temperatura reducida a tres etiquetas. Las otras dos
+          miden la temperatura en grados, y salen en <a href="#relacion-mamdani">la regla de Mamdani</a>, más abajo, después
+          de ver <a href="#etiquetas-grados">cómo se pasa de las etiquetas a los grados</a>.
+        </p>
+        <p>
+          Con 4&nbsp;°C, el hecho es la fila A′ = (0,8; 0,2; 0). Componerla con una relación R entre la temperatura y la
+          llave de la calefacción da otra fila, llave′: el grado de cada posición de la llave.
+        </p>
+        <p>
+          Con <strong>t</strong> para un valor de la temperatura y <strong>p</strong> para una posición de la llave, R(t, p)
+          es el grado en que esa temperatura va con esa posición, y llave′(p) el grado que se concluye para p:
+        </p>
+<pre class="cuenta">llave′(p)  =  sup sobre t de  min( A′(t), R(t, p) )</pre>
+        <p>
+          Esto es la regla composicional de inferencia de la <a href="#modus-ponens">sección anterior</a>: el hecho compuesto
+          con la regla da la conclusión. En las transparencias, R viene dada tal cual en esta tabla (de dónde sale a partir de
+          una regla lo vemos justo después):
         </p>
         <div class="table-scroll">
           <table>
@@ -194,17 +355,171 @@ conclusión: el tomate está más o menos maduro</pre>
             </tbody>
           </table>
         </div>
-<pre class="cuenta">llave(cerrada)     = max( min(0,8; 0),   min(0,2; 0,3), min(0; 0,8) ) = 0,2
-llave(semiabierta) = max( min(0,8; 0,4), min(0,2; 0,7), min(0; 0,2) ) = 0,4
-llave(abierta)     = max( min(0,8; 0,9), min(0,2; 0,3), min(0; 0)   ) = 0,8</pre>
+        <p>
+          Cada posición de la llave es una columna de R, emparejada con la fila A′. Podéis seguir estas tres cuentas en la
+          demo de arriba, eligiendo "El hecho de 4 °C y la llave":
+        </p>
+<pre class="cuenta">llave′(cerrada)     = max( min(0,8; 0),   min(0,2; 0,3), min(0; 0,8) ) = 0,2
+llave′(semiabierta) = max( min(0,8; 0,4), min(0,2; 0,7), min(0; 0,2) ) = 0,4
+llave′(abierta)     = max( min(0,8; 0,9), min(0,2; 0,3), min(0; 0)   ) = 0,8</pre>
         <p>
           El resultado es otro conjunto borroso: la llave debería estar sobre todo abierta. Para mover la llave hace falta un
-          ángulo, y eso es la <a href="#mamdani">desdifuminación</a>: si cerrada es 0°, semiabierta 45° y abierta 90°, la
+          ángulo, y eso es la <a href="#desdifuminar">desdifuminación</a>: si cerrada es 0°, semiabierta 45° y abierta 90°, la
           media ponderada da
         </p>
 <pre class="cuenta">(0 · 0,2 + 45 · 0,4 + 90 · 0,8) / (0,2 + 0,4 + 0,8)
   = (0 + 18 + 72) / 1,4
   = 64,3°</pre>
+
+        <h3 class="label" id="etiquetas-grados">De las etiquetas a los grados</h3>
+        <p>
+          En el ejemplo de la llave, la temperatura sólo tenía tres valores posibles: fría, templada y caliente. Es un atajo
+          de las transparencias. Alguien había convertido ya los 4&nbsp;°C en un grado para cada etiqueta, y R relacionaba
+          esas etiquetas con otras tres de la llave.
+        </p>
+        <p>
+          Pero fría, templada y caliente son conjuntos borrosos sobre la temperatura de verdad, en °C, como los de la
+          <a href="borroso.html#variables">página anterior</a>. Con estas tres funciones, 4&nbsp;°C da justo los grados del
+          ejemplo:
+        </p>
+        <figure class="wide">
+          <figcaption>fría := (0, 1) (20, 0) · templada := (0, 0) (20, 1) (40, 0) · caliente := (20, 0) (40, 1)</figcaption>
+          <svg class="explica dgz7" viewBox="0 0 560 170" role="img" aria-label="La temperatura de 0 a 40 grados. Fría baja de 1 en 0 grados a 0 en 20. Templada sube de 0 en 0 grados a 1 en 20 y baja a 0 en 40. Caliente sube de 0 en 20 grados a 1 en 40. Una línea vertical en 4 grados corta a fría en 0,8, a templada en 0,2 y a caliente en 0. En el eje, marcadas, las temperaturas 0, 4, 8, 12, 16 y 20 que se usan en las tablas de abajo.">
+            <style>
+              .dgz7 .e{stroke:var(--ink-3);stroke-width:1}
+              .dgz7 .f{fill:none;stroke:var(--maze);stroke-width:2}
+              .dgz7 .m{fill:none;stroke:var(--clyde);stroke-width:2}
+              .dgz7 .c{fill:none;stroke:var(--inky);stroke-width:2}
+              .dgz7 .tf{font-family:var(--f-mono);font-size:9.6px;font-weight:700;fill:var(--maze)}
+              .dgz7 .tm{font-family:var(--f-mono);font-size:9.6px;font-weight:700;fill:var(--clyde);text-anchor:middle}
+              .dgz7 .tc{font-family:var(--f-mono);font-size:9.6px;font-weight:700;fill:var(--inky);text-anchor:end}
+              .dgz7 .n{font-family:var(--f-mono);font-size:8.4px;fill:var(--ink-3);text-anchor:middle}
+              .dgz7 .v{stroke:var(--blinky);stroke-width:1.5;stroke-dasharray:4 3}
+              .dgz7 .p{fill:var(--blinky)}
+              .dgz7 .r{font-family:var(--f-mono);font-size:9px;font-weight:700;fill:var(--blinky);paint-order:stroke;stroke:var(--ground);stroke-width:3px;stroke-linejoin:round}
+              .dgz7 .k{stroke:var(--ink);stroke-width:1.6}
+            </style>
+            <line x1="40" y1="130" x2="520" y2="130" class="e"/><line x1="40" y1="130" x2="40" y2="36" class="e"/>
+            <text x="32" y="43" class="n">1</text><text x="32" y="133" class="n">0</text>
+            <path d="M40 40 L280 130 L520 130" class="f"/>
+            <path d="M40 130 L280 40 L520 130" class="m"/>
+            <path d="M40 130 L280 130 L520 40" class="c"/>
+            <text x="150" y="70" class="tf">fría</text><text x="280" y="32" class="tm">templada</text><text x="520" y="32" class="tc">caliente</text>
+            <line x1="40" y1="130" x2="40" y2="136" class="k"/><line x1="88" y1="130" x2="88" y2="136" class="k"/><line x1="136" y1="130" x2="136" y2="136" class="k"/>
+            <line x1="184" y1="130" x2="184" y2="136" class="k"/><line x1="232" y1="130" x2="232" y2="136" class="k"/><line x1="280" y1="130" x2="280" y2="136" class="k"/>
+            <text x="40" y="147" class="n">0</text><text x="88" y="147" class="n">4</text><text x="136" y="147" class="n">8</text><text x="184" y="147" class="n">12</text>
+            <text x="232" y="147" class="n">16</text><text x="280" y="147" class="n">20</text><text x="400" y="147" class="n">30</text><text x="520" y="147" class="n">40 °C</text>
+            <line x1="88" y1="130" x2="88" y2="30" class="v"/>
+            <circle cx="88" cy="58" r="3.4" class="p"/><circle cx="88" cy="112" r="3.4" class="p"/><circle cx="88" cy="130" r="3.4" class="p"/>
+            <text x="95" y="55" class="r">fría 0,8</text><text x="97" y="116" class="r">templada 0,2</text><text x="95" y="126" class="r">caliente 0</text>
+            <text x="40" y="164" class="n" style="text-anchor:start">las marcas gruesas: las seis temperaturas de las tablas de abajo</text>
+          </svg>
+        </figure>
+        <p>
+          Con la llave pasa lo mismo: cerrada, semiabierta y abierta eran etiquetas, y la llave de verdad se mide en grados
+          de giro. "Abierta" es un conjunto borroso sobre ese giro, que en tres posiciones vale abierta(0°) = 0,
+          abierta(45°) = 0,5 y abierta(90°) = 1.
+        </p>
+        <p>
+          Para construir R a partir de una regla hay que bajar a este nivel. La regla "si la temperatura es fría, la llave
+          está abierta" le pregunta "¿es fría?" a cada temperatura concreta, y la respuesta es un número de la curva de
+          arriba. Así que a partir de aquí <strong>t es una temperatura en °C</strong> y <strong>p un giro de la
+          llave</strong>. Para que las tablas quepan, tomamos sólo seis temperaturas, de 0 a 20&nbsp;°C de 4 en 4 (las marcas
+          gruesas), y tres giros. Con más puntos saldría lo mismo, con más filas.
+        </p>
+
+        <h3 class="label" id="relacion-mamdani">De dónde sale R: la regla de Mamdani</h3>
+        <p>
+          El método de <strong>Mamdani</strong> construye R con el mínimo: cada pareja (t, p) vale lo que valgan a la vez
+          "t es fría" y "p es abierta". Aquí fría(t) es el grado en que la temperatura t es fría, que se lee en la curva de
+          arriba, y abierta(p) el grado en que el giro p cuenta como abierto.
+        </p>
+<pre class="cuenta">R(t, p)  =  min( fría(t), abierta(p) )</pre>
+        <p>
+          De 0 a 20&nbsp;°C, "fría" vale 1, 0,8, 0,6, 0,4, 0,2 y 0. En la tabla, cada fila es una temperatura con su valor de
+          "fría" (en azul), cada columna un giro de la llave con su valor de "abierta" (en naranja), y cada casilla el menor
+          de los dos:
+        </p>
+        <figure>
+          <figcaption>R = min(fría, abierta): cada casilla es el menor entre el valor de su fila y el de su columna</figcaption>
+          <div class="table-scroll">
+            <table class="tabla-min">
+              <tbody>
+              <tr><td class="esq">t \ p</td><th scope="col" class="m-col">llave 0° <b>abierta 0</b></th><th scope="col" class="m-col">llave 45° <b>abierta 0,5</b></th><th scope="col" class="m-col usa">llave 90° <b>abierta 1</b></th></tr>
+              <tr><th scope="row" class="m-fila">0&nbsp;°C <b>fría 1</b></th><td>0</td><td>0,5</td><td>1</td></tr>
+              <tr><th scope="row" class="m-fila usa">4&nbsp;°C <b>fría 0,8</b></th><td>0</td><td>0,5</td><td class="ej">0,8</td></tr>
+              <tr><th scope="row" class="m-fila">8&nbsp;°C <b>fría 0,6</b></th><td>0</td><td>0,5</td><td>0,6</td></tr>
+              <tr><th scope="row" class="m-fila">12&nbsp;°C <b>fría 0,4</b></th><td>0</td><td>0,4</td><td>0,4</td></tr>
+              <tr><th scope="row" class="m-fila">16&nbsp;°C <b>fría 0,2</b></th><td>0</td><td>0,2</td><td>0,2</td></tr>
+              <tr><th scope="row" class="m-fila">20&nbsp;°C <b>fría 0</b></th><td>0</td><td>0</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </figure>
+<pre class="cuenta">casilla resaltada:  R(4 °C, 90°) = min( fría(4 °C), abierta(90°) )
+                                 = min( 0,8; 1 )
+                                 = 0,8</pre>
+        <p>
+          Ahora llega el hecho de siempre, 4&nbsp;°C, pero como número exacto: "hace exactamente 4&nbsp;°C". Como fila, A′
+          vale 1 en 4&nbsp;°C y 0 en las demás temperaturas: es el pico de la tabla de las tres formas de A′. En la
+          composición, cada fila de R con A′ = 0 da mínimos de 0 y no cuenta, así que sólo queda la de 4&nbsp;°C:
+        </p>
+<pre class="cuenta">llave′(0°)  = min(1; R(4 °C, 0°))  = min(1; 0)   = 0
+llave′(45°) = min(1; R(4 °C, 45°)) = min(1; 0,5) = 0,5
+llave′(90°) = min(1; R(4 °C, 90°)) = min(1; 0,8) = 0,8</pre>
+        <p>
+          Esa fila, (0; 0,5; 0,8), es min(0,8; abierta(p)): el conjunto "abierta" recortado a la altura 0,8, que es lo que
+          vale fría(4&nbsp;°C). Es el paso 3 de Mamdani, <strong>recortar el consecuente al grado de la regla</strong>.
+          Construir R y componer con sup-min da exactamente lo mismo que recortar, y por eso los motores recortan y nunca
+          construyen la tabla.
+        </p>
+        <p>
+          Con un hecho borroso, "hace unos 16&nbsp;°C" (0,5 en 12&nbsp;°C, 1 en 16&nbsp;°C, 0,5 en 20&nbsp;°C), varias filas
+          cuentan, y ahí el sup trabaja de verdad. El grado de la regla es cuánto se solapan el hecho y el antecedente, en su
+          mejor punto:
+        </p>
+<pre class="cuenta">grado = sup sobre t de  min( A′(t), fría(t) )
+      = max( min(0,5; 0,4),  min(1; 0,2),  min(0,5; 0) )
+      = max( 0,4;  0,2;  0 )
+      = 0,4
+
+llave′ = min(0,4; abierta) = (0; 0,4; 0,4)</pre>
+        <p>
+          El mejor punto de solape está en 12&nbsp;°C, no en 16: el hecho admite que haga algo menos de 16 grados, y ahí
+          "fría" se cumple más. Con exactamente 16&nbsp;°C el grado sería fría(16&nbsp;°C) = 0,2, la mitad.
+        </p>
+        <p>
+          En general, para una regla "si A entonces B" y un hecho A′, con <strong>x</strong> para los valores de la
+          entrada (aquí, la temperatura) e <strong>y</strong> para los de la salida (el giro de la llave). A(x) y B(y)
+          son los grados de pertenencia, como fría(t) y abierta(p). La letra griega <strong>α</strong> (alfa) es el grado de
+          la regla, y <strong>x₀</strong> el valor medido cuando el hecho es nítido:
+        </p>
+<pre class="cuenta">B′(y)  =  min( α, B(y) )     con   α  =  sup sobre x de  min( A′(x), A(x) )
+
+hecho nítido x₀:   α = A(x₀)</pre>
+        <p>
+          Con varias reglas, cada una da su consecuente recortado y se juntan con el máximo, que es el paso de agregar. Sale
+          lo mismo que unir las relaciones de todas las reglas con el máximo y componer una sola vez.
+        </p>
+        <div class="demo" data-borroso="recorte">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Componer con la relación de Mamdani es recortar</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. La tabla de R y las dos cuentas, con exactamente 4 °C y con unos 16 °C, están justo encima.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Con <strong>exactamente</strong>, moved la temperatura: la llave′ es siempre una fila de R, y la última línea
+              de la cuenta confirma que es "abierta" recortada. A 20&nbsp;°C la regla no se dispara.</li>
+            <li>Pasad a <strong>unos</strong> con 16&nbsp;°C: el grado sube de 0,2 a 0,4, porque el hecho llega hasta los
+              12&nbsp;°C. Las casillas marcadas son las que ganan el sup en cada columna.</li>
+            <li>Fijaos en las barras: la llave′ nunca pasa de la línea del grado ni de "abierta".</li>
+          </ul>
+        </div>
       </section>
 
       <section id="mamdani" data-corto="Mamdani, paso a paso">
@@ -213,14 +528,15 @@ llave(abierta)     = max( min(0,8; 0,9), min(0,2; 0,3), min(0; 0)   ) = 0,8</pre
           <h2 class="sec">Mamdani en cuatro pasos</h2>
         </div>
         <p>
-          En la práctica nadie escribe tablas de relación: se escriben reglas, y el motor hace las cuentas. El método de
+          En la práctica nadie escribe tablas de relación: se escriben reglas, y el motor hace las cuentas recortando cada
+          consecuente, como acabáis de ver <a href="#relacion-mamdani">al final de la sección anterior</a>. El método de
           Mamdani, el que usa jFuzzyLogic, tiene cuatro pasos. El ejemplo de siempre, que viene con jFuzzyLogic
           (<code>tipper.fcl</code>): calcular la propina según el <strong>servicio</strong> y la <strong>comida</strong>, los
           dos de 0 a 10, con tres reglas.
         </p>
-<pre class="cuenta">R1: SI el servicio es malo O la comida es rancia     ENTONCES la propina es tacaña
-R2: SI el servicio es bueno                          ENTONCES la propina es normal
-R3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es generosa</pre>
+<pre class="cuenta">regla 1: SI el servicio es malo O la comida es rancia      ENTONCES la propina es tacaña
+regla 2: SI el servicio es bueno                           ENTONCES la propina es normal
+regla 3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es generosa</pre>
         <figure class="wide">
           <figcaption>Los cuatro pasos de Mamdani</figcaption>
           <svg class="explica dgz2" viewBox="0 0 560 120" role="img" aria-label="Cuatro cajas en fila. Uno, difuminar: los números de entrada se convierten en grados de cada término. Dos, evaluar las reglas: cada antecedente da un grado, con mínimo para AND y máximo para OR. Tres, implicar y agregar: cada regla recorta su consecuente a su grado y los recortes se juntan en un solo conjunto. Cuatro, desdifuminar: el conjunto se reduce a un número, por ejemplo su centro de gravedad.">
@@ -244,33 +560,165 @@ R3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es gen
             <text x="489" y="112" class="n">propina 11,7</text>
           </svg>
         </figure>
+        <h3 class="label" id="terminos-propina">Qué es cada término, en números</h3>
         <p>
-          Con un servicio de <strong>3</strong> y una comida de <strong>8</strong>, las cuentas son estas. Son las que da
-          jFuzzyLogic, y las que podéis ver en el <a href="#banco">banco de pruebas</a> eligiendo "La propina":
+          Antes de hacer cuentas hay que saber qué significa cada palabra. Cada término se da por puntos (valor, grado), como
+          en la <a href="borroso.html#conjuntos">página anterior</a>: <code>(0, 1) (4, 0)</code> vale 1 en 0 y baja en línea
+          recta hasta 0 en 4. Estos son los de <code>tipper.fcl</code>, con los nombres en castellano:
         </p>
-<pre class="cuenta">1 · difuminar     servicio 3:  malo 0,25   bueno 0,67   excelente 0
-                  comida 8:    rancia 0    deliciosa 0,50
+<pre class="cuenta">servicio, de 0 a 10
+  malo       := (0, 1) (4, 0)
+  bueno      := (1, 0) (4, 1) (6, 1) (9, 0)
+  excelente  := (6, 0) (9, 1)
 
-2 · reglas        R1 = max(malo, rancia)        = max(0,25; 0)    = 0,25
-                  R2 = bueno                                      = 0,67
-                  R3 = min(excelente, deliciosa) = min(0; 0,50)   = 0
+comida, de 0 a 10
+  rancia     := (0, 1) (1, 1) (3, 0)
+  deliciosa  := (7, 0) (9, 1)
+
+propina, de 0 a 30 %
+  tacaña     := (0, 0)  (5, 1)  (10, 0)     un triángulo con el pico en el 5 %
+  normal     := (10, 0) (15, 1) (20, 0)     con el pico en el 15 %
+  generosa   := (20, 0) (25, 1) (30, 0)     con el pico en el 25 %</pre>
+        <figure class="wide">
+          <figcaption>Los tres términos de la propina: "tacaña" quiere decir alrededor del 5 %, "normal" del 15 % y "generosa" del 25 %</figcaption>
+          <svg class="explica dgz8" viewBox="0 0 560 130" role="img" aria-label="La propina de 0 a 30 por ciento con tres triángulos que no se pisan: tacaña, de 0 a 10 con el pico en 5; normal, de 10 a 20 con el pico en 15; generosa, de 20 a 30 con el pico en 25.">
+            <style>
+              .dgz8 .e{stroke:var(--ink-3);stroke-width:1}
+              .dgz8 .a{fill:var(--maze);fill-opacity:.14;stroke:var(--maze);stroke-width:2}
+              .dgz8 .b{fill:var(--clyde);fill-opacity:.14;stroke:var(--clyde);stroke-width:2}
+              .dgz8 .c{fill:var(--inky);fill-opacity:.14;stroke:var(--inky);stroke-width:2}
+              .dgz8 .t{font-family:var(--f-mono);font-size:9.6px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgz8 .n{font-family:var(--f-mono);font-size:8.4px;fill:var(--ink-3);text-anchor:middle}
+              .dgz8 .k{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 2}
+            </style>
+            <line x1="30" y1="100" x2="530" y2="100" class="e"/>
+            <path d="M30 100 L113.3 20 L196.7 100 Z" class="a"/>
+            <path d="M196.7 100 L280 20 L363.3 100 Z" class="b"/>
+            <path d="M363.3 100 L446.7 20 L530 100 Z" class="c"/>
+            <line x1="113.3" y1="20" x2="113.3" y2="100" class="k"/><line x1="280" y1="20" x2="280" y2="100" class="k"/><line x1="446.7" y1="20" x2="446.7" y2="100" class="k"/>
+            <text x="113.3" y="13" class="t">tacaña</text><text x="280" y="13" class="t">normal</text><text x="446.7" y="13" class="t">generosa</text>
+            <text x="30" y="113" class="n">0</text><text x="113.3" y="113" class="n">5 %</text><text x="196.7" y="113" class="n">10</text>
+            <text x="280" y="113" class="n">15 %</text><text x="363.3" y="113" class="n">20</text><text x="446.7" y="113" class="n">25 %</text><text x="530" y="113" class="n">30</text>
+          </svg>
+        </figure>
+
+        <h3 class="label">Las cuentas, con servicio 3 y comida 8</h3>
+        <p>
+          Son las que da jFuzzyLogic, y las que podéis ver en el <a href="#banco">banco de pruebas</a> eligiendo "La propina".
+          En el paso 1, cada grado se lee en la recta de su término:
+        </p>
+<pre class="cuenta">1 · difuminar     malo(3)       = (4 − 3) / (4 − 0)   = 0,25
+                  bueno(3)      = (3 − 1) / (4 − 1)   = 0,67
+                  excelente(3)  = 0                     (no empieza hasta el 6)
+                  rancia(8)     = 0                     (acaba en el 3)
+                  deliciosa(8)  = (8 − 7) / (9 − 7)   = 0,50
+
+2 · reglas        regla 1 = max(malo, rancia)         = max(0,25; 0)    = 0,25
+                  regla 2 = bueno                                       = 0,67
+                  regla 3 = min(excelente, deliciosa) = min(0; 0,50)    = 0
 
 3 · implicar      "tacaña" recortada a 0,25, "normal" recortada a 0,67, "generosa" a 0
     y agregar     el máximo de los tres recortes, punto a punto
 
 4 · desdifuminar  centro de gravedad del conjunto agregado = 11,70</pre>
         <p>
-          Una propina del 11,7&nbsp;%: el servicio regular tira hacia el 15 de "normal", y el poquito de "malo" la baja un
-          poco. Si el servicio pasa a 6, "bueno" vale 1, el resto 0, y sale exactamente 15.
+          Con los términos a la vista, el 11,7&nbsp;% se entiende: "tacaña" apunta al 5&nbsp;% y "normal" al 15&nbsp;%, y el
+          resultado es una media de esos dos números ponderada por lo que queda de cada término después de recortarlo.
+          "Normal" se cumple más (0,67 frente a 0,25) y le queda el doble de superficie, así que el 11,7 cae más cerca del 15
+          que del 5. "Generosa" no cuenta, porque la regla 3 vale 0:
+        </p>
+<pre class="cuenta">lo que queda de "tacaña":  2,19   (centro en el 5 %)
+lo que queda de "normal":  4,44   (centro en el 15 %)
+
+propina = (2,19 · 5 + 4,44 · 15) / (2,19 + 4,44) = 11,70</pre>
+        <p>
+          De dónde salen el 2,19 y el 4,44, y por qué esta media es la que hace jFuzzyLogic, lo cuenta la
+          <a href="#desdifuminar">sección siguiente</a>. Si el servicio pasa a 6, "bueno" vale 1, el resto 0, y sale
+          exactamente 15: sólo queda "normal", y su centro está en el 15.
+        </p>
+
+        <h3 class="label" id="mismo-consecuente">Dos reglas con el mismo consecuente</h3>
+        <p>
+          La regla 1 junta dos motivos con un O: servicio malo o comida rancia. Se podría haber escrito como dos reglas que
+          concluyen lo mismo:
+        </p>
+<pre class="cuenta">regla 1a: SI el servicio es malo   ENTONCES la propina es tacaña
+regla 1b: SI la comida es rancia   ENTONCES la propina es tacaña</pre>
+        <p>
+          Con servicio 3 y comida 2, las dos se cumplen a la vez: la 1a en malo(3) = 0,25 y la 1b en rancia(2) = 0,5. Cada una
+          recorta "tacaña" a su altura, y salen dos trozos del mismo término, uno dentro del otro. El paso de agregar los junta
+          punto a punto, y cómo los junta lo decide <code>ACCU</code> en el FCL. Con a y b para lo que deja cada regla en un
+          mismo punto de la escala:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">ACCU</th><th scope="col">En cada punto</th><th scope="col">"Tacaña" llega a</th><th scope="col">Propina</th></tr></thead>
+            <tbody>
+              <tr><td><code>MAX</code></td><td>el mayor, max(a, b)</td><td>0,5</td><td>10,42</td></tr>
+              <tr><td><code>SUM</code></td><td>la suma, a + b</td><td>0,25 + 0,5 = 0,75</td><td>9,28</td></tr>
+              <tr><td><code>PROBOR</code></td><td>a + b − a · b</td><td>0,625</td><td>9,69</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="wide">
+          <figcaption>Los dos recortes de "tacaña" (a 0,25 y a 0,5) y lo que queda al juntarlos con MAX y con SUM</figcaption>
+          <svg class="explica dgz9" viewBox="0 0 560 150" role="img" aria-label="Dos paneles con el triángulo de tacaña, de 0 a 10. En los dos están dibujados los recortes a 0,25 y a 0,5. A la izquierda, con MAX, el resultado es el recorte a 0,5: el de 0,25 queda dentro y no añade nada. A la derecha, con SUM, los dos se suman y el resultado sube hasta 0,75 en el centro.">
+            <style>
+              .dgz9 .e{stroke:var(--ink-3);stroke-width:1}
+              .dgz9 .tr{fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3}
+              .dgz9 .r{fill:none;stroke:var(--maze);stroke-width:1.2;stroke-dasharray:4 2}
+              .dgz9 .res{fill:var(--pill);fill-opacity:.4;stroke:var(--pill-ink);stroke-width:1.8;stroke-linejoin:round}
+              .dgz9 .t{font-family:var(--f-mono);font-size:9.6px;font-weight:700;fill:var(--ink);text-anchor:middle}
+              .dgz9 .n{font-family:var(--f-mono);font-size:8.4px;fill:var(--ink-3)}
+              .dgz9 .h{font-family:var(--f-mono);font-size:8.6px;font-weight:700;fill:var(--pill-ink)}
+            </style>
+            <g transform="translate(0,0)">
+              <text x="130" y="14" class="t">MAX: "tacaña" a 0,5</text>
+              <path d="M20 125 L130 35 L240 125" class="tr"/>
+              <path d="M20 125 L75 80 L185 80 L240 125 Z" class="res"/>
+              <path d="M20 125 L47.5 102.5 L212.5 102.5 L240 125" class="r"/>
+              <line x1="20" y1="125" x2="240" y2="125" class="e"/>
+              <text x="244" y="83" class="h">0,5</text><text x="244" y="105" class="n">0,25</text>
+              <text x="20" y="138" class="n">0</text><text x="126" y="138" class="n">5</text><text x="232" y="138" class="n">10</text>
+            </g>
+            <g transform="translate(290,0)">
+              <text x="130" y="14" class="t">SUM: "tacaña" a 0,75</text>
+              <path d="M20 125 L130 35 L240 125" class="tr"/>
+              <path d="M20 125 L47.5 80 L75 57.5 L185 57.5 L212.5 80 L240 125 Z" class="res"/>
+              <path d="M20 125 L75 80 L185 80 L240 125" class="r"/>
+              <path d="M20 125 L47.5 102.5 L212.5 102.5 L240 125" class="r"/>
+              <line x1="20" y1="125" x2="240" y2="125" class="e"/>
+              <text x="244" y="60" class="h">0,75</text>
+              <text x="20" y="138" class="n">0</text><text x="126" y="138" class="n">5</text><text x="232" y="138" class="n">10</text>
+            </g>
+          </svg>
+        </figure>
+        <p>
+          Con <strong>MAX</strong>, la regla que se cumple menos no aporta nada: su trozo de 0,25 queda dentro del de 0,5.
+          Sale lo mismo que con la regla 1 escrita con O, 10,42, porque el O también se hace con el máximo. Con
+          <strong>SUM</strong>, las dos razones se refuerzan: "tacaña" pesa más y la propina baja a 9,28. Con la cuenta de la
+          sección siguiente se ve por qué: lo que queda de "tacaña" pasa de 3,75 con MAX a 2,19 + 3,75 = 5,94 con SUM, y tira
+          más de la media hacia el 5. <strong>PROBOR</strong> también refuerza, pero menos, y nunca pasa de 1.
+        </p>
+        <p>
+          La suma sí puede pasar de 1: con comida 1, la regla 1b se cumple en 1 y "tacaña" llega a 1,25. Para eso está
+          <code>BSUM</code>, que corta en 1. Cuál elegir depende de lo que queráis decir: si dos razones independientes para
+          lo mismo deben pesar más que una, <code>SUM</code> o <code>PROBOR</code>; si con una basta y repetirla no debe contar
+          el doble, <code>MAX</code>. Y recordad que si no escribís <code>ACCU</code>, jFuzzyLogic usa <code>SUM</code>.
         </p>
         <h3 class="label">Las piezas que se pueden cambiar</h3>
+        <p>
+          Cada paso tiene su opción en <strong>FCL</strong>, el lenguaje de los ficheros <code>.fcl</code> de jFuzzyLogic.
+          Con a y b para los dos grados que se combinan, PROBOR es la "suma probabilística", a + b − a · b, y BSUM
+          la suma cortada en 1, min(1; a + b).
+        </p>
         <div class="table-scroll">
           <table class="ancha">
             <thead><tr><th scope="col">Paso</th><th scope="col">En FCL</th><th scope="col">Opciones</th><th scope="col">Qué cambia</th></tr></thead>
             <tbody>
               <tr><td>AND / OR</td><td><code>AND : MIN;</code></td><td><code>MIN</code> (y OR = <code>MAX</code>), <code>PROD</code> (y OR = <code>PROBOR</code>)</td><td>Con <code>PROD</code>, las dos condiciones cuentan siempre.</td></tr>
               <tr><td>Implicación</td><td><code>ACT : MIN;</code></td><td><code>MIN</code> recorta el consecuente; <code>PROD</code> lo encoge sin cambiarle la forma</td><td><code>PROD</code> conserva la forma del término, y suele dar salidas algo más suaves.</td></tr>
-              <tr><td>Agregación</td><td><code>ACCU : MAX;</code></td><td><code>MAX</code>, <code>SUM</code>, <code>PROBOR</code>, <code>BSUM</code></td><td>Con <code>MAX</code>, dos reglas que dicen lo mismo cuentan como una; con <code>SUM</code>, se refuerzan.</td></tr>
+              <tr><td>Agregación</td><td><code>ACCU : MAX;</code></td><td><code>MAX</code>, <code>SUM</code>, <code>PROBOR</code>, <code>BSUM</code></td><td>Con <code>MAX</code>, dos reglas que dicen lo mismo cuentan como una; con <code>SUM</code>, se refuerzan (<a href="#mismo-consecuente">el ejemplo, arriba</a>).</td></tr>
               <tr><td>Desdifuminación</td><td><code>METHOD : COG;</code></td><td><code>COG</code> centro de gravedad; <code>COA</code> centro de área; <code>LM</code>, <code>RM</code> el máximo más a la izquierda o a la derecha</td><td><code>COG</code> mezcla todo, suave; <code>LM</code> y <code>RM</code> se quedan con lo más fuerte, a saltos.</td></tr>
             </tbody>
           </table>
@@ -288,9 +736,220 @@ R3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es gen
         </div>
       </section>
 
-      <section id="banco" data-corto="Banco de pruebas">
+      <section id="desdifuminar" data-corto="Desdifuminar">
         <div class="sec-head">
           <span class="num">05</span>
+          <h2 class="sec">Desdifuminar: de una forma a un número</h2>
+        </div>
+        <p>
+          Después del paso 3, el motor tiene una forma: el conjunto agregado, una silueta sobre la escala de la salida hecha
+          con los trozos recortados de cada consecuente. Quien llama al motor necesita un número, un 11,7&nbsp;% de propina o
+          una urgencia de huir de 7,4, para compararlo o para actuar. Desdifuminar es elegir un número que represente esa
+          forma. Hay varias maneras de hacerlo, y cada una se queda con algo distinto de la forma.
+        </p>
+        <figure class="wide">
+          <figcaption>La propina con servicio 3 y comida 8: la forma que sale del paso 3, y dónde se equilibra</figcaption>
+          <svg class="explica dgz6" viewBox="0 0 560 212" role="img" aria-label="La escala de la propina de 0 a 30, con los tres términos en línea discontinua: tacaña, con el pico en 5; normal, en 15; generosa, en 25. Relleno, el conjunto agregado: tacaña recortada a 0,25, un trapecio bajo de 0 a 10, y normal recortada a 0,67, un trapecio más alto de 10 a 20. El trozo de tacaña tiene área 2,19 y centro en 5; el de normal, área 4,44 y centro en 15. Un triángulo bajo la base marca el punto de equilibrio, 11,70.">
+            <style>
+              .dgz6 .e{stroke:var(--ink-3);stroke-width:1}
+              .dgz6 .tr{fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3}
+              .dgz6 .ag{fill:var(--pill);fill-opacity:.38;stroke:var(--pill-ink);stroke-width:1.6;stroke-linejoin:round}
+              .dgz6 .c{fill:var(--ink);}
+              .dgz6 .f{fill:var(--blinky)}
+              .dgz6 .l{stroke:var(--blinky);stroke-width:1.6;stroke-dasharray:4 3}
+              .dgz6 .n{font-family:var(--f-mono);font-size:8.4px;fill:var(--ink-3);text-anchor:middle}
+              .dgz6 .t{font-family:var(--f-mono);font-size:9.4px;font-weight:700;fill:var(--ink-2);text-anchor:middle}
+              .dgz6 .s{font-family:var(--f-mono);font-size:8.6px;fill:var(--ink-2);text-anchor:middle}
+              .dgz6 .r{font-family:var(--f-mono);font-size:9.6px;font-weight:700;fill:var(--blinky);text-anchor:middle}
+            </style>
+            <path d="M30 150 L113.3 50 L196.7 150" class="tr"/>
+            <path d="M196.7 150 L280 50 L363.3 150" class="tr"/>
+            <path d="M363.3 150 L446.7 50 L530 150" class="tr"/>
+            <text x="113.3" y="42" class="t">tacaña</text><text x="280" y="42" class="t">normal</text><text x="446.7" y="42" class="t">generosa</text>
+            <path d="M30 150 L50.8 125 L175.8 125 L196.7 150 Z" class="ag"/>
+            <path d="M196.7 150 L252.2 83.3 L307.8 83.3 L363.3 150 Z" class="ag"/>
+            <line x1="30" y1="150" x2="530" y2="150" class="e"/>
+            <text x="30" y="162" class="n">0</text><text x="113.3" y="162" class="n">5</text><text x="196.7" y="162" class="n">10</text>
+            <text x="280" y="162" class="n">15</text><text x="363.3" y="162" class="n">20</text><text x="446.7" y="162" class="n">25</text><text x="530" y="162" class="n">30</text>
+            <circle cx="113.3" cy="137" r="3" class="c"/><circle cx="280" cy="117" r="3" class="c"/>
+            <text x="113.3" y="182" class="s">área 2,19 · centro 5</text>
+            <text x="300" y="182" class="s">área 4,44 · centro 15</text>
+            <line x1="225" y1="150" x2="225" y2="60" class="l"/>
+            <path d="M225 151 l-7 12 h14 z" class="f"/>
+            <text x="225" y="200" class="r">se equilibra en 11,70</text>
+          </svg>
+        </figure>
+
+        <h3 class="label">El centro de gravedad (COG)</h3>
+        <p>
+          Imaginad la forma recortada en cartón y apoyada sobre un dedo. El punto de la base donde se queda en equilibrio es
+          su <strong>centro de gravedad</strong>. Cada punto <strong>x</strong> de la escala empuja hacia su lado con un peso
+          igual a su grado en la forma, que escribimos <strong>μ(x)</strong> (μ es la letra griega mu, la de "miembro":
+          cuánto pertenece x al conjunto). Así que el centro de gravedad es una media ponderada:
+        </p>
+<pre class="cuenta">COG  =  suma de x · μ(x)  /  suma de μ(x)
+
+(si la escala es continua, las sumas son integrales)</pre>
+        <p>
+          Es la cuenta de la llave de la <a href="#hecho">sección 03</a>, con sólo tres puntos: 0°, 45° y 90°, que pesaban
+          0,2, 0,4 y 0,8. jFuzzyLogic hace la misma suma con 1000 puntos repartidos por la escala de la salida, que en la
+          propina va de 0 a 30.
+        </p>
+        <p>
+          A mano hay un atajo cuando los trozos recortados no se pisan, como en la propina, donde "tacaña" acaba en 10 y
+          "normal" empieza ahí. Cada trozo pesa lo que su área y empuja desde su centro, que en un triángulo simétrico es el
+          pico. Así que sólo hace falta el área de un triángulo recortado.
+        </p>
+        <p>
+          Sea un triángulo de base <strong>b</strong> y altura 1 (la de un término, que llega a grado 1), recortado a la
+          altura <strong>h</strong>, el grado de la regla. Lo que queda es un trapecio, y lo que se quita, la punta, es un
+          triángulo igual al entero pero en pequeño:
+        </p>
+        <figure class="wide">
+          <figcaption>Un triángulo recortado a la altura h: queda un trapecio, y la punta que se quita es el mismo triángulo en pequeño (altura 1 − h en vez de 1)</figcaption>
+          <svg class="explica dgz10" viewBox="0 0 560 215" role="img" aria-label="Un triángulo de base b y altura 1. Una línea horizontal a la altura h lo corta. Debajo queda un trapecio relleno, con base de abajo b y base de arriba b por 1 menos h. Encima, en discontinua, la punta que se quita: un triángulo con la misma forma que el entero, de altura 1 menos h en vez de 1.">
+            <style>
+              .dgz10 .e{stroke:var(--ink-3);stroke-width:1}
+              .dgz10 .tz{fill:var(--pill);fill-opacity:.4;stroke:var(--pill-ink);stroke-width:1.8;stroke-linejoin:round}
+              .dgz10 .pt{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3}
+              .dgz10 .d{stroke:var(--maze);stroke-width:1.2}
+              .dgz10 .t{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--maze);text-anchor:middle}
+              .dgz10 .s{font-family:var(--f-mono);font-size:9px;fill:var(--ink-2);text-anchor:middle}
+              .dgz10 .k{stroke:var(--blinky);stroke-width:1.4}
+              .dgz10 .tk{font-family:var(--f-mono);font-size:9.6px;font-weight:700;fill:var(--blinky);text-anchor:middle}
+            </style>
+            <path d="M140 116 L260 20 L380 116" class="pt"/>
+            <path d="M60 180 L140 116 L380 116 L460 180 Z" class="tz"/>
+            <text x="260" y="86" class="s">la punta que se quita</text>
+            <text x="260" y="156" class="s">lo que queda: un trapecio</text>
+            <line x1="60" y1="196" x2="460" y2="196" class="d"/><line x1="60" y1="191" x2="60" y2="201" class="d"/><line x1="460" y1="191" x2="460" y2="201" class="d"/>
+            <text x="260" y="210" class="t">b</text>
+            <line x1="515" y1="180" x2="515" y2="20" class="k"/><line x1="510" y1="180" x2="520" y2="180" class="k"/><line x1="510" y1="20" x2="520" y2="20" class="k"/>
+            <text x="524" y="104" class="tk" style="text-anchor:start">1</text>
+            <line x1="140" y1="104" x2="380" y2="104" class="d"/><line x1="140" y1="99" x2="140" y2="109" class="d"/><line x1="380" y1="99" x2="380" y2="109" class="d"/>
+            <text x="300" y="100" class="t">b · (1 − h)</text>
+            <line x1="490" y1="180" x2="490" y2="116" class="d"/><line x1="485" y1="180" x2="495" y2="180" class="d"/><line x1="485" y1="116" x2="495" y2="116" class="d"/>
+            <text x="482" y="152" class="t" style="text-anchor:end">h</text>
+            <line x1="490" y1="116" x2="490" y2="20" class="d"/><line x1="485" y1="20" x2="495" y2="20" class="d"/>
+            <text x="482" y="72" class="t" style="text-anchor:end">1 − h</text>
+            <line x1="380" y1="116" x2="490" y2="116" class="e" style="stroke-dasharray:2 3"/>
+            <line x1="260" y1="20" x2="515" y2="20" class="e" style="stroke-dasharray:2 3"/>
+          </svg>
+        </figure>
+        <p>
+          El lado de arriba del trapecio es la base de la punta, y la punta es una copia reducida del triángulo entero: sus
+          dos lados van por los mismos lados del triángulo, y su base es paralela a la de abajo. Tiene la misma forma, con
+          los mismos ángulos, sólo que más pequeña. Y dos triángulos con la misma forma son proporcionales (es el teorema
+          de Tales): si uno mide una fracción del otro en altura, mide esa misma fracción en base.
+        </p>
+<pre class="cuenta">                  altura     base
+triángulo entero  1          b
+punta             1 − h      ?
+
+la punta mide  (1 − h) / 1  =  1 − h  veces el triángulo en altura,
+así que también en base:
+
+base de la punta  =  b · (1 − h)</pre>
+        <p>
+          No hace falta que el pico esté en medio: vale para cualquier triángulo. Con "tacaña" recortada a 0,25, la punta
+          tiene 0,75 de alto, tres cuartos del triángulo, y su base es tres cuartos de 10: 7,5.
+        </p>
+        <p>
+          Con el lado de arriba ya sabido, el área de un trapecio es la media de sus dos bases por su altura:
+        </p>
+<pre class="cuenta">base de abajo    = b
+base de arriba   = b · (1 − h)
+altura           = h
+
+área = ( b + b · (1 − h) ) / 2 · h
+     = b · (2 − h) / 2 · h
+     = b · h · (1 − h/2)</pre>
+        <p>
+          De ahí el (1 − h/2): es la anchura media del trapecio, ( b + b · (1 − h) ) / 2, dividida entre b. Si no se recorta
+          nada (h = 1), la base de arriba es 0 y queda b / 2, el área del triángulo de siempre. Con "tacaña" se puede
+          comprobar con las bases de verdad: recortada a 0,25 va de 1,25 a 8,75 por arriba, así que mide 7,5.
+        </p>
+<pre class="cuenta">con las bases:     ( 10 + 7,5 ) / 2 · 0,25        = 2,19
+con la fórmula:    10 · 0,25 · (1 − 0,25/2)       = 2,19</pre>
+        <p>
+          Con la propina, b = 10 en los dos términos:
+        </p>
+<pre class="cuenta">"tacaña" recortada a 0,25:  área = 10 · 0,25 · (1 − 0,125) = 2,19   centro 5
+"normal" recortada a 0,67:  área = 10 · 0,67 · (1 − 0,333) = 4,44   centro 15
+
+COG = (2,19 · 5 + 4,44 · 15) / (2,19 + 4,44)
+    = (10,94 + 66,67) / 6,63
+    = 11,70</pre>
+        <p>
+          Por eso sale 11,7: "normal" pesa el doble que "tacaña" y empuja desde 15, y "tacaña" tira hacia abajo desde 5.
+        </p>
+
+        <h3 class="label">Lo que el COG no puede hacer</h3>
+        <p>
+          Como es una media de los puntos de la forma, el COG nunca sale de la zona de los términos activos y nunca llega al
+          borde de la escala. Con sólo "tacaña" activa sale 5, la recortéis a la altura que la recortéis, y con sólo
+          "generosa", 25. La propina va de 0 a 30, pero con estos términos sale siempre entre 5 y 25:
+        </p>
+<pre class="cuenta">servicio 0,  comida 8    →  sólo "tacaña"    →   5,00
+servicio 6,  comida 5    →  sólo "normal"    →  15,00
+servicio 10, comida 10   →  sólo "generosa"  →  25,00</pre>
+        <p>
+          Es la <a href="#trampas">tercera trampa</a> vista desde aquí: con un solo término activo, el grado cambia la altura
+          del trozo pero no dónde está su centro. Si necesitáis que la salida llegue cerca de los extremos, los términos de
+          los bordes tienen que ser rampas pegadas al extremo, como <code>poco := (0, 1) (4, 0)</code> en la urgencia de
+          huir del banco de pruebas: su centro está en 1,33, mucho más cerca del 0 que el pico de un triángulo.
+        </p>
+
+        <h3 class="label">Los otros métodos</h3>
+        <p>
+          Los demás no buscan el punto de equilibrio. Cada uno se fija en otra cosa de la forma:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Método</th><th scope="col">En FCL</th><th scope="col">Qué número da</th><th scope="col">Propina (servicio 3, comida 8)</th></tr></thead>
+            <tbody>
+              <tr><td>Centro de gravedad</td><td><code>METHOD : COG;</code></td><td>El punto de equilibrio de toda la forma.</td><td>11,70</td></tr>
+              <tr><td>Centro de área</td><td><code>METHOD : COA;</code></td><td>El punto que deja la mitad del área a cada lado.</td><td>13,36</td></tr>
+              <tr><td>Media de los máximos</td><td><code>METHOD : MM;</code></td><td>El punto medio de la zona más alta.</td><td>15 (jFuzzyLogic 3.2 da 0,15: <a href="#mamdani">está mal programado</a>)</td></tr>
+              <tr><td>Máximo más a la izquierda</td><td><code>METHOD : LM;</code></td><td>El primer punto de la zona más alta.</td><td>13,33</td></tr>
+              <tr><td>Máximo más a la derecha</td><td><code>METHOD : RM;</code></td><td>El último punto de la zona más alta.</td><td>16,67</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          COG y COA usan toda la forma: si una regla pasa de 0,30 a 0,31, la salida se mueve un poco. MM, LM y RM sólo miran
+          el trozo más alto. En la propina, el 0,25 de "tacaña" no cuenta para nada, y cuando otra regla pasa a ser la más
+          alta, la salida salta de golpe de un término a otro. Para algo que se recalcula en cada turno, como la urgencia de
+          huir, esos saltos son tirones, y por eso en la práctica se usa COG. Las cifras de la tabla son exactas; jFuzzyLogic
+          las saca de su rejilla de 1000 puntos y puede diferir en el segundo decimal (COA y LM le dan 13,35).
+        </p>
+        <div class="demo" data-borroso="desdifuminar">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>La misma forma, cinco números</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. La figura, la cuenta del COG y la tabla de los métodos están justo encima.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Con <strong>COG</strong>, subid "tacaña" poco a poco: la línea se va hacia la izquierda sin saltos. Con
+              <strong>LM</strong> no se mueve hasta que "tacaña" pasa de 0,67, y entonces salta al otro término.</li>
+            <li>Dejad "normal" sola y movedla de 0,1 a 1: el COG se queda en 15. Es la tercera trampa.</li>
+            <li>Con <strong>COA</strong>, la parte sombreada es la mitad del área. Cae a la derecha del COG: el trozo pequeño de
+              "tacaña" está lejos, y en el COG pesa también la distancia (como un niño en la punta de un balancín), mientras
+              que al COA sólo le importa cuánta área queda a cada lado.</li>
+            <li>Bajad las tres a 0: no queda forma que desdifuminar, y jFuzzyLogic devuelve el <code>DEFAULT</code>. Es la
+              <a href="#trampas">segunda trampa</a>.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="banco" data-corto="Banco de pruebas">
+        <div class="sec-head">
+          <span class="num">06</span>
           <h2 class="sec">Banco de pruebas</h2>
         </div>
         <p>
@@ -332,7 +991,7 @@ R3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es gen
 
       <section id="trampas" data-corto="Tres trampas">
         <div class="sec-head">
-          <span class="num">06</span>
+          <span class="num">07</span>
           <h2 class="sec">Tres trampas de diseño</h2>
         </div>
         <p>
@@ -378,13 +1037,13 @@ R3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es gen
           <p>
             Un sistema borroso no se depura regla a regla, porque las reglas no actúan solas: se mezclan. Se depura mirando la
             <strong>curva de control</strong> (qué sale para cada valor de cada entrada) y preguntándose si tiene sentido de
-            punta a punta. El banco de arriba la dibuja; para vuestro FCL, se puede sacar imprimiendo la salida para una
+            punta a punta. El banco de arriba la dibuja; para vuestro FCL, la podéis sacar imprimiendo la salida para una
             tanda de entradas.
           </p>
         </div>
       </section>
 
-      <nav class="pager" aria-label="Páginas del tema 2">
+      <nav class="pager" aria-label="Páginas de los temas 3 y 4">
         <a class="pager-prev" href="borroso.html"><span class="pager-l">Anterior</span><span class="pager-t">Conjuntos borrosos</span></a>
         <a class="pager-next" href="borroso-mspacman.html"><span class="pager-l">Siguiente</span><span class="pager-t">Lógica borrosa en Ms.&nbsp;Pac-Man</span></a>
       </nav>
@@ -400,12 +1059,13 @@ R3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es gen
             <li><a href="#modus-ponens">Modus ponens generalizado</a></li>
             <li><a href="#relaciones">Relaciones y sup-min</a></li>
             <li><a href="#mamdani">Mamdani, paso a paso</a></li>
+            <li><a href="#desdifuminar">Desdifuminar</a></li>
             <li><a href="#banco">Banco de pruebas</a></li>
             <li><a href="#trampas">Tres trampas</a></li>
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 2</h2>
+          <h2 id="del-tema">Temas 3 y 4</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
@@ -436,7 +1096,7 @@ R3: SI el servicio es excelente Y la comida deliciosa ENTONCES la propina es gen
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

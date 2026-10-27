@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Máquinas de estados · Tema 1 · ICI</title>
+<title>Máquinas de estados · Tema 2 · ICI</title>
 <meta name="description" content="Por qué los if anidados no escalan, qué es una máquina de estados y cómo se programa, la histéresis, las máquinas jerárquicas, y el paquete fsm del motor pieza a pieza, con un ejemplo completo para los fantasmas y un estado compuesto para Ms. Pac-Man.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 1</a>
+    <a href="index.html">Tema 2</a>
     <span aria-hidden="true">/</span>
     <span>Máquinas de estados</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 1 · 08 · Organizar el comportamiento</p>
+    <p class="tema-when">Tema 2 · 08 · Organizar el comportamiento</p>
     <h1>
       Máquinas de estados
       <span class="thin">Comportamientos como estados y transiciones, de la idea al paquete <code>fsm</code> del motor.</span>
@@ -190,7 +190,7 @@
         </p>
         <figure class="wide">
           <figcaption>El fantasma completo: cuatro estados y seis transiciones</figcaption>
-          <svg class="explica dgf2" viewBox="0 0 540 262" role="img" aria-label="Cuatro estados. De Movimiento aleatorio se pasa a Perseguir cuando Ms. Pac-Man reaparece; de Perseguir se vuelve a Movimiento aleatorio cuando Ms. Pac-Man muere. De Perseguir a Huir cuando el fantasma es comestible o Ms. Pac-Man está cerca de una píldora de poder; de Huir a Perseguir cuando no es comestible o Ms. Pac-Man está lejos de la píldora. De Huir al estado En el centro, esperar a salir, cuando se lo comen; y de ahí a Perseguir cuando termina el tiempo de penalización.">
+          <svg class="explica dgf2" viewBox="0 0 540 262" role="img" aria-label="Cuatro estados. De Movimiento aleatorio se pasa a Perseguir cuando Ms. Pac-Man reaparece; de Perseguir se vuelve a Movimiento aleatorio cuando Ms. Pac-Man muere. De Perseguir a Huir cuando el fantasma es comestible o Ms. Pac-Man está cerca de una píldora de poder; de Huir a Perseguir cuando no es comestible y Ms. Pac-Man está lejos de la píldora. De Huir al estado En el centro, esperar a salir, cuando se lo comen; y de ahí a Perseguir cuando termina el tiempo de penalización.">
             <style>
               .dgf2 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.6}
               .dgf2 .t{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink);text-anchor:middle}
@@ -218,7 +218,7 @@
             <text x="369" y="22" class="l">comestible |</text>
             <text x="369" y="34" class="l">MsPacMan cerca PPill</text>
             <path d="M420 68 H321" class="a"/>
-            <text x="369" y="95" class="l">no comestible |</text>
+            <text x="369" y="95" class="l">no comestible &amp;</text>
             <text x="369" y="107" class="l">MsPacMan lejos PPill</text>
             <path d="M476 78 C 476 170, 420 230, 347 230" class="a"/>
             <text x="480" y="166" class="ls">comido</text>
@@ -636,7 +636,7 @@ entrar  salir
           </svg>
         </figure>
         <p>
-          Nadie la ha dibujado mal: es lo que sale. Y lo peor no es leerla, es cambiarla. Un séptimo estado,
+          Nadie la ha dibujado mal: es lo que sale. Y peor que leerla es cambiarla. Un séptimo estado,
           ir a por la fruta pongamos, obliga a repasar cada color y decidir si le toca flecha: si puede comerse
           la PPill estando ahí, si puede morir, a dónde se vuelve cuando se acaba. Olvidar una es un fallo que
           no se ve hasta que una partida pasa justo por ese estado con esa condición.
@@ -723,7 +723,7 @@ entrar  salir
         </p>
         <figure class="wide">
           <figcaption>El fantasma, jerárquico: Perseguir y Huir son ahora máquinas enteras</figcaption>
-          <svg class="explica dgf3" viewBox="0 0 540 350" role="img" aria-label="La máquina de cuatro estados del fantasma, con Perseguir y Huir convertidos en superestados. Dentro de Perseguir hay un ciclo de tres estados: Ocupar cuadrante, Perseguir y Tapar escapatoria. Dentro de Huir, otro ciclo: Buscar cuadrante, Buscar túnel y Evitar pills. Las flechas de fuera son las mismas que en la máquina plana y salen de los bordes de los superestados: Ms. Pac-Man reaparece y Ms. Pac-Man muere con Movimiento aleatorio; comestible o cerca de la píldora hacia Huir; no comestible o lejos de vuelta a Perseguir; comido hacia En el centro; y tiempo de penalización terminado de vuelta a Perseguir.">
+          <svg class="explica dgf3" viewBox="0 0 540 350" role="img" aria-label="La máquina de cuatro estados del fantasma, con Perseguir y Huir convertidos en superestados. Dentro de Perseguir hay un ciclo de tres estados: Ocupar cuadrante, Perseguir y Tapar escapatoria. Dentro de Huir, otro ciclo: Buscar cuadrante, Buscar túnel y Evitar pills. Las flechas de fuera son las mismas que en la máquina plana y salen de los bordes de los superestados: Ms. Pac-Man reaparece y Ms. Pac-Man muere con Movimiento aleatorio; comestible o cerca de la píldora hacia Huir; no comestible y lejos de vuelta a Perseguir; comido hacia En el centro; y tiempo de penalización terminado de vuelta a Perseguir.">
             <style>
               .dgf3 .st{fill:var(--surface);stroke:var(--maze);stroke-width:1.6}
               .dgf3 .si{fill:var(--surface);stroke:var(--maze);stroke-width:1.2}
@@ -771,7 +771,7 @@ entrar  salir
             <text x="372" y="196" class="l">comestible |</text>
             <text x="372" y="208" class="l">MsPacMan cerca PPill</text>
             <path d="M290 300 C 190 300, 145 265, 145 213" class="a"/>
-            <text x="24" y="260" class="l">no comestible |</text>
+            <text x="24" y="260" class="l">no comestible &amp;</text>
             <text x="24" y="272" class="l">MsPacMan lejos PPill</text>
             <path d="M512 236 V67" class="a"/>
             <text x="504" y="150" class="le">comido</text>
@@ -1372,7 +1372,7 @@ entrar  salir
         <p>
           Una máquina se construye con tres métodos: <code>add(origen, transición, destino)</code> por cada
           flecha, <code>ready(inicial)</code> al terminar, y <code>reset()</code> para volver al estado inicial.
-          Y se ejecuta con uno, que es el que hay que entender bien. Este es, entero:
+          Y se ejecuta con uno, que es el que tenéis que entender bien. Este es, entero:
         </p>
         <div class="codigo"><pre><code><span class="k">public</span> MOVE run(Input in)
 {
@@ -1441,7 +1441,7 @@ entrar  salir
           </svg>
         </figure>
         <p>
-          De ese bucle salen todas las reglas que hay que tener en la cabeza al montar una máquina:
+          De ese bucle salen todas las reglas que tenéis que llevar en la cabeza al montar una máquina:
         </p>
         <ul>
           <li><strong>El orden de <code>add()</code> es la prioridad.</strong> Las transiciones de un estado se
@@ -2042,7 +2042,7 @@ entrar  salir
         </div>
         <p>
           Una máquina que hace algo raro casi nunca tiene un error en una acción: tiene una transición que salta
-          cuando no debe, o una que no salta nunca. Para verlo hay que mirar las transiciones, y para eso están
+          cuando no debe, o una que no salta nunca. Para verlo tenéis que mirar las transiciones, y para eso están
           los observadores. Se añaden con <code>fsm.addObserver(...)</code> <strong>justo después de crear la
           máquina</strong>, antes del primer <code>add</code>, porque el grafo se construye con los avisos de
           <code>add</code>.
@@ -2090,7 +2090,7 @@ FSM reset to initial State: Píldora cercana
           El formato es <code>[máquina] origen &gt;&gt; transición &gt;&gt; destino</code>, con los
           <code>toString()</code> de los estados y de las transiciones: por eso tienen que decir algo. La tercera
           línea es el <code>stop()</code> del compuesto reiniciando la máquina de dentro al salir de Comer. Los
-          avisos de reinicio y de "lista" no llevan el nombre de la máquina, así que con varias hay que
+          avisos de reinicio y de "lista" no llevan el nombre de la máquina, así que con varias tenéis que
           deducirlo por el estado.
         </p>
         <h3 class="label"><code>GraphFSMObserver</code></h3>
@@ -2186,9 +2186,9 @@ Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7,
         </div>
         <p>
           Todo lo anterior es mecánico. Lo que no lo es, y lo que decide si la práctica sale bien, es el
-          diagrama: qué estados hay, qué condición exacta lleva de uno a otro, y en qué orden se miran. Se hace
-          antes de escribir una línea, en papel o en cualquier herramienta de dibujo, y se discute en grupo
-          sobre él. Estos son diseños de grupos de otros cursos, tal como los entregaron.
+          diagrama: qué estados hay, qué condición exacta lleva de uno a otro, y en qué orden se miran. Hacedlo
+          antes de escribir una línea, en papel o en cualquier herramienta de dibujo, y discutidlo en grupo.
+          Estos son diseños de grupos de otros cursos, tal como los entregaron.
         </p>
         <figure class="wide">
           <figcaption>Fantasmas con dos superestados y notas al pie · imagen de J.&nbsp;A. Recio-García</figcaption>
@@ -2198,7 +2198,7 @@ Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7,
         <p>
           Lo mejor de este son las notas al pie. "Huida eficiente" o "haya un radio entre Ms.&nbsp;Pac-Man y los
           fantasmas" no se pueden programar tal cual, y el grupo lo sabía: cada asterisco dice qué significa. Eso
-          es lo que hay que hacer con cada palabra vaga del diagrama, hasta que cada flecha sea una expresión que
+          es lo que tenéis que hacer con cada palabra vaga del diagrama, hasta que cada flecha sea una expresión que
           se pueda calcular con el <code>Input</code>.
         </p>
         <figure class="wide">
@@ -2346,7 +2346,7 @@ Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7,
       </section>
 
 
-      <nav class="pager" aria-label="Páginas del tema 1">
+      <nav class="pager" aria-label="Páginas del tema 2">
         <a class="pager-prev" href="predecir-coordinar.html"><span class="pager-l">Anterior</span><span class="pager-t">Predecir, coordinar y medir</span></a>
         <a class="pager-next" href="arboles-comportamiento.html"><span class="pager-l">Siguiente</span><span class="pager-t">Árboles de comportamiento</span></a>
       </nav>
@@ -2376,7 +2376,7 @@ Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7,
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 1</h2>
+          <h2 id="del-tema">Tema 2</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
@@ -2406,7 +2406,7 @@ Stats{Desc=FSM contra FSM Ticks, average=1103.7, sum=22074.0, sumsq=4.4829362E7,
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

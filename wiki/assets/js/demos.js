@@ -1985,9 +1985,9 @@
           ' · ' + esc.cazados + ' fantasmas cazados';
       if (esc.reloj > 0) t += ' · queda' + (esc.reloj === 1 ? '' : 'n') + ' ' + esc.reloj +
                                  ' turno' + (esc.reloj === 1 ? '' : 's') + ' de poder';
-      if (aviso) return t + ' — ' + aviso;
-      if (esc.fin === 'comida') return t + ' — la han comido';
-      if (esc.fin === 'limpio') return t + ' — nivel limpio';
+      if (aviso) return t + ' · ' +aviso;
+      if (esc.fin === 'comida') return t + ' · la han comido';
+      if (esc.fin === 'limpio') return t + ' · nivel limpio';
       return t + ' · va ' + idireccion(esc.pac, dec.paso);
     }
 
@@ -3095,9 +3095,9 @@
         t = NOMBRE_PARTICION[par.particion] +
             (par.particion === 'rejilla' ? ' de ' + par.lado : '') + ' · ' +
             plural(descomp.red.nodos.length, 'nodo', 'nodos') + ' · ' + NOMBRE_ALGORITMO[par.algoritmo];
-        if (aviso) return t + ' — ' + aviso;
+        if (aviso) return t + ' · ' +aviso;
         if (!resultado) return t + (paraLector ? '' : ' · pulsa "Calcular la ruta"');
-        if (resultado.falla) return t + ' — ' + resultado.falla;
+        if (resultado.falla) return t + ' · ' +resultado.falla;
         return t + ' · ' + resultado.explorados + ' nodos explorados · ruta de ' +
                resultado.largo + ' unidades en ' +
                plural(traza.length, 'vuelta del bucle', 'vueltas del bucle');
@@ -3109,9 +3109,9 @@
              : esDijkstra ? (par.costes === 'uno' ? 'coste uniforme con todo a 1' : 'coste uniforme')
              : (par.modo === 'anchura' ? 'anchura' : 'profundidad')) +
             ' de ' + nombreNodo(esc.a) + ' a ' + nombreNodo(esc.b);
-        if (aviso) return t + ' — ' + aviso;
+        if (aviso) return t + ' · ' +aviso;
         if (!resultado) return t + (paraLector ? '' : ' · pulsa "Calcular la ruta"');
-        if (resultado.falla) return t + ' — ' + resultado.falla;
+        if (resultado.falla) return t + ' · ' +resultado.falla;
         var cam = esAstar
           ? ' · camino de ' + plural(resultado.camino.length - 1, 'arista', 'aristas')
           : ' · camino ' + resultado.camino.map(nombreNodo).join(' → ');
@@ -3136,9 +3136,9 @@
       } else {
         t = 'esta escena no se ha podido triangular';
       }
-      if (aviso) return t + ' — ' + aviso;
+      if (aviso) return t + ' · ' +aviso;
       if (!resultado) return t + (paraLector ? '' : ' · pulsa "Calcular la ruta"');
-      if (resultado.falla) return t + ' — ' + resultado.falla;
+      if (resultado.falla) return t + ' · ' +resultado.falla;
       var largo = Math.round(largoDe(resultado.pts));
       if (tipo === 'waypoints') {
         return t + ' · ruta de ' + largo + ' unidades por ' +

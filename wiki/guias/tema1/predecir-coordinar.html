@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Predecir, coordinar y medir · Tema 1 · ICI</title>
+<title>Predecir, coordinar y medir · Tema 2 · ICI</title>
 <meta name="description" content="Cómo adivinar lo suficiente de quien no controlas, cómo se reparten el trabajo cuatro fantasmas que no se hablan, el reloj del modo comestible, el presupuesto de tiempo de cada turno y cómo ver lo que piensa tu controlador.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 1</a>
+    <a href="index.html">Tema 2</a>
     <span aria-hidden="true">/</span>
     <span>Predecir, coordinar y medir</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 1 · 07 · Decidir</p>
+    <p class="tema-when">Tema 2 · 07 · Decidir</p>
     <h1>
       Predecir, coordinar y medir
       <span class="thin">Lo que hay alrededor de la decisión: el otro, los tuyos y el reloj.</span>
@@ -95,8 +95,8 @@
             <strong>Coincidir en el tiempo.</strong> Expandir dos anchuras a la vez (la de Ms.&nbsp;Pac-Man y
             la del fantasma) anotando no sólo <em>qué</em> nodos alcanza cada uno sino <strong>en qué
             turno</strong>. Un nodo al que los dos llegan en el mismo turno, y de frente, es una
-            interceptación. Uno al que llega antes el fantasma pero por detrás, no: se lo come por la espalda
-            y no pasa nada.
+            interceptación. Uno al que el fantasma llega después que ella, por detrás, no: eso es perseguirla,
+            y como van a la misma velocidad no la alcanza.
           </li>
         </ol>
         <figure class="wide">
@@ -136,7 +136,7 @@
           </svg>
         </figure>
         <p>
-          El coste de lo tercero es el de dos anchuras, o sea nada comparado con los 40&nbsp;ms. Lo que hay
+          El coste de lo tercero es el de dos anchuras, o sea nada comparado con los 40&nbsp;ms. Lo que tenéis
           que cuidar es la indexación: los nodos visitados no se marcan por nodo, se marcan por
           <strong>par (nodo, turno)</strong>, porque llegar a un sitio en el turno 6 y llegar en el 14 son
           cosas distintas. Y conviene admitir una holgura de un turno arriba o abajo, porque los fantasmas
@@ -160,9 +160,8 @@
         </div>
         <p>
           En esta práctica los fantasmas no pueden hablar entre ellos: el <code>Executor</code> se configura
-          con <code>setGhostsMessage(false)</code>. Da igual. Los cuatro los decide <strong>el mismo
-          método</strong>, con <strong>el mismo <code>Game</code></strong>, en <strong>el mismo
-          turno</strong>: comparten toda la información que podrían haberse mandado. Coordinarse aquí no es
+          con <code>setGhostsMessage(false)</code>. Da igual, porque a los cuatro los decide el mismo
+          método, con el mismo <code>Game</code>, en el mismo turno: comparten toda la información que podrían haberse mandado. Coordinarse aquí no es
           comunicar, es <em>repartir</em>.
         </p>
         <p>
@@ -230,7 +229,7 @@
         </div>
         <p>
           La mitad de las decisiones interesantes de los dos controladores dependen de un solo número:
-          <code>getGhostEdibleTime</code>. Estos son los datos del motor con los que hay que contar, y están
+          <code>getGhostEdibleTime</code>. Estos son los datos del motor con los que tenéis que contar, y están
           todos en <code>Constants</code>:
         </p>
         <div class="table-scroll">
@@ -246,7 +245,7 @@
           </table>
         </div>
         <p>
-          De la media velocidad salen las dos reglas que hay que escribir, y ninguna de las dos es
+          De la media velocidad salen las dos reglas que tenéis que escribir, y ninguna de las dos es
           "persíguelo si está cerca":
         </p>
         <div class="table-scroll">
@@ -270,7 +269,7 @@
           Y de la cadena de 3&#8239;000 puntos sale la tercera decisión, que es la que más separa una
           Ms.&nbsp;Pac-Man buena de una normal: <strong>la píldora de poder es un recurso, no una píldora
           más</strong>. Comérsela de pasada con los fantasmas lejos son 50 puntos y una oportunidad menos.
-          La forma más simple de escribirlo no es ir a buscarla: es <em>mantenerse lejos</em> de ella mientras
+          La forma más simple de escribirlo es <em>mantenerse lejos</em> de ella mientras
           no haya tres fantasmas fuera y cerca, y dejar que la persecución te lleve hasta ella cuando toque.
         </p>
         <div class="note tip">
@@ -297,7 +296,7 @@
           200&nbsp;ms se usa entero. Lo único que pagas es reloj. Y como además <strong>no hace falta
           devolver un movimiento en cada turno</strong> (si devuelves <code>null</code> el motor sigue
           recto), lo sensato es no repartir el presupuesto a partes iguales: gastar en los cruces, que son
-          uno de cada diez turnos, y no gastar nada en los pasillos.
+          más o menos uno de cada veinte turnos, y no gastar nada en los pasillos.
         </p>
         <p>
           El detalle completo, con lo que cambia en los modos que sí llevan reloj, está en las
@@ -336,10 +335,10 @@
 }</code></pre></div>
         <p>
           Cuando veas en pantalla los tramos que tu controlador considera cerrados, los errores de la
-          función <a href="estrategias.html#llego-antes">"¿llego yo antes?"</a> se hacen obvios en dos partidas. Sin eso, no.
+          función <a href="estrategias.html#llego-antes">"¿llego yo antes?"</a> se hacen obvios en dos partidas.
         </p>
         <div class="note trap">
-          <span class="note-label">El interruptor es obligatorio, no una costumbre</span>
+          <span class="note-label">Por qué el interruptor es obligatorio</span>
           <p>
             <code>addPoints</code> y <code>addLines</code> no dibujan: apuntan lo que habría que dibujar en
             dos listas <code>static</code> que sólo se vacían cuando se repinta la ventana. Sin ventana no se
@@ -350,7 +349,7 @@
         </div>
       </section>
 
-      <nav class="pager" aria-label="Páginas del tema 1">
+      <nav class="pager" aria-label="Páginas del tema 2">
         <a class="pager-prev" href="mapas-influencia.html"><span class="pager-l">Anterior</span><span class="pager-t">Mapas de influencia</span></a>
         <a class="pager-next" href="maquinas-estados.html"><span class="pager-l">Siguiente</span><span class="pager-t">Máquinas de estados</span></a>
       </nav>
@@ -370,7 +369,7 @@
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 1</h2>
+          <h2 id="del-tema">Tema 2</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
@@ -400,7 +399,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

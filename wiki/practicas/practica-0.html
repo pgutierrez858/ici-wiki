@@ -759,7 +759,7 @@
               <tr><td><code>getActivePowerPillsIndices()</code></td><td><em>Power pills</em> que quedan.</td></tr>
               <tr><td><code>getDistance(desde, hasta, DM)</code></td><td>Distancia entre dos nodos con la métrica elegida.</td></tr>
               <tr><td><code>getShortestPathDistance(desde, hasta)</code></td><td>Distancia real por el laberinto.</td></tr>
-              <tr><td><code>getClosestNodeIndexFromNodeIndex(desde, int[], DM)</code></td><td>El más cercano de un conjunto de nodos. Ideal para «la <em>pill</em> más próxima».</td></tr>
+              <tr><td><code>getClosestNodeIndexFromNodeIndex(desde, int[], DM)</code></td><td>El más cercano de un conjunto de nodos. Ideal para "la <em>pill</em> más próxima".</td></tr>
               <tr><td><code>getApproximateNextMoveTowardsTarget(desde, hasta, últimoMov, DM)</code></td><td>Movimiento aproximado para acercarse a un nodo.</td></tr>
               <tr><td><code>getApproximateNextMoveAwayFromTarget(desde, hasta, últimoMov, DM)</code></td><td>Movimiento aproximado para alejarse de un nodo.</td></tr>
               <tr><td><code>getShortestPath(desde, hasta)</code></td><td>El camino como <code>int[]</code>, útil para dibujarlo.</td></tr>
@@ -857,7 +857,7 @@
             El <code>println</code> del ejemplo imprime lo que devuelve <code>runGame</code>, que es un
             <code>int</code> con la <strong>puntuación final</strong> de esa partida: los 10 puntos de cada
             píldora, los 50 de cada una de poder y los 200, 400, 800 y 1600 de los fantasmas que se haya
-            comido. Nada más, ni tiempo, ni nivel, ni vidas. Con controladores al azar saldrán unos pocos
+            comido. No cuentan ni el tiempo, ni el nivel, ni las vidas. Con controladores al azar saldrán unos pocos
             cientos de puntos, y distintos en cada ejecución.
           </p>
           <div class="note trap">
@@ -888,7 +888,7 @@
           <div class="note mine">
             <span class="note-label">Juega un rato de verdad</span>
             <p>
-              Esta parte parece un trámite y no lo es. Juega varias partidas con el teclado y fíjate en qué
+              Juega varias partidas con el teclado y fíjate en qué
               decisiones tomas tú: cuándo das la vuelta, a qué distancia dejas de huir, qué haces cuando dos
               fantasmas vienen por pasillos distintos. Esas son exactamente las reglas que tendrás que
               escribir en código durante el resto del curso.
@@ -974,7 +974,7 @@
           </figure>
           <p>
             <code>limit</code> es el umbral de distancia por debajo del cual se considera que un fantasma
-            está «demasiado cerca». El pseudocódigo propone 20; pruébalo y ajústalo.
+            está "demasiado cerca". El pseudocódigo propone 20; pruébalo y ajústalo.
           </p>
 
           <h3><code>Ghosts</code></h3>
@@ -1054,9 +1054,8 @@
         </div>
         <p>
           Se entregaron <strong>21 controladores de cada tipo</strong>, y todos hacen lo que pide el
-          ejercicio 3: huyen, persiguen y comen. Los fallos que se repiten no son de diseño —el diseño venía
-          dado en el pseudocódigo— sino de <strong>API</strong>: llamar al método parecido en vez de al
-          correcto. Están aquí porque todos vuelven en la <a href="practica-1.html">Práctica&nbsp;1</a>, donde
+          ejercicio 3: huyen, persiguen y comen. El diseño venía dado en el pseudocódigo, así que los fallos
+          que se repiten son de <strong>API</strong>: llamar al método parecido en vez de al correcto. Están aquí porque todos vuelven en la <a href="practica-1.html">Práctica&nbsp;1</a>, donde
           ya cuestan puntos, y porque casi todos son invisibles mirando una partida.
         </p>
         <h3 class="label">Los fallos que se repiten</h3>
@@ -1117,7 +1116,7 @@
               </tr>
               <tr>
                 <td><strong>Pedir el nodo de un fantasma antes de comprobar que existe</strong></td>
-                <td><code>getGhostCurrentNodeIndex(null)</code> lanza una excepción. Cuando la función que busca al fantasma más cercano devuelve <code>null</code> —por ejemplo, con los cuatro comestibles— la partida se cae. En la corrección eso no resta puntos: hace que la partida se repita, y si pasa siempre, deja el experimento dando vueltas para siempre.</td>
+                <td><code>getGhostCurrentNodeIndex(null)</code> lanza una excepción. Cuando la función que busca al fantasma más cercano devuelve <code>null</code> (por ejemplo, con los cuatro comestibles), la partida se cae. En la corrección eso no resta puntos: hace que la partida se repita, y si pasa siempre, deja el experimento dando vueltas para siempre.</td>
               </tr>
             </tbody>
           </table>
@@ -1127,8 +1126,8 @@
           <span class="note-label">Y uno que estaba en las 21 entregas</span>
           <p>
             <strong><code>getName()</code> devolvía lo mismo en todas</strong>: <code>"MsPacMan"</code>,
-            <code>"Ghosts"</code>, o nada —y entonces <code>Controller</code> devuelve
-            <code>"Unknown Controller"</code>—. En la Práctica&nbsp;0 da igual. En la competición no, porque
+            <code>"Ghosts"</code>, o nada, y entonces <code>Controller</code> devuelve
+            <code>"Unknown Controller"</code>. En la Práctica&nbsp;0 da igual. En la competición no, porque
             el evaluador <strong>indexa la tabla de resultados por ese nombre</strong>: con veintiuna
             entregas llamadas igual, los resultados de unas pisan los de otras y la tabla sale vacía.
           </p>
@@ -1143,10 +1142,18 @@
 
         <h3 class="label">El concurso</h3>
         <p>
-          Con las 21 entregas se jugó el concurso de todos contra todos: 21 × 21 = <strong>441
-          emparejamientos</strong> a 100 partidas cada uno, o sea <strong>44&#8239;100 partidas</strong>,
-          2&#8239;100 por controlador, con la configuración de la
-          <a href="practica-1.html#reglas-simulacion">Práctica&nbsp;1</a>. Cada controlador aparece con las
+          Con las 21 entregas se jugó el concurso de todos contra todos, a 100 partidas por
+          emparejamiento y con la configuración de la
+          <a href="practica-1.html#reglas-simulacion">Práctica&nbsp;1</a>:
+        </p>
+        <figure>
+          <figcaption>Cuántas partidas son</figcaption>
+          <pre class="pseudo">emparejamientos  = 21 × 21  = 441
+partidas         = 441 × 100 = 44&#8239;100
+por controlador  = 21 × 100  = 2&#8239;100</pre>
+        </figure>
+        <p>
+          Cada controlador aparece con las
           iniciales de quien lo entregó, y el medio punto es el que sale de la fórmula de la
           <a href="../guias/competicion.html#punto-extra">guía de la competición</a>: el mejor se lo lleva
           entero, el peor se queda a cero, y los de en medio en proporción.
@@ -1255,17 +1262,17 @@
           <p>
             Comparad las dos columnas de la derecha. <strong>Los extremos no se movieron</strong>: los cuatro
             primeros de Ms.&nbsp;Pac-Man siguen siendo los mismos cuatro, y los siete últimos, los mismos
-            siete, en el mismo orden. <strong>El medio se barajó entero</strong>: WEF cayó del 5.º al 12.º,
-            GLV subió del 11.º al 6.º, y en los fantasmas AAM pasó de <strong>primero a duodécimo</strong> y
+            siete, aunque JP, MCM y VMM se reordenaron entre ellos. <strong>El medio se barajó entero</strong>: WEF cayó del 5.º al 12.º,
+            GLV subió del 11.º al 6.º, y en los fantasmas AAM pasó de primero a duodécimo y
             VMM del 11.º al 3.º.
           </p>
           <p>
             No es que la segunda medida corrigiera a la primera: es que <strong>en el medio de la tabla no
             había nada que medir</strong>. Del 6.º al 13.º hay <strong>ocho controladores metidos en 110
             puntos</strong>, y con 100 partidas la diferencia mínima creíble entre dos de ellos es de 148.
-            O sea que esos ocho <strong>siguen empatados</strong> y su orden volverá a cambiar la próxima
+            O sea que esos ocho siguen empatados y su orden volverá a cambiar la próxima
             vez que se lance. Con 10 partidas el umbral pasaba de 460 puntos, y el empate iba
-            <strong>del 4.º al 13.º</strong>: diez controladores indistinguibles entre sí.
+            del 4.º al 13.º: diez controladores indistinguibles entre sí.
           </p>
         </div>
 
@@ -1276,9 +1283,14 @@
         <div class="note trap">
           <span class="note-label">1 · Ni siquiera el primero está separado del segundo</span>
           <p>
-            MS saca 3&#8239;395 y OGA 3&#8239;208: <strong>187 puntos de diferencia</strong>. El error típico
-            de esa diferencia es √(50,8² + 43,4²) ≈ 67, y para creérsela hacen falta tres, o sea
-            <strong>200</strong>. Se queda a trece puntos de ser creíble, con 44&#8239;100 partidas jugadas.
+            MS saca 3&#8239;395 y OGA 3&#8239;208: <strong>187 puntos de diferencia</strong>. Para
+            creérsela, tiene que pasar de tres veces su error típico:
+          </p>
+          <pre class="pseudo">error típico de la diferencia = √(50,8² + 43,4²) ≈ 67
+umbral                        = 3 × 67         ≈ 200
+diferencia                    = 187            &lt; 200</pre>
+          <p>
+            Se queda a trece puntos de ser creíble, con 44&#8239;100 partidas jugadas.
             El medio punto se lo lleva MS porque la regla es la media y hay que repartir, pero
             <strong>el experimento no demuestra que MS juegue mejor que OGA</strong>.
           </p>
@@ -1296,12 +1308,12 @@
             vez de <code>getApproximateNextMoveTowardsTarget(…)</code>. Quedaron en el <strong>puesto 15 de
             21 de media</strong> en los dos rankings, frente al 10 de las otras dieciséis; cuatro de los
             cinco están entre los siete últimos de fantasmas. Son casi las mismas personas en los dos
-            rankings, así que no son diez casos independientes —y hay una excepción clara, unos fantasmas
-            terceros—; pero el motivo está en el motor y se puede leer.
+            rankings, así que no son diez casos independientes, y hay una excepción clara (unos fantasmas
+            terceros); pero el motivo está en el motor y se puede leer.
           </p>
           <p>
-            Los dos métodos hacen lo mismo —mirar las salidas y quedarse con la que deja más cerca del
-            objetivo— y se diferencian en <strong>qué distancia miden</strong>. El
+            Los dos métodos hacen lo mismo (miran las salidas y se quedan con la que deja más cerca del
+            objetivo) y se diferencian en <strong>qué distancia miden</strong>. El
             <em lang="en">approximate</em> pregunta, para cada vecino <em>v</em>, la distancia de <em>v</em>
             al objetivo sin más. El otro la pregunta <strong>imponiendo que el último movimiento fue el del
             nodo de partida</strong>, que sólo es cierto para el vecino de frente: para los de los lados
@@ -1309,7 +1321,7 @@
             El resultado es un método que evalúa bien seguir recto y mal girar.
           </p>
           <p>
-            La moraleja no es «usad el aproximado y ya»: es que <strong>los dos son aproximaciones</strong>,
+            La moraleja no es "usad el aproximado y ya": es que <strong>los dos son aproximaciones</strong>,
             y que en cuanto la decisión importe conviene calcular la distancia vosotros, con
             <code>getShortestPathDistance(vecino, objetivo, movimientoConElQueLlegoAlVecino)</code>, que es
             la comparación que de verdad queríais hacer.
@@ -1319,12 +1331,12 @@
         <div class="note trap">
           <span class="note-label">3 · El umbral de 20 era un punto de partida, no una respuesta</span>
           <p>
-            El enunciado propone <code>limit = 20</code> y dice «pruébalo y ajústalo». Casi todo el mundo lo
+            El enunciado propone <code>limit = 20</code> y dice "pruébalo y ajústalo". Casi todo el mundo lo
             dejó en 20. De los que lo tocaron: el que lo subió a 40 es <strong>primero</strong> y los dos que
             lo pusieron en 30 son <strong>tercero y cuarto</strong>; los cuatro que lo subieron a 50 o más
             quedaron <strong>6.º, 17.º, 18.º y 19.º</strong>. Son pocos casos y dentro del grupo de 20 hay de
             todo, así que no es una ley; pero la dirección se entiende: con un umbral grande casi siempre hay
-            un fantasma «cerca», así que Ms.&nbsp;Pac-Man se pasa la partida huyendo y no come.
+            un fantasma "cerca", así que Ms.&nbsp;Pac-Man se pasa la partida huyendo y no come.
           </p>
         </div>
 
@@ -1405,7 +1417,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

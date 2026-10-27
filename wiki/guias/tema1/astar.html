@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Heurísticas y A* · Tema 1 · ICI</title>
+<title>Heurísticas y A* · Tema 2 · ICI</title>
 <meta name="description" content="Qué es una heurística, cuándo es admisible y cuándo consistente, las tres métricas del motor, y A* entero: las dos listas, la función f y un ejemplo para seguirlo paso a paso.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 1</a>
+    <a href="index.html">Tema 2</a>
     <span aria-hidden="true">/</span>
     <span>Heurísticas y A*</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 1 · 03 · Buscar caminos</p>
+    <p class="tema-when">Tema 2 · 03 · Buscar caminos</p>
     <h1>
       Heurísticas y A*
       <span class="thin">Cómo estimar lo que falta, y el algoritmo que lo aprovecha.</span>
@@ -164,7 +164,7 @@
         </figure>
         <h3 class="label">Y por eso se llama monótona</h3>
         <p>
-          Aquí está la consecuencia, que es lo que de verdad hace falta. Si la <em>h</em> no puede bajar más
+          Lo que importa es la consecuencia. Si la <em>h</em> no puede bajar más
           de lo que cuesta el paso, entonces la <em>f</em> <strong>no puede bajar nunca</strong> al avanzar
           por un camino. Sale en una línea:
         </p>
@@ -327,7 +327,8 @@
         </ul>
         <p>
           Y la combinación es lo que lo hace funcionar: <em>g</em> por sí solo tiende a primero en anchura,
-          <em>h′</em> por sí solo tiende a primero en profundidad, que es la búsqueda voraz, y sumados dan una
+          <em>h′</em> por sí solo da la búsqueda voraz, que siempre abre el nodo que parece más cerca del final y
+          suele meterse por una rama hasta el fondo, como primero en profundidad, y sumados dan una
           búsqueda que se lanza hacia el objetivo pero <strong>cambia de camino</strong> en cuanto aparecen
           nodos más prometedores.
         </p>
@@ -365,7 +366,7 @@
                alt="Una rejilla con un muro gris en forma de U. Desde la casilla verde de salida se extiende una mancha de casillas azul claro, los nodos cerrados, bordeada por una franja de casillas verdes, los abiertos. Una línea amarilla rodea el muro y llega a la casilla roja del destino.">
         </figure>
         <p>
-          La forma de esa mancha es el resumen de todo el tema. No es un círculo, que sería lo que dibujaría el coste
+          Fíjate en la forma de esa mancha. No es un círculo, que sería lo que dibujaría el coste
           uniforme, sino un óvalo estirado hacia el destino: la heurística está tirando de la búsqueda. Y
           se abre en abanico al chocar con el muro, porque ahí la heurística deja de acertar y el algoritmo
           tiene que mirar a los lados.
@@ -462,13 +463,13 @@
               </tr>
               <tr>
                 <td class="num-col">1,25</td>
-                <td>Inflada, pero poco</td>
-                <td><strong>8</strong> nodos, y todavía acierta con el 36. La garantía ya no existe, pero aquí aún no se nota.</td>
+                <td>Inflada, pero poco: <strong>ya no es admisible</strong> en general</td>
+                <td><strong>8</strong> nodos, y todavía acierta con el 36. Ya no hay garantía de óptimo, pero aquí aún no se nota.</td>
               </tr>
               <tr>
                 <td class="num-col">1,5 o más</td>
-                <td>Inflada: <strong>ya no es admisible</strong></td>
-                <td>Cierra <strong>2</strong> nodos y se acabó: se traga el atajo y devuelve <strong>39</strong>. Tres unidades peor, veinte nodos menos de trabajo.</td>
+                <td>Más inflada: <strong>tampoco es admisible</strong></td>
+                <td>Cierra <strong>2</strong> nodos y se acabó: se traga el atajo y devuelve <strong>39</strong>. Frente al peso 1, tres unidades peor y once nodos menos de trabajo (13 → 2).</td>
               </tr>
             </tbody>
           </table>
@@ -493,8 +494,8 @@
           </p>
           <p>
             Con peso <em>w</em> lo único que se puede prometer es que el camino no costará más de <em>w</em>
-            veces el mejor. Aquí, con <em>w</em> = 1,5, sale un 8&#8239;% peor a cambio de mirar veinte
-            nodos menos. <strong>Ese es el trato</strong>, y se hace a sabiendas cuando no hay tiempo, que
+            veces el mejor. Aquí, con <em>w</em> = 1,5, sale un 8&#8239;% peor que con peso 1 a cambio de
+            cerrar once nodos menos (2 en vez de 13). <strong>Ese es el trato</strong>, y se hace a sabiendas cuando no hay tiempo, que
             es exactamente la situación de un personaje con 40&nbsp;ms por turno.
           </p>
           <p>
@@ -505,9 +506,8 @@
         <p>
           Y fíjate en dónde se le atraganta a la heurística: apunta al destino en línea recta, que es justo
           por donde está lo caro. Así que A* mira esa zona antes de decidirse a subir. Es la misma forma que
-          tiene la mancha de la figura de arriba al abrirse en abanico contra el muro. Una heurística es una
-          pista, no una respuesta: donde se equivoca, se paga en nodos mirados de más, y si la fuerzas, en
-          calidad del camino.
+          tiene la mancha de la figura de arriba al abrirse en abanico contra el muro. Donde la heurística
+          se equivoca, se paga en nodos mirados de más, y si la fuerzas, en calidad del camino.
         </p>
       </section>
 
@@ -519,8 +519,8 @@
         <p>
           Este es el remate de las tres primeras páginas del tema (<a href="representacion.html">representar el espacio</a>, <a href="busqueda.html">buscar en él</a> y A*), y conviene jugar con él un rato. A la izquierda se
           elige <strong>cómo se parte el espacio</strong> (puntos de ruta, rejilla o triangulación) y debajo
-          <strong>qué algoritmo busca</strong> en el grafo que sale. Las dos decisiones son independientes:
-          <strong>doce combinaciones</strong>, la misma escena, y se pueden cambiar por separado.
+          <strong>qué algoritmo busca</strong> en el grafo que sale. Las dos decisiones son independientes,
+          así que sobre la misma escena hay <strong>doce combinaciones</strong>.
         </p>
         <div class="demo" data-demo="todo">
           <div class="demo-head">
@@ -577,7 +577,7 @@
         </div>
       </section>
 
-      <nav class="pager" aria-label="Páginas del tema 1">
+      <nav class="pager" aria-label="Páginas del tema 2">
         <a class="pager-prev" href="busqueda.html"><span class="pager-l">Anterior</span><span class="pager-t">Búsqueda en espacios de estados</span></a>
         <a class="pager-next" href="astar-mspacman.html"><span class="pager-l">Siguiente</span><span class="pager-t">A* en Ms.&nbsp;Pac-Man</span></a>
       </nav>
@@ -595,7 +595,7 @@
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 1</h2>
+          <h2 id="del-tema">Tema 2</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
@@ -625,7 +625,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

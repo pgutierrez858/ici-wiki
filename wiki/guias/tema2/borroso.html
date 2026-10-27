@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Conjuntos borrosos · Tema 2 · ICI</title>
+<title>Conjuntos borrosos · Tema 4 · ICI</title>
 <meta name="description" content="Introducción a la lógica borrosa para videojuegos: el problema de los umbrales, de dónde viene la lógica borrosa y dónde se usa, conjuntos y funciones de pertenencia, variables lingüísticas, y las operaciones AND, OR y NOT, con ejemplos interactivos sobre Ms. Pac-Man.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 2</a>
+    <a href="index.html">Temas 3 y 4</a>
     <span aria-hidden="true">/</span>
     <span>Conjuntos borrosos</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 2 · 08 · Razonamiento borroso</p>
+    <p class="tema-when">Tema 4 · 08 · Razonamiento borroso</p>
     <h1>
       Conjuntos borrosos
       <span class="thin">Cuando "cerca" no es verdad ni mentira, sino verdad en cierto grado.</span>
@@ -220,7 +220,7 @@ caluroso   [30, 50]</pre>
         <p>
           La más práctica es la definida <strong>por puntos</strong>: <code>(0, 1) (15, 1) (45, 0)</code> es una línea que
           vale 1 hasta 15 y baja hasta 0 en 45. Con dos, tres o cuatro puntos salen rampas, triángulos y trapecios, y es
-          lo que usa la plantilla de la práctica casi siempre. Un detalle que importa: <strong>fuera de los puntos, la
+          lo que usa la plantilla de la práctica casi siempre. <strong>Fuera de los puntos, la
           función se queda con el valor del extremo</strong>. Con <code>(0, 1) (60, 0)</code>, una distancia de −1
           vale 1. Lo recordaremos en la <a href="borroso-mspacman.html#visibilidad">página del motor</a>.
         </p>
@@ -323,7 +323,7 @@ A OR B    =  μA + μB − μA · μB       (PROBOR, la "suma probabilística")<
             <li><strong>OR · max</strong> es la parte de arriba: cubre todo lo que es cerca <em>o</em> media.</li>
             <li><strong>NOT</strong> da la vuelta a "cerca". Fijaos en que <code>cerca AND NOT cerca</code> no es 0: en la
               rampa llega a 0,5. "Estar cerca y no estar cerca" es imposible en lógica clásica, y en la borrosa es verdad a
-              medias en la frontera. No es un error: es justo lo que significa que la frontera sea borrosa.</li>
+              medias en la frontera, que es donde "cerca" sólo se cumple en parte.</li>
           </ul>
         </div>
         <h3 class="label">Y con dos variables distintas</h3>
@@ -336,7 +336,7 @@ A OR B    =  μA + μB − μA · μB       (PROBOR, la "suma probabilística")<
         </p>
       </section>
 
-      <nav class="pager" aria-label="Páginas del tema 2">
+      <nav class="pager" aria-label="Páginas de los temas 3 y 4">
         <a class="pager-prev" href="comparar.html"><span class="pager-l">Anterior</span><span class="pager-t">Reglas, máquinas y árboles</span></a>
         <a class="pager-next" href="inferencia-borrosa.html"><span class="pager-l">Siguiente</span><span class="pager-t">Inferencia borrosa</span></a>
       </nav>
@@ -356,7 +356,7 @@ A OR B    =  μA + μB − μA · μB       (PROBOR, la "suma probabilística")<
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 2</h2>
+          <h2 id="del-tema">Temas 3 y 4</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="que-es.html"><span>01</span>Qué es un sistema de reglas</a></li>
@@ -387,7 +387,7 @@ A OR B    =  μA + μB − μA · μB       (PROBOR, la "suma probabilística")<
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Mapas de influencia · Tema 1 · ICI</title>
+<title>Mapas de influencia · Tema 2 · ICI</title>
 <meta name="description" content="Qué es una capa, cómo se propaga por el laberinto, cómo se combinan varias en una función objetivo, y cómo se escribe de principio a fin un controlador de Ms. Pac-Man que sólo decide con un mapa de influencia.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 1</a>
+    <a href="index.html">Tema 2</a>
     <span aria-hidden="true">/</span>
     <span>Mapas de influencia</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 1 · 06 · Decidir</p>
+    <p class="tema-when">Tema 2 · 06 · Decidir</p>
     <h1>
       Mapas de influencia
       <span class="thin">Pintar un número en cada nodo y dejar que el mapa decida.</span>
@@ -347,7 +347,7 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
         </p>
         <p>
           Con varias fuentes se suman las influencias, y después <strong>cada capa se divide por su
-          máximo</strong>. Ese paso parece de adorno y no lo es: sin él, una capa alimentada por veinte
+          máximo</strong>. Ese paso hace falta: sin él, una capa alimentada por veinte
           píldoras llega a valores mucho más altos que la de un solo fantasma, y su peso acaba pesando más
           sin que nadie lo haya decidido. Los pesos sólo se pueden comparar entre sí si todas las capas
           están en la misma escala.
@@ -451,8 +451,7 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
           Mirad el panel de la amenaza: no es un círculo alrededor del fantasma, es una mancha con la forma
           de los pasillos. Y mirad el total. El pasillo de en medio queda en rojo y <strong>parte el
           laberinto en dos</strong>, así que cualquier búsqueda de coste mínimo que use este mapa va a dar
-          el rodeo sin que nadie haya escrito en ninguna parte "no pases por ahí". Ahí está la gracia de la
-          técnica: el conocimiento no está en el código que decide, está en el mapa que se le da.
+          el rodeo sin que nadie haya escrito en ninguna parte "no pases por ahí".
         </p>
         <div class="note mine">
           <span class="note-label">Mapa de costes y mapa de utilidad son el mismo objeto</span>
@@ -461,8 +460,7 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
 <code>coste(c) = máx(costeMínimo, base − U(c))</code>, la línea de <code>decidir</code> que se explica al principio de la página. Se usa una forma u otra según lo que venga
             detrás: si la decisión la va a tomar una <strong>búsqueda de coste mínimo</strong> (la de
             <a href="busqueda.html#ciegas">coste uniforme</a>, sin tocar una línea) hacen falta costes; si la va a tomar un
-            <strong>máximo</strong> sobre las salidas, hace falta utilidad. El suelo del coste no es un
-            detalle: sin él, una zona muy buena saldría gratis y la distancia dejaría de contar.
+            <strong>máximo</strong> sobre las salidas, hace falta utilidad. Sin el suelo del coste, una zona muy buena saldría gratis y la distancia dejaría de contar.
           </p>
         </div>
         <div class="demo" data-demo="influencia" id="influencia-demo">
@@ -488,8 +486,8 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
         <p>
           El ejemplo trae también las otras dos formas de decidir de
           <a href="estrategias.html#tres-formas">estrategias algorítmicas</a> (reglas con prioridad y función
-          de evaluación) sobre la misma escena, para compararlas con el mapa, y lo que cambia entre ellas no es sólo
-          el resultado: es <strong>qué se toca para afinarlas</strong>. Al pasar a las reglas, la barra de
+          de evaluación) sobre la misma escena, para compararlas con el mapa, y entre ellas cambia, además del
+          resultado, <strong>qué se toca para afinarlas</strong>. Al pasar a las reglas, la barra de
           pesos desaparece de la pantalla, porque allí no pinta nada.
         </p>
         <div class="table-scroll">
@@ -523,7 +521,7 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
               </tr>
               <tr>
                 <td><strong>La función de evaluación mira mucho menos.</strong> Cambia a <em>Una función de evaluación</em>.</td>
-                <td>Sólo se puntúan los dos o tres cruces a los que se puede salir. Debajo está el desglose por términos, que es lo que hay que imprimir para depurar: los términos, nunca el total.</td>
+                <td>Sólo se puntúan los dos o tres cruces a los que se puede salir. Debajo está el desglose por términos, que es lo que tenéis que imprimir para depurar: los términos, nunca el total.</td>
               </tr>
               <tr>
                 <td><strong>El orden decide a ciegas.</strong> Cambia a <em>Reglas con prioridad</em> y prueba los dos órdenes con varios umbrales.</td>
@@ -550,8 +548,8 @@ alcance 45 pasos    0,1<sup>1/45</sup>  =  0,95</pre>
             el de la amenaza va a salir varias veces más grande que todos los demás juntos, y eso
             <strong>no es que esté mal afinado</strong>: es que las dos cosas no se miden en la misma
             escala. Lo que sí es un aviso serio es lo otro: con cinco pesos hay cinco maneras de que el
-            controlador haga algo raro y ninguna de decir cuál ha sido. Por eso se toca <em>un peso cada
-            vez</em>, se mira la capa sola antes que el total, y se escriben los términos por separado en
+            controlador haga algo raro y ninguna de decir cuál ha sido. Por eso tocad <em>un peso cada
+            vez</em>, mirad la capa sola antes que el total y escribid los términos por separado en
             el <code>println</code>.
           </p>
         </div>
@@ -591,7 +589,7 @@ una sola anchura, con las 220 ya en la cola                1 293 nodos</pre>
         <p>
           Hasta aquí el mapa se ha pintado para mirarlo. Ahora toca que decida él solo: una Ms.&nbsp;Pac-Man
           escrita desde cero cuyo <code>getMove</code> no tiene ni una regla sobre el juego. Pinta tres capas,
-          las suma con sus pesos y elige la salida que mejor sale en el mapa. Nada más. Es a propósito un
+          las suma con sus pesos y elige la salida que mejor sale en el mapa. Es a propósito un
           controlador pequeño: sirve para ver qué da de sí la técnica pura, y todo lo que le falta
           está al final de la página.
         </p>
@@ -648,7 +646,7 @@ una sola anchura, con las 220 ya en la cola                1 293 nodos</pre>
             el nodo suelto. Y en estos laberintos no hay callejones: <a href="estrategias.html#voraz">no hay un solo nodo con una única salida</a>.
           </li>
           <li>
-            La de <strong>poder</strong> se ha metido dentro de la comida. No es un capricho: si las píldoras de
+            La de <strong>poder</strong> se ha metido dentro de la comida para que atraiga: si las píldoras de
             poder no atraen, nada lleva a Ms.&nbsp;Pac-Man hasta ellas, y el nivel puede no acabarse nunca, porque
             <code>Game.checkLevelState</code> sólo pasa de nivel cuando no quedan <em>ni</em> píldoras
             <em>ni</em> píldoras de poder. El precio es que se las come en cuanto pasa cerca, las necesite
@@ -1694,7 +1692,7 @@ más recorrer los tramos                        2 o 3 pasillos hasta el cruce si
           <code>GhostsRandom</code>, la comida se repintó en 19&#8239;094 de
           32&#8239;853 llamadas en cruce: <strong>el 58&#8239;%</strong>. La caché se lleva el 42&#8239;%
           restante, que no está mal, pero no es el "sólo cuando te comes una píldora" de la nota. Con este
-          presupuesto da igual; si algún día pintáis capas caras de verdad, es lo primero que hay que
+          presupuesto da igual; si algún día pintáis capas caras de verdad, es lo primero que tenéis que
           medir.
         </p>
       </section>
@@ -1835,7 +1833,7 @@ más recorrer los tramos                        2 o 3 pasillos hasta el cruce si
           Esa última fila, y la de la caída de 0,70, son la lección de la tabla: <strong>no hay pesos buenos
           en abstracto</strong>, hay pesos buenos contra unos rivales. Si afinaseis sólo contra fantasmas
           aleatorios, os quedaríais con esas dos variantes, que son peores que el listado contra los
-          fantasmas de verdad. Por eso los rivales se dicen siempre, y por eso
+          fantasmas de verdad. Por eso decid siempre contra qué rivales habéis medido, y por eso
           la guía de <a href="../competicion.html">probar los controladores</a> insiste en medir contra
           varios.
         </p>
@@ -1913,14 +1911,13 @@ más recorrer los tramos                        2 o 3 pasillos hasta el cruce si
           este controlador está entre dos columnas: el mapa es el de costes y la elección de salida es una
           función de evaluación muy corta. Y lo que falla es lo que la tabla dice que falla en las dos: los
           pesos se pisan, y sin pintar las capas no hay manera de saber por qué eligió lo que eligió. Lo que
-          tiene a favor es que cada una de esas mejoras es <em>una capa más o un término más</em>, no una
-          regla que haya que encajar entre las demás. Esa es la parte que conviene quedarse para la
-          práctica.
+          tiene a favor, y lo que os conviene quedaros para la práctica, es que cada una de esas mejoras
+          es <em>una capa más o un término más</em>, no una regla que haya que encajar entre las demás.
         </p>
       </section>
 
 
-      <nav class="pager" aria-label="Páginas del tema 1">
+      <nav class="pager" aria-label="Páginas del tema 2">
         <a class="pager-prev" href="estrategias.html"><span class="pager-l">Anterior</span><span class="pager-t">Estrategias algorítmicas</span></a>
         <a class="pager-next" href="predecir-coordinar.html"><span class="pager-l">Siguiente</span><span class="pager-t">Predecir, coordinar y medir</span></a>
       </nav>
@@ -1947,7 +1944,7 @@ más recorrer los tramos                        2 o 3 pasillos hasta el cruce si
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 1</h2>
+          <h2 id="del-tema">Tema 2</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
@@ -1977,7 +1974,7 @@ más recorrer los tramos                        2 o 3 pasillos hasta el cruce si
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

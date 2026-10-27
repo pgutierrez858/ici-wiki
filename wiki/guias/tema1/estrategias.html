@@ -6,7 +6,7 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Estrategias algorítmicas · Tema 1 · ICI</title>
+<title>Estrategias algorítmicas · Tema 2 · ICI</title>
 <meta name="description" content="Por qué la regla voraz no basta, cómo razonar por cruces y tramos, la pregunta de si llegas antes, los movimientos seguros con dos cruces de profundidad, y las tres formas de escribir la decisión.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
@@ -51,13 +51,13 @@
     <span aria-hidden="true">/</span>
     <a href="../index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Tema 1</a>
+    <a href="index.html">Tema 2</a>
     <span aria-hidden="true">/</span>
     <span>Estrategias algorítmicas</span>
   </nav>
 
   <header class="masthead">
-    <p class="tema-when">Tema 1 · 05 · Decidir</p>
+    <p class="tema-when">Tema 2 · 05 · Decidir</p>
     <h1>
       Estrategias algorítmicas
       <span class="thin">Con el camino resuelto, lo que queda es decidir hacia dónde.</span>
@@ -167,7 +167,7 @@
         <p>
           De aquí salen los dos arreglos, y ninguno de los dos es cambiar la fórmula de la distancia:
           <strong>mirar a todas las amenazas</strong> en vez de sólo a la más cercana, y <strong>mirar más
-          lejos de un paso</strong>. Lo segundo no es una preferencia: si al entrar en un pasillo te
+          lejos de un paso</strong>. Lo segundo es obligado: si al entrar en un pasillo te
           comprometes a salir por el otro extremo, la pregunta no puede ser "¿qué nodo me aleja más?", tiene
           que ser "¿qué hay al final de ese pasillo, y quién llega antes?". Y eso, en este laberinto, tiene
           una unidad natural.
@@ -211,7 +211,7 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
           </p>
 <pre><code><span class="k">if</span> (!game.isJunction(game.getPacmanCurrentNodeIndex())) <span class="k">return null</span>;</code></pre>
           <p>
-            Y de paso te ahorra el 90&#8239;% de las llamadas, con lo que el presupuesto de 40&nbsp;ms deja
+            Y de paso te ahorra más del 95&#8239;% de las llamadas, con lo que el presupuesto de 40&nbsp;ms deja
             de ser un problema aunque hagas una búsqueda de verdad en cada cruce.
           </p>
         </div>
@@ -220,7 +220,7 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
       <section id="llego-antes">
         <div class="sec-head">
           <span class="num">03</span>
-          <h2 class="sec">La pregunta que ordena todo: ¿llego yo antes?</h2>
+          <h2 class="sec">¿Llego yo antes?</h2>
         </div>
         <p>
           Un tramo es transitable si llegas al cruce del final antes que cualquier fantasma que pueda
@@ -298,8 +298,8 @@ game.getMoveToMakeToReachDirectNeighbour(a, b)  <span class="c">// la dirección
         <p>
           Con eso ya no te metes en un tramo donde te alcanzan antes de llegar al final. Falta el otro
           medio error: meterte en uno seguro que desemboca en un cruce del que <strong>no sale nada
-          seguro</strong>. Ese es el callejón de verdad de este juego: no lo pone el laberinto, lo ponen los
-          fantasmas, y aparece y desaparece cada pocos turnos.
+          seguro</strong>. Ese es el callejón de verdad de este juego, el que ponen los fantasmas, y aparece
+          y desaparece cada pocos turnos.
         </p>
         <figure>
           <figcaption>Pseudocódigo · movimientos seguros con dos niveles de profundidad</figcaption>
@@ -547,7 +547,7 @@ total       d · (1 + 1/2 + 1/4 + …)
         </p>
       </section>
 
-      <nav class="pager" aria-label="Páginas del tema 1">
+      <nav class="pager" aria-label="Páginas del tema 2">
         <a class="pager-prev" href="astar-mspacman.html"><span class="pager-l">Anterior</span><span class="pager-t">A* en Ms.&nbsp;Pac-Man</span></a>
         <a class="pager-next" href="mapas-influencia.html"><span class="pager-l">Siguiente</span><span class="pager-t">Mapas de influencia</span></a>
       </nav>
@@ -569,7 +569,7 @@ total       d · (1 + 1/2 + 1/4 + …)
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
-          <h2 id="del-tema">Tema 1</h2>
+          <h2 id="del-tema">Tema 2</h2>
           <ol>
             <li><a href="index.html"><span>00</span>Índice del tema</a></li>
             <li><a href="representacion.html"><span>01</span>Representar el espacio</a></li>
@@ -599,7 +599,7 @@ total       d · (1 + 1/2 + 1/4 + …)
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 22 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
