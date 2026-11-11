@@ -5,6 +5,7 @@ import java.util.HashMap;
 import es.ucm.fdi.ici.c2627.practica3.grupoYY.mspacman.MsPacManInput;
 import es.ucm.fdi.ici.c2627.practica3.grupoYY.mspacman.actions.ComerAction;
 import es.ucm.fdi.ici.c2627.practica3.grupoYY.mspacman.actions.HuirAction;
+import es.ucm.fdi.ici.c2627.practica3.grupoYY.mspacman.actions.HuirDelPeligroAction;
 import es.ucm.fdi.ici.c2627.practica3.grupoYY.mspacman.actions.IrAPPillAction;
 import es.ucm.fdi.ici.c2627.practica3.grupoYY.mspacman.actions.PerseguirAction;
 import es.ucm.fdi.ici.rules.RuleEngine;
@@ -19,6 +20,7 @@ public class MsPacMan extends PacmanController {
 
     private final RuleEngine motor;
     private final UltimaAccion ultima = new UltimaAccion();
+    private final HuirDelPeligroAction huirDelPeligro = new HuirDelPeligroAction();   // lee el Input
 
     public MsPacMan() {
         this("mspacman-v1.clp");                 // la versión que va al concurso
@@ -32,7 +34,7 @@ public class MsPacMan extends PacmanController {
         HashMap<String, RulesAction> acciones = new HashMap<>();
         for (RulesAction a : new RulesAction[] {
                 new ComerAction(), new HuirAction(),
-                new IrAPPillAction(), new PerseguirAction() })
+                new IrAPPillAction(), new PerseguirAction(), huirDelPeligro })
             acciones.put(a.getActionId(), a);
 
         motor = new RuleEngine("MSPACMAN", RULES_PATH + ficheroReglas, acciones);
@@ -50,6 +52,7 @@ public class MsPacMan extends PacmanController {
     @Override
     public MOVE getMove(Game game, long timeDue) {
         MsPacManInput input = new MsPacManInput(game, ultima.get());
+        huirDelPeligro.setInput(input);           // el Input de este turno, antes de run()
         motor.reset();
         motor.assertFacts(input.getFacts());
         return motor.run(game);

@@ -1,0 +1,60 @@
+// Fantasmas · v1: la v0 y una regla para no esperarla junto a su píldora.
+
+FUNCTION_BLOCK Ghost
+
+VAR_INPUT                    // pacman y ppill, en pasos de 0 a 150; comestible, los turnos que me quedan (0: no lo soy)
+   pacman : REAL;
+   ppill : REAL;
+   comestible : REAL;
+END_VAR
+
+VAR_OUTPUT                   // una por acción, con su getActionId(), de 0 a 10
+   perseguir : REAL;
+   huir : REAL;
+END_VAR
+
+FUZZIFY pacman
+   TERM cerca := (0, 1) (15, 1) (35, 0);
+   TERM media := trian 20 45 70;
+   TERM lejos := (55, 0) (80, 1) (150, 1);
+END_FUZZIFY
+
+FUZZIFY ppill
+   TERM cerca := (0, 1) (15, 1) (35, 0);
+   TERM media := trian 20 45 70;
+   TERM lejos := (55, 0) (80, 1) (150, 1);
+END_FUZZIFY
+
+FUZZIFY comestible
+   TERM no := (0, 1) (1, 0);
+   TERM si := (0, 0) (1, 1) (200, 1);
+END_FUZZIFY
+
+DEFUZZIFY perseguir
+   TERM poco  := (0, 1) (4, 0);
+   TERM algo  := trian 2 5 8;
+   TERM mucho := (6, 0) (10, 1);
+   METHOD : COG;
+   DEFAULT := 0;
+END_DEFUZZIFY
+
+DEFUZZIFY huir
+   TERM poco  := (0, 1) (4, 0);
+   TERM algo  := trian 2 5 8;
+   TERM mucho := (6, 0) (10, 1);
+   METHOD : COG;
+   DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK reglas
+   AND : MIN;
+   ACT : MIN;
+   ACCU : MAX;
+
+   RULE 1 : IF comestible IS si THEN huir IS mucho;
+   RULE 2 : IF comestible IS no THEN perseguir IS mucho;
+   // si estoy cerca de ella y ella de su píldora de poder, mejor apartarse
+   RULE 3 : IF comestible IS no AND pacman IS cerca AND ppill IS cerca THEN huir IS mucho, perseguir IS poco;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK

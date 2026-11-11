@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Depurar reglas borrosas · Guías · ICI</title>
+<meta name="description" content="Las herramientas de depuración de la Práctica 4: probar un FCL sin jugar con casos escritos a mano y su curva de control, una traza que dice en cada turno qué reglas se activan y qué acción gana, y los errores típicos con jFuzzyLogic.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Depurar reglas borrosas</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Depurar reglas borrosas
+      <span class="thin">Qué entra, cuánto se activa cada regla, y qué sale.</span>
+    </h1>
+    <p class="standfirst">
+      Con Jess, en cada turno se disparaban unas reglas y otras no. Aquí casi todas se activan un poco, se mezclan,
+      y lo que sale es un número por acción. Eso es lo bueno de la lógica borrosa y también lo que la hace difícil
+      de seguir. Esta guía da dos herramientas para verlo, una para probar el FCL sin jugar y otra para seguirlo
+      mientras se juega, con el código entero y lo que sacan de verdad con el ejemplo de las siete reglas.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="preguntas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Tres preguntas, en este orden</h2>
+        </div>
+        <p>
+          Cuando Ms.&nbsp;Pac-Man hace algo raro, la causa está en uno de tres sitios. Id en orden: no tiene sentido
+          revisar una acción si su salida nunca es la más alta.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Pregunta</th><th scope="col">Si la respuesta es no</th><th scope="col">Cómo se mira</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>1 · ¿Las entradas valen lo que creéis?</strong></td>
+                <td>Un fallo de Java: una distancia mal calculada, un <code>-1</code> que se cuela, una variable que no se rellena.</td>
+                <td>La <a href="#traza">traza</a>: escribe las entradas de cada turno.</td>
+              </tr>
+              <tr>
+                <td><strong>2 · ¿Gana la salida que esperáis?</strong></td>
+                <td>Los términos no están donde creéis, una regla no se activa, o se activa otra con más fuerza. O un empate.</td>
+                <td>Un caso en <a href="#probar"><code>ProbarBorroso</code></a>, con su curva de control. El <a href="#resumen">resumen</a> de la traza dice qué reglas no se activan nunca.</td>
+              </tr>
+              <tr>
+                <td><strong>3 · ¿La acción hace lo que debe?</strong></td>
+                <td>El problema ya no es borroso: es Java, como en la Práctica&nbsp;1.</td>
+                <td><code>VerPartida</code> despacio, con la traza diciendo qué acción se está ejecutando.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Todo el código de esta página está en el <a href="borroso-paso-a-paso.html#proyecto">proyecto del
+          ejemplo</a>, en el paquete <code>depurar</code>.
+        </p>
+      </section>
+
+      <section id="probar">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Probar el FCL sin jugar</h2>
+        </div>
+        <p>
+          Una partida dura miles de turnos y la situación que os interesa sale una vez, o ninguna. Es mucho más rápido
+          escribir esa situación a mano, como tres números, y preguntarle al FCL qué haría. Eso hace
+          <code>ProbarBorroso</code>: carga el <code>.fcl</code> directamente con jFuzzyLogic, sin juego, y para cada
+          caso dice qué salida gana y si es la que esperabais.
+        </p>
+<div class="codigo"><pre><code><span class="k">static final</span> String FCL = <span class="s">"bin/es/ucm/fdi/ici/c2627/practica4/grupoYY/mspacman-v1.fcl"</span>;
+<span class="k">static final</span> String BLOQUE = <span class="s">"MsPacMan"</span>;
+
+<span class="k">public static void</span> main(String[] args) {
+    FIS fis = FIS.load(FCL, <span class="k">true</span>);         <span class="c">// true: si hay un error de sintaxis, lo dice</span>
+    <span class="k">if</span> (fis == <span class="k">null</span>) { System.out.println(<span class="s">"No encuentro "</span> + FCL); <span class="k">return</span>; }
+    FunctionBlock fb = fis.getFunctionBlock(BLOQUE);
+
+    <span class="c">//   nombre del caso                         gana esperada   peligro comestible ppill</span>
+    caso(fb, <span class="s">"nada cerca: come"</span>,                     <span class="s">"comer"</span>,     <span class="n">150</span>, <span class="n">150</span>, <span class="n">150</span>);
+    caso(fb, <span class="s">"peligroso a 10: huye"</span>,                 <span class="s">"huir"</span>,       <span class="n">10</span>, <span class="n">150</span>, <span class="n">150</span>);
+    caso(fb, <span class="s">"peligroso a 45: todavía come"</span>,         <span class="s">"comer"</span>,      <span class="n">45</span>, <span class="n">150</span>, <span class="n">150</span>);
+    caso(fb, <span class="s">"comestible a 10, peligroso lejos"</span>,     <span class="s">"perseguir"</span>, <span class="n">150</span>,  <span class="n">10</span>, <span class="n">150</span>);
+    caso(fb, <span class="s">"comestible a 10, peligroso a 10"</span>,      <span class="s">"huir"</span>,       <span class="n">10</span>,  <span class="n">10</span>, <span class="n">150</span>);
+    caso(fb, <span class="s">"peligroso a 20 y ppill a 5: a la ppill"</span>, <span class="s">"irAPPill"</span>, <span class="n">20</span>, <span class="n">150</span>,   <span class="n">5</span>);
+    …
+}
+
+<span class="k">static void</span> evaluar(FunctionBlock fb, <span class="k">double</span> peligro, <span class="k">double</span> comestible, <span class="k">double</span> ppill) {
+    fb.setVariable(<span class="s">"peligro"</span>, peligro);   <span class="c">// a todas las entradas, cada vez: si no, se quedan con el valor anterior</span>
+    fb.setVariable(<span class="s">"comestible"</span>, comestible);
+    fb.setVariable(<span class="s">"ppill"</span>, ppill);
+    fb.evaluate();
+}</code></pre></div>
+        <p>Y lo que saca, con las siete reglas:</p>
+<pre><code>BIEN  nada cerca: come                         gana comer     (esperaba comer)
+      salidas: comer=8.7 huir=1.3 irAPPill=0.0 perseguir=0.0
+      reglas:  R2:1.00 R5:1.00
+BIEN  peligroso a 10: huye                     gana huir      (esperaba huir)
+      salidas: comer=1.3 huir=8.7 irAPPill=0.0 perseguir=0.0
+      reglas:  R1:1.00 R3:1.00
+BIEN  peligroso a 45: todavía come             gana comer     (esperaba comer)
+      salidas: comer=5.0 huir=0.0 irAPPill=0.0 perseguir=0.0
+      reglas:  R4:1.00
+…
+BIEN  peligroso a 20 y ppill a 5: a la ppill   gana irAPPill  (esperaba irAPPill)
+      salidas: comer=1.4 huir=4.8 irAPPill=8.7 perseguir=0.0
+      reglas:  R1:0.75 R3:0.75 R7:1.00
+
+Todos los casos bien.</code></pre>
+        <p>
+          Cada caso dice tres cosas: si gana la esperada, cuánto vale cada salida, y con qué grado se ha activado cada
+          regla (sólo las que pasan de 0). Cuando un caso sale <code>MAL</code>, las dos últimas líneas suelen
+          bastar para ver por qué.
+        </p>
+        <h3 class="label" id="curva">La curva de control</h3>
+        <p>
+          Un caso prueba un punto. La curva prueba todos: mueve una entrada de punta a punta, con las otras quietas, y
+          escribe lo que sale en cada sitio. <code>ProbarBorroso</code> la saca después de los casos, para
+          <code>peligro</code> de 0 a 100 con todo lo demás lejos:
+        </p>
+<pre><code>peligro  salidas → gana
+   20   comer=1.4 huir=8.6 irAPPill=0.0 perseguir=0.0 → huir
+   25   comer=3.0 huir=8.4 irAPPill=0.0 perseguir=0.0 → huir
+   30   comer=4.1 huir=8.2 irAPPill=0.0 perseguir=0.0 → huir
+   35   comer=5.0 huir=0.0 irAPPill=0.0 perseguir=0.0 → comer
+   …
+   65   comer=6.8 huir=1.6 irAPPill=0.0 perseguir=0.0 → comer</code></pre>
+        <p>
+          En la curva se ven cosas que con casos sueltos se escapan: el punto exacto en que cambia la acción (entre 30
+          y 35), un salto brusco (<code>huir</code> de 8,2 a 0: ninguna regla de <code>huir</code> para
+          <code>media</code>), o un tramo en el que dos salidas valen lo mismo. Para una curva de otra entrada, cambiad
+          la variable que se mueve en el bucle del <code>main</code>.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Un caso por regla, desde el principio</span>
+          <p>
+            Cada regla nueva, con la situación para la que la escribís y la acción que debería ganar. Si una regla
+            posterior la rompe, os enteráis en un segundo. En el ejemplo, el caso "peligroso a 45: todavía come" fue
+            el que destapó un empate a 5,0 en la primera versión del <a href="borroso-paso-a-paso.html#paso2">paso&nbsp;2</a>.
+          </p>
+        </div>
+      </section>
+
+      <section id="traza">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Ver las reglas mientras se juega</h2>
+        </div>
+        <p>
+          El motor trae un observador, <code>ConsoleFuzzyEngineObserver</code>, que <a href="tema2/borroso-mspacman.html#ver">escribe
+          en cada turno</a> todas las entradas, todas las salidas y todas las reglas. Son unas veinte líneas por turno,
+          y una partida tiene miles. <code>TrazaBorrosa</code> hace lo mismo en una línea, sólo cuando cambia la acción
+          ganadora, y al final un resumen:
+        </p>
+<div class="codigo"><pre><code><span class="k">public class</span> TrazaBorrosa <span class="k">implements</span> FuzzyEngineObserver {
+
+    <span class="k">public</span> TrazaBorrosa(String nombre, FuzzyEngine motor, <span class="k">boolean</span> soloCambios) { … }
+
+    <span class="c">/** El FuzzyEngine avisa después de cada turno, con lo que ha entrado y lo que ha salido. */</span>
+    <span class="k">@Override</span>
+    <span class="k">public void</span> actionFired(String accion, HashMap&lt;String, Double&gt; entradas,
+            HashMap&lt;String, Double&gt; salidas, Collection&lt;String&gt; nada) {
+        turno++;
+        StringBuilder activas = <span class="k">new</span> StringBuilder();
+        <span class="k">for</span> (Rule r : reglas) {                           <span class="c">// las del FIS del motor</span>
+            <span class="k">double</span> grado = r.getDegreeOfSupport();
+            <span class="k">if</span> (grado &lt;= <span class="n">0</span>) <span class="k">continue</span>;
+            turnosRegla.merge(r.getName(), <span class="n">1</span>, Integer::sum);
+            activas.append(String.format(<span class="s">" R%s:%.2f"</span>, r.getName(), grado));
+        }
+        vecesGana.merge(accion, <span class="n">1</span>, Integer::sum);
+        <span class="k">if</span> (!soloCambios || !accion.equals(ganadora))
+            System.out.printf(<span class="s">"[%s] t=%d  %s → %s → gana %s.  Reglas:%s%n"</span>, …);
+        ganadora = accion;
+    }
+
+    <span class="c">/** Llamadlo al final: una regla que no se activa nunca no hace nada. */</span>
+    <span class="k">public void</span> resumen() { … }
+}</code></pre></div>
+        <p>
+          El <code>FuzzyEngine</code> no deja ver su <code>FIS</code>, así que <code>TrazaBorrosa</code> lo coge por
+          reflexión al crearse y lee el grado de cada regla directamente. Lo mismo hacía <code>TrazaReglas</code> con el
+          <code>Rete</code> de Jess.
+        </p>
+        <h3 class="label">Engancharla</h3>
+<div class="codigo"><pre><code>MsPacMan pacman = <span class="k">new</span> MsPacMan();
+TrazaBorrosa traza = <span class="k">new</span> TrazaBorrosa(<span class="s">"MSPACMAN"</span>, pacman.getMotor(), <span class="k">true</span>);   <span class="c">// true: sólo los cambios</span>
+
+executor.runGame(pacman, <span class="k">new</span> GhostsAggressive(), <span class="n">40</span>);
+traza.resumen();</code></pre></div>
+        <p>
+          Es lo que hace <code>VerPartida</code>. Con <code>false</code> escribe una línea en cada turno, que viene bien
+          para seguir unos pocos turnos con el juego a 200&nbsp;ms. Para los fantasmas, una traza por fantasma con
+          <code>getMotor(GHOST.BLINKY)</code>, etc.
+        </p>
+        <h3 class="label">Leerla</h3>
+        <p>Unas líneas de una partida de la v1 contra los fantasmas agresivos:</p>
+<pre><code>[MSPACMAN] t=1  {comestible=150.0 peligro=150.0 ppill=51.0} → {comer=8.7 huir=1.3 irAPPill=0.0 perseguir=0.0} → gana comer.  Reglas: R2:1.00 R5:1.00
+[MSPACMAN] t=61  {comestible=150.0 peligro=69.0 ppill=25.0} → {comer=8.1 huir=1.5 irAPPill=8.4 perseguir=0.0} → gana irAPPill.  Reglas: R2:0.56 R4:0.04 R5:0.56 R7:0.44
+[MSPACMAN] t=71  {comestible=150.0 peligro=49.0 ppill=35.0} → {comer=5.0 huir=0.0 irAPPill=0.0 perseguir=0.0} → gana comer.  Reglas: R4:0.84
+[MSPACMAN] t=79  {comestible=150.0 peligro=33.0 ppill=43.0} → {comer=4.7 huir=8.1 irAPPill=0.0 perseguir=0.0} → gana huir.  Reglas: R1:0.10 R3:0.10 R4:0.52
+[MSPACMAN] t=152  {comestible=17.0 peligro=150.0 ppill=89.0} → {comer=5.0 huir=1.3 irAPPill=0.0 perseguir=8.7} → gana perseguir.  Reglas: R2:1.00 R5:1.00 R6:0.90</code></pre>
+        <ul>
+          <li>
+            <strong>Las entradas, entre llaves.</strong> Lo primero que hay que mirar: si una distancia vale algo raro,
+            el problema es de Java y el FCL no tiene la culpa.
+          </li>
+          <li>
+            <strong>Las salidas, y la que gana.</strong> Fijaos en lo cerca que están a veces: en el turno 61,
+            <code>irAPPill</code> le gana a <code>comer</code> por tres décimas.
+          </li>
+          <li>
+            <strong>Las reglas activas, con su grado.</strong> En el turno 79, la regla 1 se activa sólo con 0,10, y
+            basta para que gane <code>huir</code>: como su salida no tiene ninguna otra regla activa, su centro de
+            gravedad es 8,1 aunque el grado sea pequeño. Es la trampa del término solo, y se ve aquí mejor que en
+            ningún sitio.
+          </li>
+        </ul>
+        <p>
+          El turno 61 es el que explica por qué la v1 no mejora: con el fantasma a 69 pasos, <code>NOT lejos</code>
+          vale 0,44 y la regla 7 manda a Ms.&nbsp;Pac-Man a gastar la píldora de poder. Está contado en el
+          <a href="borroso-paso-a-paso.html#paso4">paso&nbsp;4</a> de la guía.
+        </p>
+      </section>
+
+      <section id="resumen">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">El resumen: las reglas que no existen</h2>
+        </div>
+        <p>Al final de esa misma partida:</p>
+<pre><code>[MSPACMAN] 4001 turnos. Turnos en que se activa cada regla:
+     3352  RULE 1
+      492  RULE 2
+     3352  RULE 3
+      384  RULE 4
+      492  RULE 5
+      220  RULE 6
+      117  RULE 7
+[MSPACMAN] Veces que gana cada acción:
+      415  comer
+     3268  huir
+      110  irAPPill
+      208  perseguir</code></pre>
+        <p>
+          Una regla que en una partida entera se queda a 0 sale marcada con <code>&lt;-- NUNCA</code>, y no hace nada,
+          por bien escrita que esté. Las causas típicas: un término que no llega a las distancias que salen en el juego,
+          un <code>AND</code> de dos cosas que nunca pasan a la vez, o un nombre de término mal escrito en otra regla
+          que la tapa.
+        </p>
+        <p>
+          La otra mitad del resumen también dice mucho. Contra los agresivos, esta Ms.&nbsp;Pac-Man huye en 3&#8239;268
+          de 4&#8239;001 turnos: casi todo el tiempo. Si queréis que puntúe más, ahí está el margen, y no en afinar la
+          regla 7, que gana 110 veces.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Activarse no es ganar</span>
+          <p>
+            Con Jess, una regla que se disparaba ponía su <code>ACTION</code> en la memoria, ganara o no. Aquí una regla
+            activa con 0,04 contribuye casi nada. Mirad las dos columnas a la vez: una regla que se activa en miles de
+            turnos pero cuya acción no gana nunca, o casi nunca, seguramente tiene la salida mal puesta, o hay otra
+            regla que siempre la supera.
+          </p>
+        </div>
+      </section>
+
+      <section id="empates">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Empates y huecos</h2>
+        </div>
+        <p>
+          En Jess, si ninguna regla asertaba un <code>ACTION</code>, el motor devolvía <code>NEUTRAL</code> y se veía.
+          Aquí siempre gana alguien, aunque sea por accidente, y eso esconde dos problemas:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Lo que pasa</th><th scope="col">Cómo se ve</th><th scope="col">Qué hacer</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Un hueco</strong>: para unas entradas, ninguna regla de una salida se activa.</td>
+                <td>Esa salida vale su <code>DEFAULT</code>. Si todas lo hacen, todas valen 0 y gana la primera del array.</td>
+                <td>Mirad la curva de control: un salto a 0 es un hueco. Términos que se solapen, o reglas que cubran ese tramo.</td>
+              </tr>
+              <tr>
+                <td><strong>Un empate</strong>: dos salidas con el mismo término activo y nada más.</td>
+                <td>Valen lo mismo, 5,0 y 5,0, o 8,7 y 8,7. Gana la que vaya antes en el array de acciones.</td>
+                <td>Que la regla que debe ganar baje la otra salida: <code>THEN perseguir IS mucho, comer IS poco</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Los dos son fáciles de pillar con <code>ProbarBorroso</code>, porque las salidas aparecen con su valor: un
+          caso que gana "por los pelos" con dos salidas iguales es un empate, aunque salga <code>BIEN</code>.
+        </p>
+      </section>
+
+      <section id="sin-java">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Sin escribir Java</h2>
+        </div>
+        <p>
+          Para probar una idea rápida hay dos atajos. El primero, el banco de los apuntes, en
+          <a href="tema2/inferencia-borrosa.html">Inferencia borrosa</a>, o el de la
+          <a href="borroso-paso-a-paso.html#reglas">guía del ejemplo</a>, que ya tiene cargado el FCL de las siete
+          reglas: pegáis vuestro FCL, movéis las entradas y veis los recortes, las salidas y la curva. Da las mismas
+          cifras que jFuzzyLogic.
+        </p>
+        <p>
+          El segundo, la consola de jFuzzyLogic, que viene en <code>MsPacManEngine/lib</code>:
+        </p>
+<pre><code>java -jar jFuzzyLogic.jar -e mspacman-v1.fcl 150 20 10</code></pre>
+<pre><code>	VAR_OUTPUT	     comer = 1.397199
+	VAR_INPUT 	comestible = 150.000000
+	VAR_OUTPUT	      huir = 4.838223
+	VAR_OUTPUT	  irAPPill = 8.663333
+	VAR_INPUT 	   peligro = 20.000000
+	VAR_OUTPUT	 perseguir = 0.000000
+	VAR_INPUT 	     ppill = 10.000000
+	RULE_BLOCK reglas
+		Support  	Rule name 	Rule
+		0.750000	1         	IF peligro IS cerca THEN huir IS mucho;
+		…
+		1.000000	7         	IF (peligro  IS NOT lejos) AND (ppill IS cerca) THEN irAPPill IS mucho , huir IS poco;</code></pre>
+        <p>
+          Dos avisos. Los números se asignan a las entradas <strong>en orden alfabético</strong>, no en el de
+          <code>VAR_INPUT</code>: aquí <code>comestible</code>, <code>peligro</code>, <code>ppill</code>. Mirad siempre
+          las líneas <code>VAR_INPUT</code>. Y después de escribir los valores abre una ventana con las gráficas de
+          cada variable; el programa no termina hasta que la cerráis.
+        </p>
+      </section>
+
+      <section id="errores">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Errores típicos de la práctica</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Lo que pasa</th><th scope="col">Por qué, y qué hacer</th></tr></thead>
+            <tbody>
+              <tr><td>Al arrancar sale <code>Can't load file</code>, y luego <code>Error evaluating fuzzy logic</code> en cada turno. Ms.&nbsp;Pac-Man no se mueve.</td><td>La ruta del <code>.fcl</code> no existe desde la carpeta en la que se lanza el programa: <code>FCL_PATH</code> sin vuestra letra, o el fichero sin copiar a <code>bin/</code>. <span class="path">Project &gt; Clean</span>, y probad la ruta con <code>ProbarBorroso</code>.</td></tr>
+              <tr><td><code>No such variable: 'Peligro'</code>, en cada turno.</td><td>Una clave del mapa del <code>Input</code> no coincide con un nombre de <code>VAR_INPUT</code>. Las mayúsculas cuentan. También pasa si una versión vieja del <code>.fcl</code> no declara una entrada que añadisteis después.</td></tr>
+              <tr><td>El fichero carga, pero en cada turno sale <code>Error evaluating fuzzy logic</code> con un <code>NullPointerException</code>.</td><td>El tercer argumento del <code>FuzzyEngine</code> es el nombre del <code>FUNCTION_BLOCK</code>, no el del fichero, y no coincide.</td></tr>
+              <tr><td>Una acción no gana nunca, aunque sus reglas se activan.</td><td>Su <code>VAR_OUTPUT</code> no se llama como su <code>getActionId()</code>, o su salida está en otra escala. Las mayúsculas cuentan también aquí.</td></tr>
+              <tr><td>Con dos salidas iguales gana siempre la misma, o una distinta en cada ejecución.</td><td>Un empate. Con el <code>MaxActionSelector</code> del ejemplo gana la primera del array; con uno que recorra el <code>HashMap</code> de salidas, cualquiera. Ved la <a href="#empates">sección&nbsp;5</a>.</td></tr>
+              <tr><td>Un fantasma que no existe hace huir a Ms.&nbsp;Pac-Man.</td><td>Un <code>-1</code> como distancia, fuera de los términos: vale "cerca" con un 1. "No hay" tiene que ser un número dentro del rango, como <code>LEJOS</code>.</td></tr>
+              <tr><td>Las entradas valen siempre lo mismo, o lo del turno anterior.</td><td>Atributos del <code>Input</code> inicializados en la declaración, que pisan lo que calcula <code>parseInput</code>; o una variable que no se manda en algún turno. Ved <a href="borroso-paso-a-paso.html#entradas">las entradas</a>.</td></tr>
+              <tr><td>Una regla con <code>NOT</code> se activa mucho más de lo que esperabais.</td><td><code>NOT lejos</code> no es <code>cerca</code>: es 1&nbsp;−&nbsp;μ, y vale algo en todo el tramo en que <code>lejos</code> no es 1. El <a href="borroso-paso-a-paso.html#paso4">paso&nbsp;4</a> del ejemplo.</td></tr>
+              <tr><td>Una regla con <code>OR</code> y <code>AND</code> se activa cuando no debería.</td><td>jFuzzyLogic lee de izquierda a derecha, sin precedencia. Paréntesis.</td></tr>
+              <tr><td>Con <code>METHOD : MM</code> salen valores absurdos, cerca de 0.</td><td>Un error de jFuzzyLogic 3.2 con la media de los máximos. Usad <code>COG</code>.</td></tr>
+              <tr><td><code>TrazaBorrosa</code> o un <code>ConsoleFuzzyEngineObserver</code> enganchados en la entrega.</td><td>Escriben en cada turno y ralentizan el concurso. Fuera antes de subir el zip.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Guías de la Práctica 4">
+        <a class="pager-prev" href="borroso-paso-a-paso.html"><span class="pager-l">Anterior</span><span class="pager-t">Siete reglas borrosas</span></a>
+        <a class="pager-next" href="comparar-versiones.html"><span class="pager-l">Siguiente</span><span class="pager-t">Comparar versiones</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#preguntas">Tres preguntas</a></li>
+            <li><a href="#probar">Probar sin jugar</a></li>
+            <li><a href="#traza">La traza</a></li>
+            <li><a href="#resumen">El resumen</a></li>
+            <li><a href="#empates">Empates y huecos</a></li>
+            <li><a href="#sin-java">Sin escribir Java</a></li>
+            <li><a href="#errores">Errores típicos</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">Práctica 4</h2>
+          <ol>
+            <li><a href="../practicas/practica-4.html"><span>00</span>El enunciado</a></li>
+            <li><a href="borroso-paso-a-paso.html"><span>01</span>Siete reglas borrosas</a></li>
+            <li><a href="depurar-borroso.html" aria-current="page"><span>02</span>Depurar reglas borrosas</a></li>
+            <li><a href="comparar-versiones.html"><span>03</span>Comparar versiones</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

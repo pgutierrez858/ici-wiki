@@ -577,6 +577,97 @@
       ].join('\n'),
       ini: { service: 3, food: 8 }
     },
+    mspacman: {
+      txt: 'Ms. Pac-Man · v1 de la Práctica 4',
+      src: [
+        '// Ms. Pac-Man · v1: la v0 y una regla más, para ir a la píldora de poder.',
+        '',
+        'FUNCTION_BLOCK MsPacMan',
+        '',
+        'VAR_INPUT                    // distancias en pasos, de 0 a 150 (150: lejos, o no hay)',
+        '   peligro : REAL;',
+        '   comestible : REAL;',
+        '   ppill : REAL;',
+        'END_VAR',
+        '',
+        'VAR_OUTPUT                   // una por acción, con su getActionId(), de 0 a 10',
+        '   comer : REAL;',
+        '   huir : REAL;',
+        '   perseguir : REAL;',
+        '   irAPPill : REAL;',
+        'END_VAR',
+        '',
+        'FUZZIFY peligro',
+        '   TERM cerca := (0, 1) (15, 1) (35, 0);',
+        '   TERM media := trian 20 45 70;',
+        '   TERM lejos := (55, 0) (80, 1) (150, 1);',
+        'END_FUZZIFY',
+        '',
+        'FUZZIFY comestible',
+        '   TERM cerca := (0, 1) (15, 1) (35, 0);',
+        '   TERM media := trian 20 45 70;',
+        '   TERM lejos := (55, 0) (80, 1) (150, 1);',
+        'END_FUZZIFY',
+        '',
+        'FUZZIFY ppill',
+        '   TERM cerca := (0, 1) (15, 1) (35, 0);',
+        '   TERM media := trian 20 45 70;',
+        '   TERM lejos := (55, 0) (80, 1) (150, 1);',
+        'END_FUZZIFY',
+        '',
+        'DEFUZZIFY comer',
+        '   TERM poco  := (0, 1) (4, 0);',
+        '   TERM algo  := trian 2 5 8;',
+        '   TERM mucho := (6, 0) (10, 1);',
+        '   METHOD : COG;',
+        '   DEFAULT := 0;',
+        'END_DEFUZZIFY',
+        '',
+        'DEFUZZIFY huir',
+        '   TERM poco  := (0, 1) (4, 0);',
+        '   TERM algo  := trian 2 5 8;',
+        '   TERM mucho := (6, 0) (10, 1);',
+        '   METHOD : COG;',
+        '   DEFAULT := 0;',
+        'END_DEFUZZIFY',
+        '',
+        'DEFUZZIFY perseguir',
+        '   TERM poco  := (0, 1) (4, 0);',
+        '   TERM algo  := trian 2 5 8;',
+        '   TERM mucho := (6, 0) (10, 1);',
+        '   METHOD : COG;',
+        '   DEFAULT := 0;',
+        'END_DEFUZZIFY',
+        '',
+        'DEFUZZIFY irAPPill',
+        '   TERM poco  := (0, 1) (4, 0);',
+        '   TERM algo  := trian 2 5 8;',
+        '   TERM mucho := (6, 0) (10, 1);',
+        '   METHOD : COG;',
+        '   DEFAULT := 0;',
+        'END_DEFUZZIFY',
+        '',
+        'RULEBLOCK reglas',
+        '   AND : MIN;',
+        '   ACT : MIN;',
+        '   ACCU : MAX;',
+        '',
+        '   // huir crece al acercarse el fantasma; comer, al alejarse',
+        '   RULE 1 : IF peligro IS cerca THEN huir IS mucho;',
+        '   RULE 2 : IF peligro IS lejos THEN huir IS poco;',
+        '   RULE 3 : IF peligro IS cerca THEN comer IS poco;',
+        '   RULE 4 : IF peligro IS media THEN comer IS algo;',
+        '   RULE 5 : IF peligro IS lejos THEN comer IS mucho;',
+        '   // un comestible cerca y ningún peligro encima: perseguirlo, y comer baja',
+        '   RULE 6 : IF comestible IS cerca AND peligro IS NOT cerca THEN perseguir IS mucho, comer IS poco;',
+        '   // un fantasma que no está lejos y la píldora de poder cerca: a por ella, y huir baja',
+        '   RULE 7 : IF peligro IS NOT lejos AND ppill IS cerca THEN irAPPill IS mucho, huir IS poco;',
+        'END_RULEBLOCK',
+        '',
+        'END_FUNCTION_BLOCK'
+      ].join('\n'),
+      ini: { peligro: 20, comestible: 150, ppill: 60 }
+    },
     calma: {
       txt: 'Dos fantasmas que se contradicen',
       src: [
@@ -812,8 +903,12 @@
       var cajaC = el('div', 'bz-salida'); cajaC.appendChild(Lc.svg); zonaS.appendChild(cajaC);
 
       var activas = r.reglas.filter(function (x) { return x.grado > 0; }).length;
+      // con varias salidas, la que ganaría en el MaxActionSelector de la Práctica 4
+      var nombres = Object.keys(fb.salidas), gana = nombres[0];
+      nombres.forEach(function (n) { if (r.salidas[n].valor > r.salidas[gana].valor) gana = n; });
       d.read.textContent = activas + ' de ' + r.reglas.length + ' reglas activas. ' + lect.join(' · ') +
-        (r.reglas.length && !activas ? ' (ninguna regla se cumple: sale el DEFAULT)' : '') + '.';
+        (r.reglas.length && !activas ? ' (ninguna regla se cumple: sale el DEFAULT)' : '') + '.' +
+        (nombres.length > 1 ? ' Gana ' + gana + '.' : '');
       if (grupos.barre) {
         grupos.barre.innerHTML = '';
         grupos.barre.appendChild(opciones('Curva según', Object.keys(fb.entradas).map(function (n) { return [n, n]; }), barrido, function (v) { barrido = v; pinta(); }));

@@ -60,7 +60,7 @@
       <span class="thin">El ejemplo guiado de la Práctica&nbsp;3: de una regla a siete, midiendo cada paso.</span>
     </h1>
     <p class="standfirst">
-      Un controlador de reglas completo y pequeño, montado poco a poco: los hechos que ve, las cuatro acciones
+      Un controlador de reglas completo y pequeño, montado poco a poco: los hechos que ve, las acciones
       que sabe hacer y siete reglas que se añaden de una en una, cada una con lo que cambió en 300 partidas
       contra cinco rivales. Al final, lo que le falta a esta Ms.&nbsp;Pac-Man, y el esqueleto de los fantasmas
       para que empecéis los vuestros.
@@ -154,7 +154,7 @@
             <tbody>
               <tr><td><code>grupoYY/MsPacMan.java</code></td><td>El controlador: un <code>RuleEngine</code>, el <code>Input</code> y las acciones. <a href="#controlador">Sección&nbsp;5</a>.</td></tr>
               <tr><td><code>grupoYY/mspacman-v0.clp</code> · <code>-v1.clp</code></td><td>Las reglas, en dos versiones: las seis primeras, y las siete.</td></tr>
-              <tr><td><code>grupoYY/mspacman/</code></td><td><code>MsPacManInput</code> y las cuatro acciones.</td></tr>
+              <tr><td><code>grupoYY/mspacman/</code></td><td><code>MsPacManInput</code> y las acciones.</td></tr>
               <tr><td><code>grupoYY/UltimaAccion.java</code></td><td>La memoria entre turnos: apunta qué acción ganó. <a href="#paso3">Paso&nbsp;3</a>.</td></tr>
               <tr><td><code>grupoYY/Ghosts.java</code> · <code>ghosts-v0.clp</code> · <code>-v1.clp</code> · <code>ghosts/</code></td><td>El esqueleto de los fantasmas, con dos y tres reglas. <a href="#seguir-fantasmas">Sección&nbsp;7</a>.</td></tr>
               <tr><td><code>grupoYY/depurar/</code></td><td><code>TrazaReglas</code> y <code>ProbarReglas</code>. En <a href="depurar-reglas.html">Depurar reglas</a>.</td></tr>
@@ -197,6 +197,7 @@
     <span class="k">private static final int</span> LEJOS = <span class="n">1000</span>;        <span class="c">// "no hay": ningún fantasma, ninguna píldora</span>
 
     <span class="k">private int</span> distFantasma;                     <span class="c">// al fantasma peligroso más cercano</span>
+    <span class="k">private int</span> nodoPeligro;                      <span class="c">// dónde está ese fantasma; -1 si no hay</span>
     <span class="k">private int</span> distPPill;                        <span class="c">// a la píldora de poder más cercana</span>
     <span class="k">private</span> List&lt;String&gt; fantasmas;               <span class="c">// un hecho FANTASMA por cada uno fuera de la cárcel</span>
     <span class="k">private final</span> String ultima;                  <span class="c">// la acción que ganó en el turno anterior</span>
@@ -210,6 +211,7 @@
     <span class="k">public void</span> parseInput() {
         <span class="k">int</span> pacman = game.getPacmanCurrentNodeIndex();
         distFantasma = LEJOS;
+        nodoPeligro = -<span class="n">1</span>;
         fantasmas = <span class="k">new</span> ArrayList&lt;&gt;();
         <span class="k">for</span> (GHOST g : GHOST.values()) {
             <span class="k">if</span> (game.getGhostLairTime(g) &gt; <span class="n">0</span>) <span class="k">continue</span>;      <span class="c">// en la cárcel no cuenta</span>
@@ -220,7 +222,7 @@
             <span class="k">int</span> d = comestible
                     ? game.getShortestPathDistance(pacman, nodo)
                     : game.getShortestPathDistance(nodo, pacman, game.getGhostLastMoveMade(g));
-            <span class="k">if</span> (!comestible) distFantasma = Math.min(distFantasma, d);
+            <span class="k">if</span> (!comestible &amp;&amp; d &lt; distFantasma) { distFantasma = d; nodoPeligro = nodo; }
             fantasmas.add(String.format(<span class="s">"(FANTASMA (nombre %s) (comestible %s) (distancia %d) (tiempo %d))"</span>,
                     g, comestible, d, game.getGhostEdibleTime(g)));
         }
@@ -228,6 +230,9 @@
         <span class="k">for</span> (<span class="k">int</span> ppill : game.getActivePowerPillsIndices())
             distPPill = Math.min(distPPill, game.getShortestPathDistance(pacman, ppill));
     }
+
+    <span class="c">/** No va a Jess: es para HuirDelPeligroAction, que huye del fantasma de distFantasma. */</span>
+    <span class="k">public int</span> getNodoPeligro() { <span class="k">return</span> nodoPeligro; }
 
     <span class="k">@Override</span>
     <span class="k">public</span> Collection&lt;String&gt; getFacts() {
@@ -270,7 +275,7 @@
       <section id="acciones">
         <div class="sec-head">
           <span class="num">03</span>
-          <h2 class="sec">Lo que sabe hacer: cuatro acciones</h2>
+          <h2 class="sec">Lo que sabe hacer: las acciones</h2>
         </div>
         <div class="table-scroll">
           <table class="ancha">
@@ -315,6 +320,75 @@
           Una acción con parámetro ahorra clases: en vez de <code>PerseguirBlinky</code>,
           <code>PerseguirInky</code>… hay una, y la regla dice cuál. Lo mismo vale para "ir a un nodo", "huir por
           una salida" o "esperar junto a una píldora".
+        </p>
+        <h3 class="label" id="accion-input">Una acción que lee el Input</h3>
+        <p>
+          Las acciones sólo reciben el <code>Game</code>, así que lo que ya calculó el <code>Input</code> lo
+          tienen que volver a calcular. <code>HuirAction</code> busca otra vez el fantasma peligroso más cercano, y
+          además lo mide desde Ms.&nbsp;Pac-Man, no desde el fantasma como el <code>Input</code>. Casi siempre sale
+          el mismo, pero no siempre: la regla decide huir por culpa de SUE y la acción huye de BLINKY.
+        </p>
+        <p>
+          <code>HuirDelPeligroAction</code>, con id <code>huirDelPeligro</code>, huye del mismo fantasma que vieron
+          las reglas, porque se lo pregunta al <code>Input</code>. El <code>Input</code> guarda su nodo en
+          <code>nodoPeligro</code> y lo da con <code>getNodoPeligro()</code> (está arriba, en
+          <a href="#hechos">los hechos</a>). La acción:
+        </p>
+<div class="codigo"><pre><code><span class="k">public class</span> HuirDelPeligroAction <span class="k">implements</span> RulesAction {
+
+    <span class="k">private</span> MsPacManInput input;
+
+    <span class="c">/** El controlador se lo da en cada turno, antes de lanzar el motor. */</span>
+    <span class="k">public void</span> setInput(MsPacManInput input) { <span class="k">this</span>.input = input; }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> MOVE execute(Game game) {
+        <span class="k">int</span> peligro = input.getNodoPeligro();
+        <span class="k">if</span> (peligro == -<span class="n">1</span>) <span class="k">return</span> MOVE.NEUTRAL;
+        <span class="k">return</span> game.getNextMoveAwayFromTarget(game.getPacmanCurrentNodeIndex(), peligro, DM.PATH);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public void</span> parseFact(Fact actionFact) { }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> String getActionId() { <span class="k">return</span> <span class="s">"huirDelPeligro"</span>; }
+}</code></pre></div>
+        <p>Y en el controlador, dos líneas más (las veréis en <a href="#controlador">la sección&nbsp;5</a>):</p>
+<div class="codigo"><pre><code><span class="c">// un atributo, porque hay que hablarle en cada turno</span>
+<span class="k">private final</span> HuirDelPeligroAction huirDelPeligro = <span class="k">new</span> HuirDelPeligroAction();
+
+<span class="c">// en getMove, después de crear el Input y antes de motor.run(game)</span>
+huirDelPeligro.setInput(input);</code></pre></div>
+        <ul>
+          <li>
+            <strong>El <code>Input</code> no se le pasa en el constructor.</strong> La acción se crea una vez, y
+            el <code>Input</code> es nuevo en cada turno: con el del constructor huiría siempre del fantasma del
+            primer turno.
+          </li>
+          <li>
+            <strong>Lo que lee la acción no tiene por qué ir a Jess.</strong> <code>nodoPeligro</code> no sale en
+            <code>getFacts</code>: a las reglas les basta con <code>distFantasma</code>, y el nodo es cosa de Java.
+          </li>
+          <li>
+            <strong>¿Parámetro o <code>Input</code>?</strong> Si lo elige la regla, como a quién perseguir, va en
+            un slot del <code>ACTION</code>. Si ya está decidido en Java y la regla sólo dice "huye", lo lee la
+            acción del <code>Input</code>.
+          </li>
+        </ul>
+        <div class="note trap">
+          <span class="note-label">Si se os olvida el setInput</span>
+          <p>
+            <code>input</code> es <code>null</code> y <code>execute</code> lanza un
+            <code>NullPointerException</code>. El <code>RuleEngine</code> lo captura, lo imprime en la consola y
+            devuelve <code>NEUTRAL</code>, así que lo único que se ve es a Ms.&nbsp;Pac-Man parada. Y en el
+            concurso, un controlador que lanza excepciones queda descalificado.
+          </p>
+        </div>
+        <p>
+          Ninguna de las siete reglas la usa todavía. Para probarla, haced una v2 cambiando sólo R4 por
+          <code>(assert (ACTION (id huirDelPeligro) (info "R4: hay peligro") (priority 80)))</code> y comparadla
+          con la v1. La v0 y la v1 juegan igual que antes, porque nunca asertan esa acción.
         </p>
       </section>
 
@@ -661,6 +735,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
 
     <span class="k">private final</span> RuleEngine motor;
     <span class="k">private final</span> UltimaAccion ultima = <span class="k">new</span> UltimaAccion();
+    <span class="k">private final</span> HuirDelPeligroAction huirDelPeligro = <span class="k">new</span> HuirDelPeligroAction();   <span class="c">// lee el Input</span>
 
     <span class="k">public</span> MsPacMan() {
         <span class="k">this</span>(<span class="s">"mspacman-v1.clp"</span>);                 <span class="c">// la versión que va al concurso</span>
@@ -674,7 +749,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
         HashMap&lt;String, RulesAction&gt; acciones = <span class="k">new</span> HashMap&lt;&gt;();
         <span class="k">for</span> (RulesAction a : <span class="k">new</span> RulesAction[] {
                 <span class="k">new</span> ComerAction(), <span class="k">new</span> HuirAction(),
-                <span class="k">new</span> IrAPPillAction(), <span class="k">new</span> PerseguirAction() })
+                <span class="k">new</span> IrAPPillAction(), <span class="k">new</span> PerseguirAction(), huirDelPeligro })
             acciones.put(a.getActionId(), a);
 
         motor = <span class="k">new</span> RuleEngine(<span class="s">"MSPACMAN"</span>, RULES_PATH + ficheroReglas, acciones);
@@ -692,6 +767,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
     <span class="k">@Override</span>
     <span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
         MsPacManInput input = <span class="k">new</span> MsPacManInput(game, ultima.get());
+        huirDelPeligro.setInput(input);           <span class="c">// el Input de este turno, antes de run()</span>
         motor.reset();
         motor.assertFacts(input.getFacts());
         <span class="k">return</span> motor.run(game);
@@ -1007,7 +1083,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de octubre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

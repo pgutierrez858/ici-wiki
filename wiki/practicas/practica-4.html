@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 4 · Razonamiento borroso · ICI</title>
+<meta name="description" content="Enunciado de la Práctica 4: implementar con lógica borrosa (jFuzzyLogic y FCL) los comportamientos de Ms. Pac-Man y de los fantasmas, partiendo de un ejemplo guiado de siete reglas, mirando qué reglas se activan y midiendo cada versión contra rivales fijos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <span>Práctica 4</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Razonamiento borroso
+      <span class="thin">Reglas que se activan a medias, y versiones que se miden contra los mismos rivales.</span>
+    </h1>
+    <p class="standfirst">
+      El objetivo de esta práctica es implementar los comportamientos de Ms.&nbsp;Pac-Man y de los fantasmas
+      mediante <strong>lógica borrosa</strong>, con reglas escritas en FCL y evaluadas por jFuzzyLogic. Como en las
+      dos prácticas anteriores, lo que más pesa es <strong>cómo llegáis</strong> al controlador final: saber qué
+      reglas se activan y qué sale de ellas, y saber si cada versión es mejor que la anterior, con números.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Entrega</dt>
+      <dd>16 de noviembre<small>Lunes, a las 23:59, por el Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Modalidad</dt>
+      <dd>Grupos de 3 o 4<small>Como en la Práctica&nbsp;3</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Visibilidad</dt>
+      <dd>Completa<small>Como en las prácticas anteriores</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Para empezar</dt>
+      <dd>Siete reglas<small>Un ejemplo guiado, con su proyecto</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="que-se-pide">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué se pide</h2>
+        </div>
+        <p>
+          Los dos controladores de siempre, <code>MsPacMan</code> y <code>Ghosts</code>, pero ahora cada uno decide
+          con un sistema borroso, usando el paquete <code>fuzzy</code> del motor. Las piezas son cuatro:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Pieza</th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Las entradas</strong></td><td>Una clase que extiende <code>FuzzyInput</code> y en cada turno convierte el juego en números, uno por variable de entrada. Muchos saldrán de vuestros hechos de la Práctica&nbsp;3.</td></tr>
+              <tr><td><strong>El fichero FCL</strong></td><td>Las variables de entrada y de salida, sus términos (<code>cerca</code>, <code>lejos</code>, <code>mucho</code>…) y las reglas que las relacionan.</td></tr>
+              <tr><td><strong>El selector</strong></td><td>Una clase que implementa <code>ActionSelector</code> y convierte las salidas, que son números, en una acción. El ejemplo trae uno que elige la salida más alta.</td></tr>
+              <tr><td><strong>Las acciones</strong></td><td>Clases que implementan <code>Action</code>. Las de la Práctica&nbsp;3 sirven casi tal cual, quitando <code>parseFact</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Antes de empezar</span>
+          <p>
+            Leed <a href="../guias/tema2/borroso-mspacman.html"><strong>Lógica borrosa en Ms.&nbsp;Pac-Man</strong></a>,
+            en los apuntes del tema 4: el formato FCL y el paquete <code>fuzzy</code> pieza a pieza. Y después haced
+            entera la guía <a href="../guias/borroso-paso-a-paso.html"><strong>Ms.&nbsp;Pac-Man con siete reglas
+            borrosas</strong></a>, con su proyecto descargado y abierto: es el punto de partida de la práctica.
+          </p>
+        </div>
+        <h3 class="label">Las tres guías de la práctica</h3>
+        <ul class="links">
+          <li>
+            <a href="../guias/borroso-paso-a-paso.html">
+              <span class="lt">Ms.&nbsp;Pac-Man con siete reglas borrosas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · el ejemplo</span>
+              <span class="ld">
+                Un controlador borroso montado de dos reglas a siete, con lo que cambió cada paso medido contra los
+                rivales de referencia. Después, cómo seguir con Ms.&nbsp;Pac-Man y el esqueleto de los fantasmas.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="../guias/depurar-borroso.html">
+              <span class="lt">Depurar reglas borrosas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · la traza</span>
+              <span class="ld">
+                Probar el FCL sin jugar con casos escritos a mano y su curva de control, y una traza que dice en cada
+                turno qué reglas se activan, qué sale y cuáles no se activan nunca.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="../guias/comparar-versiones.html">
+              <span class="lt">Comparar versiones<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · el banco</span>
+              <span class="ld">
+                El mismo banco de la Práctica&nbsp;3: juega cada versión contra los rivales de referencia, con la
+                métrica que elijáis, y dice si la diferencia es real, rival a rival y en media.
+              </span>
+            </a>
+          </li>
+        </ul>
+        <h3 class="label">Reglas de simulación</h3>
+        <p>
+          Las de las prácticas anteriores: <strong>sin visibilidad parcial</strong> y con el <strong>tiempo de
+          razonamiento por defecto (40&nbsp;ms)</strong>. Evaluar un FCL pequeño cuesta muy poco, mucho menos que
+          Jess: el banco <code>Comparar</code> juega las 6&#8239;000 partidas de la guía en menos de un minuto.
+        </p>
+      </section>
+
+      <section id="evaluacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Cómo se evalúa</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Se mira</th><th scope="col">En concreto</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>El proceso</strong></td>
+                <td>Que haya varias versiones, que cada una esté medida contra la anterior con los mismos rivales, que se vea en el diario cómo depurasteis el FCL (casos que fallaban, empates, huecos en una curva, reglas que no se activaban) y que la versión elegida salga de las medidas. Es lo que más pesa.</td>
+              </tr>
+              <tr>
+                <td><strong>El sistema borroso</strong></td>
+                <td>No hay un número mínimo de reglas. Se valora cómo está hecho: entradas bien elegidas, términos pensados para lo que significan, salidas que recorren su escala, reglas que combinan varias entradas, y que <strong>todas se activen</strong>: una regla que en una partida entera no se activa nunca no hace nada. El resumen de la <a href="../guias/depurar-borroso.html#resumen">traza</a> lo dice.</td>
+              </tr>
+              <tr>
+                <td><strong>El rendimiento</strong></td>
+                <td>Cómo juega la versión que elijáis, contra rivales de referencia y contra los demás grupos en el concurso. <a href="../guias/competicion.html">Cómo se juega</a>, en la guía.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Sin mínimo no quiere decir cuatro reglas</span>
+          <p>
+            Una base borrosa con muchas reglas casi iguales, una por fantasma o una por cada combinación posible de
+            términos, no es mejor que una pequeña. Lo que se valora es lo que aprovecha la lógica borrosa: que las
+            decisiones cambien poco a poco y no a saltos, que una regla ordene prioridades subiendo una salida y bajando
+            otra, y que lo podáis enseñar con la curva de control. Todo eso aparece en el ejemplo guiado, con su porqué.
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Los cuatro fantasmas</span>
+          <p>
+            Pueden compartir un <code>.fcl</code>, como en el ejemplo, o tener uno cada uno. Si son cuatro copias
+            cambiando el nombre, cuentan como uno.
+          </p>
+        </div>
+      </section>
+
+      <section id="como-trabajar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Cómo trabajar</h2>
+        </div>
+        <p>
+          Igual que en la Práctica&nbsp;3: un bucle, y cada vuelta deja una versión. Las herramientas son las mismas,
+          adaptadas a lógica borrosa.
+        </p>
+        <div class="step">
+          <span class="step-num">0</span>
+          <div class="step-body">
+            <h3 class="label">Arrancad con el ejemplo</h3>
+            <p>
+              Descargad <a href="../recursos/ICI-Practica4.zip" download><code>ICI-Practica4.zip</code></a>: trae el
+              simulador, <code>MsPacManEngine</code>, y el
+              <a href="../guias/borroso-paso-a-paso.html#proyecto">proyecto del ejemplo guiado</a>, con los rivales de
+              referencia dentro. Descomprimidlo fuera del <em>workspace</em>, importad los dos proyectos con
+              <span class="path">File &gt; Import &gt; Existing Projects into Workspace</span> (con "Copy projects
+              into workspace") y pasad <span class="path">Maven &gt; Update Project</span> al motor; los pasos,
+              <a href="../guias/borroso-paso-a-paso.html#proyecto">en la guía</a>. Después, ejecutad sus tres
+              programas: <code>VerPartida</code>, <code>ProbarBorroso</code> y <code>Comparar</code>. Si los tres
+              funcionan, el entorno está listo. Poned vuestra letra en el paquete y cambiad a mano las rutas de los
+              <code>.fcl</code>, que son texto.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Vuestras entradas y vuestras acciones</h3>
+            <p>
+              Qué números necesita cada personaje para decidir, calculados en Java, y qué sabe hacer, como acciones.
+              Partid de vuestra Práctica&nbsp;3: los hechos que eran números pasan casi tal cual, y las acciones
+              también. Lo que eran símbolos (<code>comestible true</code>) se convierte en un número, o se queda en
+              Java.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">v0: un FCL pequeño que funcione</h3>
+            <p>
+              Pocas reglas, como las del ejemplo, y cada salida con reglas para varios términos. Cada situación
+              importante, con su caso en <a href="../guias/depurar-borroso.html#probar"><code>ProbarBorroso</code></a>
+              desde el principio, y su curva de control mirada: sin huecos ni empates.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Fijad las métricas, y medid la v0</h3>
+            <p>
+              Los rivales ya vienen: <a href="../guias/comparar-versiones.html#rivales">cinco fantasmas y tres
+              Ms.&nbsp;Pac-Man de referencia</a>, los mismos para todos los grupos. Si queréis añadir más (vuestros
+              controladores de la Práctica&nbsp;3, por ejemplo), ahora, y ya no se cambian hasta el final. Elegid las
+              métricas, además de los puntos, y dejad las partidas en 300. Con eso,
+              <a href="../guias/comparar-versiones.html"><code>Comparar</code></a> mide la <code>v0</code>, y todo
+              queda apuntado arriba del diario.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Mirad qué hacen las reglas</h3>
+            <p>
+              Con la <a href="../guias/depurar-borroso.html#traza">traza</a> enganchada: qué entradas había cuando las
+              cosas salen mal, qué regla se activa con fuerza, por cuánto gana la acción ganadora, qué reglas no se
+              activan nunca. Apuntad en una o dos líneas el problema y por qué creéis que pasa.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Una versión nueva, con un solo cambio</h3>
+            <p>
+              Un <code>.fcl</code> nuevo (y clases nuevas si hacen falta), sin tocar el anterior. Su caso nuevo en
+              <code>ProbarBorroso</code>, con todos los viejos en <code>BIEN</code>, y la curva sin huecos. Comprobad en
+              la traza que la regla nueva se activa, y medid contra la anterior. Se queda o se descarta, y por qué, en el
+              diario. Y vuelta al paso 4.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">6</span>
+          <div class="step-body">
+            <h3 class="label">Elegir para el concurso</h3>
+            <p>
+              Con qué versión os quedáis, de Ms.&nbsp;Pac-Man y de fantasmas, y por qué. No tiene por qué ser la
+              última: en el ejemplo guiado, la buena es la de seis reglas, porque la séptima gasta las píldoras de
+              poder antes de tiempo.
+            </p>
+          </div>
+        </div>
+        <p>
+          Los fantasmas siguen el mismo bucle, con <code>COMPARO_FANTASMAS = true</code> en <code>Comparar</code>:
+          entonces juegan contra las tres Ms.&nbsp;Pac-Man de referencia, más las que añadáis. Cómo organizar las
+          versiones en el paquete está en <a href="../guias/borroso-paso-a-paso.html#versiones">la guía del
+          ejemplo</a>: normalmente basta un <code>.fcl</code> por versión.
+        </p>
+      </section>
+
+      <section id="significativa">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">¿La mejora es real?</h2>
+        </div>
+        <p>
+          La cuenta es la de la <a href="practica-2.html#significativa">Práctica&nbsp;2</a>, y la hace
+          <code>Comparar</code> por vosotros, contra cada rival y en media:
+        </p>
+<pre><code>D      = media nueva − media vieja
+ET_D   = √(ET_nueva² + ET_vieja²)
+real   si |D| &gt; 2 · ET_D</code></pre>
+        <p>
+          Y los dos avisos de la <a href="practica-3.html#significativa">Práctica&nbsp;3</a> siguen valiendo. Con
+          cinco rivales, un <code>mejor</code> o un <code>peor</code> suelto no se cree hasta que se repite. Y si la
+          media pasa el umbral por poco, se repite con otra <code>SEMILLA</code>. En el ejemplo guiado pasó dos veces:
+          el paso de dos a cinco reglas salió mejor por 107 con un umbral de 75, y se sostuvo al repetir; la séptima
+          regla salió ruido, y al repetir, mejor por 5 puntos sobre el umbral. La primera se queda; la segunda no.
+        </p>
+      </section>
+
+      <section id="diario">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">El diario de desarrollo</h2>
+        </div>
+        <p>
+          Como el de la <a href="practica-3.html#diario">Práctica&nbsp;3</a>: un solo <code>diario.md</code>, escrito
+          <strong>mientras</strong> trabajáis, con entradas cortas y con fecha. Arriba, los integrantes, los rivales,
+          las partidas, las métricas y qué versiones van al concurso. En cada versión:
+        </p>
+        <ul>
+          <li><strong>Qué cambia y por qué</strong>, en una o dos líneas: el problema que visteis y el cambio que lo ataca.</li>
+          <li><strong>Los casos nuevos</strong> de <code>ProbarBorroso</code>, o el que fallaba y cómo se arregló. Si cambió una curva, cómo.</li>
+          <li><strong>La fila de la media</strong> de cada métrica y el recuento de rivales, tal cual los saca <code>Comparar</code>.</li>
+          <li><strong>El resumen de la traza</strong> cuando diga algo: una regla a 0, una acción que gana casi todos los turnos, un turno que explica un fallo.</li>
+          <li><strong>Si usáis IA, el <em>prompt</em></strong>, tal cual, y qué cambiasteis vosotros. Con la regla que ya sabéis escribir decidida antes de pedirla, como en la <a href="practica-2.html#diario">Práctica&nbsp;2</a>.</li>
+        </ul>
+        <h3 class="label">Un diario de ejemplo</h3>
+        <p>
+          El del ejemplo guiado, con sus cifras de verdad, y sólo la parte de Ms.&nbsp;Pac-Man. Así de corto:
+        </p>
+<pre><code># Diario · Práctica 4 · grupo YY
+Integrantes: …
+Concurso: MsPacMan con mspacman-v0.fcl (6 reglas). Ghosts con ghosts-v0.fcl.
+Rivales: los de referencia. 300 partidas por rival. Métricas: puntos,
+turnos por vida, fantasmas comidos.
+
+## lun 9 nov · huir o comer (2 reglas)
+Base: 2082 puntos de media, una vida cada 461 turnos.
+Con un término por salida, es un umbral a 25 pasos.
+
+## lun 9 nov · huir y comer por toda la escala (5 reglas)
+Caso "peligroso a 45" daba empate a 5,0 (huir y comer IS algo).
+Quitado huir de la regla de media. BIEN.
+  puntos  D = +107, 2·ET_D = 75  → mejor, por poco
+Repetida con SEMILLA 1000: +132, umbral 75. Se queda.
+
+## mar 10 nov · + perseguir (6 reglas) → v0
+Empataba con comer a 8,7: la regla baja comer (comer IS poco). BIEN.
+  puntos  2190 → 2755  mejor (5 de 5)
+  fantasmas comidos  1,6 → 2,9
+
+## mar 10 nov · + irAPPill (7 reglas) → v1
+Ruido (+27, umbral 114). Repetida: +120, umbral 115. No me lo creo.
+Traza: t=61 va a la ppill con el fantasma a 69. NOT lejos vale 0,44.
+Al concurso va v0. Siguiente: v2 con "peligro IS cerca".</code></pre>
+        <p>
+          Están el porqué de cada regla, un empate que pilló un caso y cómo se arregló, una mejora pequeña confirmada
+          repitiendo, la traza explicando por qué una regla no sirve y una versión descartada. Eso es lo que se pide.
+        </p>
+      </section>
+
+      <section id="lista">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">La lista del proceso</h2>
+        </div>
+        <p>
+          Para ir tachando. Las casillas se quedan guardadas en este navegador, y la del bucle se puede desmarcar
+          entera cada vez que empezáis una versión nueva.
+        </p>
+
+        <h3 class="label">Una vez · arrancar</h3>
+        <ul class="check" data-guardar="p4-base">
+          <li><code>ICI-Practica4.zip</code> importado, y <code>VerPartida</code>, <code>ProbarBorroso</code> y <code>Comparar</code> funcionando.</li>
+          <li>El paquete con vuestra letra, y <code>FCL_PATH</code> y <code>FCL</code> cambiados a mano.</li>
+          <li>Las entradas y las acciones de cada personaje, partiendo de la Práctica&nbsp;3.</li>
+          <li>Decidido si añadís rivales a los de referencia, y apuntado en el diario.</li>
+          <li>Fijado el número de partidas y elegidas las métricas, además de los puntos.</li>
+          <li>La <code>v0</code> de cada controlador, con sus casos en <code>ProbarBorroso</code>, medida contra todos.</li>
+        </ul>
+
+        <h3 class="label">Cada versión · el bucle</h3>
+        <ul class="check" data-guardar="p4-bucle" data-reiniciar>
+          <li>Mirado con la traza qué entradas había y qué regla pesaba cuando salió mal.</li>
+          <li>Escrito en una o dos líneas el problema y por qué creéis que pasa.</li>
+          <li>Decidido <strong>un</strong> cambio, y escrito antes de programarlo.</li>
+          <li>Si hubo IA, el <em>prompt</em> está en el diario.</li>
+          <li>Versión nueva en su propio <code>.fcl</code>, sin tocar la anterior.</li>
+          <li>Su caso nuevo en <code>ProbarBorroso</code>, todos en <code>BIEN</code>, y la curva sin huecos ni empates.</li>
+          <li>En el resumen de la traza, ninguna regla nueva a 0.</li>
+          <li>Medida con <code>Comparar</code> contra los mismos rivales y las mismas partidas.</li>
+          <li>Si la media pasa el umbral por poco, repetida con otra semilla.</li>
+          <li>Entrada del diario cerrada: se queda o se descarta, y por qué.</li>
+        </ul>
+
+        <h3 class="label">Para el lunes 16 · el cierre</h3>
+        <ul class="check" data-guardar="p4-cierre">
+          <li>En las versiones elegidas, todas las reglas se activan.</li>
+          <li>En dos líneas, qué versiones van al concurso y por qué.</li>
+          <li><code>MsPacMan()</code> y <code>Ghosts()</code>, sin argumentos, cargan esas versiones.</li>
+          <li>Pasada la lista de <a href="#entrega">antes de subir el zip</a>.</li>
+        </ul>
+      </section>
+
+      <section id="entrega">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Reglas de entrega</h2>
+        </div>
+        <p>
+          Esta práctica se desarrolla en <strong>grupos de 3 o 4 estudiantes</strong>, y se entrega en una tarea del
+          Campus Virtual antes del <strong>lunes 16 de noviembre a las 23:59</strong>:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Qué</th><th scope="col">Cómo exactamente</th></tr></thead>
+            <tbody>
+              <tr><td>Archivo</td><td><code>practica4-grupoYY.zip</code>, donde <code>YY</code> es la letra de vuestro grupo.</td></tr>
+              <tr><td>Paquete</td><td><code>es.ucm.fdi.ici.c2627.practica4.grupoYY</code></td></tr>
+              <tr><td>Controladores a concurso</td><td><code>MsPacMan</code> y <code>Ghosts</code>. Su constructor sin argumentos carga la versión elegida.</td></tr>
+              <tr><td>Nombres</td><td>Es requisito imprescindible dar nombre al equipo y a cada comportamiento con <code>setName</code> y <code>setTeam</code>.</td></tr>
+              <tr><td>Reglas</td><td>Los <code>.fcl</code> de todas las versiones, dentro del paquete, junto a las clases. La ruta, como en el ejemplo: <code>"bin/es/ucm/fdi/ici/c2627/practica4/grupoYY/"</code> con vuestra letra.</td></tr>
+              <tr><td>Raíz del zip</td><td>La carpeta <code>es</code>, comprimiendo desde la raíz del código fuente, y a su lado el <code>diario.md</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">No se modifica el simulador</span>
+          <p>
+            Obviamente no se permite modificar el código del simulador, ni tampoco el paquete <code>fuzzy</code>.
+            Por lo tanto, la entrega <strong>no debe contener el código del simulador</strong> (paquete
+            <code>pacman.*</code>). Cumpliendo esto, podéis crear los paquetes y clases que queráis.
+          </p>
+        </div>
+        <p>
+          Todas las prácticas serán comprobadas para la detección de plagios.
+        </p>
+
+        <h3 class="label">Antes de subir el zip</h3>
+        <ul class="check" data-guardar="p4-zip">
+          <li>El paquete es <code>es.ucm.fdi.ici.c2627.practica4.grupoYY</code>, con vuestra letra, y <code>FCL_PATH</code> también.</li>
+          <li>Al abrir el zip, los <code>.fcl</code> están dentro del paquete, al lado de las clases.</li>
+          <li><code>setName</code> y <code>setTeam</code> llevan el nombre de vuestro grupo, en los dos controladores.</li>
+          <li>Cada <code>FuzzyEngine</code> se crea en el constructor del controlador, no en <code>preCompute</code> ni en <code>getMove</code>.</li>
+          <li>Ninguna <code>TrazaBorrosa</code> ni <code>ConsoleFuzzyEngineObserver</code> enganchados.</li>
+          <li>No hay estado en atributos <code>static</code>.</li>
+          <li>Todo compila en un proyecto limpio que sólo referencia a <code>MsPacManEngine</code>.</li>
+          <li>Una pasada de <code>Comparar</code> con las versiones elegidas termina sin ningún <code>OJO</code> y sin <code>Exception</code> ni <code>Error evaluating fuzzy logic</code> en la consola.</li>
+          <li>Al abrir el zip aparecen <code>es/</code> y <code>diario.md</code> en la raíz, y ni un archivo de <code>pacman.*</code>.</li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#que-se-pide">Qué se pide</a></li>
+            <li><a href="#evaluacion">Cómo se evalúa</a></li>
+            <li><a href="#como-trabajar">Cómo trabajar</a></li>
+            <li><a href="#significativa">¿La mejora es real?</a></li>
+            <li><a href="#diario">El diario</a></li>
+            <li><a href="#lista">La lista del proceso</a></li>
+            <li><a href="#entrega">Reglas de entrega</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">Las guías</h2>
+          <ol>
+            <li><a href="../guias/borroso-paso-a-paso.html"><span>01</span>Siete reglas borrosas</a></li>
+            <li><a href="../guias/depurar-borroso.html"><span>02</span>Depurar reglas borrosas</a></li>
+            <li><a href="../guias/comparar-versiones.html"><span>03</span>Comparar versiones</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El tema</span>
+          <p style="margin:0">
+            <a href="../guias/tema2/borroso.html">Razonamiento borroso</a>: conjuntos, inferencia, desdifuminar y FCL,
+            con bancos de pruebas en la página.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Dudas</span>
+          <p style="margin:0">
+            <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a>. Mejor preguntar con la traza en la mano que con
+            "no se mueve".
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

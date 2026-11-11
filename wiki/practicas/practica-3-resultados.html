@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 3 · Resultados del concurso · ICI</title>
+<meta name="description" content="Cierre del concurso de la Práctica 3: los dos rankings de todos contra todos, el punto extra de cada grupo, la tabla completa y dos equipos de fantasmas que no decidían.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <a href="practica-3.html">Práctica 3</a>
+    <span aria-hidden="true">/</span>
+    <span>Resultados</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      El concurso de los sistemas de reglas
+      <span class="thin">Cómo quedó la Práctica 3, y dos equipos de fantasmas que no llegaron a decidir.</span>
+    </h1>
+    <p class="standfirst">
+      Los once grupos han jugado todos contra todos con la versión que eligieron: cada Ms.&nbsp;Pac-Man
+      contra los fantasmas de toda la clase, 300 partidas por emparejamiento. Aquí están los dos rankings,
+      el punto extra que reparten y la tabla completa. Esta vez nadie se ha quedado fuera, pero hay algo
+      nuevo que contar: dos equipos de fantasmas <strong>devolvían NEUTRAL en todos los turnos</strong> sin
+      lanzar ni una excepción, y conviene saber por qué y cómo se ve antes de entregar.
+    </p>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Partidas</dt>
+      <dd>36&#8239;300<small>11 × 11 emparejamientos, 300 cada uno</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Mejor Ms. Pac-Man</dt>
+      <dd>8&#8239;414<small>JPC_SBV_APF_DGR, con ventaja clara</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Mejores fantasmas</dt>
+      <dd>3&#8239;586<small>HLI_EJB_CSB, con mucha ventaja</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Fuera del concurso</dt>
+      <dd>0<small>sin excepciones ni entregas tardías</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="rankings">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Los dos rankings</h2>
+        </div>
+        <p>
+          Se han jugado los controladores con las reglas de
+          <a href="../guias/competicion.html#ranking">la guía de la competición</a>: la puntuación de una
+          Ms.&nbsp;Pac-Man es la media de su fila, lo que saca contra los fantasmas de toda la clase, y la de
+          unos fantasmas es la media de su columna, lo que dejan sacar. Han jugado los once grupos con sus dos
+          controladores, así que cada media sale de 3&#8239;300 partidas.
+        </p>
+        <!--P3:PAC-->
+        <div class="table-scroll">
+          <table class="ranking">
+            <caption>Ranking de Ms. Pac-Man · más es mejor</caption>
+            <thead><tr><th scope="col">Puesto</th><th scope="col">Grupo</th><th scope="col" class="num-col">Media</th><th scope="col" class="num-col">Error típico</th><th scope="col" class="num-col">Medio punto</th></tr></thead>
+            <tbody>
+              <tr><td class="num-col">1</td><th scope="row">JPC_SBV_APF_DGR</th><td class="num-col">8&#8239;414</td><td class="num-col">±&#8239;58</td><td class="num-col">0,50</td></tr>
+              <tr><td class="num-col">2</td><th scope="row">GIRM_OGA_LIN_LING</th><td class="num-col">7&#8239;928</td><td class="num-col">±&#8239;56</td><td class="num-col">0,46</td></tr>
+              <tr><td class="num-col">3</td><th scope="row">GGH_MCM_NRR_PGP</th><td class="num-col">7&#8239;655</td><td class="num-col">±&#8239;53</td><td class="num-col">0,44</td></tr>
+              <tr><td class="num-col">4</td><th scope="row">ABC_HD_VMM_SVU</th><td class="num-col">6&#8239;814</td><td class="num-col">±&#8239;45</td><td class="num-col">0,38</td></tr>
+              <tr><td class="num-col">5</td><th scope="row">VRC_MS_WFJ</th><td class="num-col">6&#8239;246</td><td class="num-col">±&#8239;54</td><td class="num-col">0,33</td></tr>
+              <tr><td class="num-col">6</td><th scope="row">DIE_IEO_ARN_EM</th><td class="num-col">5&#8239;145</td><td class="num-col">±&#8239;48</td><td class="num-col">0,25</td></tr>
+              <tr><td class="num-col">7</td><th scope="row">HLI_EJB_CSB</th><td class="num-col">5&#8239;014</td><td class="num-col">±&#8239;38</td><td class="num-col">0,24</td></tr>
+              <tr><td class="num-col">8</td><th scope="row">ASP_AAM</th><td class="num-col">4&#8239;099</td><td class="num-col">±&#8239;49</td><td class="num-col">0,17</td></tr>
+              <tr><td class="num-col">9</td><th scope="row">PBA_JMN</th><td class="num-col">2&#8239;763</td><td class="num-col">±&#8239;34</td><td class="num-col">0,06</td></tr>
+              <tr><td class="num-col">10</td><th scope="row">GBB_ZZ_JYP_GLV</th><td class="num-col">2&#8239;549</td><td class="num-col">±&#8239;25</td><td class="num-col">0,05</td></tr>
+              <tr><td class="num-col">11</td><th scope="row">JJAF</th><td class="num-col">1&#8239;951</td><td class="num-col">±&#8239;16</td><td class="num-col">0,00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!--/P3:PAC-->
+        <!--P3:GHO-->
+        <div class="table-scroll">
+          <table class="ranking">
+            <caption>Ranking de fantasmas · menos es mejor</caption>
+            <thead><tr><th scope="col">Puesto</th><th scope="col">Grupo</th><th scope="col" class="num-col">Media</th><th scope="col" class="num-col">Error típico</th><th scope="col" class="num-col">Medio punto</th></tr></thead>
+            <tbody>
+              <tr><td class="num-col">1</td><th scope="row">HLI_EJB_CSB</th><td class="num-col">3&#8239;586</td><td class="num-col">±&#8239;39</td><td class="num-col">0,50</td></tr>
+              <tr><td class="num-col">2</td><th scope="row">VRC_MS_WFJ</th><td class="num-col">4&#8239;322</td><td class="num-col">±&#8239;50</td><td class="num-col">0,38</td></tr>
+              <tr><td class="num-col">3</td><th scope="row">JPC_SBV_APF_DGR</th><td class="num-col">4&#8239;559</td><td class="num-col">±&#8239;45</td><td class="num-col">0,34</td></tr>
+              <tr><td class="num-col">4</td><th scope="row">ASP_AAM</th><td class="num-col">4&#8239;640</td><td class="num-col">±&#8239;52</td><td class="num-col">0,33</td></tr>
+              <tr><td class="num-col">5</td><th scope="row">GBB_ZZ_JYP_GLV</th><td class="num-col">4&#8239;769</td><td class="num-col">±&#8239;55</td><td class="num-col">0,31</td></tr>
+              <tr><td class="num-col">6</td><th scope="row">GGH_MCM_NRR_PGP</th><td class="num-col">5&#8239;022</td><td class="num-col">±&#8239;45</td><td class="num-col">0,27</td></tr>
+              <tr><td class="num-col">7</td><th scope="row">PBA_JMN</th><td class="num-col">5&#8239;810</td><td class="num-col">±&#8239;70</td><td class="num-col">0,14</td></tr>
+              <tr><td class="num-col">8</td><th scope="row">JJAF</th><td class="num-col">5&#8239;989</td><td class="num-col">±&#8239;51</td><td class="num-col">0,11</td></tr>
+              <tr><td class="num-col">9</td><th scope="row">ABC_HD_VMM_SVU</th><td class="num-col">6&#8239;590</td><td class="num-col">±&#8239;64</td><td class="num-col">0,02</td></tr>
+              <tr><td class="num-col">10</td><th scope="row">DIE_IEO_ARN_EM</th><td class="num-col">6&#8239;609</td><td class="num-col">±&#8239;65</td><td class="num-col">0,01</td></tr>
+              <tr><td class="num-col">11</td><th scope="row">GIRM_OGA_LIN_LING</th><td class="num-col">6&#8239;684</td><td class="num-col">±&#8239;72</td><td class="num-col">0,00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!--/P3:GHO-->
+
+        <h3 class="label">Lo que se lee en las dos tablas</h3>
+        <p>
+          <strong>En Ms.&nbsp;Pac-Man gana JPC_SBV_APF_DGR, y no por azar.</strong> Saca 486 puntos más que
+          GIRM_OGA_LIN_LING, y lo que puede moverse una media de 3&#8239;300 partidas es mucho menos:
+        </p>
+        <pre><code>diferencia         8 414 − 7 928            = 486
+error de la resta  √(58² + 56²)  = √6 512   =  81
+cociente           486 / 81                 ≈  6 errores típicos  → no es azar</code></pre>
+        <p>
+          <strong>En fantasmas, HLI_EJB_CSB gana con mucha más ventaja.</strong> Deja 735 puntos menos que los
+          segundos, los de VRC_MS_WFJ:
+        </p>
+        <pre><code>diferencia         4 322 − 3 586            = 735
+error de la resta  √(50² + 39²)  = √4 095   =  64
+cociente           735 / 64                 ≈ 11 errores típicos  → no es azar</code></pre>
+        <p>
+          <strong>Al final de los fantasmas hay un empate a tres.</strong> GIRM_OGA_LIN_LING, DIE_IEO_ARN_EM y
+          ABC_HD_VMM_SVU dejan entre 6&#8239;590 y 6&#8239;684 puntos, y entre ellos la diferencia (menos de
+          100) no llega al error de la resta, que ronda los 97. Los de DIE_IEO_ARN_EM y ABC_HD_VMM_SVU no
+          decidían nunca (<a href="#neutral">abajo</a> está por qué), así que esas dos cifras son lo que saca
+          cada Ms.&nbsp;Pac-Man contra unos fantasmas que se limitan a seguir de frente.
+        </p>
+        <p>
+          <strong>El punto extra más alto es el de JPC_SBV_APF_DGR</strong>, con la mejor Ms.&nbsp;Pac-Man y los
+          terceros mejores fantasmas. El segundo es HLI_EJB_CSB, que llega casi sólo con sus fantasmas.
+        </p>
+
+        <h3 class="label">El punto extra</h3>
+        <p>
+          Medio punto por cada ranking, con la fórmula de
+          <a href="../guias/competicion.html#punto-extra">la guía</a>: el mejor se lleva el medio punto
+          entero, el peor se queda a cero y los demás reciben la parte proporcional a lo cerca que quedaron
+          del mejor. Cada medio punto se redondea a dos decimales antes de sumar. El punto extra va aparte de
+          la nota de la práctica.
+        </p>
+        <!--P3:EXTRA-->
+        <div class="table-scroll">
+          <table class="ranking">
+            <caption>El punto extra de cada grupo</caption>
+            <thead><tr><th scope="col">Grupo</th><th scope="col">Ms. Pac-Man</th><th scope="col">Fantasmas</th><th scope="col" class="num-col">Punto extra</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">JPC_SBV_APF_DGR</th><td><span class="puesto">1.º de 11</span> 0,50</td><td><span class="puesto">3.º de 11</span> 0,34</td><td class="num-col"><strong>0,84</strong></td></tr>
+              <tr><th scope="row">HLI_EJB_CSB</th><td><span class="puesto">7.º de 11</span> 0,24</td><td><span class="puesto">1.º de 11</span> 0,50</td><td class="num-col"><strong>0,74</strong></td></tr>
+              <tr><th scope="row">GGH_MCM_NRR_PGP</th><td><span class="puesto">3.º de 11</span> 0,44</td><td><span class="puesto">6.º de 11</span> 0,27</td><td class="num-col"><strong>0,71</strong></td></tr>
+              <tr><th scope="row">VRC_MS_WFJ</th><td><span class="puesto">5.º de 11</span> 0,33</td><td><span class="puesto">2.º de 11</span> 0,38</td><td class="num-col"><strong>0,71</strong></td></tr>
+              <tr><th scope="row">ASP_AAM</th><td><span class="puesto">8.º de 11</span> 0,17</td><td><span class="puesto">4.º de 11</span> 0,33</td><td class="num-col"><strong>0,50</strong></td></tr>
+              <tr><th scope="row">GIRM_OGA_LIN_LING</th><td><span class="puesto">2.º de 11</span> 0,46</td><td><span class="puesto">11.º de 11</span> 0,00</td><td class="num-col"><strong>0,46</strong></td></tr>
+              <tr><th scope="row">ABC_HD_VMM_SVU</th><td><span class="puesto">4.º de 11</span> 0,38</td><td><span class="puesto">9.º de 11</span> 0,02</td><td class="num-col"><strong>0,40</strong></td></tr>
+              <tr><th scope="row">GBB_ZZ_JYP_GLV</th><td><span class="puesto">10.º de 11</span> 0,05</td><td><span class="puesto">5.º de 11</span> 0,31</td><td class="num-col"><strong>0,36</strong></td></tr>
+              <tr><th scope="row">DIE_IEO_ARN_EM</th><td><span class="puesto">6.º de 11</span> 0,25</td><td><span class="puesto">10.º de 11</span> 0,01</td><td class="num-col"><strong>0,26</strong></td></tr>
+              <tr><th scope="row">PBA_JMN</th><td><span class="puesto">9.º de 11</span> 0,06</td><td><span class="puesto">7.º de 11</span> 0,14</td><td class="num-col"><strong>0,20</strong></td></tr>
+              <tr><th scope="row">JJAF</th><td><span class="puesto">11.º de 11</span> 0,00</td><td><span class="puesto">8.º de 11</span> 0,11</td><td class="num-col"><strong>0,11</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!--/P3:EXTRA-->
+        <p class="apunte">
+          La cifra que vale es la del Campus Virtual. Si no coincide con la de esta tabla, escribidme.
+        </p>
+      </section>
+
+      <section id="tabla">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">La tabla completa</h2>
+        </div>
+        <p>
+          Cada casilla es la media de 300 partidas de una Ms.&nbsp;Pac-Man (fila) contra unos fantasmas
+          (columna). Las filas van ordenadas de la mejor Ms.&nbsp;Pac-Man a la peor y las columnas, de los
+          mejores fantasmas a los peores, así que las cifras más altas quedan arriba a la derecha y las más
+          bajas, abajo a la izquierda. En gris, cada grupo contra sí mismo.
+        </p>
+        <!--P3:MATRIZ-->
+        <div class="table-scroll matriz-scroll">
+          <table class="matriz">
+            <caption>Media de 300 partidas en cada casilla · filas: Ms. Pac-Man; columnas: fantasmas</caption>
+            <thead><tr><th scope="col"><span class="sr-only">Ms. Pac-Man contra fantasmas</span></th><th scope="col">HLI_EJB_CSB</th><th scope="col">VRC_MS_WFJ</th><th scope="col">JPC_SBV_APF_DGR</th><th scope="col">ASP_AAM</th><th scope="col">GBB_ZZ_JYP_GLV</th><th scope="col">GGH_MCM_NRR_PGP</th><th scope="col">PBA_JMN</th><th scope="col">JJAF</th><th scope="col">ABC_HD_VMM_SVU</th><th scope="col">DIE_IEO_ARN_EM</th><th scope="col">GIRM_OGA_LIN_LING</th><th scope="col" class="media">Media</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">JPC_SBV_APF_DGR</th><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas HLI_EJB_CSB">6&#8239;220</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas VRC_MS_WFJ">8&#8239;054</td><td class="num-col propia" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas JPC_SBV_APF_DGR">7&#8239;472</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas ASP_AAM">8&#8239;600</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas GBB_ZZ_JYP_GLV">8&#8239;908</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas GGH_MCM_NRR_PGP">7&#8239;639</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas PBA_JMN">11&#8239;428</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas JJAF">6&#8239;634</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas ABC_HD_VMM_SVU">8&#8239;123</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas DIE_IEO_ARN_EM">8&#8239;109</td><td class="num-col" title="Ms. Pac-Man JPC_SBV_APF_DGR contra los fantasmas GIRM_OGA_LIN_LING">11&#8239;369</td><td class="num-col media">8&#8239;414</td></tr>
+              <tr><th scope="row">GIRM_OGA_LIN_LING</th><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas HLI_EJB_CSB">4&#8239;662</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas VRC_MS_WFJ">6&#8239;855</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas JPC_SBV_APF_DGR">6&#8239;888</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas ASP_AAM">6&#8239;596</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas GBB_ZZ_JYP_GLV">7&#8239;185</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas GGH_MCM_NRR_PGP">6&#8239;934</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas PBA_JMN">8&#8239;864</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas JJAF">8&#8239;733</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas ABC_HD_VMM_SVU">10&#8239;252</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas DIE_IEO_ARN_EM">10&#8239;071</td><td class="num-col propia" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas GIRM_OGA_LIN_LING">10&#8239;167</td><td class="num-col media">7&#8239;928</td></tr>
+              <tr><th scope="row">GGH_MCM_NRR_PGP</th><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas HLI_EJB_CSB">5&#8239;493</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas VRC_MS_WFJ">6&#8239;068</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas JPC_SBV_APF_DGR">6&#8239;386</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas ASP_AAM">6&#8239;192</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas GBB_ZZ_JYP_GLV">7&#8239;051</td><td class="num-col propia" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas GGH_MCM_NRR_PGP">7&#8239;607</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas PBA_JMN">7&#8239;948</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas JJAF">8&#8239;849</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas ABC_HD_VMM_SVU">9&#8239;831</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas DIE_IEO_ARN_EM">10&#8239;116</td><td class="num-col" title="Ms. Pac-Man GGH_MCM_NRR_PGP contra los fantasmas GIRM_OGA_LIN_LING">8&#8239;662</td><td class="num-col media">7&#8239;655</td></tr>
+              <tr><th scope="row">ABC_HD_VMM_SVU</th><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas HLI_EJB_CSB">4&#8239;340</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas VRC_MS_WFJ">5&#8239;717</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas JPC_SBV_APF_DGR">6&#8239;695</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas ASP_AAM">6&#8239;330</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas GBB_ZZ_JYP_GLV">5&#8239;911</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas GGH_MCM_NRR_PGP">7&#8239;001</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas PBA_JMN">5&#8239;526</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas JJAF">8&#8239;040</td><td class="num-col propia" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas ABC_HD_VMM_SVU">8&#8239;813</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas DIE_IEO_ARN_EM">8&#8239;892</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas GIRM_OGA_LIN_LING">7&#8239;692</td><td class="num-col media">6&#8239;814</td></tr>
+              <tr><th scope="row">VRC_MS_WFJ</th><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas HLI_EJB_CSB">3&#8239;836</td><td class="num-col propia" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas VRC_MS_WFJ">4&#8239;749</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas JPC_SBV_APF_DGR">4&#8239;817</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas ASP_AAM">4&#8239;932</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas GBB_ZZ_JYP_GLV">5&#8239;534</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas GGH_MCM_NRR_PGP">6&#8239;225</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas PBA_JMN">7&#8239;779</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas JJAF">7&#8239;170</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas ABC_HD_VMM_SVU">8&#8239;221</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas DIE_IEO_ARN_EM">7&#8239;657</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas GIRM_OGA_LIN_LING">7&#8239;791</td><td class="num-col media">6&#8239;246</td></tr>
+              <tr><th scope="row">DIE_IEO_ARN_EM</th><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas HLI_EJB_CSB">3&#8239;163</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas VRC_MS_WFJ">3&#8239;866</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas JPC_SBV_APF_DGR">4&#8239;297</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas ASP_AAM">4&#8239;144</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas GBB_ZZ_JYP_GLV">4&#8239;128</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas GGH_MCM_NRR_PGP">4&#8239;771</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas PBA_JMN">4&#8239;864</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas JJAF">6&#8239;690</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas ABC_HD_VMM_SVU">6&#8239;815</td><td class="num-col propia" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas DIE_IEO_ARN_EM">7&#8239;303</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas GIRM_OGA_LIN_LING">6&#8239;558</td><td class="num-col media">5&#8239;145</td></tr>
+              <tr><th scope="row">HLI_EJB_CSB</th><td class="num-col propia" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas HLI_EJB_CSB">4&#8239;580</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas VRC_MS_WFJ">4&#8239;530</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas JPC_SBV_APF_DGR">4&#8239;229</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas ASP_AAM">5&#8239;022</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas GBB_ZZ_JYP_GLV">5&#8239;193</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas GGH_MCM_NRR_PGP">4&#8239;400</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas PBA_JMN">6&#8239;165</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas JJAF">4&#8239;169</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas ABC_HD_VMM_SVU">4&#8239;720</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas DIE_IEO_ARN_EM">4&#8239;960</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas GIRM_OGA_LIN_LING">7&#8239;190</td><td class="num-col media">5&#8239;014</td></tr>
+              <tr><th scope="row">ASP_AAM</th><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas HLI_EJB_CSB">2&#8239;419</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas VRC_MS_WFJ">2&#8239;722</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas JPC_SBV_APF_DGR">3&#8239;539</td><td class="num-col propia" title="Ms. Pac-Man ASP_AAM contra los fantasmas ASP_AAM">3&#8239;567</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas GBB_ZZ_JYP_GLV">3&#8239;037</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas GGH_MCM_NRR_PGP">3&#8239;376</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas PBA_JMN">3&#8239;885</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas JJAF">5&#8239;578</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas ABC_HD_VMM_SVU">5&#8239;568</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas DIE_IEO_ARN_EM">5&#8239;683</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas GIRM_OGA_LIN_LING">5&#8239;717</td><td class="num-col media">4&#8239;099</td></tr>
+              <tr><th scope="row">PBA_JMN</th><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas HLI_EJB_CSB">1&#8239;585</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas VRC_MS_WFJ">1&#8239;687</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas JPC_SBV_APF_DGR">1&#8239;932</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas ASP_AAM">1&#8239;828</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas GBB_ZZ_JYP_GLV">1&#8239;908</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas GGH_MCM_NRR_PGP">2&#8239;804</td><td class="num-col propia" title="Ms. Pac-Man PBA_JMN contra los fantasmas PBA_JMN">2&#8239;582</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas JJAF">4&#8239;704</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas ABC_HD_VMM_SVU">4&#8239;305</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas DIE_IEO_ARN_EM">4&#8239;139</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas GIRM_OGA_LIN_LING">2&#8239;917</td><td class="num-col media">2&#8239;763</td></tr>
+              <tr><th scope="row">GBB_ZZ_JYP_GLV</th><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas HLI_EJB_CSB">1&#8239;671</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas VRC_MS_WFJ">1&#8239;827</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas JPC_SBV_APF_DGR">2&#8239;224</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas ASP_AAM">2&#8239;138</td><td class="num-col propia" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas GBB_ZZ_JYP_GLV">2&#8239;021</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas GGH_MCM_NRR_PGP">2&#8239;512</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas PBA_JMN">2&#8239;859</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas JJAF">2&#8239;981</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas ABC_HD_VMM_SVU">3&#8239;274</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas DIE_IEO_ARN_EM">3&#8239;271</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas GIRM_OGA_LIN_LING">3&#8239;261</td><td class="num-col media">2&#8239;549</td></tr>
+              <tr><th scope="row">JJAF</th><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas HLI_EJB_CSB">1&#8239;481</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas VRC_MS_WFJ">1&#8239;463</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas JPC_SBV_APF_DGR">1&#8239;666</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas ASP_AAM">1&#8239;688</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas GBB_ZZ_JYP_GLV">1&#8239;586</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas GGH_MCM_NRR_PGP">1&#8239;970</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas PBA_JMN">2&#8239;012</td><td class="num-col propia" title="Ms. Pac-Man JJAF contra los fantasmas JJAF">2&#8239;333</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas ABC_HD_VMM_SVU">2&#8239;563</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas DIE_IEO_ARN_EM">2&#8239;496</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas GIRM_OGA_LIN_LING">2&#8239;200</td><td class="num-col media">1&#8239;951</td></tr>
+              <tr class="media"><th scope="row">Media</th><td class="num-col">3&#8239;586</td><td class="num-col">4&#8239;322</td><td class="num-col">4&#8239;559</td><td class="num-col">4&#8239;640</td><td class="num-col">4&#8239;769</td><td class="num-col">5&#8239;022</td><td class="num-col">5&#8239;810</td><td class="num-col">5&#8239;989</td><td class="num-col">6&#8239;590</td><td class="num-col">6&#8239;609</td><td class="num-col">6&#8239;684</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!--/P3:MATRIZ-->
+        <p>
+          Merece la pena buscar vuestra fila y vuestra columna: la media resume, pero las casillas dicen
+          contra quién se pierde. La casilla más baja de la tabla es de 1&#8239;463 puntos (JJAF contra los
+          fantasmas de VRC_MS_WFJ) y la más alta, de 11&#8239;428 (JPC_SBV_APF_DGR contra los de PBA_JMN).
+        </p>
+        <div class="note mine">
+          <span class="note-label">Qué se ha tocado del código para jugar</span>
+          <p>
+            Lo mismo que en las prácticas anteriores: el paquete, para que once entregas convivan en un
+            proyecto, y lo que devuelve <code>getName()</code>, porque el evaluador indexa la tabla por ese
+            nombre. Y algo nuevo: la ruta de los <code>.clp</code>, que es texto y se mueve con el paquete.
+            En dos grupos el diario elegía una versión y el constructor sin argumentos cargaba otra; ha jugado
+            la del diario (los fantasmas <code>ghosts-v1</code> de ABC_HD_VMM_SVU y la Ms.&nbsp;Pac-Man
+            <code>mspacman-v7</code> de DIE_IEO_ARN_EM).
+          </p>
+        </div>
+      </section>
+
+      <section id="neutral">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Fantasmas que no deciden</h2>
+        </div>
+        <p>
+          Esta vez nadie se ha quedado fuera. Ningún controlador ha lanzado una excepción en las
+          36&#8239;300 partidas, y todas las entregas llegaron antes de las 12 horas de margen sobre el plazo
+          del lunes 2 de noviembre. Pero dos equipos de fantasmas no han tomado ni una decisión en todo el
+          concurso:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Grupo</th><th scope="col">Qué pasa</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">ABC_HD_VMM_SVU</th><td>El <code>GhostsInput</code> entregado aserta en <code>FANTASMA</code> slots como <code>puedeAyudar</code> o <code>ayudarDist</code>, que no declara el <code>deftemplate</code> de ninguno de sus <code>ghosts-v*.clp</code>.</td></tr>
+              <tr><th scope="row">DIE_IEO_ARN_EM</th><td>El <code>GhostsInput</code> entregado es el del esqueleto, que aserta <code>enCarcel</code> y <code>distPacman</code>, y sus <code>.clp</code> esperan otros slots (<code>cazador</code>, <code>distAPacman</code>, <code>distAPP</code>…).</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Por qué no salta ninguna excepción</h3>
+        <p>
+          Cuando un hecho trae un slot que su plantilla no tiene, Jess lo rechaza. El <code>RuleEngine</code>
+          del motor captura ese error, lo escribe en la consola de errores y sigue: el hecho principal no llega
+          a la memoria de trabajo, no se dispara ninguna regla, no hay ningún <code>ACTION</code> y el motor
+          devuelve <code>NEUTRAL</code>. Con <code>NEUTRAL</code> cada fantasma sigue en la dirección que llevaba.
+          La partida no se rompe, así que el evaluador no lo ve como un fallo: sólo se nota en que los
+          fantasmas juegan mucho peor, y en la consola llena de <code>No such slot</code>.
+        </p>
+        <p>
+          Las dos entregas tenían reglas de fantasmas trabajadas, con sus versiones y sus medidas en el
+          diario. Lo que falló fue el último paso: el <code>Input</code> que se subió no era el que
+          correspondía a esos <code>.clp</code>. He decidido que jueguen tal cual, sin descalificarlos ni
+          arreglarlos.
+        </p>
+
+        <h3 class="label">Cómo comprobarlo antes de entregar</h3>
+        <ul>
+          <li>Mirad la consola de errores después de medir. Una línea con <code>No such slot</code> o
+            <code>Exception assserting fact</code> quiere decir que hay hechos que no entran.</li>
+          <li>ProbarReglas no lo detecta si los hechos de los casos se escriben a mano: prueba las reglas, no
+            el <code>Input</code>. Lo que sí lo ve es <a href="../guias/depurar-reglas.html">la traza</a> en
+            una partida de verdad: avisa de cada turno sin <code>ACTION</code>.</li>
+          <li>Medid la versión final con el proyecto tal y como lo vais a comprimir, y si cambiáis el
+            <code>Input</code> entre versiones, guardad uno por versión para que las viejas sigan
+            funcionando.</li>
+        </ul>
+      </section>
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#rankings">Los dos rankings</a></li>
+            <li><a href="#tabla">La tabla completa</a></li>
+            <li><a href="#neutral">Fantasmas que no deciden</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El enunciado</span>
+          <p style="margin:0">
+            <a href="practica-3.html">Práctica 3 · Sistemas de reglas</a>.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Las reglas del concurso</span>
+          <p style="margin:0">
+            <a href="../guias/competicion.html">Cómo se mide, cómo se calcula el ranking y de dónde sale el
+            punto extra</a>.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

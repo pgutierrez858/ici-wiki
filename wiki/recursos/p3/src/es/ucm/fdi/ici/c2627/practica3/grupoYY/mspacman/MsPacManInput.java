@@ -13,6 +13,7 @@ public class MsPacManInput extends RulesInput {
     private static final int LEJOS = 1000;        // "no hay": ningún fantasma, ninguna píldora
 
     private int distFantasma;                     // al fantasma peligroso más cercano
+    private int nodoPeligro;                      // dónde está ese fantasma; -1 si no hay
     private int distPPill;                        // a la píldora de poder más cercana
     private List<String> fantasmas;               // un hecho FANTASMA por cada uno fuera de la cárcel
     private final String ultima;                  // la acción que ganó en el turno anterior
@@ -26,6 +27,7 @@ public class MsPacManInput extends RulesInput {
     public void parseInput() {
         int pacman = game.getPacmanCurrentNodeIndex();
         distFantasma = LEJOS;
+        nodoPeligro = -1;
         fantasmas = new ArrayList<>();
         for (GHOST g : GHOST.values()) {
             if (game.getGhostLairTime(g) > 0) continue;      // en la cárcel no cuenta
@@ -36,7 +38,7 @@ public class MsPacManInput extends RulesInput {
             int d = comestible
                     ? game.getShortestPathDistance(pacman, nodo)
                     : game.getShortestPathDistance(nodo, pacman, game.getGhostLastMoveMade(g));
-            if (!comestible) distFantasma = Math.min(distFantasma, d);
+            if (!comestible && d < distFantasma) { distFantasma = d; nodoPeligro = nodo; }
             fantasmas.add(String.format("(FANTASMA (nombre %s) (comestible %s) (distancia %d) (tiempo %d))",
                     g, comestible, d, game.getGhostEdibleTime(g)));
         }
@@ -44,6 +46,9 @@ public class MsPacManInput extends RulesInput {
         for (int ppill : game.getActivePowerPillsIndices())
             distPPill = Math.min(distPPill, game.getShortestPathDistance(pacman, ppill));
     }
+
+    /** No va a Jess: es para HuirDelPeligroAction, que huye del fantasma de distFantasma. */
+    public int getNodoPeligro() { return nodoPeligro; }
 
     @Override
     public Collection<String> getFacts() {

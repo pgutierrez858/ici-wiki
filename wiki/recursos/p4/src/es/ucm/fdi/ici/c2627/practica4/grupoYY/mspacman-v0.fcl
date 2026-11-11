@@ -1,0 +1,74 @@
+// Ms. Pac-Man · v0: huir, comer y perseguir. ppill se recibe, pero todavía no se usa.
+
+FUNCTION_BLOCK MsPacMan
+
+VAR_INPUT                    // distancias en pasos, de 0 a 150 (150: lejos, o no hay)
+   peligro : REAL;
+   comestible : REAL;
+   ppill : REAL;
+END_VAR
+
+VAR_OUTPUT                   // una por acción, con su getActionId(), de 0 a 10
+   comer : REAL;
+   huir : REAL;
+   perseguir : REAL;
+END_VAR
+
+FUZZIFY peligro
+   TERM cerca := (0, 1) (15, 1) (35, 0);
+   TERM media := trian 20 45 70;
+   TERM lejos := (55, 0) (80, 1) (150, 1);
+END_FUZZIFY
+
+FUZZIFY comestible
+   TERM cerca := (0, 1) (15, 1) (35, 0);
+   TERM media := trian 20 45 70;
+   TERM lejos := (55, 0) (80, 1) (150, 1);
+END_FUZZIFY
+
+FUZZIFY ppill
+   TERM cerca := (0, 1) (15, 1) (35, 0);
+   TERM media := trian 20 45 70;
+   TERM lejos := (55, 0) (80, 1) (150, 1);
+END_FUZZIFY
+
+DEFUZZIFY comer
+   TERM poco  := (0, 1) (4, 0);
+   TERM algo  := trian 2 5 8;
+   TERM mucho := (6, 0) (10, 1);
+   METHOD : COG;
+   DEFAULT := 0;
+END_DEFUZZIFY
+
+DEFUZZIFY huir
+   TERM poco  := (0, 1) (4, 0);
+   TERM algo  := trian 2 5 8;
+   TERM mucho := (6, 0) (10, 1);
+   METHOD : COG;
+   DEFAULT := 0;
+END_DEFUZZIFY
+
+DEFUZZIFY perseguir
+   TERM poco  := (0, 1) (4, 0);
+   TERM algo  := trian 2 5 8;
+   TERM mucho := (6, 0) (10, 1);
+   METHOD : COG;
+   DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK reglas
+   AND : MIN;
+   ACT : MIN;
+   ACCU : MAX;
+
+   // huir crece al acercarse el fantasma; comer, al alejarse
+   RULE 1 : IF peligro IS cerca THEN huir IS mucho;
+   RULE 2 : IF peligro IS lejos THEN huir IS poco;
+   RULE 3 : IF peligro IS cerca THEN comer IS poco;
+   RULE 4 : IF peligro IS media THEN comer IS algo;
+   RULE 5 : IF peligro IS lejos THEN comer IS mucho;
+   // un comestible cerca y ningún peligro encima: perseguirlo, y comer baja
+   RULE 6 : IF comestible IS cerca AND peligro IS NOT cerca THEN perseguir IS mucho, comer IS poco;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
