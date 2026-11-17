@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 5 · Juegos por turnos · ICI</title>
+<meta name="description" content="Enunciado de la Práctica 5: un jugador de ajedrez en Python con Monte Carlo Tree Search, montado con una guía de seis pasos y mejorado después con ideas propias, cada una medida contra rivales de referencia, y un concurso de todos contra todos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <span>Práctica 5</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Juegos por turnos
+      <span class="thin">Un jugador de ajedrez que decide simulando el futuro, y lo que le añadís vosotros.</span>
+    </h1>
+    <p class="standfirst">
+      El objetivo de esta práctica es programar en Python un jugador de ajedrez que decide con <strong>Monte Carlo
+      Tree Search</strong>. La base se monta con una guía de seis pasos, igual para todos. Lo que se evalúa es lo que
+      viene después: qué le cambiáis a vuestro MCTS, por qué, y si cada cambio lo mejora de verdad, con números.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Entrega</dt>
+      <dd>29 de noviembre<small>Domingo, a las 23:59, por el Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Modalidad</dt>
+      <dd>Grupos de 3 o 4<small>Como en la Práctica&nbsp;4</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Lenguaje</dt>
+      <dd>Python<small>Con python-chess, en VS Code</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Para empezar</dt>
+      <dd>Seis pasos<small>Una guía con su comprobación en cada uno</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="que-se-pide">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué se pide</h2>
+        </div>
+        <p>
+          Esta vez el entorno cambia: dejamos Ms.&nbsp;Pac-Man y pasamos al <strong>ajedrez</strong>, un juego por
+          turnos, con dos jugadores y en el que se ve todo el tablero. Es el terreno de los algoritmos que
+          <strong>simulan el futuro</strong> en vez de razonar sólo sobre el presente, como hacían las reglas o la lógica
+          borrosa. Las reglas del ajedrez las pone la biblioteca python-chess; vosotros escribís quién decide.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Parte</th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><strong>La base</strong></td><td>Un MCTS con sus cuatro fases (selección con UCB1, expansión, simulación y retropropagación), montado con la <a href="../guias/mcts-paso-a-paso.html">guía paso a paso</a>. Es igual para todos los grupos y viene con su comprobación: tiene que estar, pero no es lo que se evalúa.</td></tr>
+              <tr><td><strong>Vuestro MCTS</strong></td><td>Lo que le añadís o le cambiáis después: vuestra evaluación de una posición, simulaciones con conocimiento de ajedrez, ideas de minimax, reutilizar el árbol… Una idea por versión, y cada versión medida contra la anterior.</td></tr>
+              <tr><td><strong>El diario</strong></td><td>Un <code>diario.md</code> que cuenta, mientras trabajáis, qué probasteis, por qué, y qué dijeron las medidas.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Antes de empezar</span>
+          <p>
+            Leed en los apuntes del tema&nbsp;5 la página de <a href="../guias/tema5/mcts.html"><strong>Monte Carlo
+            Tree Search</strong></a>, y después haced entera la guía <a href="../guias/mcts-paso-a-paso.html"><strong>MCTS
+            paso a paso</strong></a>, con su carpeta descargada y abierta en VS Code. Cuando los seis pasos digan
+            <code>BIEN</code>, empieza la práctica de verdad.
+          </p>
+        </div>
+        <h3 class="label">La guía y los apuntes</h3>
+        <ul class="links">
+          <li>
+            <a href="../guias/mcts-paso-a-paso.html">
+              <span class="lt">MCTS paso a paso<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · la base</span>
+              <span class="ld">
+                Instalar Python y VS Code, lo justo de python-chess, las cuatro fases en seis huecos con su comprobación,
+                cómo verlo jugar y medirlo, y qué ideas hay para seguir.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="../guias/tema5/index.html">
+              <span class="lt">Juegos por turnos<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · tema 5</span>
+              <span class="ld">
+                Árboles de juego y minimax, MCTS con ejemplos para tocar, sus mejoras, qué hacer cuando no se ve todo
+                (cartas, niebla de guerra) y qué bibliotecas hay.
+              </span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="evaluacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Cómo se evalúa</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Se mira</th><th scope="col">En concreto</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>El proceso</strong></td>
+                <td>Que haya varias versiones después de la base, cada una con una idea, que cada una esté medida contra la anterior con los mismos rivales y las mismas aperturas, que el diario cuente qué visteis en las partidas para decidir cada cambio, y que la versión elegida salga de las medidas. Es lo que más pesa.</td>
+              </tr>
+              <tr>
+                <td><strong>Vuestro MCTS</strong></td>
+                <td>Qué habéis añadido a la base y si lo entendéis: qué problema ataca cada cambio, cómo funciona y qué pasó al medirlo. Una idea pequeña bien explicada y bien medida vale más que cinco copiadas sin saber si sirven. Probar cosas que no salen también cuenta, si está en el diario.</td>
+              </tr>
+              <tr>
+                <td><strong>El rendimiento</strong></td>
+                <td>Cómo juega la versión que elijáis contra los rivales de referencia y contra los demás grupos en el <a href="#concurso">concurso</a>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">La base sola no aprueba</span>
+          <p>
+            Los seis pasos de la guía traen la solución plegada, así que todos los grupos pueden llegar ahí. Una entrega
+            con la base y poco más se queda corta aunque gane a Voraz: lo que se valora empieza en el paso&nbsp;7.
+          </p>
+        </div>
+      </section>
+
+      <section id="reglas">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Reglas del jugador</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Regla</th><th scope="col">Qué quiere decir</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Decide un MCTS</strong></td><td>Con sus cuatro fases. Se puede mezclar con lo que queráis (una evaluación propia, minimax en las hojas, respaldos minimax, jugadas que se prueban primero), pero la decisión tiene que salir del árbol. Un minimax con otro nombre no vale.</td></tr>
+              <tr><td><strong>Sólo Python y python-chess</strong></td><td>La biblioteca estándar y <code>chess</code>. Nada más que haya que instalar.</td></tr>
+              <tr><td><strong>Nada de fuera</strong></td><td>Ni motores externos (Stockfish o cualquier otro, tampoco con <code>chess.engine</code>), ni libros de aperturas, ni tablas de finales descargadas, ni red. El conocimiento de ajedrez que tenga vuestro jugador lo escribís vosotros.</td></tr>
+              <tr><td><strong>Ni hilos, ni procesos, ni ficheros</strong></td><td>El jugador piensa en el hilo en el que se le llama, y no lee ni escribe ficheros.</td></tr>
+              <tr><td><strong>Sin estado global</strong></td><td>Todo lo que haya que recordar entre jugadas (un árbol reutilizado, por ejemplo) va en atributos del objeto, no en variables del módulo. En el concurso se juegan muchas partidas en el mismo proceso.</td></tr>
+              <tr><td><strong>El tiempo</strong></td><td>1 segundo por jugada en el concurso. <code>elegir</code> recibe el tiempo como argumento: usadlo en vez de escribir el número.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="como-trabajar">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Cómo trabajar</h2>
+        </div>
+        <p>
+          Un bucle, como en las prácticas anteriores: mirar partidas, encontrar algo que hace mal, cambiar una cosa, y
+          medir. Cada vuelta deja una versión.
+        </p>
+        <div class="step">
+          <span class="step-num">0</span>
+          <div class="step-body">
+            <h3 class="label">La base</h3>
+            <p>
+              Descargad <a href="../recursos/ICI-Practica5.zip" download><code>ICI-Practica5.zip</code></a>, abrid la
+              carpeta en VS Code, cread el entorno y haced los seis pasos de la
+              <a href="../guias/mcts-paso-a-paso.html">guía</a>, hasta que <strong>Comprobar todos los pasos</strong>
+              los dé todos en <code>BIEN</code>. Poned vuestra letra en la carpeta <code>grupoYY</code> y en los
+              <code>import</code> de los cuatro programas que la usan.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Medid la base</h3>
+            <p>
+              Con <code>comparar.py</code> tal como viene: tres rivales, ocho aperturas, los dos colores y 0,3 segundos
+              por jugada. Si añadís rivales (<code>AlfaBeta(3)</code>, por ejemplo) o cambiáis el tiempo, ahora, y ya no se
+              cambian hasta el final. La tabla de la base va arriba del diario. De paso, haced el experimento de
+              <a href="../guias/mcts-paso-a-paso.html#paso7">simular hasta el final</a>.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Mirad cómo juega</h3>
+            <p>
+              Con <strong>Ver partida</strong> contra cada rival, y jugando vosotros contra él. Las flechas y el panel
+              dicen qué pensó en cada jugada. Buscad algo concreto que haga mal (deja piezas colgadas, no remata una
+              partida ganada, saca la dama a pasear) y apuntad en una o dos líneas qué es y por qué creéis que pasa.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Una versión nueva, con un solo cambio</h3>
+            <p>
+              Un parámetro distinto o una clase que hereda de la anterior, sin borrar la anterior: las dos tienen que
+              poder jugar en <code>comparar.py</code>. Las ideas, ordenadas de fácil a difícil, están en
+              <a href="../guias/mcts-paso-a-paso.html#vuestro">Vuestro MCTS</a>. Comprobad con <strong>Ver
+              partida</strong> que el cambio hace lo que creéis.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Medidla contra la anterior</h3>
+            <p>
+              Las dos en <code>VERSIONES</code>, contra los mismos rivales. Mirad los márgenes: si los intervalos se
+              solapan casi enteros, no hay diferencia demostrada (el <a href="#significativa">porqué</a>, abajo). Se queda
+              o se descarta, y por qué, en el diario. Y vuelta al paso&nbsp;2.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Elegid para el concurso</h3>
+            <p>
+              Con qué versión os quedáis y por qué. Comprobad que también juega bien con <strong>1 segundo</strong> por
+              jugada, que es el tiempo del concurso: una idea que gana con 0,3 segundos puede no ganar con 1, y al revés.
+              <code>jugador()</code> en <code>grupoYY/__init__.py</code> crea esa versión.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="significativa">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">¿La mejora es real?</h2>
+        </div>
+        <p>
+          <code>comparar.py</code> da, para cada versión y cada rival, el porcentaje de puntos y un margen de dos
+          errores típicos. Llamamos <!--tex p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span><!--/tex--> al porcentaje y <!--tex m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> al margen: el resultado de verdad está, casi seguro, entre
+          <!--tex p - m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>−</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">p - m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> y <!--tex p + m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>+</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">p + m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex-->. Con la base contra Voraz:
+        </p>
+<!--TEX \begin{aligned}
+p &= 72\,\%, \qquad m = 20 \\[6pt]
+\text{entre}\quad 72 - 20 &= 52\,\% \\
+\text{y}\quad 72 + 20 &= 92\,\%
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>p</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>72</mn><mtext> </mtext><mi mathvariant="normal">%</mi><mo separator="true">,</mo><mspace width="2em"/><mi>m</mi><mo>=</mo><mn>20</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>entre</mtext><mspace width="1em"/><mn>72</mn><mo>−</mo><mn>20</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>52</mn><mtext> </mtext><mi mathvariant="normal">%</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>y</mtext><mspace width="1em"/><mn>72</mn><mo>+</mo><mn>20</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>92</mn><mtext> </mtext><mi mathvariant="normal">%</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+p &amp;= 72\,\%, \qquad m = 20 \\[6pt]
+\text{entre}\quad 72 - 20 &amp;= 52\,\% \\
+\text{y}\quad 72 + 20 &amp;= 92\,\%
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:4.8em;vertical-align:-2.15em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span></span></span><span style="top:-2.71em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">entre</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord">72</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">20</span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">y</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord">72</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">20</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">72</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">%</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">20</span></span></span><span style="top:-2.71em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">52</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">%</span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">92</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">%</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Una versión que saque un 80&nbsp;% contra Voraz no ha demostrado nada: su intervalo y el de la base se
+          solapan casi enteros. Una que pase del 0 al 30&nbsp;% contra AlfaBeta2, sí. Si la diferencia queda justa,
+          dos salidas: repetir la pasada (los resultados cambian, porque MCTS juega con azar) o jugar más partidas,
+          añadiendo aperturas a <code>APERTURAS</code>. Las dos cosas cuestan tiempo, así que id a por cambios que se
+          noten.
+        </p>
+      </section>
+
+      <section id="concurso">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">El concurso</h2>
+        </div>
+        <p>
+          Una liguilla de <strong>todos contra todos</strong> con el <code>jugador()</code> de cada grupo:
+        </p>
+        <ul>
+          <li>Cada pareja juega varias partidas desde aperturas de la lista de <code>comparar.py</code>, la mitad con cada color.</li>
+          <li><strong>1 segundo por jugada.</strong></li>
+          <li>Como mucho <strong>200 medias jugadas</strong>. Si se llega ahí, gana quien tenga 3 o más puntos de material de ventaja; si no, tablas.</li>
+          <li>Una <strong>jugada ilegal</strong>, o <strong>tardar más de 1,5 segundos</strong> en una jugada, pierde esa partida.</li>
+          <li>Un jugador que lance una <strong>excepción</strong> queda <strong>descalificado</strong> del concurso, sin arreglos ni repeticiones.</li>
+        </ul>
+        <p>
+          La clasificación es por porcentaje de puntos (1 por victoria, ½ por tablas) sobre todas vuestras partidas. El
+          concurso reparte <strong>un punto extra</strong> sobre la nota de la práctica. Llamamos "vuestro" a vuestro
+          porcentaje, y "mejor" y "peor" al más alto y al más bajo de la clasificación:
+        </p>
+<!--TEX \text{punto extra} \;=\; \frac{\text{vuestro} - \text{peor}}{\text{mejor} - \text{peor}} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>punto extra</mtext><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mfrac><mrow><mtext>vuestro</mtext><mo>−</mo><mtext>peor</mtext></mrow><mrow><mtext>mejor</mtext><mo>−</mo><mtext>peor</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{punto extra} \;=\; \frac{\text{vuestro} - \text{peor}}{\text{mejor} - \text{peor}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8095em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">punto extra</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1725em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2921em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">mejor</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord text"><span class="mord">peor</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">vuestro</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord text"><span class="mord">peor</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Redondeado a dos decimales. El primero se lleva el punto entero, el último se queda a cero, y quedar cerca del
+          primero vale casi tanto como ganar. La nota de la práctica no pasa de 10 con el punto extra.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Excepciones y tiempo</span>
+          <p>
+            Lo que suele dejar a un grupo fuera de un concurso es un caso raro que nadie probó: una
+            posición con una sola jugada legal, una coronación, un final con muy pocas piezas, un árbol reutilizado que ya
+            no corresponde a la posición. Y con el tiempo, una evaluación lenta que con 0,3 segundos pasaba y con 1 se
+            dispara en alguna posición rara. Antes de entregar, jugad unas cuantas partidas largas con 1 segundo.
+          </p>
+        </div>
+      </section>
+
+      <section id="diario">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">El diario de desarrollo</h2>
+        </div>
+        <p>
+          Un solo <code>diario.md</code>, escrito <strong>mientras</strong> trabajáis, con entradas cortas y con fecha.
+          Arriba, los integrantes, los rivales, las aperturas, el tiempo por jugada y qué versión va al concurso. En
+          cada versión:
+        </p>
+        <ul>
+          <li><strong>Qué cambia y por qué</strong>, en una o dos líneas: lo que visteis en las partidas y el cambio que lo ataca.</li>
+          <li><strong>La tabla de <code>comparar.py</code></strong> con la versión nueva y la anterior, tal cual sale.</li>
+          <li><strong>Se queda o se descarta</strong>, y por qué. Una idea descartada con su medida también es trabajo.</li>
+          <li><strong>Si usáis IA, el <em>prompt</em></strong>, tal cual, y qué cambiasteis vosotros. Con la idea decidida antes de pedir el código: la IA puede ayudaros a probar más cosas, no a decidir qué probar.</li>
+        </ul>
+        <h3 class="label">Un diario de ejemplo</h3>
+        <p>
+          Con cifras de verdad, medidas al preparar la práctica. Para abreviar, las versiones nuevas sólo se midieron
+          contra AlfaBeta2; el vuestro, con todos los rivales.
+        </p>
+<pre><code># Diario · Práctica 5 · grupo YY
+Integrantes: …
+Concurso: v2.
+Rivales: Aleatorio, Voraz, AlfaBeta2. Las 8 aperturas de comparar.py,
+con los dos colores. 0,3 s por jugada, 120 medias jugadas.
+
+## mié 18 nov · v0, la base de la guía
+          Aleatorio          Voraz              AlfaBeta2
+v0        100% ±0 (16-0-0)   72% ±20 (10-3-3)   0% ±0 (0-0-16)
+Contra AlfaBeta2 deja piezas colgadas. La media de las respuestas
+tapa la única que se come la pieza.
+
+## jue 19 nov · v1: simulación que captura primero, profundidad 4
+Si en la simulación nadie captura, dejarse piezas no se castiga.
+AlfaBeta2: 0% → 16% (2-1-13). Dentro del margen, pero va en la
+dirección que esperábamos. Se queda, y seguimos por ahí.
+
+## sáb 21 nov · v2: v1 + respaldo minimax implícito (peso 0,8)
+Cada nodo guarda también el peor caso de sus hijos.
+AlfaBeta2: 16% → 28% (4-1-11). Al concurso va v2.</code></pre>
+        <p>
+          Están el problema visto en una partida, la idea que lo ataca, la medida, y una decisión con su porqué aunque la
+          diferencia quedara justa. Eso es lo que se pide.
+        </p>
+      </section>
+
+      <section id="lista">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">La lista del proceso</h2>
+        </div>
+        <p>
+          Para ir tachando. Las casillas se quedan guardadas en este navegador, y la del bucle se puede desmarcar
+          entera cada vez que empezáis una versión nueva.
+        </p>
+
+        <h3 class="label">Una vez · arrancar</h3>
+        <ul class="check" data-guardar="p5-base">
+          <li>Python y VS Code instalados, el entorno <code>.venv</code> creado, y <strong>Ver partida</strong> abre la ventana.</li>
+          <li>Los seis pasos de la guía en <code>BIEN</code> con <strong>Comprobar todos los pasos</strong>.</li>
+          <li>La carpeta con vuestra letra, y los <code>import</code> de los cuatro programas cambiados.</li>
+          <li>Decididos los rivales, las aperturas y el tiempo de <code>comparar.py</code>, y apuntados en el diario.</li>
+          <li>La base medida, con su tabla en el diario.</li>
+        </ul>
+
+        <h3 class="label">Cada versión · el bucle</h3>
+        <ul class="check" data-guardar="p5-bucle" data-reiniciar>
+          <li>Visto en una partida algo concreto que hace mal.</li>
+          <li>Escrito en una o dos líneas el problema y por qué creéis que pasa.</li>
+          <li>Decidido <strong>un</strong> cambio, y escrito antes de programarlo.</li>
+          <li>Si hubo IA, el <em>prompt</em> está en el diario.</li>
+          <li>Versión nueva sin tocar la anterior: las dos juegan en <code>comparar.py</code>.</li>
+          <li>Comprobado con <strong>Ver partida</strong> que el cambio hace lo que creéis.</li>
+          <li>Medida contra la anterior con los mismos rivales y aperturas.</li>
+          <li>Si la diferencia queda justa, repetida o con más partidas.</li>
+          <li>Entrada del diario cerrada: se queda o se descarta, y por qué.</li>
+        </ul>
+
+        <h3 class="label">Para el domingo 29 · el cierre</h3>
+        <ul class="check" data-guardar="p5-cierre">
+          <li>En dos líneas, qué versión va al concurso y por qué.</li>
+          <li>Esa versión, probada con 1 segundo por jugada en varias partidas completas.</li>
+          <li><code>jugador()</code>, sin argumentos, crea esa versión con el nombre de vuestro grupo.</li>
+          <li>Pasada la lista de <a href="#entrega">antes de subir el zip</a>.</li>
+        </ul>
+      </section>
+
+      <section id="entrega">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">Reglas de entrega</h2>
+        </div>
+        <p>
+          Esta práctica se desarrolla en <strong>grupos de 3 o 4 estudiantes</strong>, y se entrega en una tarea del
+          Campus Virtual antes del <strong>domingo 29 de noviembre a las 23:59</strong>:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Qué</th><th scope="col">Cómo exactamente</th></tr></thead>
+            <tbody>
+              <tr><td>Archivo</td><td><code>practica5-grupoYY.zip</code>, donde <code>YY</code> es la letra de vuestro grupo.</td></tr>
+              <tr><td>Paquete</td><td>La carpeta <code>grupoYY</code>, con vuestra letra en el nombre, con todo vuestro código dentro: todas las versiones, no sólo la del concurso.</td></tr>
+              <tr><td>Jugador del concurso</td><td>La función <code>jugador()</code> de <code>grupoYY/__init__.py</code>: sin argumentos, crea la versión elegida con <code>nombre="grupoYY"</code>.</td></tr>
+              <tr><td>Importaciones</td><td>El concurso copia vuestra carpeta al lado de la carpeta <code>ajedrez/</code> original. Del entorno, <code>from ajedrez import …</code>; entre vuestros ficheros, con un punto: <code>from .mcts import MCTS</code>.</td></tr>
+              <tr><td>Raíz del zip</td><td>La carpeta <code>grupoYY</code> y, a su lado, el <code>diario.md</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">No se modifica el entorno</span>
+          <p>
+            La carpeta <code>ajedrez/</code> no se toca, y la entrega <strong>no la incluye</strong>, ni tampoco
+            <code>comparar.py</code>, <code>comprobar.py</code> ni la carpeta <code>.venv</code>. Cumpliendo esto,
+            dentro de <code>grupoYY</code> podéis crear los ficheros y las clases que queráis.
+          </p>
+        </div>
+        <p>
+          Todas las prácticas serán comprobadas para la detección de plagios.
+        </p>
+
+        <h3 class="label">Antes de subir el zip</h3>
+        <ul class="check" data-guardar="p5-zip">
+          <li>La carpeta se llama <code>grupo</code> y vuestra letra, y <code>jugador()</code> lleva ese mismo nombre.</li>
+          <li>En una carpeta limpia con sólo <code>ajedrez/</code> y vuestra <code>grupoYY/</code>, <code>python -c "import grupoYY; print(grupoYY.jugador().nombre)"</code> funciona.</li>
+          <li>Ningún <code>print</code> de depuración dentro de <code>elegir</code>: cuesta tiempo en cada jugada.</li>
+          <li>Ni hilos, ni ficheros, ni variables globales que cambien durante la partida.</li>
+          <li>Unas cuantas partidas completas con 1 segundo por jugada, sin excepciones ni avisos de <code>OJO</code> por tiempo.</li>
+          <li>Al abrir el zip aparecen <code>grupoYY/</code> y <code>diario.md</code> en la raíz, y nada de <code>ajedrez/</code>, <code>.venv</code> ni <code>__pycache__</code>.</li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#que-se-pide">Qué se pide</a></li>
+            <li><a href="#evaluacion">Cómo se evalúa</a></li>
+            <li><a href="#reglas">Reglas del jugador</a></li>
+            <li><a href="#como-trabajar">Cómo trabajar</a></li>
+            <li><a href="#significativa">¿La mejora es real?</a></li>
+            <li><a href="#concurso">El concurso</a></li>
+            <li><a href="#diario">El diario</a></li>
+            <li><a href="#lista">La lista del proceso</a></li>
+            <li><a href="#entrega">Reglas de entrega</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">La guía</h2>
+          <ol>
+            <li><a href="../guias/mcts-paso-a-paso.html"><span>01</span>MCTS paso a paso</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El tema</span>
+          <p style="margin:0">
+            <a href="../guias/tema5/index.html">Juegos por turnos</a> Minimax, MCTS con ejemplos para tocar, sus
+            mejoras, información imperfecta y bibliotecas.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Dudas</span>
+          <p style="margin:0">
+            <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a>. Mejor preguntar con la posición (el FEN) y lo que
+            pensó vuestro MCTS que con "juega mal".
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

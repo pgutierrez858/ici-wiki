@@ -13,6 +13,7 @@
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
 <link rel="stylesheet" href="../../assets/css/ici.css">
 <script src="../../assets/js/tema.js"></script>
 </head>
@@ -240,8 +241,8 @@
         </p>
         <p>
           Queda por decir cómo se comprueba que "el segmento <em>p</em>–<em>q</em> no corta ningún
-          obstáculo", que es donde este método se pasa todo el tiempo: con <em>n</em> puntos hay
-          <em>n</em>(<em>n</em>&nbsp;−&nbsp;1)/2 parejas, y cada una se mide contra todos los lados de
+          obstáculo", que es donde este método se pasa todo el tiempo: con <!--tex n --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span><!--/tex--> puntos hay
+          <!--tex n(n - 1)/2 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">n(n - 1)/2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord">/2</span></span></span></span><!--/tex--> parejas, y cada una se mide contra todos los lados de
           todos los obstáculos. Son tres pasos, y el primero es el que lo hace barato.
         </p>
         <figure>
@@ -285,7 +286,7 @@
           </li>
           <li>
             <strong>El descarte por cajas es lo que lo salva.</strong> La comprobación completa es
-            <em>O</em>(<em>n</em>²&nbsp;·&nbsp;lados), y en la escena de arriba eso son más de cien mil
+            <!--tex O(n^2 \cdot \text{lados}) --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>⋅</mo><mtext>lados</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2 \cdot \text{lados})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">lados</span></span><span class="mclose">)</span></span></span></span><!--/tex-->, y en la escena de arriba eso son más de cien mil
             pruebas de signo cada vez que mueves un obstáculo. Comparando primero los dos rectángulos
             envolventes, la inmensa mayoría de las parejas se resuelve en cuatro comparaciones.
           </li>
@@ -561,7 +562,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

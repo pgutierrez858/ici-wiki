@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>MCTS paso a paso · Guías · ICI</title>
+<meta name="description" content="La guía de la Práctica 5: un jugador de ajedrez con Monte Carlo Tree Search en Python, montado en seis pasos con VS Code, cada uno con su comprobación, y después medido contra rivales de referencia y mejorado con ideas propias.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html">Prácticas</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>MCTS paso a paso</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      MCTS paso a paso
+      <span class="thin">La Práctica&nbsp;5 guiada: un jugador de ajedrez en Python, en seis huecos que se rellenan y se comprueban.</span>
+    </h1>
+    <p class="standfirst">
+      Del proyecto descargado a un MCTS que gana a un rival aleatorio: instalar Python y VS Code, lo justo de
+      python-chess, las cuatro fases del algoritmo escritas una a una con su comprobación, y cómo verlo jugar y medirlo.
+      Al final, la parte que es de cada grupo: qué se le puede cambiar a un MCTS y qué problema ataca cada cambio.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <p>
+        Antes de esta guía, leed en los apuntes del tema&nbsp;5 la página de
+        <a href="tema5/mcts.html">Monte Carlo Tree Search</a>: qué es un bandido multibrazo, de dónde sale UCB1 y qué
+        hace cada una de las cuatro fases. Aquí se programan sin volver a explicar la teoría desde cero.
+      </p>
+
+      <section id="proyecto">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El proyecto de partida</h2>
+        </div>
+        <p>
+          Esta práctica es en <strong>Python</strong>, y el entorno es el <strong>ajedrez</strong>. Las reglas del ajedrez (qué jugadas son legales, cuándo hay mate, el enroque, la
+          captura al paso) las pone la biblioteca <a href="https://python-chess.readthedocs.io/">python-chess</a>, así
+          que vosotros sólo os ocupáis de decidir. Todo lo demás viene en una carpeta lista para abrir en VS Code.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../recursos/ICI-Practica5.zip" download>
+              <span class="lt"><code>ICI-Practica5.zip</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Una carpeta para VS Code</span>
+              <span class="ld">
+                La plantilla del MCTS con sus seis huecos, el programa que comprueba cada paso, la ventana para ver
+                partidas y jugar contra vuestro jugador, el banco para comparar versiones y los rivales de referencia.
+              </span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="step" id="paso0">
+          <span class="step-num">0</span>
+          <div class="step-body">
+            <h3 class="label">Instalarlo todo, una vez</h3>
+            <ol>
+              <li>
+                <strong>Python 3.10 o más nuevo.</strong> Si no lo tenéis, de
+                <a href="https://www.python.org/downloads/">python.org</a>. En Windows, en la primera pantalla del
+                instalador marcad <strong>"Add python.exe to PATH"</strong>: si no, la terminal no lo encuentra.
+              </li>
+              <li>
+                <strong>VS Code</strong>, y dentro, la extensión <strong>Python</strong> de Microsoft (en la barra de la
+                izquierda, Extensiones, buscad "Python"). Trae el depurador.
+              </li>
+              <li>
+                Descomprimid el zip y abrid <strong>la carpeta <code>ICI-Practica5</code></strong> con
+                <span class="path">File &gt; Open Folder…</span>. Tiene que ser esa carpeta y no la de encima: los
+                lanzadores de <code>.vscode/launch.json</code> buscan los programas en la carpeta abierta.
+              </li>
+              <li>
+                <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> en Mac),
+                <span class="path">Python: Create Environment &gt; Venv</span>, elegid vuestro Python y marcad
+                <code>requirements.txt</code>. VS Code crea una carpeta <code>.venv</code> con un Python sólo para esta
+                práctica y le instala <code>chess</code> y <code>pygame-ce</code>. Tarda un minuto.
+              </li>
+              <li>
+                Comprobad que VS Code usa ese Python: abajo a la derecha, con un <code>.py</code> abierto, tiene que poner
+                algo como <code>3.12.4 ('.venv': venv)</code>. Si no, clic ahí y elegid el de <code>.venv</code>.
+              </li>
+              <li>
+                Abrid <span class="path">Ejecutar y depurar</span> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>), elegid
+                <strong>Ver partida</strong> en el desplegable de arriba y pulsad <kbd>F5</kbd>. Se abre la ventana con el
+                tablero y, enseguida, el panel de la derecha dice <code>Error: NotImplementedError</code>, porque
+                <code>MCTS</code> está sin hacer. Si llega ahí, el entorno está bien.
+              </li>
+            </ol>
+            <p>
+              Para comprobar la ventana sin vuestro código, cambiad en <code>ver_partida.py</code> la línea
+              <code>BLANCAS = MCTS()</code> por <code>BLANCAS = Aleatorio()</code> y volved a lanzarlo: se juega una
+              partida entera entre Aleatorio y Voraz.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="label">Los lanzadores</h3>
+        <p>
+          En <span class="path">Ejecutar y depurar</span> hay cinco. Todos se lanzan con <kbd>F5</kbd> y se paran en los
+          puntos de ruptura que pongáis.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Lanzador</th><th scope="col">Qué hace</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comprobar paso…</strong></td><td>Pregunta qué paso (del 1 al 6) y lo comprueba con <code>comprobar.py</code>. Es el que más vais a usar.</td></tr>
+              <tr><td><strong>Comprobar todos los pasos</strong></td><td>Todos en orden, hasta el primero que esté sin hacer o que falle.</td></tr>
+              <tr><td><strong>Ver partida</strong></td><td>Una partida en la ventana, con los jugadores de <code>ver_partida.py</code>.</td></tr>
+              <tr><td><strong>Jugar contra el MCTS</strong></td><td>Vosotros con el ratón contra vuestro MCTS (<code>jugar_contra.py</code>).</td></tr>
+              <tr><td><strong>Comparar versiones</strong></td><td>Vuestras versiones contra los rivales de referencia, con una tabla de puntos (<code>comparar.py</code>).</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Sin VS Code, lo mismo desde una terminal abierta en la carpeta, con el entorno activado:
+        </p>
+<pre><code>python -m venv .venv
+.venv\Scripts\activate             <span class="c"># Windows</span>
+source .venv/bin/activate          <span class="c"># Mac y Linux</span>
+pip install -r requirements.txt
+python comprobar.py 1
+python ver_partida.py</code></pre>
+
+        <h3 class="label">Qué hay en la carpeta</h3>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Archivo</th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><code>grupoYY/mcts.py</code></td><td>Vuestro MCTS. Lo que se rellena en los <a href="#pasos">seis pasos</a>.</td></tr>
+              <tr><td><code>grupoYY/__init__.py</code></td><td><code>jugador()</code>: la versión que va al concurso.</td></tr>
+              <tr><td><code>comprobar.py</code></td><td>Comprueba cada paso con casos escritos a mano: <code>python comprobar.py 3</code>.</td></tr>
+              <tr><td><code>ver_partida.py</code></td><td>Una partida en una ventana, con lo que pensó cada jugador al lado.</td></tr>
+              <tr><td><code>jugar_contra.py</code></td><td>Vosotros contra vuestro MCTS.</td></tr>
+              <tr><td><code>comparar.py</code></td><td>Versiones contra los rivales de referencia, desde ocho aperturas y con los dos colores.</td></tr>
+              <tr><td><code>ajedrez/</code></td><td>El entorno: partidas, rivales y ventana. <strong>No se modifica.</strong></td></tr>
+              <tr><td><code>.vscode/launch.json</code></td><td>Los cinco lanzadores.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note trap">
+          <span class="note-label">"python" no se reconoce como un comando</span>
+          <p>
+            En Windows, Python se instaló sin marcar "Add python.exe to PATH". Volved a lanzar el instalador,
+            <strong>Modify</strong>, y marcadlo. Mientras tanto, <code>py</code> suele funcionar en su lugar:
+            <code>py -m venv .venv</code>.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">ModuleNotFoundError: No module named 'chess'</span>
+          <p>
+            VS Code está usando un Python que no es el de <code>.venv</code>. Mirad abajo a la derecha qué intérprete
+            sale y cambiadlo, o <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, <span class="path">Python: Select
+            Interpreter</span>. En la terminal, lo mismo: si el prompt no empieza por <code>(.venv)</code>, el entorno
+            no está activado.
+          </p>
+        </div>
+        <div class="note trap">
+          <span class="note-label">PowerShell no deja activar el entorno</span>
+          <p>
+            Si <code>.venv\Scripts\activate</code> dice que "la ejecución de scripts está deshabilitada", una vez:
+            <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>, y abrid otra terminal. Desde los
+            lanzadores de VS Code no hace falta activar nada.
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">En Mac con el Python de Homebrew</span>
+          <p>
+            El Python de Homebrew viene sin <code>tkinter</code>, y por eso la ventana usa <strong>pygame-ce</strong>,
+            que se instala con <code>pip</code> como cualquier otra biblioteca y no necesita nada del sistema. Si al
+            instalar <code>requirements.txt</code> pygame-ce falla, casi siempre es un Python demasiado nuevo para el
+            que todavía no hay versión: cread el entorno con un Python un poco más antiguo (3.12 o 3.13).
+          </p>
+        </div>
+
+        <h3 class="label">Depurar: mirar el árbol por dentro</h3>
+        <p>
+          Lo que más ayuda en esta práctica es <strong>parar el programa y mirar el árbol</strong>. Poned un punto de
+          ruptura con <kbd>F9</kbd> (o clic a la izquierda del número de línea) en la última línea de
+          <code>elegir</code>, lanzad <strong>Comprobar paso…</strong> con el 6 y, cuando se pare, desplegad
+          <code>raiz</code> en el panel <strong>Variables</strong>: veréis sus <code>hijos</code>, las
+          <code>visitas</code> y el <code>valor</code> de cada uno, y podéis bajar por el árbol tanto como queráis.
+          <kbd>F10</kbd> avanza una línea, <kbd>F11</kbd> entra en la función, <kbd>F5</kbd> sigue hasta el siguiente
+          punto. En la <strong>Consola de depuración</strong> se puede escribir Python con las variables de ese
+          momento: <code>[(h.jugada.uci(), h.visitas) for h in raiz.hijos]</code>.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Si preferís Jupyter</span>
+          <p>
+            También se puede, aunque la guía está pensada para VS Code. Cread el notebook dentro de
+            <code>ICI-Practica5</code>, para que <code>from grupoYY.mcts import MCTS</code> funcione, y usad
+            <code>%run comprobar.py 3</code> para comprobar un paso. La ventana de pygame no hace falta: en un notebook,
+            un <code>chess.Board</code> que quede como última línea de una celda se pinta solo como un tablero.
+            Lo único que no va bien es <code>comparar.py</code>, que reparte las partidas entre procesos: lanzadlo desde
+            una terminal.
+          </p>
+        </div>
+      </section>
+
+      <section id="python-chess">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">python-chess en cinco minutos</h2>
+        </div>
+        <p>
+          De toda la biblioteca, os basta con esto:
+        </p>
+<pre><code><span class="k">import</span> chess
+<span class="k">from</span> ajedrez <span class="k">import</span> material
+
+t = chess.Board()                      <span class="c"># la posición inicial (o chess.Board(fen) para otra)</span>
+t.turn                                 <span class="c"># a quién le toca: chess.WHITE (True) o chess.BLACK (False)</span>
+<span class="k">not</span> t.turn                             <span class="c"># el otro color</span>
+jugadas = list(t.legal_moves)          <span class="c"># las jugadas legales: 20 al empezar</span>
+t.push(jugadas[<span class="n">0</span>])                     <span class="c"># hacer una jugada (modifica t)</span>
+t.pop()                                <span class="c"># deshacer la última</span>
+copia = t.copy(stack=<span class="k">False</span>)          <span class="c"># una copia sin el historial de jugadas: mucho más rápida</span>
+
+t.is_checkmate()                       <span class="c"># ¿el que tiene el turno está mateado?</span>
+t.is_stalemate()                       <span class="c"># ¿rey ahogado? (no tiene jugadas y no está en jaque)</span>
+t.is_insufficient_material()           <span class="c"># ¿nadie puede dar mate? (rey contra rey, por ejemplo)</span>
+
+material(t, chess.WHITE)               <span class="c"># material de blancas menos el de negras</span>
+chess.Move.from_uci(<span class="s">"e2e4"</span>)            <span class="c"># una jugada escrita a mano</span>
+t.san(jugadas[<span class="n">0</span>])                      <span class="c"># la jugada en notación de ajedrez: "Nh3"</span></code></pre>
+        <p>
+          <code>material</code> viene de la carpeta <code>ajedrez</code>: cuenta peón 1, caballo y alfil 3, torre 5 y
+          dama 9, y resta lo de un color de lo del otro. Al empezar vale 0, y si las blancas tienen una dama de más,
+          <code>material(t, chess.WHITE)</code> vale 9 y <code>material(t, chess.BLACK)</code>, −9.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Mateado es el que tiene el turno</span>
+          <p>
+            Cuando <code>t.is_checkmate()</code> es verdad, el que está mateado es <code>t.turn</code>: el que tendría
+            que mover y no puede. El que ha ganado es <code>not t.turn</code>. Este detalle decide si el paso&nbsp;1
+            sale bien o al revés.
+          </p>
+        </div>
+      </section>
+
+      <section id="nodo">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El árbol: la clase Nodo</h2>
+        </div>
+        <p>
+          La plantilla ya trae el nodo hecho. Cada nodo es una posición del árbol, y guarda cómo se llegó a ella y lo que
+          se sabe de ella hasta ahora:
+        </p>
+<pre><code><span class="k">class</span> Nodo:
+    <span class="k">def</span> __init__(self, tablero, padre=<span class="k">None</span>, jugada=<span class="k">None</span>):
+        self.padre = padre
+        self.jugada = jugada                          <span class="c"># la jugada que lleva del padre aquí</span>
+        self.hijos = []                               <span class="c"># los nodos ya creados debajo</span>
+        self.sin_probar = list(tablero.legal_moves)   <span class="c"># las jugadas que todavía no tienen hijo</span>
+        random.shuffle(self.sin_probar)
+        self.visitas = <span class="n">0</span>                              <span class="c"># N: cuántas simulaciones han pasado por aquí</span>
+        self.valor = <span class="n">0.0</span>                              <span class="c"># W: la suma de sus recompensas...</span>
+        self.color = <span class="k">not</span> tablero.turn                 <span class="c"># ...vistas por quien hizo `jugada`</span></code></pre>
+        <p>
+          Llamamos <strong>N</strong> a las visitas de un nodo y <strong>W</strong> a la suma de las recompensas que
+          ha recibido; su media, W/N, es lo bien que le va. Dos cosas que conviene entender antes de seguir:
+        </p>
+        <ul>
+          <li>
+            <strong>El nodo no guarda el tablero.</strong> Sólo la jugada. En cada iteración se parte de una copia del
+            tablero de la raíz y se van haciendo las jugadas de los nodos por los que se baja. Guardar un tablero por
+            nodo gastaría mucha memoria con miles de nodos.
+          </li>
+          <li>
+            <strong><code>color</code> es quien hizo la jugada que lleva al nodo</strong>, no a quién le toca en él.
+            Como el tablero que recibe el constructor ya tiene la jugada hecha, el que movió es
+            <code>not tablero.turn</code>. Y <code>valor</code> se suma desde el punto de vista de ese color. Es lo que
+            hace que la selección funcione igual para blancas y para negras, y se ve en el
+            <a href="#paso5">paso&nbsp;5</a>.
+          </li>
+        </ul>
+      </section>
+
+      <section id="pasos">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Seis huecos, paso a paso</h2>
+        </div>
+        <p>
+          Cada función de <code>grupoYY/mcts.py</code> con <code>raise NotImplementedError</code> es un hueco. Se
+          rellenan en orden, y después de cada uno se lanza <strong>Comprobar paso…</strong> con su número. Si todo va
+          bien sale <code>Paso 3: BIEN</code>; si no, <code>Paso 3: MAL.</code> seguido de lo que esperaba y lo que ha
+          salido. No paséis al siguiente hasta tener el <code>BIEN</code>: cada paso se apoya en los anteriores.
+        </p>
+        <p>
+          Cada paso trae la idea, una pista y, plegada, la solución. Intentadlo antes de abrirla: son entre tres y doce
+          líneas cada uno, y escribirlas es la mejor forma de entender el algoritmo. Lo que se evalúa de verdad es lo que
+          hagáis <a href="#vuestro">después</a>.
+        </p>
+
+        <div class="step" id="paso1">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">La recompensa: cuánto le gusta una posición a un color</h3>
+            <p>
+              Cada simulación termina en una posición, y hay que convertirla en un número entre 0 (perdida) y 1 (ganada)
+              para un color dado. Si la partida ha terminado es fácil: mate, 0 o 1; ahogado o material insuficiente,
+              tablas, 0,5. Si no ha terminado, porque cortamos la simulación antes (lo veréis en el
+              <a href="#paso4">paso&nbsp;4</a>), hay que estimar quién va mejor, y la estimación más sencilla es el
+              material.
+            </p>
+            <p>
+              Pero el material no está entre 0 y 1: va de −39 a 39. Para llevarlo a esa escala se usa una
+              <strong>sigmoide</strong>: <!--tex 1 / (1 + e^{-m/3}) --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi><mi mathvariant="normal">/</mi><mn>3</mn></mrow></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">1 / (1 + e^{-m/3})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.138em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">m</span><span class="mord mtight">/3</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><!--/tex-->, donde <!--tex m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> es el material del color que pregunta. Con
+              material igualado da 0,5, crece con cada pieza de ventaja y nunca llega del todo a 1:
+            </p>
+<pre class="cuenta">m = 0    (igualado)           0,50
+m = 1    (un peón más)        0,58
+m = 3    (un caballo más)     0,73
+m = 5    (una torre más)      0,84
+m = 9    (una dama más)       0,95
+m = −3   (un caballo menos)   0,27</pre>
+            <p>
+              Por qué así y no de otra forma. Las recompensas tienen que estar en la misma escala que ganar y perder,
+              porque UCB1 suma la media con un término de exploración pensado para valores entre 0 y 1 (el
+              <a href="#paso2">paso&nbsp;2</a>). La sigmoide además hace que <strong>un mate valga siempre más que
+              cualquier ventaja de material</strong>: un 1 exacto contra un 0,95 como mucho. Y el 3 que divide a m
+              decide lo deprisa que sube la curva: con un número más pequeño, un peón de más ya parecería casi una
+              victoria. Es la primera decisión de diseño que podréis cambiar más adelante.
+            </p>
+            <p>
+              <strong>Pista:</strong> mirad primero si hay mate, con el aviso de la
+              <a href="#python-chess">sección anterior</a> sobre quién es el mateado; después las tablas; y si no, la
+              fórmula, con <code>math.exp</code>.
+            </p>
+            <p>
+              <strong>Qué comprueba:</strong> el mate del loco (las negras dan mate en la segunda jugada) tiene que dar 1
+              a las negras y 0 a las blancas; un rey ahogado, 0,5; la posición inicial, 0,5; una dama de más, 0,953 para
+              las blancas y lo que falta hasta 1 para las negras.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="k">def</span> recompensa(tablero, color):
+    <span class="k">if</span> tablero.is_checkmate():
+        <span class="k">return</span> <span class="n">0.0</span> <span class="k">if</span> tablero.turn == color <span class="k">else</span> <span class="n">1.0</span>
+    <span class="k">if</span> tablero.is_stalemate() <span class="k">or</span> tablero.is_insufficient_material():
+        <span class="k">return</span> <span class="n">0.5</span>
+    <span class="k">return</span> <span class="n">1</span> / (<span class="n">1</span> + math.exp(-material(tablero, color) / <span class="n">3</span>))</code></pre>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="step" id="paso2">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Selección: UCB1</h3>
+            <p>
+              Para bajar por el árbol, en cada nodo hay que elegir un hijo. Si se elige siempre el de mejor media, una
+              jugada que tuvo mala suerte en sus primeras simulaciones no se vuelve a probar nunca; si se elige al azar,
+              se malgastan simulaciones en jugadas malas. <strong>UCB1</strong> reparte entre las dos cosas: a la media
+              de cada hijo le suma un premio que crece cuanto menos se ha probado ese hijo. Es el
+              <a href="tema5/mcts.html">bandido multibrazo de los apuntes</a>, aplicado en cada nodo.
+            </p>
+            <p>
+              Para un hijo <!--tex h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span><!--/tex--> de un padre <!--tex p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span><!--/tex-->, con <!--tex W_h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">W_h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> y <!--tex N_h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">N_h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> el valor y las visitas del hijo,
+              <!--tex N_p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">N_p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> las visitas del padre y <!--tex c --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span><!--/tex--> la constante de exploración:
+            </p>
+<!--TEX \mathrm{UCB1}(h) \;=\; \underbrace{\frac{W_h}{N_h}}_{\text{explotar}} \;+\; \underbrace{c\,\sqrt{\frac{\ln N_p}{N_h}}}_{\text{explorar}} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">U</mi><mi mathvariant="normal">C</mi><mi mathvariant="normal">B</mi><mn>1</mn></mrow><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><munder><munder><mfrac><msub><mi>W</mi><mi>h</mi></msub><msub><mi>N</mi><mi>h</mi></msub></mfrac><mo stretchy="true">⏟</mo></munder><mtext>explotar</mtext></munder><mtext>  </mtext><mo>+</mo><mtext>  </mtext><munder><munder><mrow><mi>c</mi><mtext> </mtext><msqrt><mfrac><mrow><mi>ln</mi><mo>⁡</mo><msub><mi>N</mi><mi>p</mi></msub></mrow><msub><mi>N</mi><mi>h</mi></msub></mfrac></msqrt></mrow><mo stretchy="true">⏟</mo></munder><mtext>explorar</mtext></munder></mrow><annotation encoding="application/x-tex">\mathrm{UCB1}(h) \;=\; \underbrace{\frac{W_h}{N_h}}_{\text{explotar}} \;+\; \underbrace{c\,\sqrt{\frac{\ln N_p}{N_h}}}_{\text{explorar}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm">UCB1</span></span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.6665em;vertical-align:-2.3062em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-1.1902em;"><span class="pstrut" style="height:3.3603em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">explotar</span></span></span></span></span><span style="top:-3.3603em;"><span class="pstrut" style="height:3.3603em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span class="svg-align" style="top:-1.8763em;"><span class="pstrut" style="height:3.3603em;"></span><span class="katex-stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMinYMin slice"><path d="M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13
+ 35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688
+ 0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7
+-331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z"/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMidYMin slice"><path d="M199572 214
+c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
+ 53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3
+ 11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0
+-5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z"/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMaxYMin slice"><path d="M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3
+ 28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237
+-174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z"/></svg></span></span></span><span style="top:-3.3603em;"><span class="pstrut" style="height:3.3603em;"></span><span class="mord"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.484em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.3062em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.9102em;vertical-align:-2.3086em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6016em;"><span style="top:-1.4291em;"><span class="pstrut" style="height:3.6016em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">explorar</span></span></span></span></span><span style="top:-3.6016em;"><span class="pstrut" style="height:3.6016em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6016em;"><span class="svg-align" style="top:-2.1152em;"><span class="pstrut" style="height:3.6016em;"></span><span class="katex-stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMinYMin slice"><path d="M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13
+ 35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688
+ 0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7
+-331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z"/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMidYMin slice"><path d="M199572 214
+c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
+ 53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3
+ 11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0
+-5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z"/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMaxYMin slice"><path d="M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3
+ 28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237
+-174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z"/></svg></span></span></span><span style="top:-3.6016em;"><span class="pstrut" style="height:3.6016em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6016em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.5616em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478
+c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514
+c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20
+s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121
+s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081
+l0 -0c4,-6.7,10,-10,18,-10 H400000
+v40H1014.6
+s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185
+c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2z M1001 80
+h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8384em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4864em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.3086em;"><span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+            <p>
+              Con <!--tex c = 0 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span><!--/tex--> sólo cuenta la media. Cuanto mayor es c, más se prueban las jugadas poco visitadas. La
+              plantilla usa <!--tex c = 1,4 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>=</mo><mn>1,4</mn></mrow><annotation encoding="application/x-tex">c = 1{,}4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span></span></span></span><!--/tex-->, que es más o menos <!--tex \sqrt{2} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mn>2</mn></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">2</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span></span></span></span><!--/tex-->, el valor de la teoría para recompensas entre 0 y 1.
+            </p>
+            <p>
+              Es el caso de la comprobación: un padre con 20 visitas y dos hijos, A con 6 de valor en 10 visitas y B con
+              4 en 5:
+            </p>
+<!--TEX \begin{aligned}
+\ln 20 &= 2,996 \\[10pt]
+\text{A:}\quad & 0,6 + 1,4 \cdot \sqrt{\frac{2,996}{10}} \\
+&= 0,6 + 1,4 \cdot 0,547 \\
+&= 0,6 + 0,766 \\
+&= 1,366 \\[10pt]
+\text{B:}\quad & 0,8 + 1,4 \cdot \sqrt{\frac{2,996}{5}} \\
+&= 0,8 + 1,4 \cdot 0,774 \\
+&= 0,8 + 1,084 \\
+&= 1,884 \qquad \leftarrow\ \text{gana B}
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>ln</mi><mo>⁡</mo><mn>20</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2,996</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>A:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0,6</mn><mo>+</mo><mn>1,4</mn><mo>⋅</mo><msqrt><mfrac><mn>2,996</mn><mn>10</mn></mfrac></msqrt></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,6</mn><mo>+</mo><mn>1,4</mn><mo>⋅</mo><mn>0,547</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,6</mn><mo>+</mo><mn>0,766</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1,366</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>B:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0,8</mn><mo>+</mo><mn>1,4</mn><mo>⋅</mo><msqrt><mfrac><mn>2,996</mn><mn>5</mn></mfrac></msqrt></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,8</mn><mo>+</mo><mn>1,4</mn><mo>⋅</mo><mn>0,774</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,8</mn><mo>+</mo><mn>1,084</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1,884</mn><mspace width="2em"/><mo>←</mo><mtext> gana B</mtext></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+\ln 20 &amp;= 2{,}996 \\[10pt]
+\text{A:}\quad &amp; 0{,}6 + 1{,}4 \cdot \sqrt{\frac{2{,}996}{10}} \\
+&amp;= 0{,}6 + 1{,}4 \cdot 0{,}547 \\
+&amp;= 0{,}6 + 0{,}766 \\
+&amp;= 1{,}366 \\[10pt]
+\text{B:}\quad &amp; 0{,}8 + 1{,}4 \cdot \sqrt{\frac{2{,}996}{5}} \\
+&amp;= 0{,}8 + 1{,}4 \cdot 0{,}774 \\
+&amp;= 0{,}8 + 1{,}084 \\
+&amp;= 1{,}884 \qquad \leftarrow\ \text{gana B}
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:17.68em;vertical-align:-8.59em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:9.09em;"><span style="top:-11.9016em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">20</span></span></span><span style="top:-8.59em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord text"><span class="mord">A:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-6.6616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:-5.1616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:-3.6616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:-0.35em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord text"><span class="mord">B:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:1.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:3.0784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:4.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:8.59em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:9.09em;"><span style="top:-11.9016em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">996</span></span></span><span style="top:-8.59em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6516em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">10</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">996</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.6116em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478
+c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514
+c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20
+s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121
+s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081
+l0 -0c4,-6.7,10,-10,18,-10 H400000
+v40H1014.6
+s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185
+c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2z M1001 80
+h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7884em;"><span></span></span></span></span></span></span></span><span style="top:-6.6616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">547</span></span></span><span style="top:-5.1616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">766</span></span></span><span style="top:-3.6616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">366</span></span></span><span style="top:-0.35em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6516em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">996</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.6116em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478
+c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514
+c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20
+s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121
+s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081
+l0 -0c4,-6.7,10,-10,18,-10 H400000
+v40H1014.6
+s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185
+c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2z M1001 80
+h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7884em;"><span></span></span></span></span></span></span></span><span style="top:1.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">774</span></span></span><span style="top:3.0784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">084</span></span></span><span style="top:4.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">884</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">gana B</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:8.59em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+            <p>
+              B gana por las dos razones: tiene mejor media y menos visitas. Si a B le bajamos el valor a 1 (media 0,2)
+              y ponemos c&nbsp;=&nbsp;0, gana A, porque sólo cuenta la media.
+            </p>
+            <p>
+              <strong>Pista:</strong> <code>ucb1</code> es la fórmula tal cual, con <code>math.sqrt</code> y
+              <code>math.log</code>; las visitas del padre están en <code>hijo.padre.visitas</code>.
+              <code>seleccionar</code> es una línea: <code>max</code> sobre <code>nodo.hijos</code> con un
+              <code>key</code>. No hace falta preocuparse de los hijos con 0 visitas (que darían una división por cero):
+              sólo se selecciona entre hijos de un nodo que ya no tiene jugadas sin probar, y todos sus hijos tienen al
+              menos la visita de cuando se crearon.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="k">def</span> ucb1(hijo, c):
+    explotar = hijo.valor / hijo.visitas
+    explorar = c * math.sqrt(math.log(hijo.padre.visitas) / hijo.visitas)
+    <span class="k">return</span> explotar + explorar
+
+
+<span class="k">def</span> seleccionar(nodo, c):
+    <span class="k">return</span> max(nodo.hijos, key=<span class="k">lambda</span> h: ucb1(h, c))</code></pre>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="step" id="paso3">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Expansión: un hijo nuevo</h3>
+            <p>
+              Cuando la selección llega a un nodo que todavía tiene jugadas sin probar, el árbol crece por ahí:
+              <strong>un hijo nuevo por iteración</strong>, no todos a la vez. Así el árbol sólo se hace grande por donde
+              las simulaciones dicen que merece la pena, y las ramas malas se quedan con uno o dos nodos.
+            </p>
+            <p>
+              <code>expandir(nodo, tablero)</code> saca una jugada de <code>nodo.sin_probar</code>, la hace en
+              <code>tablero</code> (que es la copia de esta iteración, con las jugadas de la selección ya hechas), crea el
+              <code>Nodo</code> hijo con ese tablero, lo añade a <code>nodo.hijos</code> y lo devuelve.
+            </p>
+            <p>
+              <strong>Pista:</strong> <code>sin_probar</code> ya está barajada desde el constructor, así que
+              <code>pop()</code> saca una al azar. El orden importa: primero <code>tablero.push</code> y después
+              <code>Nodo(tablero, …)</code>, para que el hijo calcule sus jugadas legales y su <code>color</code> en la
+              posición de después de la jugada.
+            </p>
+            <p>
+              <strong>Qué comprueba:</strong> desde la posición inicial, que devuelva un <code>Nodo</code> que está en
+              <code>raiz.hijos</code> y cuyo padre es la raíz, que en <code>sin_probar</code> queden 19 jugadas y no esté
+              la del hijo, que la jugada esté hecha en el tablero y que el hijo sea de color blanco.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="k">def</span> expandir(nodo, tablero):
+    jugada = nodo.sin_probar.pop()
+    tablero.push(jugada)
+    hijo = Nodo(tablero, nodo, jugada)
+    nodo.hijos.append(hijo)
+    <span class="k">return</span> hijo</code></pre>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="step" id="paso4">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Simulación: jugar al azar, y cortar</h3>
+            <p>
+              Desde el nodo nuevo se juega al azar para tener una idea de cuánto vale. En los apuntes la simulación
+              llega hasta el final de la partida, y en el tres en raya o el Go es lo normal. En ajedrez no funciona:
+              una partida entre dos jugadores que mueven al azar dura cientos de jugadas y casi siempre acaba en tablas.
+              Cada simulación sería lentísima y diría poco.
+            </p>
+            <p>
+              Así que se corta: como mucho <code>profundidad</code> medias jugadas al azar (10 en la plantilla) y, donde
+              se quede, se evalúa con <code>recompensa</code>, que para eso estima con el material. Si antes no quedan
+              jugadas legales (mate o ahogado), se para ahí, y <code>recompensa</code> da el valor exacto.
+            </p>
+            <p>
+              <code>simular</code> devuelve siempre la recompensa <strong>para las blancas</strong>. Elegir un color fijo
+              simplifica el paso siguiente: allí cada nodo la traduce a su punto de vista.
+            </p>
+            <p>
+              <strong>Pista:</strong> un <code>for</code> de <code>profundidad</code> vueltas; en cada una, las jugadas
+              legales en una lista; si está vacía, <code>break</code>; si no, <code>random.choice</code> y
+              <code>push</code>. Al salir, <code>recompensa(tablero, chess.WHITE)</code>.
+            </p>
+            <p>
+              <strong>Qué comprueba:</strong> que devuelva un número entre 0 y 1 y no juegue más de 10 medias jugadas;
+              que con profundidad 0 no juegue nada y devuelva 0,5 en la posición inicial; que con un mate ya dado devuelva
+              0 (las blancas están mateadas); y que con una dama blanca de más pase de 0,9.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="k">def</span> simular(tablero, profundidad):
+    <span class="k">for</span> _ <span class="k">in</span> range(profundidad):
+        jugadas = list(tablero.legal_moves)
+        <span class="k">if</span> <span class="k">not</span> jugadas:
+            <span class="k">break</span>
+        tablero.push(random.choice(jugadas))
+    <span class="k">return</span> recompensa(tablero, chess.WHITE)</code></pre>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="step" id="paso5">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Retropropagación: cada nodo, desde su punto de vista</h3>
+            <p>
+              El resultado de la simulación sube desde el nodo nuevo hasta la raíz, y cada nodo del camino suma una
+              visita y la recompensa. Lo delicado es <strong>de quién es la recompensa</strong>.
+            </p>
+            <p>
+              Pensad en la selección. En un nodo donde mueven las negras, <code>seleccionar</code> elige el hijo de
+              mayor UCB1, es decir, el de mejor media. Para que eso sea lo que quieren las negras, la media de esos hijos
+              tiene que estar contada <strong>desde el punto de vista de las negras</strong>, que son quienes hicieron la
+              jugada de cada hijo. Por eso cada nodo guarda <code>color</code>, el de quien movió para llegar a él, y
+              suma la recompensa vista por ese color:
+            </p>
+<pre class="cuenta">si nodo.color es blanco   suma  r_blancas
+si nodo.color es negro    suma  1 − r_blancas</pre>
+            <p>
+              El caso de la comprobación: raíz, <code>e4</code> (una jugada de blancas) y <code>e5</code> (de negras),
+              con una simulación que da 0,8 a las blancas:
+            </p>
+<pre class="cuenta">e5    lo jugaron las negras    suma 1 − 0,8 = 0,2
+e4    lo jugaron las blancas   suma 0,8
+raíz  (su valor no se usa)     suma lo que toque; sólo cuentan sus visitas</pre>
+            <p>
+              Así, el mismo <code>max</code> sirve en todos los niveles: cada jugador elige lo que es mejor para él. Es
+              la misma idea que el minimax de los apuntes (cada uno maximiza lo suyo), escrita con medias en vez de con
+              máximos y mínimos.
+            </p>
+            <div class="note trap">
+              <span class="note-label">El fallo más típico de todo MCTS</span>
+              <p>
+                Sumar <code>r_blancas</code> en todos los nodos. No da ningún error, el programa juega, y las negras eligen
+                en el árbol las jugadas que <strong>mejor les vienen a las blancas</strong>: el MCTS se ayuda a perder en
+                la mitad de los niveles. La comprobación del paso&nbsp;5 está para pillarlo.
+              </p>
+            </div>
+            <p>
+              <strong>Pista:</strong> un <code>while nodo is not None</code> que sube con <code>nodo = nodo.padre</code>.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="k">def</span> retropropagar(nodo, r_blancas):
+    <span class="k">while</span> nodo <span class="k">is not</span> <span class="k">None</span>:
+        nodo.visitas += <span class="n">1</span>
+        nodo.valor += r_blancas <span class="k">if</span> nodo.color == chess.WHITE <span class="k">else</span> <span class="n">1</span> - r_blancas
+        nodo = nodo.padre</code></pre>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="step" id="paso6">
+          <span class="step-num">6</span>
+          <div class="step-body">
+            <h3 class="label">El bucle: las cuatro fases, una y otra vez</h3>
+            <p>
+              <code>elegir(tablero, tiempo)</code> es lo que llama la partida cada vez que os toca mover. Crea la raíz
+              y repite iteraciones hasta que se acaba el tiempo (o hasta <code>iteraciones</code>, si se ha dado, que es
+              lo que usan las comprobaciones para no depender de la velocidad del ordenador). Cada iteración:
+            </p>
+            <ol>
+              <li><strong>Selección.</strong> Desde la raíz, mientras el nodo no tenga jugadas sin probar y sí tenga hijos, bajar al hijo que diga <code>seleccionar</code> y hacer su jugada en <code>t</code>.</li>
+              <li><strong>Expansión.</strong> Si al nodo donde se ha parado le quedan jugadas sin probar, <code>expandir</code>, y seguir desde el hijo nuevo.</li>
+              <li><strong>Simulación.</strong> <code>simular</code> desde <code>t</code>.</li>
+              <li><strong>Retropropagación</strong> desde el nodo donde se ha quedado.</li>
+            </ol>
+            <p>
+              Lo de antes y lo de después del bucle ya está en la plantilla: <code>t</code> es una copia nueva del
+              tablero en cada iteración, con <code>copy(stack=False)</code> porque copiar el historial de la partida en
+              cada vuelta es lento. Al final se rellenan las <code>estadisticas</code> que pinta la ventana y se devuelve
+              <strong>la jugada más visitada</strong>, no la de mejor media: una jugada con dos visitas y media 1 puede
+              ser pura suerte, y una con 800 visitas está bien medida.
+            </p>
+            <p>
+              Hay un caso que se resuelve solo. Si la selección llega a una posición <strong>terminal</strong> (mate o
+              ahogado), no tiene jugadas sin probar ni hijos: el bucle de selección para, no se expande, y
+              <code>simular</code> no puede jugar nada y devuelve la recompensa exacta. Por eso un mate se encuentra
+              tan deprisa: cada visita a ese nodo da un 1 limpio y sin ruido.
+            </p>
+            <p>
+              <strong>Pista:</strong> son siete líneas en lugar del <code>raise</code>. La primera,
+              <code>while not nodo.sin_probar and nodo.hijos:</code>.
+            </p>
+            <p>
+              <strong>Qué comprueba:</strong> tres posiciones con un mate en una (una de ellas con negras) en las que tiene
+              que dar mate, una dama regalada que tiene que comerse, que con 1 segundo no tarde más de 1,2, cuántas
+              iteraciones hace en ese segundo, y dos partidas contra Aleatorio de las que tiene que sacar al menos 1,5
+              puntos. Esto último tarda unos 20 segundos.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="c"># el bucle de elegir, sin el raise (allí va con dos sangrías más)</span>
+<span class="k">while</span> <span class="k">True</span>:
+    t = tablero.copy(stack=<span class="k">False</span>)
+    nodo = raiz
+    <span class="k">while</span> <span class="k">not</span> nodo.sin_probar <span class="k">and</span> nodo.hijos:      <span class="c"># 1. selección</span>
+        nodo = self.seleccionar(nodo)
+        t.push(nodo.jugada)
+    <span class="k">if</span> nodo.sin_probar:                              <span class="c"># 2. expansión</span>
+        nodo = self.expandir(nodo, t)
+    r = self.simular(t)                              <span class="c"># 3. simulación</span>
+    self.retropropagar(nodo, r)                      <span class="c"># 4. retropropagación</span>
+    n += <span class="n">1</span>
+    <span class="k">if</span> (self.iteraciones <span class="k">and</span> n &gt;= self.iteraciones) <span class="k">or</span> \
+       (<span class="k">not</span> self.iteraciones <span class="k">and</span> time.perf_counter() &gt; fin):
+        <span class="k">break</span></code></pre>
+              </div>
+            </details>
+            <p>
+              Con los seis pasos en <code>BIEN</code>, <strong>Comprobar todos los pasos</strong> tiene que darlos todos
+              seguidos.
+            </p>
+          </div>
+        </div>
+        <div class="note trap">
+          <span class="note-label">Lo que se pierde con stack=False</span>
+          <p>
+            La copia sin historial no sabe qué posiciones se han repetido, así que dentro del árbol no se detectan las
+            tablas por repetición. La partida de verdad sí las detecta. Para empezar da igual; si veis que vuestro MCTS
+            repite jugadas en una posición ganada y se deja empatar, ya sabéis por dónde mirar.
+          </p>
+        </div>
+      </section>
+
+      <section id="medir">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Verlo jugar y medirlo</h2>
+        </div>
+
+        <div class="step" id="paso7">
+          <span class="step-num">7</span>
+          <div class="step-body">
+            <h3 class="label">Verlo, jugar contra él y medirlo</h3>
+            <p>
+              <strong>Ver partida</strong>, con <code>BLANCAS = MCTS()</code> y <code>NEGRAS = Voraz()</code> como viene.
+              Las flechas son las tres jugadas más visitadas por el último que ha movido, y la gruesa es la elegida. A la
+              derecha, lo que pensó: cada jugada con sus visitas (la barra) y su valor medio, y cuántas iteraciones le dio
+              tiempo a hacer. <kbd>Espacio</kbd> pausa, <kbd>&#8594;</kbd> avanza una jugada en pausa y <kbd>Esc</kbd>
+              sale. Mirad cuándo duda (barras parecidas) y cuándo lo tiene claro (una barra muy por encima de las demás).
+            </p>
+            <p>
+              <strong>Jugar contra el MCTS</strong>: clic en una pieza y clic en la casilla; los peones coronan siempre
+              a dama. Con 2 segundos por jugada es más flojo de lo que parece al principio, y jugar contra él es la forma
+              más rápida de ver qué no entiende.
+            </p>
+            <p>
+              <strong>Comparar versiones</strong> juega cada versión de <code>VERSIONES</code> contra los tres rivales de
+              referencia, desde ocho aperturas y una vez con cada color: 16 partidas por rival. Con 0,3 segundos por
+              jugada y 120 medias jugadas como mucho, y después decide el material. Los rivales son:
+            </p>
+            <div class="table-scroll">
+              <table class="ancha">
+                <thead><tr><th scope="col">Rival</th><th scope="col">Cómo juega</th></tr></thead>
+                <tbody>
+                  <tr><td><code>Aleatorio</code></td><td>Una jugada legal cualquiera.</td></tr>
+                  <tr><td><code>Voraz</code></td><td>Da mate si puede; si no, la captura más valiosa; si no hay ninguna, al azar. No mira qué le contestan.</td></tr>
+                  <tr><td><code>AlfaBeta2</code></td><td>Minimax con poda alfa-beta a dos medias jugadas (la suya y la respuesta), contando sólo material. No deja una pieza colgada a la primera.</td></tr>
+                  <tr><td><code>AlfaBeta(3)</code></td><td>Lo mismo a tres. No viene en la lista; añadidlo si queréis un reto más.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Con la solución de esta guía, tal cual, sale esto:
+            </p>
+<pre class="cuenta">                 Aleatorio                 Voraz             AlfaBeta2         TOTAL
+v0        100% ±0 (16-0-0)      72% ±20 (10-3-3)        0% ±0 (0-0-16)       57% ±14</pre>
+            <p>
+              Cada casilla es el porcentaje de puntos (1 por victoria, ½ por tablas), con dos errores típicos de margen y,
+              entre paréntesis, ganadas, tablas y perdidas. Contra Aleatorio gana siempre; contra Voraz, casi tres de
+              cada cuatro; contra AlfaBeta2 no saca nada. Tardó 1,3 minutos en un ordenador de 18 núcleos, con 9
+              procesos; en un portátil, contad con entre 3 y 5 minutos.
+            </p>
+            <div class="note mine">
+              <span class="note-label">Qué quiere decir el ±</span>
+              <p>
+                Con 16 partidas por rival, un 72&nbsp;% ±20 quiere decir "algo entre el 52 y el 92&nbsp;%". Si una
+                versión nueva saca un 80&nbsp;% contra Voraz, no habéis demostrado nada: los intervalos se solapan casi
+                enteros. Contra AlfaBeta2, en cambio, pasar del 0 al 30&nbsp;% sí se ve. Para afinar más, más aperturas o
+                más tiempo, sabiendo que la pasada tarda más.
+              </p>
+            </div>
+            <h3 class="label">Un experimento antes de seguir: ¿por qué cortar?</h3>
+            <p>
+              El paso&nbsp;4 corta la simulación a 10 medias jugadas. Comprobad vosotros por qué. En la posición inicial y
+              con 0,9 segundos de búsqueda, estas son las iteraciones que salen según <code>profundidad</code>:
+            </p>
+<pre class="cuenta">profundidad 0       24 838 iteraciones   (sin simulación: evalúa el nodo nuevo y ya)
+profundidad 5        7 287
+profundidad 10       4 442
+profundidad 20       2 373
+profundidad 1000        93   (en la práctica, hasta el final de la partida)</pre>
+            <p>
+              Hasta el final salen 93 simulaciones para repartir entre 20 jugadas: menos de cinco por jugada, y casi
+              todas acaban en tablas. Meted dos versiones en <code>comparar.py</code>, una con
+              <code>MCTS(profundidad=1000)</code> y otra con la de siempre, y mirad la diferencia. Es la primera entrada
+              de vuestro diario.
+            </p>
+<pre><code>VERSIONES = {
+    <span class="s">"v0"</span>: <span class="k">lambda</span>: MCTS(),
+    <span class="s">"hasta-el-final"</span>: <span class="k">lambda</span>: MCTS(profundidad=<span class="n">1000</span>),
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="vuestro">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Vuestro MCTS</h2>
+        </div>
+        <p>
+          Hasta aquí todos los grupos tienen el mismo jugador. A partir de aquí empieza lo vuestro, que es lo que se
+          evalúa: qué le cambiáis, por qué, y si lo podéis demostrar con <code>comparar.py</code>.
+        </p>
+        <p>
+          Un dato para orientarse: en ajedrez, un MCTS con simulaciones al azar es <strong>flojo en táctica</strong>.
+          Hace la media de lo que pasa después de una jugada, y si de 30 respuestas posibles sólo una os come la dama, las
+          otras 29 tapan esa. AlfaBeta2 no comete ese error nunca: mira todas las respuestas y se queda con la peor. Casi
+          todas las ideas de abajo atacan ese problema desde un lado distinto.
+        </p>
+
+        <div class="step" id="paso8">
+          <span class="step-num">8</span>
+          <div class="step-body">
+            <h3 class="label">Ideas, de la más sencilla a la más difícil</h3>
+            <div class="table-scroll">
+              <table class="ancha" style="min-width:42rem">
+                <thead><tr><th scope="col">Idea</th><th scope="col">Qué problema ataca</th><th scope="col">Qué hay que tocar</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Ajustar c y la profundidad</strong></td>
+                    <td>Explora demasiado (o demasiado poco) y simula demasiado largo (o corto).</td>
+                    <td>Sólo los parámetros de <code>MCTS(…)</code>. Sirve para aprender a medir; no esperéis grandes saltos.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Vuestra evaluación</strong></td>
+                    <td>El material solo no sabe nada de ajedrez: un caballo en el centro vale lo mismo que en una esquina.</td>
+                    <td><code>recompensa</code>: tablas de posición por pieza, peones doblados o pasados, el rey protegido, la escala de la sigmoide. Aquí entra vuestro conocimiento de ajedrez.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Simulaciones con conocimiento</strong></td>
+                    <td>Al azar, nadie captura lo que está colgado, así que la simulación no castiga dejarse piezas.</td>
+                    <td><code>simular</code>: preferir capturas, y entre ellas la pieza más valiosa con el atacante más barato (se llama MVV-LVA). Más lenta por jugada, así que cortad antes.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mates en una al expandir</strong></td>
+                    <td>Una jugada que da mate puede tardar en probarse si hay 40 jugadas sin probar delante.</td>
+                    <td><code>expandir</code> o el constructor de <code>Nodo</code>: probar primero las jugadas que dan mate (o jaque, o capturan).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Respaldo minimax implícito</strong></td>
+                    <td>La media tapa la respuesta que os come la dama.</td>
+                    <td>Cada nodo guarda además un valor minimax con las evaluaciones de sus hijos, y la selección usa una mezcla de la media y ese valor.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Reutilizar el árbol</strong></td>
+                    <td>Cada jugada se empieza de cero, y se tira lo que se pensó en la anterior.</td>
+                    <td><code>elegir</code>: guardar la raíz en el objeto y, en la jugada siguiente, empezar desde el nieto que corresponda a lo que se jugó.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Gestionar el tiempo</strong></td>
+                    <td>Se piensa lo mismo con una sola jugada legal que en el momento clave de la partida.</td>
+                    <td><code>elegir</code>: contestar al momento si sólo hay una jugada, parar antes si una jugada ya tiene casi todas las visitas. El límite del concurso sigue siendo 1 segundo por jugada.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Para que sepáis por dónde van los tiros, esto es lo que medimos al preparar la práctica contra AlfaBeta2,
+              con las mismas 16 partidas de <code>comparar.py</code> y 0,3 segundos por jugada. Son pocas partidas, así que
+              tomadlo como orientación, con unos ±20 puntos de margen:
+            </p>
+<pre class="cuenta">la solución de esta guía                                     0 %
+simulación con capturas primero                           6 – 16 %
+minimax implícito + simulación con capturas              25 – 28 %
+respaldo minimax puro sobre evaluaciones, sin simular        59 %</pre>
+            <p>
+              La última es legítima. El jugador sigue siendo un MCTS mientras estén las cuatro fases: selección con UCB1,
+              expansión de un hijo por iteración, una evaluación del nodo nuevo (que puede ser una simulación de cero
+              jugadas) y retropropagación. Lo que cambia es qué se guarda al subir. Mezclar MCTS con evaluaciones y con
+              ideas de minimax es justo lo que hacen los programas más fuertes; los apuntes lo cuentan en
+              <a href="tema5/mejoras.html">Mejoras de MCTS</a>.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="label" id="versiones">Cómo organizar las versiones</h3>
+        <p>
+          Cada versión tiene que seguir existiendo cuando hagáis la siguiente, para poder medirlas una contra otra. Hay dos
+          formas cómodas. Si la diferencia es un número, un parámetro:
+        </p>
+<pre><code>VERSIONES = {
+    <span class="s">"v0"</span>: <span class="k">lambda</span>: MCTS(),
+    <span class="s">"v1"</span>: <span class="k">lambda</span>: MCTS(c=<span class="n">0.7</span>, profundidad=<span class="n">6</span>),
+}</code></pre>
+        <p>
+          Si cambia una fase, una clase nueva que hereda de <code>MCTS</code> y sólo redefine lo que cambia. Para eso
+          están los cuatro métodos de <code>MCTS</code> que llaman a las funciones de los pasos 2 a 5
+          (<code>self.seleccionar</code>, <code>self.expandir</code>, <code>self.simular</code> y
+          <code>self.retropropagar</code>): <code>elegir</code> usa los métodos, y la <code>v0</code> sigue igual:
+        </p>
+<pre><code><span class="k">class</span> MCTSCapturas(MCTS):
+    <span class="c">"""v2: simulación que prefiere capturas."""</span>
+
+    <span class="k">def</span> simular(self, tablero):
+        ...                               <span class="c"># vuestra versión</span></code></pre>
+        <p>
+          Y en <code>comparar.py</code>, <code>"v2": lambda: MCTSCapturas()</code>, con la clase importada arriba junto a
+          la otra: <code>from grupoYY.mcts import MCTS, MCTSCapturas</code>. Un <code>.py</code> por versión dentro de <code>grupoYY/</code> también vale, si os
+          resulta más claro.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Al poner vuestra letra</span>
+          <p>
+            Renombrad la carpeta <code>grupoYY</code> con vuestra letra cuando queráis, pero los cuatro programas de
+            fuera la importan por su nombre: <code>comprobar.py</code>, <code>ver_partida.py</code>,
+            <code>jugar_contra.py</code> y <code>comparar.py</code>. Con <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd>
+            (buscar y reemplazar en todos los ficheros) se cambian de una vez. Dentro del paquete, importad con un punto
+            (<code>from .mcts import MCTS</code>), y así no depende del nombre.
+          </p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Y a partir de aquí, el bucle de siempre</span>
+          <p>
+            Mirad partidas con <strong>Ver partida</strong> hasta encontrar algo que hace mal, escribid en el diario qué
+            es y qué vais a cambiar, haced una versión con ese cambio y medidla contra la anterior. Lo que se pide está
+            en <a href="../practicas/practica-5.html#como-trabajar">el enunciado</a>.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Práctica 5">
+        <a class="pager-prev" href="../practicas/practica-5.html"><span class="pager-l">El enunciado</span><span class="pager-t">Práctica 5</span></a>
+        <a class="pager-next" href="tema5/mcts.html"><span class="pager-l">Los apuntes</span><span class="pager-t">Monte Carlo Tree Search</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#proyecto">El proyecto de partida</a></li>
+            <li><a href="#python-chess">python-chess</a></li>
+            <li><a href="#nodo">La clase Nodo</a></li>
+            <li><a href="#pasos">Seis huecos</a></li>
+            <li><a href="#medir">Verlo jugar y medirlo</a></li>
+            <li><a href="#vuestro">Vuestro MCTS</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">Práctica 5</h2>
+          <ol>
+            <li><a href="../practicas/practica-5.html"><span>00</span>El enunciado</a></li>
+            <li><a href="mcts-paso-a-paso.html" aria-current="page"><span>01</span>MCTS paso a paso</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El tema</span>
+          <p style="margin:0">
+            <a href="tema5/index.html">Juegos por turnos</a> Minimax, MCTS, sus mejoras, información imperfecta y
+            bibliotecas.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

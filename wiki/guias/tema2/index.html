@@ -13,6 +13,7 @@
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
 <link rel="stylesheet" href="../../assets/css/ici.css">
 <script src="../../assets/js/tema.js"></script>
 </head>
@@ -200,7 +201,7 @@
           <li>En el motor de Ms.&nbsp;Pac-Man se disparan todas las reglas, cada una aserta un <code>ACTION</code>, y Java se queda con el de <code>priority</code> más alta. La memoria se vacía en cada turno: lo que haya que recordar lo guarda Java y lo aserta como un hecho.</li>
           <li>Jess 7.1 no es CLIPS en los detalles: no entiende <code>allowed-symbols</code> ni <code>range</code>, y no comprueba <code>type</code>.</li>
           <li>Un <strong>conjunto borroso</strong> asigna a cada valor un grado de pertenencia entre 0 y 1. Una variable lingüística es una magnitud con unas pocas palabras que la describen, y esas palabras tienen que cubrir todo el rango y solaparse.</li>
-          <li>AND es el mínimo, OR el máximo y NOT es 1&nbsp;−&nbsp;μ. La lógica clásica es el caso en que todo vale 0 o 1.</li>
+          <li>AND es el mínimo, OR el máximo y NOT es <!--tex 1 - \mu --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">1 - \mu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span><!--/tex-->. La lógica clásica es el caso en que todo vale 0 o 1.</li>
           <li><strong>Mamdani</strong> en cuatro pasos: difuminar, evaluar las reglas, recortar y agregar sus consecuentes, y desdifuminar. Las reglas borrosas no compiten: se mezclan.</li>
           <li>Un sistema borroso se depura mirando su <strong>curva de control</strong>. Las tres trampas son reglas que se contradicen, huecos sin reglas y un centro de gravedad que dice dónde pero no cuánto.</li>
           <li>En jFuzzyLogic, AND y OR se leen de izquierda a derecha, <code>ACCU</code> vale <code>SUM</code> si no se escribe, y <code>MM</code> está roto: paréntesis, <code>ACCU</code> siempre y <code>COG</code>.</li>
@@ -244,7 +245,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

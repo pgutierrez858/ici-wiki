@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>MCTS en la práctica · Tema 5 · ICI</title>
+<meta name="description" content="Dónde se usa MCTS (go, AlphaGo y AlphaZero, Total War, juegos de cartas), por qué en ajedrez con simulaciones al azar es flojo en táctica, con medidas, y las mejoras que lo arreglan: cortar y evaluar, simulaciones con conocimiento, la constante c, conocimiento previo, MCTS-Solver, minimax implícito explicado paso a paso, reutilizar el árbol y paralelizar.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 5</a>
+    <span aria-hidden="true">/</span>
+    <span>MCTS en la práctica</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 5 · 03 · Juegos por turnos</p>
+    <h1>
+      MCTS en la práctica
+      <span class="thin">El algoritmo de la página anterior cabe en cuarenta líneas. Hacer que juegue bien es otra cosa.</span>
+    </h1>
+    <p class="standfirst">
+      Dónde se usa MCTS de verdad, por qué en ajedrez la versión básica cae en trampas que un principiante ve, con números medidos, y el catálogo de mejoras que se le hacen: qué problema ataca cada una y lo que cuesta.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="donde" data-corto="Dónde se usa">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Dónde se usa</h2>
+        </div>
+        <ul>
+          <li>
+            <strong>Go.</strong> Es donde nació. Minimax no funcionaba porque nadie sabía escribir una función de
+            evaluación para el go. Hacia 2006 los primeros programas con MCTS, como Crazy Stone y MoGo, dieron un salto
+            enorme, y en pocos años ganaban partidas a profesionales en el tablero pequeño de 9×9.
+          </li>
+          <li>
+            <strong>AlphaGo y AlphaZero.</strong> En 2016 AlphaGo, de DeepMind, ganó 4 a 1 a Lee Sedol, uno de los mejores
+            jugadores del mundo. Era MCTS con dos redes neuronales: una que decía qué jugadas merecía la pena probar y otra
+            que estimaba quién iba ganando. En 2017, AlphaZero quitó del todo las simulaciones al azar: la red evalúa la
+            hoja y ese valor se retropropaga. Aprendió solo, jugando contra sí mismo, a jugar al go, al ajedrez y al shogi.
+            Leela Chess Zero (Lc0) y KataGo son programas libres que siguen esa receta. AlphaGo sólo perdió la cuarta
+            partida, por la jugada 78 de Lee Sedol (la primera imagen de abajo): según DeepMind, era una jugada con una
+            posibilidad entre 10&nbsp;000 de jugarse. Es el precio de explorar sobre todo lo que parece prometedor.
+          </li>
+          <li>
+            <strong>Total War: Rome II</strong> (Creative Assembly, 2013). La IA del mapa de campaña usa MCTS para
+            planificar parte de sus decisiones, un caso conocido de MCTS en un juego comercial que no es de tablero. Lo
+            contaron sus desarrolladores en la Game/AI Conference de 2014, y fue la primera vez que MCTS llegaba a un
+            juego de gran presupuesto.
+          </li>
+          <li>
+            <strong>Juegos de cartas.</strong> El <em>Spades</em> para móviles de AI Factory usa una variante de MCTS
+            para información oculta (ISMCTS, en la <a href="informacion-imperfecta.html">página 04</a>) desarrollada con
+            la Universidad de York, y se publicó cómo la ajustaron para que jugara de forma creíble y no sólo fuerte.
+            Magic: The Gathering y Hearthstone son bancos de pruebas habituales en la investigación.
+          </li>
+          <li>
+            <strong>Juego general.</strong> En las competiciones de <em lang="en">General Game Playing</em> el programa
+            recibe las reglas de un juego que no ha visto nunca y tiene que jugarlo bien. Como no hay tiempo de escribir
+            una evaluación para cada juego, MCTS, que sólo necesita las reglas, se convirtió en la técnica dominante.
+          </li>
+        </ul>
+        <div class="capturas">
+          <figure>
+            <figcaption>Lee Sedol contra AlphaGo, partida 4 · la jugada 78, marcada · Axd, CC BY-SA 4.0, Wikimedia Commons</figcaption>
+            <img class="shot" src="../../assets/img/mcts-alphago-jugada78.jpg" width="620" height="620" loading="lazy"
+                 alt="Tablero de go de la cuarta partida entre Lee Sedol y AlphaGo, con la piedra blanca de la jugada 78 numerada en el centro.">
+          </figure>
+          <figure>
+            <figcaption>KataGo analizando una posición: sobre cada jugada candidata, su porcentaje de victoria y sus visitas · Juscelk, CC BY-SA 4.0, Wikimedia Commons</figcaption>
+            <img class="shot" src="../../assets/img/mcts-katago-analisis.jpg" width="620" height="623" loading="lazy"
+                 alt="Tablero de go con el análisis de KataGo: zonas coloreadas según quién domina y, sobre varias intersecciones, dos números pequeños, un porcentaje y un número de visitas.">
+          </figure>
+          <figure>
+            <figcaption>Total War: Rome II · el mapa de campaña, donde decide su MCTS · Creative Assembly / SEGA, vía Steam</figcaption>
+            <img class="shot" src="../../assets/img/mcts-rome2-campana.jpg" width="900" height="506" loading="lazy"
+                 alt="Captura del mapa de campaña de Total War: Rome II: una costa con ciudades, ejércitos con estandartes y la barra de unidades de un ejército abajo.">
+          </figure>
+          <figure>
+            <figcaption>Spades de AI Factory, para móviles · la puja y una baza · AI Factory, vía aifactory.co.uk</figcaption>
+            <img class="shot" src="../../assets/img/mcts-spades-aifactory.jpg" width="349" height="260" loading="lazy" style="max-width:349px"
+                 alt="Dos pantallas del juego de cartas Spades de AI Factory: a la izquierda, la puja con los números del 1 al 13; a la derecha, una baza en la mesa con tres rivales alrededor.">
+          </figure>
+        </div>
+        <p>
+          El patrón es siempre el mismo: MCTS gana cuando hay muchas jugadas posibles, cuando no se sabe escribir una buena
+          evaluación, o cuando el juego cambia y no hay tiempo de afinar una. Donde ya hay una buena evaluación y mucha
+          táctica, como en ajedrez, la cosa es más complicada.
+        </p>
+      </section>
+
+      <section id="ajedrez" data-corto="MCTS y el ajedrez">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">MCTS y el ajedrez: medido</h2>
+        </div>
+        <p>
+          Primero, jugar hasta el final al azar en ajedrez es inútil: una partida al azar dura cientos de jugadas, acaba
+          casi siempre en tablas por falta de material, y su resultado no tiene nada que ver con la posición de la que salió.
+          Con el código de la práctica, en Python, salen unas <strong>90 iteraciones por segundo</strong> así. Cortando la
+          simulación a 10 medias jugadas y contando el material al final salen unas <strong>5&#8239;000</strong>, y además
+          cada simulación dice algo. Ese es el MCTS básico de la guía de la práctica.
+        </p>
+        <p>
+          Contra los rivales de referencia, con 0,3 segundos por jugada, desde 8 aperturas y con los dos colores (16 partidas
+          por rival):
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Versión</th><th scope="col">Aleatorio</th><th scope="col">Voraz</th><th scope="col">AlfaBeta2</th></tr></thead>
+            <tbody>
+              <tr><td>MCTS básico: UCB1, corte a 10 y material</td><td>100&nbsp;%</td><td>72&nbsp;%</td><td>0&nbsp;%</td></tr>
+              <tr><td>+ simulaciones que prefieren capturar</td><td></td><td></td><td>de 3 a 16&nbsp;%</td></tr>
+              <tr><td>+ minimax implícito y simulaciones que capturan</td><td></td><td></td><td>25 y 28&nbsp;%</td></tr>
+              <tr><td>Respaldo minimax puro sobre la evaluación, sin simulación</td><td></td><td></td><td>59&nbsp;%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          (Los porcentajes son puntos: victoria 1, tablas ½. Con 16 partidas, diferencias de diez puntos pueden ser suerte;
+          de 0 a 59, no.)
+        </p>
+        <p>
+          <code>AlfaBeta2</code> sólo mira dos medias jugadas, y aun así gana todas las partidas al MCTS básico. El motivo es
+          el fallo de Monte Carlo que visteis en la <a href="mcts.html#montecarlo">página anterior</a>: si dejáis una pieza
+          colgando, de las 35 respuestas del rival sólo una o dos la comen. En las simulaciones al azar, la mayoría de las
+          veces nadie la come, y la jugada sale con buena media. AlfaBeta2 mira las 35 respuestas y ve la que la come. En
+          ajedrez <strong>una sola jugada del rival lo cambia todo</strong> muy a menudo, y eso es justo lo que una media
+          esconde.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Lo que queda para la práctica</span>
+          <p>
+            El MCTS básico os va a salir en una tarde con la guía. Lo que queda es atacar este problema, y no hay una sola
+            respuesta: cada mejora de esta página es una idea que podéis probar, medir y quedaros o descartar. Las dos de abajo
+            de la tabla mezclan MCTS con minimax, y es lo que más ha funcionado; no son las únicas.
+          </p>
+        </div>
+      </section>
+
+      <section id="mandos" data-corto="Los mandos">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Los mandos: qué se elige y qué lo limita</h2>
+        </div>
+        <p>
+          Un MCTS tiene pocos parámetros, y casi todos responden a la misma pregunta: cómo gastar un presupuesto de tiempo
+          que no elegís vosotros. Por eso conviene empezar por el presupuesto, que es lo que de verdad decide el diseño.
+        </p>
+        <h3 class="label">El presupuesto: tiempo, no iteraciones</h3>
+        <p>
+          Lo que fija el juego es el <strong>tiempo por decisión</strong>:
+        </p>
+        <ul>
+          <li><strong>En la práctica</strong>, 1 segundo por jugada, y pasar de 1,5 pierde la partida. Por eso la plantilla
+            para al 90&nbsp;% del tiempo: el margen es para no pasarse.</li>
+          <li><strong>En un juego por turnos</strong>, el jugador espera unos segundos como mucho, y si hay varios rivales,
+            se los reparten entre todos.</li>
+          <li><strong>En tiempo real</strong>, a 60 fotogramas por segundo, cada fotograma dura <!--tex 1000 / 60 \approx 16,7 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1000</mn><mi mathvariant="normal">/</mi><mn>60</mn><mo>≈</mo><mn>16,7</mn></mrow><annotation encoding="application/x-tex">1000 / 60 \approx 16{,}7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1000/60</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">16</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">7</span></span></span></span><!--/tex-->
+            milisegundos, y la IA se lleva sólo una parte. Por eso MCTS se usa poco en tiempo real, y cuando se usa se
+            reparte la búsqueda entre varios fotogramas: como se puede parar en cualquier momento, sigue pensando en el
+            siguiente.</li>
+        </ul>
+        <p>
+          Las iteraciones son lo que cabe en ese tiempo. Con la plantilla, en Python, salen unas 5&#8239;000 por segundo en
+          ajedrez: 5&#8239;720 en la posición inicial y 4&#8239;712 en un medio juego. Todo lo que haga
+          más lenta una iteración se paga en iteraciones, y por eso cada decisión de abajo es un intercambio.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Qué se elige</th><th scope="col">Qué cambia</th><th scope="col">Lo que cuesta o lo limita</th></tr></thead>
+            <tbody>
+              <tr><td>Tiempo por jugada</td><td>Más iteraciones, mejor juego, cada vez con menos ganancia</td><td>Lo que deje el juego. En la práctica, 1&nbsp;s</td></tr>
+              <tr><td>Profundidad de la simulación</td><td>Cuánto mira cada simulación hacia delante</td><td>Cada media jugada más son iteraciones menos</td></tr>
+              <tr><td>Simulaciones por hoja</td><td>Menos ruido en el resultado de cada hoja</td><td>Cada simulación de más es una iteración menos: un árbol más pequeño</td></tr>
+              <tr><td>La constante <!--tex c --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span><!--/tex--></td><td>Árbol más ancho o más hondo</td><td>Depende de la escala de la recompensa; se mide</td></tr>
+              <tr><td>Cómo se simula</td><td>Lo que se parece la simulación a una partida de verdad</td><td>Cada jugada con criterio es más lenta que una al azar</td></tr>
+              <tr><td>La evaluación al cortar</td><td>Lo que dice una posición a medias</td><td>Lo que sepáis del juego, y lo que tarde en calcularse</td></tr>
+              <tr><td>Guardar el árbol entre jugadas</td><td>Trabajo de la jugada anterior que no se tira</td><td>Memoria, y algo de código</td></tr>
+              <tr><td>El tamaño del árbol</td><td>Hasta dónde puede crecer</td><td>Memoria: unos 3 o 4&nbsp;KB por nodo en Python</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Lo último no es un detalle. A unas 5&#8239;000 iteraciones por segundo, el árbol crece unos 5&#8239;000 nodos por
+          segundo, y a 3 o 4&nbsp;KB cada uno son de 15 a 20&nbsp;MB por cada segundo que se piensa. En un ordenador no importa
+          en un segundo, pero sí en un videojuego que piensa durante toda la partida, en una consola con la memoria contada o
+          en un móvil. Ahí se limita el número de nodos y, cuando se llega al límite, se dejan de crear o se borran los menos
+          visitados. El Spades de la sección 01 lleva desde 2013 una versión de MCTS con la memoria acotada, pensada justo
+          para un móvil.
+        </p>
+        <h3 class="label">La profundidad de la simulación, medida</h3>
+        <p>
+          La plantilla corta la simulación a 10 medias jugadas y evalúa con el material. Con otras profundidades, a
+          0,3&nbsp;segundos por jugada, contra Voraz, desde 8 aperturas y con los dos colores. Las iteraciones son las de
+          los 0,9&nbsp;s que busca, en la posición inicial; los puntos, en porcentaje, con ganadas-tablas-perdidas:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Profundidad</th><th scope="col">Iteraciones</th><th scope="col">Contra Voraz</th><th scope="col">G-T-P</th></tr></thead>
+            <tbody>
+              <tr><td>0</td><td>23&#8239;847</td><td>100&nbsp;%</td><td>16-0-0</td></tr>
+              <tr><td>2</td><td>13&#8239;746</td><td>100&nbsp;%</td><td>16-0-0</td></tr>
+              <tr><td>5</td><td>8&#8239;540</td><td>100&nbsp;%</td><td>16-0-0</td></tr>
+              <tr><td>10</td><td>4&#8239;966</td><td>91&nbsp;%</td><td>14-1-1</td></tr>
+              <tr><td>25</td><td>2&#8239;053</td><td>69&nbsp;%</td><td>10-2-4</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Contra Voraz, cortar pronto sale mejor que cortar a 10: con profundidad 0, 2 o 5 ganó las 16 partidas, y a 25
+          bajó al 69&nbsp;%. Cuanto más larga es la simulación, menos iteraciones caben, y más se aleja su resultado de la
+          posición de la que salió: veinte jugadas al azar cambian el material por casualidad. Con profundidad 0 no se
+          simula nada y cada hoja vale su evaluación, como hace AlphaZero con su red.
+        </p>
+        <p>
+          Pero contra AlfaBeta2, con las profundidades 0, 2, 5 y 10, los puntos se quedan entre el 0 y el 12&nbsp;%, todo
+          dentro del ruido. La profundidad no es lo que falla contra AlfaBeta2: falla la media, que es lo que ataca el
+          <a href="#minimax">minimax implícito</a>. Y una advertencia sobre las cifras: con 16 partidas, el margen es de unos
+          20 puntos. El 91&nbsp;% contra Voraz con profundidad 10 de esta tabla y el 72&nbsp;% de la tabla de la sección 02
+          son el mismo jugador medido dos veces.
+        </p>
+        <h3 class="label">El tiempo por jugada, medido</h3>
+        <p>
+          El mismo MCTS de la plantilla, con más o menos tiempo, contra Voraz. Las iteraciones son aproximadas, a unas
+          5&#8239;500 por segundo durante el 90&nbsp;% del tiempo:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Tiempo</th><th scope="col">Iteraciones</th><th scope="col">Contra Voraz</th><th scope="col">G-T-P</th></tr></thead>
+            <tbody>
+              <tr><td>0,05&nbsp;s</td><td>unas 250</td><td>59&nbsp;%</td><td>8-3-5</td></tr>
+              <tr><td>0,1&nbsp;s</td><td>unas 500</td><td>84&nbsp;%</td><td>13-1-2</td></tr>
+              <tr><td>0,3&nbsp;s</td><td>unas 1&#8239;500</td><td>91&nbsp;%</td><td>14-1-1</td></tr>
+              <tr><td>1&nbsp;s</td><td>unas 5&#8239;000</td><td>100&nbsp;%</td><td>16-0-0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Más tiempo es mejor juego, pero cada vez se gana menos: de 0,05 a 0,1&nbsp;s son 25 puntos más; de 0,3 a
+          1&nbsp;s, 9. Y el tiempo no arregla un fallo de diseño: si el jugador valora mal las posiciones con piezas
+          colgadas, con más simulaciones las sigue valorando mal, sólo que con más seguridad.
+        </p>
+        <h3 class="label">Varias simulaciones por hoja</h3>
+        <p>
+          Otra forma de gastar el tiempo: desde cada hoja nueva, 4 simulaciones en vez de una, y su media. Cada hoja da un
+          resultado menos ruidoso, pero el árbol crece cuatro veces más despacio. Contra Voraz, a 0,3&nbsp;s: con una
+          simulación por hoja, 91&nbsp;% (14-1-1); con cuatro, 94&nbsp;% (14-2-0). La diferencia cabe de sobra en el ruido. Es lo habitual: una simulación por hoja suele bastar, porque
+          el árbol ya hace la media al volver muchas veces a los nodos que importan.
+        </p>
+        <h3 class="label">Y en minimax</h3>
+        <p>
+          Minimax tiene menos mandos: la <strong>profundidad</strong>, el <strong>orden</strong> de las jugadas y la
+          <strong>evaluación</strong>. El problema es el reloj, porque el tiempo de una búsqueda a profundidad fija no se
+          sabe de antemano. Con el AlfaBeta de la práctica, en Python, en un medio juego con 37 jugadas legales:
+        </p>
+<!--TEX \begin{array}{lr}
+\text{AlfaBeta(1)} & 0,003\ \text{s} \\
+\text{AlfaBeta(2)} & 0,013\ \text{s} \\
+\text{AlfaBeta(3)} & 0,25\ \text{s} \\
+\text{AlfaBeta(4)} & 2,57\ \text{s}
+\end{array} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.16em" columnalign="left right" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>AlfaBeta(1)</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0,003</mn><mtext> s</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>AlfaBeta(2)</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0,013</mn><mtext> s</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>AlfaBeta(3)</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0,25</mn><mtext> s</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>AlfaBeta(4)</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>2,57</mn><mtext> s</mtext></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{array}{lr}
+\text{AlfaBeta(1)} &amp; 0{,}003\ \text{s} \\
+\text{AlfaBeta(2)} &amp; 0{,}013\ \text{s} \\
+\text{AlfaBeta(3)} &amp; 0{,}25\ \text{s} \\
+\text{AlfaBeta(4)} &amp; 2{,}57\ \text{s}
+\end{array}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:4.8em;vertical-align:-2.15em;"></span><span class="mord"><span class="mtable"><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(1)</span></span></span></span><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(2)</span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(3)</span></span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(4)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">003</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">013</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">25</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">57</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Cada media jugada más multiplica el tiempo, aquí entre 4 y 20 veces. A 1 segundo por jugada, <code>AlfaBeta(4)</code>
+          perdería las partidas por tiempo en el medio juego, aunque en la posición inicial tarde 0,66&nbsp;s. Por eso los
+          programas de verdad no buscan a profundidad fija, sino con <strong>profundización iterativa</strong>: buscan a
+          profundidad 1, luego a 2, luego a 3, hasta que se acaba el reloj, y juegan lo que dijo la última búsqueda
+          completa. Parece un desperdicio repetir los niveles de arriba, pero cuestan poco al lado del último, y cada
+          búsqueda deja ordenadas las jugadas para la siguiente, que así poda más. Es la forma de que minimax también tenga
+          una respuesta en cualquier momento, algo que MCTS trae de serie.
+        </p>
+      </section>
+
+      <section id="conocimiento" data-corto="Dónde entra el conocimiento">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Dónde entra lo que sabéis del juego</h2>
+        </div>
+        <p>
+          Que una dama vale 9, que capturar suele ser bueno, que el rey en el centro corre peligro: eso es una
+          <strong>heurística</strong>, una regla que acierta casi siempre pero no siempre. Es lo mismo que escribíais en
+          las máquinas de estados y en las reglas, sólo que aquí no decide la jugada: guía la búsqueda. Minimax y MCTS
+          tienen sitios concretos donde meterla, y en la plantilla cada uno es una función:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Para qué</th><th scope="col">En minimax</th><th scope="col">En MCTS</th><th scope="col">En la práctica</th></tr></thead>
+            <tbody>
+              <tr><td>Valorar una posición sin acabar la partida</td><td>La evaluación en las hojas del corte. Es casi todo lo que sabe.</td><td>Al cortar la simulación, o en lugar de simular (profundidad 0).</td><td><code>recompensa</code></td></tr>
+              <tr><td>Mirar antes lo prometedor</td><td>Ordenar las jugadas, capturas primero: más podas.</td><td>El orden en que se expanden las jugadas sin probar.</td><td><code>Nodo</code>, <code>expandir</code></td></tr>
+              <tr><td>Que lo que no se guarda se parezca a una partida</td><td>No hay: minimax no simula.</td><td>La política de simulación: capturar, dar jaque, no colgar piezas.</td><td><code>simular</code></td></tr>
+              <tr><td>Empezar con ventaja lo prometedor</td><td>No hace falta: lo mira todo hasta el corte.</td><td>Un sesgo en la selección, o visitas ficticias al crear el nodo (<a href="#seleccion">sección 06</a>).</td><td><code>ucb1</code>, <code>seleccionar</code></td></tr>
+              <tr><td>No fiarse del corte en una posición movida</td><td>Búsqueda de quietud: seguir con las capturas hasta que la posición se calma.</td><td>No cortar la simulación con capturas pendientes.</td><td><code>simular</code></td></tr>
+              <tr><td>Que una sola respuesta pese</td><td>Ya lo hace: es minimax.</td><td>El minimax implícito (<a href="#minimax">sección 08</a>) y los mates (MCTS-Solver).</td><td><code>retropropagar</code>, <code>seleccionar</code></td></tr>
+              <tr><td>No perder tiempo en lo absurdo</td><td>Podas heurísticas: no mirar ciertas jugadas.</td><td>No expandir ciertas jugadas.</td><td><code>Nodo</code>, <code>expandir</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Las dos búsquedas aguantan de forma distinta una heurística mala. <strong>Minimax se fía a ciegas</strong> de su
+          evaluación: si dice +1 después de comerse un peón envenenado, eso es lo que sube hasta la raíz. <strong>MCTS
+          promedia</strong> muchas simulaciones, así que aguanta mejor una evaluación con ruido, que unas veces se pasa y
+          otras se queda corta. Lo que no aguanta es una heurística con sesgo: si vuestra política de simulación no juega
+          nunca cierta jugada, o no expandís nunca otra, MCTS no puede aprender lo que valen. Por eso las simulaciones con
+          criterio se mezclan con algo de azar, y las podas heurísticas se usan con mucho cuidado.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Para vuestro diario</span>
+          <p>
+            Cada heurística cuesta tiempo en cada iteración, y el tiempo se paga en iteraciones. Una heurística que acierta
+            pero hace la simulación tres veces más lenta puede salir a cuenta o no: eso no se razona, se mide. Meted cada
+            idea por separado en <code>comparar.py</code>, como una versión más, y apuntad lo que da.
+          </p>
+        </div>
+      </section>
+
+      <section id="simulacion" data-corto="Mejorar la simulación">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Mejorar la simulación</h2>
+        </div>
+        <h3 class="label">Cortar y evaluar</h3>
+        <p>
+          En vez de jugar hasta el final, se juegan unas pocas medias jugadas al azar y la posición a la que se llega se
+          valora con una función de evaluación pasada a un número entre 0 y 1. Ataca dos problemas a la vez: cada simulación
+          cuesta menos (más iteraciones) y su resultado tiene que ver con la posición. En la práctica, el material se pasa a
+          [0,&nbsp;1] con una curva en forma de S (una sigmoide): con material igualado da 0,5, y cuanto más material de
+          ventaja, más se acerca a 1. La profundidad del corte es un parámetro que se mide: con 0 no se simula nada y se
+          evalúa la hoja directamente, como AlphaZero con su red.
+        </p>
+        <h3 class="label">Simulaciones con conocimiento</h3>
+        <p>
+          Al azar, las dos partes juegan fatal, y la simulación cuenta poco. Si las jugadas de la simulación se eligen con
+          algo de criterio (en inglés, <em lang="en">heavy playouts</em>), el resultado se parece más a lo que pasaría de
+          verdad. En ajedrez lo más directo es capturar cuando se puede, y capturar bien: primero la pieza más valiosa, y con
+          la pieza menos valiosa que pueda (se le llama MVV-LVA, <em lang="en">most valuable victim, least valuable
+          attacker</em>). Así, una pieza colgada se come en la simulación, que era el problema.
+        </p>
+        <p>
+          El precio: cada jugada de la simulación cuesta más, así que salen menos iteraciones. Y no hay que pasarse: una
+          simulación que juega siempre igual (la misma jugada en la misma posición) da siempre el mismo resultado y deja de
+          ser Monte Carlo. Lo normal es mezclar: con cierta probabilidad la jugada con criterio, y si no, al azar.
+        </p>
+      </section>
+
+      <section id="seleccion" data-corto="Mejorar la selección">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Mejorar la selección</h2>
+        </div>
+        <h3 class="label">La constante c</h3>
+        <p>
+          El <!--tex \sqrt{2} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mn>2</mn></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">2</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span></span></span></span><!--/tex--> es el valor teórico para premios entre 0 y 1, pero el bueno depende del juego y de lo que valga vuestra
+          recompensa. Con una c baja el árbol va más hondo por las líneas que ya parecen buenas; con una alta, más ancho. Probad
+          también valores por debajo de 1. Es lo primero que se ajusta, y lo más fácil de medir mal: probad pocos valores bien separados (0,3, 0,7, 1,4) y con muchas partidas.
+        </p>
+        <h3 class="label">Empezar sabiendo algo</h3>
+        <p>
+          Un hijo recién creado no sabe nada, y hasta que acumula visitas UCB1 lo trata igual que a los demás. Si tenéis una
+          idea previa de qué jugadas son prometedoras (capturas, jaques, desarrollar piezas), se le puede dar ventaja desde
+          el principio, de dos formas: sumando un término que pesa mucho con pocas visitas y se desvanece con muchas
+          (<em lang="en">progressive bias</em>), o empezando el nodo con visitas y victorias ficticias, como si ya se hubiera
+          probado unas cuantas veces. AlphaZero hace lo primero con lo que dice su red, en una variante de UCB1 llamada PUCT.
+        </p>
+      </section>
+
+      <section id="arbol" data-corto="Mejorar el árbol">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Mejorar lo que se guarda en el árbol</h2>
+        </div>
+        <h3 class="label">Ver los mates: MCTS-Solver</h3>
+        <p>
+          Si un hijo da mate, ese hijo vale 1 seguro, no "más o menos 1 después de muchas simulaciones". MCTS-Solver (Winands,
+          Björnsson y Saito, 2008) marca los nodos con resultado demostrado y lo sube por el árbol con reglas de minimax: un
+          nodo es ganado si algún hijo gana, y perdido si todos sus hijos pierden. Así, un mate en una o en dos se encuentra
+          enseguida y no se pierde por culpa de una media. La versión mínima ya ayuda: antes de buscar, mirar si alguna jugada
+          da mate.
+        </p>
+        <h3 class="label">Minimax implícito</h3>
+        <p>
+          Guardar en cada nodo, además de la media, lo que diría minimax con lo que ya hay en el árbol. Es la mejora que
+          más subió en las medidas de la sección 02, y tiene sección propia, la <a href="#minimax">siguiente</a>.
+        </p>
+        <h3 class="label">Reutilizar el árbol</h3>
+        <p>
+          Después de vuestra jugada y la del rival, la posición nueva ya estaba en el árbol, dos niveles más abajo, con sus
+          visitas. En vez de empezar de cero, se puede guardar el árbol y usar ese nodo como raíz nueva. Es trabajo gratis,
+          sobre todo si el rival hace la jugada que vuestro MCTS esperaba.
+        </p>
+      </section>
+
+      <section id="minimax" data-corto="Minimax implícito">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Minimax implícito: la media y el peor caso</h2>
+        </div>
+        <p>
+          En la sección 02 visteis el problema: dejáis la dama colgando, de las treinta respuestas del rival sólo una se la
+          come, y la media de las simulaciones no se entera. Esta mejora va a por eso. Es de Lanctot, Winands, Pepels y
+          Sturtevant (2014), y es la que más subió contra AlfaBeta2 en las medidas de esa sección.
+        </p>
+        <h3 class="label">Un ejemplo: la dama por un peón</h3>
+        <p>
+          Mueven blancas, y el árbol ya tiene tres hijos en la raíz: <strong>Dxb7</strong> (la dama se come un peón),
+          <strong>Cf3</strong> y <strong>h3</strong>. Debajo de Dxb7 están las respuestas de negras que ya se han probado:
+          <strong>Txb7</strong> (la torre se come la dama), Cc6 y a6. Las otras 27 están sin probar.
+        </p>
+        <p>
+          Dxb7 lleva 120 visitas y una media <!--tex W/N = 0,61 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi mathvariant="normal">/</mi><mi>N</mi><mo>=</mo><mn>0,61</mn></mrow><annotation encoding="application/x-tex">W/N = 0{,}61</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">61</span></span></span></span><!--/tex-->, la más alta de las tres. Esa media es la de las 120
+          partidas que han pasado por Dxb7, y casi todas se jugaron antes de que nadie probara Txb7, o en simulaciones
+          donde negras juegan al azar y no ven la captura. Txb7 entró en el árbol tarde y tiene pocas visitas, así que
+          apenas mueve la media. Para la selección, Dxb7 sigue siendo la mejor jugada.
+        </p>
+        <h3 class="label">Lo que guarda M</h3>
+        <p>
+          Cada nodo guarda un número más, <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex-->: lo que vale el nodo si se mira con minimax lo que ya hay en el árbol,
+          en vez de hacer la media. Igual que <!--tex W --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span><!--/tex-->, se cuenta desde quien hizo la jugada que lleva al nodo, y va
+          de 0 a 1. Se calcula con dos reglas:
+        </p>
+        <ol>
+          <li><strong>Un nodo sin hijos</strong>, recién creado: <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> es la evaluación de su posición, la misma
+            sigmoide de material que usáis al cortar la simulación, sin simular nada.</li>
+          <li><strong>Un nodo con hijos</strong>: sus hijos son jugadas del rival, y el rival elige la que más le
+            conviene, la de más <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex-->. Lo que es bueno para el rival es malo para quien hizo la jugada del nodo, así
+            que el nodo vale uno menos eso.</li>
+        </ol>
+<!--TEX M(\text{nodo}) \;=\; 1 - \max_{\text{hijo}} M(\text{hijo}) --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>M</mi><mo stretchy="false">(</mo><mtext>nodo</mtext><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><mn>1</mn><mo>−</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mtext>hijo</mtext></munder><mi>M</mi><mo stretchy="false">(</mo><mtext>hijo</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">M(\text{nodo}) \;=\; 1 - \max_{\text{hijo}} M(\text{hijo})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord text"><span class="mord">nodo</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.6382em;vertical-align:-0.8882em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.4306em;"><span style="top:-2.3479em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">hijo</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop">max</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8882em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord text"><span class="mord">hijo</span></span><span class="mclose">)</span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Es minimax escrito como en la práctica: cada nodo mira desde quien lo jugó, y por eso no hay que alternar
+          máximos y mínimos, basta el máximo con el <!--tex 1 - --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo></mrow><annotation encoding="application/x-tex">1 -</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord">−</span></span></span></span><!--/tex--> delante. Es la misma idea que el negamax de
+          <code>rivales.py</code>. Con el ejemplo, las tres respuestas de negras se valoran desde negras: con Txb7 ganan
+          la dama por un peón (8 de material), y con Cc6 o a6 siguen un peón por debajo.
+        </p>
+<!--TEX \begin{aligned}
+M(\text{Txb7}) &= \frac{1}{1 + e^{-8/3}} = 0,94 \\
+M(\text{Cc6}) &= M(\text{a6}) = \frac{1}{1 + e^{1/3}} = 0,42 \\[10pt]
+M(\text{Dxb7}) &= 1 - \max(0,94;\ 0,42;\ 0,42) \\
+&= 1 - 0,94 \\
+&= 0,06
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>M</mi><mo stretchy="false">(</mo><mtext>Txb7</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mn>8</mn><mi mathvariant="normal">/</mi><mn>3</mn></mrow></msup></mrow></mfrac><mo>=</mo><mn>0,94</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>M</mi><mo stretchy="false">(</mo><mtext>Cc6</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>M</mi><mo stretchy="false">(</mo><mtext>a6</mtext><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mn>3</mn></mrow></msup></mrow></mfrac><mo>=</mo><mn>0,42</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>M</mi><mo stretchy="false">(</mo><mtext>Dxb7</mtext><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn><mo>−</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0,94</mn><mo separator="true">;</mo><mtext> </mtext><mn>0,42</mn><mo separator="true">;</mo><mtext> </mtext><mn>0,42</mn><mo stretchy="false">)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1</mn><mo>−</mo><mn>0,94</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,06</mn></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+M(\text{Txb7}) &amp;= \frac{1}{1 + e^{-8/3}} = 0{,}94 \\
+M(\text{Cc6}) &amp;= M(\text{a6}) = \frac{1}{1 + e^{1/3}} = 0{,}42 \\[10pt]
+M(\text{Dxb7}) &amp;= 1 - \max(0{,}94;\ 0{,}42;\ 0{,}42) \\
+&amp;= 1 - 0{,}94 \\
+&amp;= 0{,}06
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:9.5902em;vertical-align:-4.5451em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:5.0451em;"><span style="top:-7.0451em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord text"><span class="mord">Txb7</span></span><span class="mclose">)</span></span></span><span style="top:-4.6363em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord text"><span class="mord">Cc6</span></span><span class="mclose">)</span></span></span><span style="top:-2.1363em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord text"><span class="mord">Dxb7</span></span><span class="mclose">)</span></span></span><span style="top:-0.6363em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span><span style="top:0.8637em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:4.5451em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:5.0451em;"><span style="top:-7.0451em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.296em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.814em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">8/3</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7873em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">94</span></span></span><span style="top:-4.6363em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord text"><span class="mord">a6</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.296em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.814em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1/3</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7873em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">42</span></span></span><span style="top:-2.1363em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mop">max</span><span class="mopen">(</span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">94</span><span class="mpunct">;</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">42</span><span class="mpunct">;</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">42</span><span class="mclose">)</span></span></span><span style="top:-0.6363em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">94</span></span></span><span style="top:0.8637em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">06</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:4.5451em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          La media dice 0,61; el peor caso, 0,06. En Cf3 y h3 las respuestas dejan el material igualado, la mejor para
+          negras vale 0,50, y <!--tex M = 1 - 0,50 = 0,50 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>=</mo><mn>1</mn><mo>−</mo><mn>0,50</mn><mo>=</mo><mn>0,50</mn></mrow><annotation encoding="application/x-tex">M = 1 - 0{,}50 = 0{,}50</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">50</span></span></span></span><!--/tex-->. Fijaos en que <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> sólo ve lo que está en el árbol: si
+          Txb7 todavía no se hubiera probado, <!--tex M(\text{Dxb7}) --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo stretchy="false">(</mo><mtext>Dxb7</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">M(\text{Dxb7})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord text"><span class="mord">Dxb7</span></span><span class="mclose">)</span></span></span></span><!--/tex--> sería <!--tex 1 - 0,42 = 0,58 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mn>0,42</mn><mo>=</mo><mn>0,58</mn></mrow><annotation encoding="application/x-tex">1 - 0{,}42 = 0{,}58</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">42</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">58</span></span></span></span><!--/tex-->, y tampoco vería la
+          trampa.
+        </p>
+        <p>
+          <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> se actualiza al retropropagar. Mientras subís por el camino sumando <!--tex N --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><!--/tex--> y <!--tex W --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span><!--/tex-->, recalculáis
+          también el <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> de cada nodo con la regla 2. Sólo cambian los nodos del camino, así que cuesta poco:
+        </p>
+        <pre class="pseudo">al expandir:      <span class="var">hijo</span>.M = la evaluación de la posición del hijo, vista por su color
+al retropropagar: para cada <span class="var">nodo</span> del camino, de abajo arriba:
+                      N += 1  y  W += el resultado visto por su color
+                      <b>si</b> tiene hijos:  <span class="var">nodo</span>.M = 1 − el mayor M de sus hijos</pre>
+        <h3 class="label">La mezcla, en la selección</h3>
+        <p>
+          La selección no usa <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> a secas, sino una mezcla con la media. Llamamos <!--tex \lambda --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span><!--/tex--> (lambda) al peso
+          de <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> en la mezcla, entre 0 y 1. En el artículo original se llama <!--tex \alpha --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span></span></span></span><!--/tex-->, pero aquí
+          <!--tex \alpha --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span></span></span></span><!--/tex--> ya es la cota de <a href="juegos.html#alfabeta">alfa-beta</a>. La parte de explorar de UCB1 no
+          cambia:
+        </p>
+<!--TEX \begin{aligned}
+\text{valor} &= (1 - \lambda) \cdot \frac{W}{N} + \lambda \cdot M \\[6pt]
+\mathrm{UCB1} &= \text{valor} + c\,\sqrt{\frac{\ln N_{\text{padre}}}{N}}
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>valor</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><mo>⋅</mo><mfrac><mi>W</mi><mi>N</mi></mfrac><mo>+</mo><mi>λ</mi><mo>⋅</mo><mi>M</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">U</mi><mi mathvariant="normal">C</mi><mi mathvariant="normal">B</mi><mn>1</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mtext>valor</mtext><mo>+</mo><mi>c</mi><mtext> </mtext><msqrt><mfrac><mrow><mi>ln</mi><mo>⁡</mo><msub><mi>N</mi><mtext>padre</mtext></msub></mrow><mi>N</mi></mfrac></msqrt></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+\text{valor} &amp;= (1 - \lambda) \cdot \frac{W}{N} + \lambda \cdot M \\[6pt]
+\mathrm{UCB1} &amp;= \text{valor} + c\,\sqrt{\frac{\ln N_{\text{padre}}}{N}}
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:5.0603em;vertical-align:-2.2802em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.7802em;"><span style="top:-5.0964em;"><span class="pstrut" style="height:3.6766em;"></span><span class="mord"><span class="mord text"><span class="mord">valor</span></span></span></span><span style="top:-2.1598em;"><span class="pstrut" style="height:3.6766em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">UCB1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.2802em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.7802em;"><span style="top:-5.0964em;"><span class="pstrut" style="height:3.6766em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">λ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span><span style="top:-2.1598em;"><span class="pstrut" style="height:3.6766em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">valor</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6766em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">padre</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.6366em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478
+c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514
+c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20
+s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121
+s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081
+l0 -0c4,-6.7,10,-10,18,-10 H400000
+v40H1014.6
+s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185
+c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2z M1001 80
+h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7634em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.2802em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Con el ejemplo, mirando sólo el valor, con <!--tex \lambda = 0 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span><!--/tex--> y con <!--tex \lambda = 0,5 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0,5</mn></mrow><annotation encoding="application/x-tex">\lambda = 0{,}5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">5</span></span></span></span><!--/tex-->:
+        </p>
+<!--TEX \begin{array}{ll}
+\lambda = 0: & \text{Dxb7: } 0,61 \qquad \text{Cf3: } 0,54 \qquad \text{h3: } 0,50 \;\Rightarrow\; \text{Dxb7} \\[12pt]
+\lambda = 0,5: & \text{Dxb7: } 0,5 \cdot 0,61 + 0,5 \cdot 0,06 = 0,305 + 0,03 = 0,335 \\
+& \text{Cf3: } 0,5 \cdot 0,54 + 0,5 \cdot 0,50 = 0,27 + 0,25 = 0,52 \\
+& \text{h3: } 0,5 \cdot 0,50 + 0,5 \cdot 0,50 = 0,25 + 0,25 = 0,50 \;\Rightarrow\; \text{Cf3}
+\end{array} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.16em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>λ</mi><mo>=</mo><mn>0</mn><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>Dxb7: </mtext><mn>0,61</mn><mspace width="2em"/><mtext>Cf3: </mtext><mn>0,54</mn><mspace width="2em"/><mtext>h3: </mtext><mn>0,50</mn><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mtext>Dxb7</mtext></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>λ</mi><mo>=</mo><mn>0,5</mn><mo>:</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>Dxb7: </mtext><mn>0,5</mn><mo>⋅</mo><mn>0,61</mn><mo>+</mo><mn>0,5</mn><mo>⋅</mo><mn>0,06</mn><mo>=</mo><mn>0,305</mn><mo>+</mo><mn>0,03</mn><mo>=</mo><mn>0,335</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>Cf3: </mtext><mn>0,5</mn><mo>⋅</mo><mn>0,54</mn><mo>+</mo><mn>0,5</mn><mo>⋅</mo><mn>0,50</mn><mo>=</mo><mn>0,27</mn><mo>+</mo><mn>0,25</mn><mo>=</mo><mn>0,52</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mtext>h3: </mtext><mn>0,5</mn><mo>⋅</mo><mn>0,50</mn><mo>+</mo><mn>0,5</mn><mo>⋅</mo><mn>0,50</mn><mo>=</mo><mn>0,25</mn><mo>+</mo><mn>0,25</mn><mo>=</mo><mn>0,50</mn><mtext>  </mtext><mo>⇒</mo><mtext>  </mtext><mtext>Cf3</mtext></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{array}{ll}
+\lambda = 0: &amp; \text{Dxb7: } 0{,}61 \qquad \text{Cf3: } 0{,}54 \qquad \text{h3: } 0{,}50 \;\Rightarrow\; \text{Dxb7} \\[12pt]
+\lambda = 0{,}5: &amp; \text{Dxb7: } 0{,}5 \cdot 0{,}61 + 0{,}5 \cdot 0{,}06 = 0{,}305 + 0{,}03 = 0{,}335 \\
+&amp; \text{Cf3: } 0{,}5 \cdot 0{,}54 + 0{,}5 \cdot 0{,}50 = 0{,}27 + 0{,}25 = 0{,}52 \\
+&amp; \text{h3: } 0{,}5 \cdot 0{,}50 + 0{,}5 \cdot 0{,}50 = 0{,}25 + 0{,}25 = 0{,}50 \;\Rightarrow\; \text{Cf3}
+\end{array}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:6em;vertical-align:-2.75em;"></span><span class="mord"><span class="mtable"><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.25em;"><span style="top:-5.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"></span></span><span style="top:-0.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.75em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.25em;"><span style="top:-5.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Dxb7: </span></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">61</span><span class="mspace" style="margin-right:2em;"></span><span class="mord text"><span class="mord">Cf3: </span></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">54</span><span class="mspace" style="margin-right:2em;"></span><span class="mord text"><span class="mord">h3: </span></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">Dxb7</span></span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Dxb7: </span></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">61</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">06</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">305</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">03</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">335</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Cf3: </span></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">54</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">27</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">25</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">52</span></span></span><span style="top:-0.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">h3: </span></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">25</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">25</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">Cf3</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.75em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span></span></span></span></span></span></span></div><!--/TEX-->
+        <div class="demo" data-mcts="minimax">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>La media, el peor caso y el peso que los mezcla</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Es el árbol de arriba con un deslizador para el peso λ: con λ = 0 la selección baja por Dxb7, y a partir de λ = 0,15 baja por Cf3.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <ul>
+            <li>Subid <!--tex \lambda --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span><!--/tex--> poco a poco. ¿A partir de qué valor deja la selección de bajar por Dxb7? Hace falta
+              muy poco peso, porque la diferencia entre 0,61 y 0,06 es enorme.</li>
+            <li>Pasad Txb7 a <strong>Todavía sin probar</strong>. Con cualquier <!--tex \lambda --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span><!--/tex-->, Dxb7 vuelve a parecer
+              buena: el peor caso sólo cuenta lo que ya está en el árbol.</li>
+          </ul>
+        </div>
+        <h3 class="label">Qué peso elegir</h3>
+        <p>
+          Con <!--tex \lambda = 0 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span><!--/tex--> es el MCTS de siempre. Con <!--tex \lambda = 1 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span><!--/tex--> el árbol se recorre como MCTS pero se
+          valora como minimax, con la evaluación en las hojas: si además la simulación tiene profundidad 0, no se simula
+          nada, y es el <em>respaldo minimax puro</em> de la tabla de la sección 02, el que llegó al 59&nbsp;% contra
+          AlfaBeta2. Lo de en medio mezcla las dos cosas. Como <!--tex c --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span><!--/tex-->, <!--tex \lambda --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span><!--/tex--> se mide: probad pocos valores
+          bien separados (0,3, 0,6, 0,9) con <code>comparar.py</code>.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Lo que no arregla</span>
+          <ul>
+            <li><!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> es tan bueno como la evaluación. Con sólo material, el efecto horizonte vuelve: si la captura
+              está un nivel por debajo de lo que ha crecido el árbol, <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> no la ve.</li>
+            <li>Una respuesta sin probar no cuenta. Si probáis antes las capturas al expandir (la sección 04 y las ideas de la
+              <a href="../mcts-paso-a-paso.html#vuestro">guía</a>), las respuestas peligrosas entran pronto en el árbol y <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> las ve antes.</li>
+            <li>Al final se sigue devolviendo la jugada más visitada. <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> cambia qué se visita, no cómo se elige.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="iteraciones" data-corto="Más iteraciones">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">Más iteraciones en el mismo tiempo</h2>
+        </div>
+        <p>
+          MCTS mejora con las iteraciones, así que todo lo que las abarate cuenta. En Python lo caro suele ser copiar
+          tableros, generar jugadas legales y comprobar si la partida ha terminado. Medid antes de optimizar: el panel de la
+          ventana de la práctica dice cuántas iteraciones hace cada jugada.
+        </p>
+        <p>
+          La otra vía es <strong>paralelizar</strong>. Lo más sencillo es la paralelización en la raíz: varios procesos
+          construyen cada uno su árbol desde la misma posición, y al final se suman las visitas de cada jugada. En Python
+          tienen que ser procesos (<code>multiprocessing</code>) y no hilos, porque los hilos no ejecutan código Python a la
+          vez. En la práctica no se usa: el <a href="../../practicas/practica-5.html">enunciado</a> pide un jugador sin hilos
+          ni procesos, porque en el concurso se juegan muchas partidas a la vez en la misma máquina y cada jugador tiene que
+          pensar con un solo núcleo, en igualdad de condiciones.
+        </p>
+      </section>
+
+      <section id="resumen" data-corto="Resumen">
+        <div class="sec-head">
+          <span class="num">10</span>
+          <h2 class="sec">Las mejoras, de un vistazo</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Mejora</th><th scope="col">Qué problema ataca</th><th scope="col">Lo que cuesta</th></tr></thead>
+            <tbody>
+              <tr><td>Cortar y evaluar</td><td>Simulaciones largas que no dicen nada</td><td>Escribir una evaluación</td></tr>
+              <tr><td>Simulaciones con conocimiento</td><td>Piezas colgadas que nadie come al azar</td><td>Menos iteraciones</td></tr>
+              <tr><td>Ajustar c</td><td>Demasiado ancho o demasiado estrecho</td><td>Muchas partidas para medirlo</td></tr>
+              <tr><td>Conocimiento previo</td><td>Jugadas buenas que tardan en probarse</td><td>Un criterio de qué es prometedor</td></tr>
+              <tr><td>MCTS-Solver, mates</td><td>Mates que se diluyen en una media</td><td>Algo de lógica en la retropropagación</td></tr>
+              <tr><td>Minimax implícito</td><td>Una sola respuesta del rival que lo cambia todo</td><td>Un valor más por nodo, y elegir λ</td></tr>
+              <tr><td>Reutilizar el árbol</td><td>Tirar el trabajo de la jugada anterior</td><td>Guardar estado entre jugadas</td></tr>
+              <tr><td>Optimizar y paralelizar</td><td>Pocas iteraciones</td><td>Código más difícil de leer</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">En la práctica</span>
+          <p>
+            La <a href="../mcts-paso-a-paso.html">guía paso a paso</a> os lleva hasta el MCTS básico. A partir de ahí, cada
+            mejora es una versión nueva que se mide contra la anterior con los mismos rivales, como en las prácticas de antes.
+            Una mejora que en teoría ayuda y en vuestras medidas no, se descarta, y eso también se cuenta en el diario.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 5">
+        <a class="pager-prev" href="mcts.html"><span class="pager-l">Anterior</span><span class="pager-t">Monte Carlo Tree Search</span></a>
+        <a class="pager-next" href="informacion-imperfecta.html"><span class="pager-l">Siguiente</span><span class="pager-t">Azar e información oculta</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#donde">Dónde se usa</a></li>
+            <li><a href="#ajedrez">MCTS y el ajedrez</a></li>
+            <li><a href="#simulacion">Mejorar la simulación</a></li>
+            <li><a href="#seleccion">Mejorar la selección</a></li>
+            <li><a href="#arbol">Mejorar el árbol</a></li>
+            <li><a href="#iteraciones">Más iteraciones</a></li>
+            <li><a href="#resumen">Resumen</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 5</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="juegos.html"><span>01</span>Juegos por turnos</a></li>
+            <li><a href="mcts.html"><span>02</span>Monte Carlo Tree Search</a></li>
+            <li><a href="mejoras.html" aria-current="page"><span>03</span>MCTS en la práctica</a></li>
+            <li><a href="informacion-imperfecta.html"><span>04</span>Azar e información oculta</a></li>
+            <li><a href="librerias.html"><span>05</span>Librerías</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/mcts.js" defer></script>
+</body>
+</html>

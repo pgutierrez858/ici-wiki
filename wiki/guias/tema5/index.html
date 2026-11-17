@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Tema 5 · Juegos por turnos · ICI</title>
+<meta name="description" content="Tema 5 de ICI: juegos por turnos. El árbol de juego, minimax y alfa-beta, Monte Carlo Tree Search con UCB1 y sus cuatro fases, sus mejoras en ajedrez, azar e información oculta (determinizar e ISMCTS) y librerías, con ejemplos interactivos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span>Tema 5</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Juegos por turnos
+      <span class="thin">Simular el futuro en vez de describir el presente.</span>
+    </h1>
+    <p class="standfirst">
+      Los apuntes del tema&nbsp;5, en cinco páginas cortas. Hasta ahora la decisión la escribíais vosotros; aquí el programa
+      la busca, probando jugadas y mirando cómo acaban. El centro del tema es Monte Carlo Tree Search, el algoritmo de la
+      Práctica&nbsp;5, que se programa en Python sobre ajedrez.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Tema</dt>
+      <dd>05<small>Juegos por turnos</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Práctica asociada</dt>
+      <dd><a href="../../practicas/practica-5.html">Práctica 5</a><small>MCTS en ajedrez, en Python</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Antes de leer</dt>
+      <dd>Nada nuevo<small>Basta con saber qué es un árbol</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="paginas" data-corto="Las páginas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Las páginas</h2>
+        </div>
+        <p>
+          Van en orden. Las dos primeras son lo que hay que saber para la práctica; la tercera, lo que os hará falta para
+          mejorarla; las dos últimas, para ir más allá.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="juegos.html">
+              <span class="lt">01 · Juegos por turnos<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 7 secciones</span>
+              <span class="ld">Describir el presente o simular el futuro, el árbol de juego y cuánto crece (del tres en raya al go), minimax, la poda alfa-beta, y su límite: la función de evaluación.</span>
+            </a>
+          </li>
+          <li>
+            <a href="mcts.html">
+              <span class="lt">02 · Monte Carlo Tree Search<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplos interactivos</span>
+              <span class="ld">Jugar al azar para valorar una jugada, el bandido multibrazo y UCB1, las cuatro fases paso a paso en un tres en raya, quién gana en cada nodo, qué jugada se elige, y un Conecta&nbsp;4 contra MCTS.</span>
+            </a>
+          </li>
+          <li>
+            <a href="mejoras.html">
+              <span class="lt">03 · MCTS en la práctica<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · Práctica 5</span>
+              <span class="ld">Dónde se usa (de AlphaGo a Total War), por qué en ajedrez la versión básica cae en trampas, con medidas, y el catálogo de mejoras: qué ataca cada una y lo que cuesta.</span>
+            </a>
+          </li>
+          <li>
+            <a href="informacion-imperfecta.html">
+              <span class="lt">04 · Azar e información oculta<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplo interactivo</span>
+              <span class="ld">Nodos de azar y expectimax, determinizar las cartas que no se ven, sus dos trampas, ISMCTS, y por qué el póker necesita otra cosa.</span>
+            </a>
+          </li>
+          <li>
+            <a href="librerias.html">
+              <span class="lt">05 · Librerías<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con código</span>
+              <span class="ld">python-chess a fondo (y Stockfish para analizar), OpenSpiel, PettingZoo, Ludii, Lc0 y KataGo, y por qué el MCTS de la práctica lo escribís vosotros.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="resumen" data-corto="Lo que hay que llevarse">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Lo que hay que llevarse</h2>
+        </div>
+        <ol>
+          <li>En un juego por turnos con reglas conocidas se puede <strong>buscar</strong>: probar jugadas, imaginar las respuestas y elegir mirando cómo acaban. Nadie escribe la decisión; el programa la encuentra.</li>
+          <li>El árbol de juego crece como <!--tex b^d --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>b</mi><mi>d</mi></msup></mrow><annotation encoding="application/x-tex">b^d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span></span></span></span></span></span></span></span><!--/tex-->: unas <!--tex 10^{123} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>123</mn></msup></mrow><annotation encoding="application/x-tex">10^{123}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">123</span></span></span></span></span></span></span></span></span></span></span></span><!--/tex--> partidas en ajedrez. Ningún método lo recorre entero; todos deciden qué trozo mirar.</li>
+          <li><strong>Minimax</strong> supone que el rival juega bien: MAX se queda con el máximo de sus hijos y MIN con el mínimo. <strong>Alfa-beta</strong> poda lo que ya no puede cambiar la decisión.</li>
+          <li>Minimax tiene que cortar, y detrás del corte sólo sabe lo que diga la <strong>función de evaluación</strong>. Si no se sabe escribir, como en go, no sirve.</li>
+          <li><strong>MCTS</strong> valora jugando: en cada iteración <strong>selecciona</strong> con UCB1, <strong>expande</strong> un nodo, <strong>simula</strong> una partida y <strong>retropropaga</strong> el resultado. Más tiempo es mejor juego.</li>
+          <li><strong>UCB1</strong> reparte los intentos entre explotar lo que va bien y explorar lo poco probado: media más <!--tex c --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span><!--/tex--> por la raíz de <!--tex \ln n --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ln</mi><mo>⁡</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\ln n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span><!--/tex--> entre <!--tex n_i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">n_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex-->.</li>
+          <li>Cada nodo cuenta las victorias <strong>del jugador que hizo la jugada que lleva a él</strong>. Sumar siempre las de un mismo color es el error típico. Al final se juega el hijo <strong>más visitado</strong>.</li>
+          <li>En ajedrez, con simulaciones al azar, MCTS no ve las trampas tácticas: una media esconde la única respuesta que lo cambia todo. Cortar y evaluar, simular con criterio, buscar mates y mezclar con minimax son las mejoras.</li>
+          <li>Con <strong>dados</strong>, nodos de azar con la media pesada. Con <strong>cartas escondidas</strong>, determinizar (inventarse lo que no se ve), con cuidado con la fusión de estrategias, que ISMCTS arregla.</li>
+        </ol>
+        <div class="note mine">
+          <span class="note-label">Y en la práctica</span>
+          <p>
+            La <a href="../mcts-paso-a-paso.html">guía paso a paso</a> lleva del tablero vacío a un MCTS que gana a un rival
+            al azar, en Python y con Visual Studio Code. Lo demás, que vuestro MCTS gane a algo más, es cosa vuestra.
+          </p>
+        </div>
+      </section>
+
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#paginas">Las páginas</a></li>
+            <li><a href="#resumen">Lo que hay que llevarse</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 5</h2>
+          <ol>
+            <li><a href="index.html" aria-current="page"><span>00</span>Índice del tema</a></li>
+            <li><a href="juegos.html"><span>01</span>Juegos por turnos</a></li>
+            <li><a href="mcts.html"><span>02</span>Monte Carlo Tree Search</a></li>
+            <li><a href="mejoras.html"><span>03</span>MCTS en la práctica</a></li>
+            <li><a href="informacion-imperfecta.html"><span>04</span>Azar e información oculta</a></li>
+            <li><a href="librerias.html"><span>05</span>Librerías</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

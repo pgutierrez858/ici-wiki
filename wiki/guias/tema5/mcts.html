@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Monte Carlo Tree Search · Tema 5 · ICI</title>
+<meta name="description" content="Monte Carlo Tree Search desde cero: jugar partidas al azar para valorar una jugada, el bandido multibrazo y UCB1, las cuatro fases (selección, expansión, simulación y retropropagación), desde qué jugador se cuenta cada nodo, qué jugada se elige al final, con ejemplos interactivos y un Conecta 4 contra MCTS.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 5</a>
+    <span aria-hidden="true">/</span>
+    <span>Monte Carlo Tree Search</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 5 · 02 · Juegos por turnos</p>
+    <h1>
+      Monte Carlo Tree Search
+      <span class="thin">Valorar una jugada jugando, muchas veces y sin pensar, y dejar que el árbol crezca hacia donde merece la pena.</span>
+    </h1>
+    <p class="standfirst">
+      La idea de Monte Carlo, el problema de repartir intentos entre opciones que no conocéis (el bandido multibrazo) y su solución, UCB1; cómo se convierte eso en un árbol con las cuatro fases de MCTS, el error típico al contar quién gana, qué jugada se elige al final, y por qué el árbol crece torcido a propósito.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        En la <a href="juegos.html">página anterior</a> el problema quedó así: minimax necesita una función que diga cómo
+        de buena es una posición, y en muchos juegos nadie sabe escribirla. <strong>Monte Carlo Tree Search</strong>
+        (MCTS) la sustituye por algo que cualquiera puede hacer sin saber nada del juego: <strong>jugar la partida hasta
+        el final, al azar, y mirar quién gana</strong>. Una partida al azar no dice casi nada, pero la media de miles
+        de ellas, bien repartidas, sí.
+      </p>
+
+      <section id="montecarlo" data-corto="Jugar al azar">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Valorar una jugada jugando al azar</h2>
+        </div>
+        <p>
+          "Monte Carlo" es el nombre que se da a cualquier método que estima algo repitiendo un experimento aleatorio
+          muchas veces (por el casino, claro). Aplicado a un juego, la versión más sencilla, a la que se llama
+          <strong>Monte Carlo plano</strong>, es esta:
+        </p>
+        <pre class="pseudo"><b>para cada</b> jugada legal <span class="var">j</span>:
+    <b>repetir</b> muchas veces: hacer <span class="var">j</span> y jugar el resto de la partida al azar, los dos jugadores
+    <span class="var">valor(j)</span> = la media de los resultados (gana 1, tablas 0,5, pierde 0)
+jugar la <span class="var">j</span> de mayor valor</pre>
+        <p>
+          No necesita ninguna función de evaluación: sólo las reglas. Y funciona mejor de lo que parece, porque una jugada
+          que deja una posición fuerte gana más partidas al azar que una que deja una posición débil. En la posición del
+          ejemplo interactivo de más abajo (mueve O y X amenaza la diagonal), con 20&#8239;000 partidas al azar por jugada,
+          tapar la diagonal sale con un 0,49 y la mejor de las otras con un 0,34. Acierta.
+        </p>
+        <p>
+          Pero tiene dos fallos de fondo:
+        </p>
+        <ul>
+          <li><strong>Supone que el rival juega al azar.</strong> Imaginad una jugada después de la cual el rival tiene
+            diez respuestas: nueve pierden y una gana. Al azar, el rival encuentra la buena una vez de cada diez, así que
+            la jugada sale con un 0,9. Pero un rival de verdad la encuentra siempre, y esa jugada pierde.</li>
+          <li><strong>Gasta lo mismo en todas las jugadas</strong>, también en las que a las cien partidas ya se ve que
+            son malas.</li>
+        </ul>
+        <p>
+          MCTS arregla las dos cosas con la misma idea: <strong>repartir las partidas con cabeza</strong>, dando más a las
+          jugadas que prometen, y <strong>guardar un árbol</strong> para que, en las posiciones que se repiten, el rival
+          también aprenda a elegir. Lo primero es un problema con nombre propio.
+        </p>
+      </section>
+
+      <section id="bandido" data-corto="El bandido y UCB1">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">El bandido multibrazo: explorar o explotar</h2>
+        </div>
+        <p>
+          Estáis en un casino delante de cuatro tragaperras (en inglés, <em lang="en">one-armed bandits</em>, bandidos de
+          un brazo). Cada una da premio con una probabilidad distinta que no conocéis, y tenéis cien monedas. ¿De cuál
+          tiráis? Si os quedáis con la primera que os dé premio, puede que haya otra mejor que no habéis probado lo
+          suficiente. Si probáis todas por igual, gastáis monedas en las malas. Es el dilema entre
+          <strong>explotar</strong> lo que ya parece bueno y <strong>explorar</strong> lo que todavía no conocéis.
+        </p>
+        <div class="demo" data-mcts="bandido">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Cuatro tragaperras: tirad vosotros, y después que tire UCB1</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Son cuatro máquinas con probabilidades de premio de 0,35, 0,6, 0,5 y 0,25, y la fórmula de UCB1 está justo debajo.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <ul>
+            <li>Tirad unas veinte veces sin mirar nada más. ¿Cuál creéis que es la mejor? ¿Cuántas tiradas os ha costado
+              decidirlo? Después, <strong>Revelar probabilidades</strong>.</li>
+            <li>Con <strong>Mostrar</strong> en UCB1, la barra azul es la media y la amarilla, lo que UCB1 le suma por haberla
+              probado poco. Pulsad <strong>UCB1 elige una</strong> varias veces: ¿adivináis cuál va a elegir antes de
+              pulsar?</li>
+            <li>Con <strong>c</strong> a 0, UCB1 se queda con la primera máquina que vaya bien y no vuelve a mirar las
+              demás. Con c a 3, reparte casi por igual. <strong>Que juegue UCB1 (100 tiradas)</strong> compara su total con
+              el vuestro.</li>
+          </ul>
+        </div>
+        <p>
+          Hay una forma de repartir las tiradas que se sabe que funciona bien: <strong>UCB1</strong> (<em lang="en">Upper
+          Confidence Bound</em>, publicada por Auer, Cesa-Bianchi y Fischer en 2002). Para cada máquina <!--tex i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span><!--/tex-->, llamamos
+          <strong><!--tex n_i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">n_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--></strong> a cuántas veces habéis tirado de ella, <strong><!--tex \bar{x}_i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\bar{x}_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7178em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--></strong> a su
+          premio medio hasta ahora, y <!--tex n --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span><!--/tex--> al total de tiradas entre todas. UCB1 tira de la máquina con más
+        </p>
+<!--TEX \mathrm{UCB1}(i) \;=\; \underbrace{\bar{x}_i}_{\text{explotar}} \;+\; \underbrace{c\,\sqrt{\frac{\ln n}{n_i}}}_{\text{explorar}} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">U</mi><mi mathvariant="normal">C</mi><mi mathvariant="normal">B</mi><mn>1</mn></mrow><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><munder><munder><msub><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover><mi>i</mi></msub><mo stretchy="true">⏟</mo></munder><mtext>explotar</mtext></munder><mtext>  </mtext><mo>+</mo><mtext>  </mtext><munder><munder><mrow><mi>c</mi><mtext> </mtext><msqrt><mfrac><mrow><mi>ln</mi><mo>⁡</mo><mi>n</mi></mrow><msub><mi>n</mi><mi>i</mi></msub></mfrac></msqrt></mrow><mo stretchy="true">⏟</mo></munder><mtext>explorar</mtext></munder></mrow><annotation encoding="application/x-tex">\mathrm{UCB1}(i) \;=\; \underbrace{\bar{x}_i}_{\text{explotar}} \;+\; \underbrace{c\,\sqrt{\frac{\ln n}{n_i}}}_{\text{explorar}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm">UCB1</span></span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2035em;vertical-align:-1.6202em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-1.5159em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">explotar</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span class="svg-align" style="top:-2.202em;"><span class="pstrut" style="height:3em;"></span><span class="katex-stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMinYMin slice"><path d="M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13
+ 35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688
+ 0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7
+-331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z"/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMidYMin slice"><path d="M199572 214
+c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
+ 53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3
+ 11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0
+-5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z"/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMaxYMin slice"><path d="M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3
+ 28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237
+-174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z"/></svg></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.798em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.6202em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.9102em;vertical-align:-2.3086em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6016em;"><span style="top:-1.4291em;"><span class="pstrut" style="height:3.6016em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">explorar</span></span></span></span></span><span style="top:-3.6016em;"><span class="pstrut" style="height:3.6016em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6016em;"><span class="svg-align" style="top:-2.1152em;"><span class="pstrut" style="height:3.6016em;"></span><span class="katex-stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMinYMin slice"><path d="M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13
+ 35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688
+ 0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7
+-331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z"/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMidYMin slice"><path d="M199572 214
+c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
+ 53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3
+ 11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0
+-5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z"/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMaxYMin slice"><path d="M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3
+ 28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237
+-174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z"/></svg></span></span></span><span style="top:-3.6016em;"><span class="pstrut" style="height:3.6016em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6016em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.5616em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478
+c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514
+c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20
+s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121
+s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081
+l0 -0c4,-6.7,10,-10,18,-10 H400000
+v40H1014.6
+s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185
+c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2z M1001 80
+h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8384em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4864em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.3086em;"><span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          El primer sumando es lo que la máquina ha dado. El segundo es un premio por la duda: crece despacio con el total
+          de tiradas (<strong>ln</strong> es el logaritmo neperiano) y baja a medida que tiráis de esa máquina. Una máquina
+          olvidada va ganando puntos sola hasta que le vuelve a tocar. Y una máquina sin probar, con <!--tex n_i = 0 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">n_i = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span><!--/tex-->,
+          tiene UCB1 infinito: todas se prueban una vez antes de repetir ninguna. La constante <!--tex c --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span><!--/tex--> regula
+          cuánto pesa la duda; con premios entre 0 y 1, el valor teórico es <!--tex \sqrt{2} \approx 1,4 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mn>2</mn></msqrt><mo>≈</mo><mn>1,4</mn></mrow><annotation encoding="application/x-tex">\sqrt{2} \approx 1{,}4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">2</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span></span></span></span><!--/tex-->.
+        </p>
+        <p>
+          Un ejemplo con números. Después de 20 tiradas, la máquina A lleva 10 tiradas y 6 premios, y la B, 5 tiradas y 4
+          premios. Con <!--tex c = 1,4 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>=</mo><mn>1,4</mn></mrow><annotation encoding="application/x-tex">c = 1{,}4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span></span></span></span><!--/tex-->:
+        </p>
+<!--TEX \begin{aligned}
+\ln 20 &= 3,00 \\[10pt]
+\text{A:}\quad & 0,6 + 1,4 \cdot \sqrt{\frac{3,00}{10}} \\
+&= 0,6 + 1,4 \cdot 0,547 \\
+&= 0,6 + 0,77 \\
+&= 1,37 \\[10pt]
+\text{B:}\quad & 0,8 + 1,4 \cdot \sqrt{\frac{3,00}{5}} \\
+&= 0,8 + 1,4 \cdot 0,774 \\
+&= 0,8 + 1,08 \\
+&= 1,88
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>ln</mi><mo>⁡</mo><mn>20</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>3,00</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>A:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0,6</mn><mo>+</mo><mn>1,4</mn><mo>⋅</mo><msqrt><mfrac><mn>3,00</mn><mn>10</mn></mfrac></msqrt></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,6</mn><mo>+</mo><mn>1,4</mn><mo>⋅</mo><mn>0,547</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,6</mn><mo>+</mo><mn>0,77</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1,37</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>B:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>0,8</mn><mo>+</mo><mn>1,4</mn><mo>⋅</mo><msqrt><mfrac><mn>3,00</mn><mn>5</mn></mfrac></msqrt></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,8</mn><mo>+</mo><mn>1,4</mn><mo>⋅</mo><mn>0,774</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>0,8</mn><mo>+</mo><mn>1,08</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>1,88</mn></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+\ln 20 &amp;= 3{,}00 \\[10pt]
+\text{A:}\quad &amp; 0{,}6 + 1{,}4 \cdot \sqrt{\frac{3{,}00}{10}} \\
+&amp;= 0{,}6 + 1{,}4 \cdot 0{,}547 \\
+&amp;= 0{,}6 + 0{,}77 \\
+&amp;= 1{,}37 \\[10pt]
+\text{B:}\quad &amp; 0{,}8 + 1{,}4 \cdot \sqrt{\frac{3{,}00}{5}} \\
+&amp;= 0{,}8 + 1{,}4 \cdot 0{,}774 \\
+&amp;= 0{,}8 + 1{,}08 \\
+&amp;= 1{,}88
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:17.68em;vertical-align:-8.59em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:9.09em;"><span style="top:-11.9016em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">20</span></span></span><span style="top:-8.59em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord text"><span class="mord">A:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-6.6616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:-5.1616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:-3.6616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:-0.35em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord text"><span class="mord">B:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:1.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:3.0784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span><span style="top:4.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:8.59em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:9.09em;"><span style="top:-11.9016em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">3</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">00</span></span></span><span style="top:-8.59em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6516em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">10</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">00</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.6116em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478
+c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514
+c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20
+s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121
+s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081
+l0 -0c4,-6.7,10,-10,18,-10 H400000
+v40H1014.6
+s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185
+c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2z M1001 80
+h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7884em;"><span></span></span></span></span></span></span></span><span style="top:-6.6616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">547</span></span></span><span style="top:-5.1616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">77</span></span></span><span style="top:-3.6616em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">37</span></span></span><span style="top:-0.35em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6516em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">00</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.6116em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478
+c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514
+c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20
+s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121
+s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081
+l0 -0c4,-6.7,10,-10,18,-10 H400000
+v40H1014.6
+s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185
+c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2z M1001 80
+h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7884em;"><span></span></span></span></span></span></span></span><span style="top:1.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">774</span></span></span><span style="top:3.0784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">08</span></span></span><span style="top:4.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">88</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:8.59em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Toca la B: tiene mejor media <em>y</em> menos tiradas, así que gana por los dos lados. Si la B hubiera dado 1
+          premio en 5 (media 0,2), su UCB1 sería 0,2&nbsp;+&nbsp;1,08&nbsp;=&nbsp;1,28 y tocaría la A, aunque la duda sobre la
+          B siguiera siendo mayor.
+        </p>
+      </section>
+
+      <section id="fases" data-corto="Las cuatro fases">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Del bandido al árbol: las cuatro fases</h2>
+        </div>
+        <p>
+          La idea de MCTS (Rémi Coulom le puso el nombre en 2006, y ese mismo año Kocsis y Szepesvári publicaron UCT, la
+          versión con UCB1 que vais a programar) es tratar <strong>cada nodo del árbol como un bandido</strong>: sus
+          jugadas son las máquinas, y tirar de una es bajar por ella y jugar una partida. Cada nodo guarda dos números:
+          <strong>N</strong>, cuántas partidas han pasado por él (sus <em>visitas</em>), y <strong>W</strong>, la suma de
+          lo que han dado esas partidas. Su valor medio es <strong>W/N</strong>. El árbol empieza con la raíz sola y, en
+          cada <strong>iteración</strong>, crece un nodo y se juega una partida, en cuatro fases:
+        </p>
+        <figure class="wide">
+          <figcaption>Una iteración de MCTS. En amarillo, el camino de esta iteración</figcaption>
+          <svg class="explica" viewBox="0 0 680 304" role="img" aria-label="Cuatro dibujos del mismo árbol. Selección: desde la raíz se baja por el hijo del centro hasta un nieto, eligiendo con UCB1. Expansión: debajo de ese nieto aparece un nodo nuevo. Simulación: desde el nodo nuevo, una línea quebrada baja hasta el final de una partida al azar. Retropropagación: el resultado sube por el camino hasta la raíz y cada nodo suma una visita.">
+            <g transform="translate(0,0)">
+              <text x="75" y="16" class="mc-t mc-centro"><tspan font-weight="700">1 · Selección</tspan></text>
+              <line x1="75" y1="40" x2="30" y2="90" class="mc-arista"/><line x1="75" y1="40" x2="75" y2="90" class="mc-arista camino"/><line x1="75" y1="40" x2="120" y2="90" class="mc-arista"/>
+              <line x1="75" y1="90" x2="55" y2="140" class="mc-arista"/><line x1="75" y1="90" x2="95" y2="140" class="mc-arista camino"/>
+              <circle cx="75" cy="40" r="11" class="mc-nodo"/><circle cx="30" cy="90" r="11" class="mc-nodo"/><circle cx="75" cy="90" r="11" class="mc-nodo azar"/><circle cx="120" cy="90" r="11" class="mc-nodo"/>
+              <circle cx="55" cy="140" r="11" class="mc-nodo"/><circle cx="95" cy="140" r="11" class="mc-nodo azar"/>
+              <text x="75" y="264" class="mc-t mc-centro">bajar eligiendo</text>
+              <text x="75" y="278" class="mc-t mc-centro">con UCB1 hasta</text>
+              <text x="75" y="292" class="mc-t mc-centro">algo sin probar</text>
+            </g>
+            <g transform="translate(170,0)">
+              <text x="75" y="16" class="mc-t mc-centro"><tspan font-weight="700">2 · Expansión</tspan></text>
+              <line x1="75" y1="40" x2="30" y2="90" class="mc-arista"/><line x1="75" y1="40" x2="75" y2="90" class="mc-arista"/><line x1="75" y1="40" x2="120" y2="90" class="mc-arista"/>
+              <line x1="75" y1="90" x2="55" y2="140" class="mc-arista"/><line x1="75" y1="90" x2="95" y2="140" class="mc-arista"/>
+              <line x1="95" y1="140" x2="95" y2="190" class="mc-arista camino"/>
+              <circle cx="75" cy="40" r="11" class="mc-nodo"/><circle cx="30" cy="90" r="11" class="mc-nodo"/><circle cx="75" cy="90" r="11" class="mc-nodo"/><circle cx="120" cy="90" r="11" class="mc-nodo"/>
+              <circle cx="55" cy="140" r="11" class="mc-nodo"/><circle cx="95" cy="140" r="11" class="mc-nodo"/>
+              <circle cx="95" cy="190" r="11" class="mc-nodo azar"/>
+              <text x="118" y="194" class="mc-t">nuevo</text>
+              <text x="75" y="264" class="mc-t mc-centro">añadir un hijo</text>
+              <text x="75" y="278" class="mc-t mc-centro">con una jugada</text>
+              <text x="75" y="292" class="mc-t mc-centro">sin probar</text>
+            </g>
+            <g transform="translate(340,0)">
+              <text x="75" y="16" class="mc-t mc-centro"><tspan font-weight="700">3 · Simulación</tspan></text>
+              <line x1="75" y1="40" x2="30" y2="90" class="mc-arista"/><line x1="75" y1="40" x2="75" y2="90" class="mc-arista"/><line x1="75" y1="40" x2="120" y2="90" class="mc-arista"/>
+              <line x1="75" y1="90" x2="55" y2="140" class="mc-arista"/><line x1="75" y1="90" x2="95" y2="140" class="mc-arista"/>
+              <line x1="95" y1="140" x2="95" y2="190" class="mc-arista"/>
+              <circle cx="75" cy="40" r="11" class="mc-nodo"/><circle cx="30" cy="90" r="11" class="mc-nodo"/><circle cx="75" cy="90" r="11" class="mc-nodo"/><circle cx="120" cy="90" r="11" class="mc-nodo"/>
+              <circle cx="55" cy="140" r="11" class="mc-nodo"/><circle cx="95" cy="140" r="11" class="mc-nodo"/>
+              <circle cx="95" cy="190" r="11" class="mc-nodo azar"/>
+              <polyline points="95,201 85,210 103,218 87,226 101,234 91,242" fill="none" class="mc-arista camino"/>
+              <text x="112" y="246" class="mc-t"><tspan font-weight="700">gana X</tspan></text>
+              <text x="75" y="264" class="mc-t mc-centro">jugar al azar</text>
+              <text x="75" y="278" class="mc-t mc-centro">hasta el final,</text>
+              <text x="75" y="292" class="mc-t mc-centro">sin guardar nada</text>
+            </g>
+            <g transform="translate(510,0)">
+              <text x="75" y="16" class="mc-t mc-centro"><tspan font-weight="700">4 · Retropropagación</tspan></text>
+              <line x1="75" y1="40" x2="30" y2="90" class="mc-arista"/><line x1="75" y1="40" x2="75" y2="90" class="mc-arista camino"/><line x1="75" y1="40" x2="120" y2="90" class="mc-arista"/>
+              <line x1="75" y1="90" x2="55" y2="140" class="mc-arista"/><line x1="75" y1="90" x2="95" y2="140" class="mc-arista camino"/>
+              <line x1="95" y1="140" x2="95" y2="190" class="mc-arista camino"/>
+              <circle cx="75" cy="40" r="11" class="mc-nodo azar"/><circle cx="30" cy="90" r="11" class="mc-nodo"/><circle cx="75" cy="90" r="11" class="mc-nodo azar"/><circle cx="120" cy="90" r="11" class="mc-nodo"/>
+              <circle cx="55" cy="140" r="11" class="mc-nodo"/><circle cx="95" cy="140" r="11" class="mc-nodo azar"/>
+              <circle cx="95" cy="190" r="11" class="mc-nodo azar"/>
+              <text x="140" y="44" class="mc-t">N+1</text><text x="140" y="94" class="mc-t">N+1</text><text x="140" y="144" class="mc-t">N+1</text><text x="140" y="194" class="mc-t">N+1</text>
+              <text x="75" y="264" class="mc-t mc-centro">subir el resultado</text>
+              <text x="75" y="278" class="mc-t mc-centro">y sumarlo en</text>
+              <text x="75" y="292" class="mc-t mc-centro">cada nodo</text>
+            </g>
+          </svg>
+        </figure>
+        <ol>
+          <li><strong>Selección.</strong> Desde la raíz, mientras el nodo tenga todas sus jugadas ya probadas, se baja al
+            hijo con más UCB1. Es el bandido de antes, en cada nivel: <!--tex \bar{x}_i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\bar{x}_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7178em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> es el <!--tex W/N --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi mathvariant="normal">/</mi><mi>N</mi></mrow><annotation encoding="application/x-tex">W/N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><!--/tex--> del hijo, <!--tex n_i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">n_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> su
+            <!--tex N --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><!--/tex-->, y <!--tex n --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span><!--/tex--> el <!--tex N --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><!--/tex--> del padre.</li>
+          <li><strong>Expansión.</strong> Al llegar a un nodo con alguna jugada sin probar, se elige una, se hace y se
+            añade al árbol un hijo nuevo, con N&nbsp;=&nbsp;0 y W&nbsp;=&nbsp;0. Uno por iteración.</li>
+          <li><strong>Simulación</strong> (en inglés, <em lang="en">rollout</em> o <em lang="en">playout</em>). Desde ese
+            hijo, se juega el resto de la partida al azar. Esas jugadas no se guardan: sólo interesa quién gana.</li>
+          <li><strong>Retropropagación.</strong> El resultado sube por el camino, de la hoja a la raíz, y cada nodo suma 1
+            a su N y el resultado a su W.</li>
+        </ol>
+        <pre class="pseudo"><b>function</b> <span class="fn">mcts</span>(<span class="var">posición</span>, <span class="var">tiempo</span>)
+  <span class="var">raíz</span> = un nodo con <span class="var">posición</span>
+  <b>while</b> quede <span class="var">tiempo</span>:
+      <span class="var">nodo</span> = <span class="fn">seleccionar</span>(<span class="var">raíz</span>)        <span class="var">bajar con UCB1</span>
+      <span class="var">nodo</span> = <span class="fn">expandir</span>(<span class="var">nodo</span>)          <span class="var">un hijo nuevo</span>
+      <span class="var">r</span>    = <span class="fn">simular</span>(<span class="var">nodo</span>)           <span class="var">partida al azar</span>
+      <span class="fn">retropropagar</span>(<span class="var">nodo</span>, <span class="var">r</span>)       <span class="var">sumar N y W hasta la raíz</span>
+  <b>return</b> la jugada del hijo de <span class="var">raíz</span> con más visitas</pre>
+        <p>
+          Probadlo fase a fase en la posición de antes: mueve O, y X amenaza la diagonal 1-5-9. La única jugada que no
+          pierde es tapar en la 9.
+        </p>
+        <div class="demo" data-mcts="fases">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>MCTS en tres en raya, una fase cada vez</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Las cuatro fases están explicadas justo encima; tras unas cien iteraciones, la jugada más visitada es tapar en la casilla 9.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué mirar</span>
+          <ul>
+            <li>Las seis primeras iteraciones no seleccionan nada: la raíz tiene jugadas sin probar, así que se expande
+              directamente. Desde la séptima, la selección enseña el UCB1 de cada hijo.</li>
+            <li>Con <strong>×100</strong> un par de veces, la casilla 9 se queda con la mayoría de las visitas. Su W/N se
+              acerca a 0,5, porque bien jugada la partida acaba en tablas; las demás bajan hacia 0.</li>
+            <li>Con <strong>Simula: La clase</strong>, la fase de simulación os la deja a vosotros: jugad el tablero de la
+              derecha sin pensar y decid quién ha ganado.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="punto-de-vista" data-corto="Quién gana en cada nodo">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Quién gana en cada nodo</h2>
+        </div>
+        <p>
+          Hay un detalle que decide si vuestro MCTS juega bien o regala la partida. En la selección, cada nodo elige al hijo
+          con más W/N. Pero en un nivel elige un jugador y en el siguiente, el otro, y lo que es bueno para uno es malo para
+          el otro. La forma más limpia de no liarse: <strong>el W de cada nodo se cuenta desde el jugador que hizo la
+          jugada que lleva a él</strong>. Así, cuando un padre elige entre sus hijos, todos esos hijos los creó el jugador
+          que mueve en el padre, y el que tiene más W/N es el mejor para quien elige.
+        </p>
+        <p>
+          Al retropropagar, cada nodo suma el resultado visto por su jugador. Con un resultado r para las blancas, entre 0
+          y 1 (en tablas, 0,5), un camino de tres nodos queda así:
+        </p>
+<pre class="cuenta">la simulación acaba con r = 0,8 para las blancas
+
+raíz               (la creó una jugada de negras)    N + 1    W + (1 − 0,8)  =  W + 0,2
+hijo  (e4)         (la creó una jugada de blancas)   N + 1    W + 0,8
+nieto (e5)         (la creó una jugada de negras)    N + 1    W + 0,2</pre>
+        <div class="note trap">
+          <span class="note-label">El error típico</span>
+          <p>
+            Sumar siempre la recompensa de las blancas en todos los nodos. En los niveles en que eligen las blancas sale
+            bien, pero en los de las negras el árbol cree que las negras buscan lo mejor para las blancas: supone un rival
+            que os ayuda. El programa juega jugadas que sólo funcionan si el rival se equivoca, y pierde contra cualquiera
+            que no se equivoque. Si vuestro MCTS hace jugadas absurdas que "esperan" un regalo, mirad aquí primero.
+          </p>
+        </div>
+      </section>
+
+      <section id="elegir" data-corto="Qué jugada se elige">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Qué jugada se elige al final</h2>
+        </div>
+        <p>
+          Cuando se acaba el tiempo, ¿qué hijo de la raíz se juega? Lo habitual es el <strong>más visitado</strong>, no el
+          de mayor media. La media de un hijo con muy pocas visitas no es de fiar: un hijo con una visita y una victoria
+          tiene media 1,0, y otro con 300 visitas y media 0,62 es mucho más seguro.
+        </p>
+<pre class="cuenta">hijo A    N =   1    W/N = 1,00     una partida, ganada por suerte
+hijo B    N = 300    W/N = 0,62     se juega B</pre>
+        <p>
+          Además, por cómo funciona UCB1, el más visitado y el de mayor media suelen coincidir cuando hay tiempo de sobra: si
+          un hijo tiene buena media, la selección lo visita más. Cuando no coinciden, es señal de que no ha dado tiempo a
+          aclararse, y el más visitado es la apuesta prudente.
+        </p>
+      </section>
+
+      <section id="asimetrico" data-corto="Un árbol torcido">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Un árbol que crece hacia lo interesante</h2>
+        </div>
+        <p>
+          Minimax con profundidad fija mira todas las jugadas a la misma profundidad, las buenas y las absurdas. MCTS no:
+          como la selección va a lo que promete, el árbol crece <strong>torcido</strong>, muy hondo por las líneas buenas y
+          casi nada por las malas. Es como piensa un jugador humano, que no analiza las jugadas que ve perdedoras a primera
+          vista.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col"></th><th scope="col">Minimax con alfa-beta</th><th scope="col">MCTS</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Qué necesita del juego</strong></td><td>Las reglas y una función de evaluación buena.</td><td>Sólo las reglas (la evaluación es opcional).</td></tr>
+              <tr><td><strong>Forma del árbol</strong></td><td>Todo hasta la misma profundidad.</td><td>Hondo donde promete, poco donde no.</td></tr>
+              <tr><td><strong>Si se le corta antes</strong></td><td>Una búsqueda a medias puede no servir.</td><td>Tiene una respuesta en cualquier momento (<em lang="en">anytime</em>), mejor cuanto más tiempo.</td></tr>
+              <tr><td><strong>Qué devuelve</strong></td><td>El valor exacto, hasta donde mira.</td><td>Una estimación, que mejora con las iteraciones.</td></tr>
+              <tr><td><strong>Dónde brilla</strong></td><td>Juegos tácticos con buena evaluación: ajedrez, damas.</td><td>Mucha ramificación y sin buena evaluación: go, juegos de cartas, juegos nuevos.</td></tr>
+              <tr><td><strong>Su punto débil</strong></td><td>El efecto horizonte, y escribir la evaluación.</td><td>Las trampas tácticas: una sola respuesta del rival lo cambia todo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Comparado con lo que hicisteis en las prácticas anteriores, MCTS es casi lo contrario de una máquina de estados:
+          no hay que escribir cuándo hacer cada cosa, sólo las reglas del juego, y juega mejor cuanto más tiempo le deis.
+          Lo que cuesta a cambio es tiempo de cálculo en cada turno, y por eso en videojuegos de acción en tiempo real se usa
+          poco. Comprobad cuánto importan las iteraciones jugando contra él:
+        </p>
+        <div class="demo" data-mcts="conecta4">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Conecta 4 contra MCTS</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Es un Conecta 4 contra un MCTS con simulaciones al azar, en el que se puede elegir el número de iteraciones por jugada.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Con 10 iteraciones juega casi al azar: si tenéis tres fichas en línea, sólo las tapa una vez de cada cuatro.
+              Con 100 ya casi siempre, y con 1&#8239;000, siempre. Con 20&#8239;000, ¿le ganáis?</li>
+            <li>Mirad las barras después de cada jugada suya: cuando ve una amenaza, casi todas las visitas se van a una
+              columna. Cuando la posición está tranquila, se reparten.</li>
+            <li>Las simulaciones son al azar, así que cree que vosotros también jugáis al azar. Por eso su porcentaje es
+              optimista al principio y se desploma cuando le preparáis una doble amenaza.</li>
+          </ul>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Lo que hay que llevarse</span>
+          <p>
+            Cuatro fases: seleccionar con UCB1, expandir un nodo, simular al azar y retropropagar. Cada nodo cuenta desde el
+            jugador que lo creó. Se juega la jugada más visitada. Y más tiempo es más iteraciones, y más iteraciones es mejor
+            juego. Lo que pasa cuando las simulaciones al azar no bastan, como en ajedrez, en la
+            <a href="mejoras.html">página siguiente</a>.
+          </p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 5">
+        <a class="pager-prev" href="juegos.html"><span class="pager-l">Anterior</span><span class="pager-t">Juegos por turnos</span></a>
+        <a class="pager-next" href="mejoras.html"><span class="pager-l">Siguiente</span><span class="pager-t">MCTS en la práctica</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#montecarlo">Jugar al azar</a></li>
+            <li><a href="#bandido">El bandido y UCB1</a></li>
+            <li><a href="#fases">Las cuatro fases</a></li>
+            <li><a href="#punto-de-vista">Quién gana en cada nodo</a></li>
+            <li><a href="#elegir">Qué jugada se elige</a></li>
+            <li><a href="#asimetrico">Un árbol torcido</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 5</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="juegos.html"><span>01</span>Juegos por turnos</a></li>
+            <li><a href="mcts.html" aria-current="page"><span>02</span>Monte Carlo Tree Search</a></li>
+            <li><a href="mejoras.html"><span>03</span>MCTS en la práctica</a></li>
+            <li><a href="informacion-imperfecta.html"><span>04</span>Azar e información oculta</a></li>
+            <li><a href="librerias.html"><span>05</span>Librerías</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/mcts.js" defer></script>
+</body>
+</html>

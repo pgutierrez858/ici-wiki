@@ -13,6 +13,7 @@
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
 <link rel="stylesheet" href="../../assets/css/ici.css">
 <script src="../../assets/js/tema.js"></script>
 </head>
@@ -367,7 +368,7 @@
 
         <h3 class="label">Coste uniforme, o Dijkstra</h3>
         <p>
-          La frontera es una <strong>cola de prioridad</strong> ordenada por <em>g</em>(n), el coste real
+          La frontera es una <strong>cola de prioridad</strong> ordenada por <!--tex g(n) --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">g(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span><!--/tex-->, el coste real
           acumulado desde la salida. Es la anchura generalizada a aristas con coste distinto, y es
           exactamente el algoritmo de Dijkstra. Con todos los costes a 1 la cola de prioridad se comporta
           como una FIFO y sale la anchura, tal cual; por eso en el laberinto de Ms.&nbsp;Pac-Man no aporta
@@ -427,7 +428,7 @@
         <p>
           Compáralo con <a href="astar.html#astar">A*</a> y verás que <strong>son el mismo código</strong>: lo único
           que le falta aquí es sumarle la heurística al ordenar. Dicho al revés, y es la forma corta de
-          recordarlo: <strong>A* con <em>h</em>&nbsp;=&nbsp;0 es Dijkstra, y Dijkstra con todos los costes
+          recordarlo: <strong>A* con <!--tex h = 0 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span><!--/tex--> es Dijkstra, y Dijkstra con todos los costes
           iguales es la anchura</strong>. Los tres son el bucle del <a href="busqueda.html#espacios">esquema general</a> con otra cosa dentro de la
           frontera.
         </p>
@@ -530,7 +531,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

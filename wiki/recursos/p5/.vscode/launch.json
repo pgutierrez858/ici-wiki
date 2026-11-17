@@ -1,0 +1,57 @@
+{
+  // Los programas de la práctica, en Ejecutar y depurar (Ctrl+Shift+D / Cmd+Shift+D).
+  // Elegid uno en el desplegable de arriba y pulsad F5. Con F5 se para en los puntos de ruptura.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Comprobar paso…",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/comprobar.py",
+      "args": ["${input:paso}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Comprobar todos los pasos",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/comprobar.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Ver partida",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/ver_partida.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Jugar contra el MCTS",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/jugar_contra.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Comparar versiones",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/comparar.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "subProcess": false
+    }
+  ],
+  "inputs": [
+    {
+      "id": "paso",
+      "type": "pickString",
+      "description": "¿Qué paso compruebo?",
+      "options": ["1", "2", "3", "4", "5", "6"]
+    }
+  ]
+}

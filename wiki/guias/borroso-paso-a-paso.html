@@ -13,6 +13,7 @@
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
 <link rel="stylesheet" href="../assets/css/ici.css">
 <script src="../assets/js/tema.js"></script>
 </head>
@@ -380,7 +381,7 @@ END_FUZZIFY</code></pre>
 <pre><code>RULE 1 : IF peligro IS cerca THEN huir IS mucho;
 RULE 2 : IF peligro IS NOT cerca THEN comer IS mucho;</code></pre>
             <p>
-              Lo mínimo que juega: huir si el fantasma está cerca, comer si no. <code>NOT</code> es 1&nbsp;−&nbsp;μ, así
+              Lo mínimo que juega: huir si el fantasma está cerca, comer si no. <code>NOT</code> es <!--tex 1 - \mu --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">1 - \mu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span><!--/tex-->, así
               que las dos reglas se reparten el peso: a 25 pasos, <code>cerca</code> vale 0,5 y las dos se activan
               con 0,5.
             </p>
@@ -857,7 +858,7 @@ RULE 3 : IF comestible IS no AND pacman IS cerca AND ppill IS cerca THEN huir IS
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

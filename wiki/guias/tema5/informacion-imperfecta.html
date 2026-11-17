@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Azar e información oculta · Tema 5 · ICI</title>
+<meta name="description" content="Búsqueda en juegos con dados y con cartas escondidas: nodos de azar y expectimax, determinizar (Perfect Information Monte Carlo) y sus dos trampas, la fusión de estrategias y la no localidad, ISMCTS, y cuándo hace falta otra cosa, como en el póker.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../presentacion.html">Presentación</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Guías</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 5</a>
+    <span aria-hidden="true">/</span>
+    <span>Azar e información oculta</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 5 · 04 · Juegos por turnos</p>
+    <h1>
+      Azar e información oculta
+      <span class="thin">Cuando hay dados, o cuando no veis las cartas del rival.</span>
+    </h1>
+    <p class="standfirst">
+      Hasta aquí los dos jugadores lo veían todo y nada dependía de la suerte. Qué cambia con los dados (nodos de azar), qué cambia con las cartas escondidas (determinizar), por qué determinizar engaña, cómo lo arregla ISMCTS, y por qué en el póker hace falta otra cosa.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="familias" data-corto="Tres familias">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Tres familias de juegos</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Familia</th><th scope="col">Ejemplos de mesa</th><th scope="col">En videojuegos</th><th scope="col">Lo que hay que añadir a la búsqueda</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Información perfecta, sin azar</strong></td><td>Tres en raya, ajedrez, go</td><td>Puzles, tácticos por turnos con todo a la vista</td><td>Nada: lo de las páginas anteriores.</td></tr>
+              <tr><td><strong>Con azar</strong></td><td>Parchís, backgammon, Catan</td><td>Golpes que aciertan o no, botín aleatorio</td><td>Nodos de azar.</td></tr>
+              <tr><td><strong>Con información oculta</strong></td><td>Mus, bridge, póker, Stratego</td><td>Cartas en la mano del rival, niebla de guerra</td><td>Razonar sobre lo que no se ve.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Las técnicas de los temas anteriores (máquinas de estados, reglas, lógica borrosa) no notan la diferencia: reaccionan
+          a lo que ven, y lo que no ven no existe para ellas. La búsqueda sí la nota, porque para simular el futuro hay que
+          saber qué jugadas son posibles, y eso depende de los dados y de las cartas que no veis.
+        </p>
+      </section>
+
+      <section id="azar" data-corto="Nodos de azar">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">El azar: nodos de azar</h2>
+        </div>
+        <p>
+          Con dados, el árbol tiene un tercer tipo de nodo: además de los de MAX y los de MIN, los <strong>nodos de
+          azar</strong>, en los que no elige nadie y cada rama tiene una probabilidad. Un nodo de azar vale la
+          <strong>media de sus hijos, pesada por su probabilidad</strong>, lo que en estadística se llama valor esperado. A
+          minimax con nodos de azar se le llama <strong>expectimax</strong>.
+        </p>
+        <figure class="wide">
+          <figcaption>MAX elige entre dos jugadas que dependen de la suerte. Los círculos amarillos son nodos de azar</figcaption>
+          <svg class="explica" viewBox="0 0 560 200" role="img" aria-label="Árbol con azar. MAX elige entre la jugada A, que depende de una moneda (la mitad de las veces 10, la otra mitad 0) y vale 5, y la jugada B, que depende de un dado (con un 1 vale 0, con 2 a 6 vale 8) y vale 6,67. MAX elige B.">
+            <line x1="280" y1="46" x2="150" y2="96" class="mc-arista"/>
+            <line x1="280" y1="46" x2="410" y2="96" class="mc-arista camino"/>
+            <line x1="150" y1="118" x2="90" y2="160" class="mc-arista"/><line x1="150" y1="118" x2="210" y2="160" class="mc-arista"/>
+            <line x1="410" y1="118" x2="350" y2="160" class="mc-arista"/><line x1="410" y1="118" x2="470" y2="160" class="mc-arista"/>
+            <polygon points="280,8 302,46 258,46" class="mc-nodo max"/>
+            <circle cx="150" cy="107" r="19" class="mc-nodo azar"/>
+            <circle cx="410" cy="107" r="19" class="mc-nodo azar"/>
+            <text x="280" y="40" class="mc-t mc-centro"><tspan font-weight="700">6,67</tspan></text>
+            <text x="150" y="111" class="mc-t mc-centro"><tspan font-weight="700">5</tspan></text>
+            <text x="410" y="111" class="mc-t mc-centro"><tspan font-weight="700">6,67</tspan></text>
+            <text x="200" y="74" class="mc-t">A</text><text x="352" y="74" class="mc-t">B</text>
+            <text x="108" y="140" class="mc-t mc-dcha">cara ½</text><text x="192" y="140" class="mc-t">cruz ½</text>
+            <text x="368" y="140" class="mc-t mc-dcha">un 1 · ⅙</text><text x="452" y="140" class="mc-t">del 2 al 6 · ⅚</text>
+            <rect x="77" y="160" width="26" height="24" class="mc-tab"/><rect x="197" y="160" width="26" height="24" class="mc-tab"/>
+            <rect x="337" y="160" width="26" height="24" class="mc-tab"/><rect x="457" y="160" width="26" height="24" class="mc-tab"/>
+            <text x="90" y="176" class="mc-t mc-centro">10</text><text x="210" y="176" class="mc-t mc-centro">0</text>
+            <text x="350" y="176" class="mc-t mc-centro">0</text><text x="470" y="176" class="mc-t mc-centro">8</text>
+          </svg>
+        </figure>
+<!--TEX \begin{aligned}
+A &= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
+&= 5 \\[10pt]
+B &= \tfrac{1}{6} \cdot 0 + \tfrac{5}{6} \cdot 8 \\
+&= 6,67 \\[10pt]
+\text{MAX} &= \max(5;\ 6,67) = 6,67 \qquad \Rightarrow\ B
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>A</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo>⋅</mo><mn>10</mn><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo>⋅</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>5</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mi>B</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>6</mn></mfrac></mstyle><mo>⋅</mo><mn>0</mn><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>5</mn><mn>6</mn></mfrac></mstyle><mo>⋅</mo><mn>8</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>6,67</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mtext>MAX</mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>5</mn><mo separator="true">;</mo><mtext> </mtext><mn>6,67</mn><mo stretchy="false">)</mo><mo>=</mo><mn>6,67</mn><mspace width="2em"/><mo>⇒</mo><mtext> </mtext><mi>B</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+A &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
+&amp;= 5 \\[10pt]
+B &amp;= \tfrac{1}{6} \cdot 0 + \tfrac{5}{6} \cdot 8 \\
+&amp;= 6{,}67 \\[10pt]
+\text{MAX} &amp;= \max(5;\ 6{,}67) = 6{,}67 \qquad \Rightarrow\ B
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:9.2102em;vertical-align:-4.3551em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:4.8551em;"><span style="top:-7.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">A</span></span></span><span style="top:-5.51em;"><span class="pstrut" style="height:3em;"></span><span class="mord"></span></span><span style="top:-3.0049em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span><span style="top:-1.5049em;"><span class="pstrut" style="height:3em;"></span><span class="mord"></span></span><span style="top:0.9951em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">MAX</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:4.3551em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:4.8551em;"><span style="top:-7.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span></span></span><span style="top:-5.51em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">5</span></span></span><span style="top:-3.0049em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">8</span></span></span><span style="top:-1.5049em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">6</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">67</span></span></span><span style="top:0.9951em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mop">max</span><span class="mopen">(</span><span class="mord">5</span><span class="mpunct">;</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">6</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">67</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">6</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">67</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:4.3551em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          En MCTS, el azar casi no da trabajo: al bajar por el árbol, cuando se llega a un nodo de azar <strong>se tira el
+          dado de verdad</strong> (con sus probabilidades) y se baja por la rama que salga. Como cada rama sale con la
+          frecuencia que le toca, las medias W/N acaban siendo esos valores esperados sin hacer ninguna cuenta. En la
+          simulación, igual: los dados se tiran al azar como el resto de las jugadas.
+        </p>
+      </section>
+
+      <section id="determinizar" data-corto="Determinizar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Las cartas escondidas: determinizar</h2>
+        </div>
+        <p>
+          Con información oculta el problema es otro: no sabéis en qué posición estáis. Si el rival tiene tres cartas que no
+          veis, la partida puede estar en cualquiera de las posiciones compatibles con lo que sabéis. A ese conjunto de
+          posiciones que para vosotros son indistinguibles se le llama <strong>conjunto de información</strong>.
+        </p>
+        <p>
+          La salida más directa es <strong>inventarse lo que falta</strong>: repartir al rival unas cartas cualesquiera que
+          encajen con lo que sabéis (las que no han salido, las que no tenéis vosotros), y con ese reparto inventado el juego
+          ya es de información perfecta, así que se busca como siempre. A eso se le llama <strong>determinizar</strong>, y a
+          cada reparto inventado, una determinización. Se repite con muchos repartos distintos y se elige la jugada que mejor
+          sale de media, o la que más repartos votan. El método completo se conoce como <strong>Perfect Information Monte
+          Carlo</strong> (PIMC). Es sencillo y funciona sorprendentemente bien en muchos juegos de cartas: el programa de
+          bridge GIB, de Matthew Ginsberg, uno de los más fuertes de finales de los noventa, jugaba así.
+        </p>
+        <pre class="pseudo"><b>repetir</b> muchas veces:
+    repartir al azar lo que no veis, de forma compatible con lo que sabéis
+    buscar en ese mundo como si lo vierais todo (MCTS, minimax…)
+    apuntar lo que vale cada jugada en ese mundo
+jugar la jugada con mejor media entre todos los mundos</pre>
+      </section>
+
+      <section id="trampas" data-corto="Sus dos trampas">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Las dos trampas de determinizar</h2>
+        </div>
+        <h3 class="label">La fusión de estrategias</h3>
+        <p>
+          En cada mundo inventado la búsqueda ve las cartas del rival. Así que cualquier plan que dependa de
+          <strong>adivinar</strong> algo le sale siempre bien, porque en cada mundo "adivina" con las cartas a la vista. Un
+          ejemplo pequeño: al final de una mano podéis plantaros y llevaros 6 puntos seguros (jugada B), o jugar el as
+          (jugada A) y, en la última baza, adivinar el palo de la única carta que le queda al rival, corazones o picas, mitad y
+          mitad. Si acertáis, 10 puntos; si falláis, 0.
+        </p>
+        <div class="demo" data-mcts="determinizar">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h4>Plantarse o adivinar: determinizar contra un árbol de lo que sabéis</h4>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Determinizando, A vale 10 en cada mundo y se elige A; de verdad vale 5, y B, con 6, era mejor.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p>
+          Determinizando, la jugada A vale 10 en todos los mundos y gana siempre. Pero en la partida de verdad no veis la
+          carta: diréis un palo, y acertaréis la mitad de las veces.
+        </p>
+<!--TEX \begin{aligned}
+A \text{ de verdad} &= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
+&= 5 \;<\; 6 = B
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>A</mi><mtext> de verdad</mtext></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo>⋅</mo><mn>10</mn><mo>+</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo>⋅</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>5</mn><mtext>  </mtext><mo>&lt;</mo><mtext>  </mtext><mn>6</mn><mo>=</mo><mi>B</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+A \text{ de verdad} &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
+&amp;= 5 \;&lt;\; 6 = B
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.7051em;vertical-align:-1.1026em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6026em;"><span style="top:-3.7574em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="mord text"><span class="mord"> de verdad</span></span></span></span><span style="top:-2.2574em;"><span class="pstrut" style="height:3em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.1026em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6026em;"><span style="top:-3.7574em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span></span></span><span style="top:-2.2574em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.1026em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          El error viene de tomar en cada mundo una decisión distinta (decir corazones en unos y picas en otros) donde de
+          verdad tenéis que tomar una sola, porque no distinguís esos mundos. Se dice que se "funden" estrategias que en
+          realidad no podéis seguir.
+        </p>
+        <h3 class="label">La no localidad</h3>
+        <p>
+          La segunda trampa es más sutil. Al repartir las cartas del rival al azar, se olvida que <strong>lo que ha jugado
+          el rival dice algo de lo que tiene</strong>. Si alguien en el mus ha ido a grande con todo, es raro que lleve
+          sotas. Una determinización uniforme le reparte cualquier cosa. Lo que vale una posición depende de cómo se llegó a
+          ella, de partes del árbol que no están debajo, y por eso se habla de no localidad. Se suaviza repartiendo con
+          probabilidades que tengan en cuenta lo que ha hecho el rival, pero no tiene arreglo sencillo.
+        </p>
+      </section>
+
+      <section id="ismcts" data-corto="ISMCTS">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">ISMCTS: un árbol de lo que sabéis</h2>
+        </div>
+        <p>
+          <strong>ISMCTS</strong> (<em lang="en">Information Set MCTS</em>, de Cowling, Powley y Whitehouse, 2012) ataca la
+          fusión de estrategias así: en vez de un árbol por cada mundo inventado, construye <strong>un solo árbol cuyos nodos
+          son conjuntos de información</strong>, es decir, lo que sabe el jugador que decide, no la posición exacta.
+        </p>
+        <figure class="wide">
+          <figcaption>Determinizar hace un árbol por mundo; ISMCTS, un nodo para todo lo que no distinguís</figcaption>
+          <svg class="explica" viewBox="0 0 560 190" role="img" aria-label="A la izquierda, dos árboles separados, uno para el mundo en que el rival tiene corazones y otro para picas; en cada uno, la decisión de qué palo decir se toma sabiendo la carta. A la derecha, un solo nodo, rodeado por una línea discontinua, que agrupa los dos mundos: la decisión de qué palo decir es la misma para los dos.">
+            <text x="140" y="16" class="mc-t mc-centro"><tspan font-weight="700">Determinizar: un árbol por mundo</tspan></text>
+            <line x1="80" y1="58" x2="50" y2="118" class="mc-arista"/><line x1="80" y1="58" x2="110" y2="118" class="mc-arista camino"/>
+            <line x1="200" y1="58" x2="170" y2="118" class="mc-arista camino"/><line x1="200" y1="58" x2="230" y2="118" class="mc-arista"/>
+            <circle cx="80" cy="46" r="13" class="mc-nodo max"/><circle cx="200" cy="46" r="13" class="mc-nodo max"/>
+            <text x="80" y="50" class="mc-t mc-centro">♥</text><text x="200" y="50" class="mc-t mc-centro">♠</text>
+            <rect x="37" y="118" width="26" height="22" class="mc-tab"/><rect x="97" y="118" width="26" height="22" class="mc-tab"/>
+            <rect x="157" y="118" width="26" height="22" class="mc-tab"/><rect x="217" y="118" width="26" height="22" class="mc-tab"/>
+            <text x="50" y="133" class="mc-t mc-centro">0</text><text x="110" y="133" class="mc-t mc-centro">10</text>
+            <text x="170" y="133" class="mc-t mc-centro">10</text><text x="230" y="133" class="mc-t mc-centro">0</text>
+            <text x="50" y="156" class="mc-t mc-centro">♠</text><text x="110" y="156" class="mc-t mc-centro">♥</text>
+            <text x="170" y="156" class="mc-t mc-centro">♠</text><text x="230" y="156" class="mc-t mc-centro">♥</text>
+            <text x="140" y="180" class="mc-t mc-centro mc-tenue">en cada mundo se dice el palo bueno: 10</text>
+            <text x="420" y="16" class="mc-t mc-centro"><tspan font-weight="700">ISMCTS: un nodo para lo que sabéis</tspan></text>
+            <rect x="372" y="28" width="96" height="36" rx="18" class="mc-conjunto"/>
+            <circle cx="400" cy="46" r="13" class="mc-nodo max"/><circle cx="440" cy="46" r="13" class="mc-nodo max"/>
+            <text x="400" y="50" class="mc-t mc-centro">♥</text><text x="440" y="50" class="mc-t mc-centro">♠</text>
+            <line x1="420" y1="64" x2="370" y2="118" class="mc-arista"/><line x1="420" y1="64" x2="470" y2="118" class="mc-arista"/>
+            <rect x="345" y="118" width="50" height="22" class="mc-tab"/><rect x="445" y="118" width="50" height="22" class="mc-tab"/>
+            <text x="370" y="133" class="mc-t mc-centro">10 o 0</text><text x="470" y="133" class="mc-t mc-centro">0 o 10</text>
+            <text x="370" y="156" class="mc-t mc-centro">decir ♥</text><text x="470" y="156" class="mc-t mc-centro">decir ♠</text>
+            <text x="420" y="180" class="mc-t mc-centro mc-tenue">la misma decisión para los dos mundos: 5</text>
+          </svg>
+        </figure>
+        <p>
+          Cada iteración hace lo mismo que MCTS, con una determinización nueva:
+        </p>
+        <ol>
+          <li><strong>Se inventa un mundo</strong> compatible con lo que sabe el que decide, uno distinto en cada
+            iteración.</li>
+          <li><strong>Selección, expansión, simulación y retropropagación</strong> como siempre, pero sólo con las jugadas
+            que son legales en ese mundo. Una jugada que sólo existe en algunos mundos está disponible en unas iteraciones y
+            en otras no, así que UCB1 usa, en vez de N del padre, cuántas veces estuvo disponible ese hijo.</li>
+          <li>Como todos los mundos comparten los mismos nodos, <strong>las estadísticas se mezclan</strong>: la jugada
+            "decir corazones" acumula las simulaciones de los mundos en que acierta y de los mundos en que falla, y su media
+            acaba siendo el 5 de verdad.</li>
+        </ol>
+        <p>
+          En el ejemplo de arriba, el botón <strong>Lo que sé (ISMCTS)</strong> cuenta así: el palo que diréis tiene que ser
+          el mismo en todos los mundos. Es la versión que usa el <em>Spades</em> de AI Factory que aparecía en la
+          <a href="mejoras.html#donde">página anterior</a>. La no localidad, en cambio, no la arregla: el mundo de cada
+          iteración se sigue inventando como se pueda.
+        </p>
+      </section>
+
+      <section id="otra-cosa" data-corto="Cuándo no basta">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Cuándo hace falta otra cosa</h2>
+        </div>
+        <p>
+          En el póker, casi todo el juego está en lo que no se ve. Un jugador que siempre hace lo mismo con
+          las mismas cartas es fácil de leer, así que hay que mezclar: farolear a veces, y con una frecuencia bien pensada.
+          Eso es una <strong>estrategia mixta</strong>, y MCTS, que busca una jugada buena, no la da. Para estos juegos se usan
+          métodos de teoría de juegos que buscan una estrategia de equilibrio jugando millones de manos contra sí mismos; el
+          más conocido es <strong>CFR</strong> (<em lang="en">counterfactual regret minimization</em>, 2007). Con
+          descendientes suyos, Libratus ganó en 2017 a profesionales de póker sin límite mano a mano, y Pluribus, en 2019, en
+          mesas de seis jugadores.
+        </p>
+        <p>
+          Y en los videojuegos queda la salida menos elegante: que la IA <strong>haga trampa</strong> y vea lo que el
+          jugador no ve. Es habitual en juegos de estrategia, y no siempre es mala idea si el jugador no lo nota. Pero en un
+          juego de cartas se nota enseguida, y por eso en ellos se usan determinizar o ISMCTS.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Lo que hay que llevarse</span>
+          <ul>
+            <li>Con <strong>azar</strong>, los nodos de azar valen la media pesada de sus hijos; en MCTS basta con tirar el dado al bajar.</li>
+            <li>Con <strong>información oculta</strong>, determinizar es inventarse lo que no se ve y buscar como siempre. Es sencillo y a menudo funciona.</li>
+            <li>Pero cree que podrá adivinar siempre (<strong>fusión de estrategias</strong>) y olvida lo que delatan las jugadas del rival (<strong>no localidad</strong>).</li>
+            <li><strong>ISMCTS</strong> busca en un solo árbol de lo que sabe el que decide, y arregla lo primero.</li>
+          </ul>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Páginas del tema 5">
+        <a class="pager-prev" href="mejoras.html"><span class="pager-l">Anterior</span><span class="pager-t">MCTS en la práctica</span></a>
+        <a class="pager-next" href="librerias.html"><span class="pager-l">Siguiente</span><span class="pager-t">Librerías</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#familias">Tres familias</a></li>
+            <li><a href="#azar">Nodos de azar</a></li>
+            <li><a href="#determinizar">Determinizar</a></li>
+            <li><a href="#trampas">Sus dos trampas</a></li>
+            <li><a href="#ismcts">ISMCTS</a></li>
+            <li><a href="#otra-cosa">Cuándo no basta</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 5</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="juegos.html"><span>01</span>Juegos por turnos</a></li>
+            <li><a href="mcts.html"><span>02</span>Monte Carlo Tree Search</a></li>
+            <li><a href="mejoras.html"><span>03</span>MCTS en la práctica</a></li>
+            <li><a href="informacion-imperfecta.html" aria-current="page"><span>04</span>Azar e información oculta</a></li>
+            <li><a href="librerias.html"><span>05</span>Librerías</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/mcts.js" defer></script>
+</body>
+</html>

@@ -671,6 +671,24 @@ pre code { background: none; padding: 0; font-size: inherit; }
   font-variant-numeric: tabular-nums;
 }
 
+/* Una fórmula aparte, dibujada con KaTeX al construir (tools/build.mjs): la
+   letra de un libro de matemáticas, alineada a la izquierda con el texto. Si es
+   más ancha que la columna, se desliza ella sola y no la página. */
+.tex-bloque {
+  margin: 0 0 1.4rem;
+  padding: .3rem 0 .3rem 1.4rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.tex-bloque .katex-display { margin: 0; }
+/* una fórmula en un título, una cabecera o un pie va en mayúsculas espaciadas: ella no */
+.katex { text-transform: none; letter-spacing: normal; font-size: 1.1em; }
+.tex-bloque .katex { font-size: 1.25em; }
+@media (max-width: 600px) {
+  .tex-bloque { padding-left: .4rem; }
+  .tex-bloque .katex { font-size: 1.05em; }
+}
+
 figure { margin: 0 0 1.6rem; max-width: var(--measure); }
 .shot {
   display: block;
@@ -921,6 +939,7 @@ footer.page .credito { font-size: .82rem; }
 [data-b="p2"]   { --b: var(--clyde);  --b-soft: color-mix(in oklab, var(--clyde)  20%, var(--surface)); }
 [data-b="p3"]   { --b: var(--blinky); --b-soft: color-mix(in oklab, var(--blinky) 20%, var(--surface)); }
 [data-b="p4"]   { --b: var(--pinky);  --b-soft: color-mix(in oklab, var(--pinky)  20%, var(--surface)); }
+[data-b="p5"]   { --b: var(--ink);    --b-soft: color-mix(in oklab, var(--ink)    14%, var(--surface)); }
 [data-b="mx"]   { --b: var(--ink-3);    --b-soft: var(--mx-ground); }
 [data-b="cb"]   { --b: var(--pill-ink); --b-soft: color-mix(in oklab, var(--pill)   26%, var(--surface)); }
 [data-b="bn"]   { --b: var(--ok);       --b-soft: color-mix(in oklab, var(--ok)     18%, var(--surface)); }
@@ -937,6 +956,7 @@ footer.page .credito { font-size: .82rem; }
   :root:not([data-theme="light"]) [data-b="p2"] { --b-soft: color-mix(in oklab, var(--clyde) 24%, var(--surface)); }
   :root:not([data-theme="light"]) [data-b="p3"] { --b-soft: color-mix(in oklab, var(--blinky) 24%, var(--surface)); }
   :root:not([data-theme="light"]) [data-b="p4"] { --b-soft: color-mix(in oklab, var(--pinky) 24%, var(--surface)); }
+  :root:not([data-theme="light"]) [data-b="p5"] { --b-soft: color-mix(in oklab, var(--ink) 18%, var(--surface)); }
   :root:not([data-theme="light"]) [data-b="mx"] { --b-soft: var(--mx-ground); }
   :root:not([data-theme="light"]) [data-b="cb"] { --b-soft: color-mix(in oklab, var(--pill) 26%, var(--surface)); }
   :root:not([data-theme="light"]) [data-b="bn"] { --b-soft: color-mix(in oklab, var(--ok) 26%, var(--surface)); }
@@ -947,6 +967,7 @@ footer.page .credito { font-size: .82rem; }
   :root[data-theme="dark"] [data-b="p2"] { --b-soft: color-mix(in oklab, var(--clyde) 24%, var(--surface)); }
   :root[data-theme="dark"] [data-b="p3"] { --b-soft: color-mix(in oklab, var(--blinky) 24%, var(--surface)); }
   :root[data-theme="dark"] [data-b="p4"] { --b-soft: color-mix(in oklab, var(--pinky) 24%, var(--surface)); }
+  :root[data-theme="dark"] [data-b="p5"] { --b-soft: color-mix(in oklab, var(--ink) 18%, var(--surface)); }
   :root[data-theme="dark"] [data-b="mx"] { --b-soft: var(--mx-ground); }
   :root[data-theme="dark"] [data-b="cb"] { --b-soft: color-mix(in oklab, var(--pill) 26%, var(--surface)); }
   :root[data-theme="dark"] [data-b="bn"] { --b-soft: color-mix(in oklab, var(--ok) 26%, var(--surface)); }
@@ -2456,3 +2477,72 @@ figure.lab-uno { max-width: 17rem; }
      que dice, y el color sigue contando lo mismo */
   .dm-inf-num { display: none; }
 }
+
+/* ---- tema 5: MCTS (assets/js/mcts.js) ----
+   Los dos jugadores con dos colores de fantasma: X en azul de laberinto y O
+   en rojo; en Conecta 4, vosotros en amarillo de píldora y la máquina en rojo.
+   El camino de cada iteración, en amarillo con su filo oscuro. */
+.mc-svg { cursor: default; }
+.mc-t { font-family: var(--f-mono); font-size: 10.5px; fill: var(--ink-2); }
+.mc-centro { text-anchor: middle; }
+.mc-dcha { text-anchor: end; }
+.mc-tenue { fill: var(--ink-3); color: var(--ink-3); }
+.mc-ucb { fill: var(--pill-ink); font-weight: 700; }
+.mc-maq-caja { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+.mc-maquina.ultima .mc-maq-caja { stroke: var(--ink-3); stroke-width: 2; }
+.mc-maquina.elegida .mc-maq-caja { fill: var(--pill-soft); stroke: var(--pill-ink); stroke-width: 2; }
+.mc-maq-nom { font-family: var(--f-display); font-size: 15px; font-weight: 700; fill: var(--ink); text-anchor: middle; }
+.mc-fondo { fill: var(--surface-2); stroke: var(--line); stroke-width: 1; }
+.mc-media { fill: var(--maze); }
+.mc-media.elegida { fill: var(--pill); stroke: var(--pill-ink); stroke-width: 1.5; }
+.mc-explora { fill: var(--pill); fill-opacity: .55; stroke: var(--pill-ink); stroke-width: 1; stroke-dasharray: 3 2; }
+.mc-explora.infinito { fill-opacity: .25; }
+.mc-real { stroke: var(--blinky); stroke-width: 2.5; }
+.mc-real-t { fill: var(--blinky); font-weight: 700; }
+.mc-tab { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+.mc-tab.raiz { stroke: var(--ink-3); }
+.mc-tab.camino { fill: var(--pill-soft); stroke: var(--pill-ink); stroke-width: 2.2; }
+.mc-tab.hoja { stroke: var(--pill-ink); stroke-width: 2.2; stroke-dasharray: 4 2; }
+.mc-tab.final { stroke: var(--ink); stroke-width: 1.6; }
+.mc-nuevo { fill: var(--line-soft); }
+.mc-rej { stroke: var(--line); stroke-width: 1; }
+.mc-x { fill: none; stroke: var(--maze); stroke-width: 2.2; stroke-linecap: round; }
+.mc-o { fill: none; stroke: var(--blinky); stroke-width: 2.2; }
+.mc-x.tenue, .mc-o.tenue { stroke-opacity: .45; stroke-dasharray: 2 2; }
+.mc-hueco { fill: none; stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 3; }
+.mc-arista { stroke: var(--ink-3); stroke-width: 1; }
+.mc-arista.vacia { stroke: var(--line); stroke-dasharray: 3 3; }
+.mc-arista.camino { stroke: var(--pill-ink); stroke-width: 2.6; }
+.mc-c4-marco { fill: var(--maze); }
+.mc-c4-hueco { fill: var(--surface); }
+.mc-c4-hueco.vos { fill: var(--pill); }
+.mc-c4-hueco.maq { fill: var(--blinky); }
+.mc-c4-hueco.ultima { stroke: var(--ink); stroke-width: 3; }
+.mc-c4-zona { fill: transparent; cursor: pointer; }
+.mc-c4-zona:hover { fill: var(--ink); fill-opacity: .06; }
+.mc-det { min-width: 30rem; font-variant-numeric: tabular-nums; }
+.mc-det td, .mc-det th { text-align: center; }
+.mc-det td.mejor { background: var(--pill-soft); font-weight: 700; }
+.mc-det .mc-palo { font-size: 1.15rem; }
+.mc-det .mc-medias th, .mc-det .mc-medias td { border-top: 1.5px solid var(--ink-3); font-weight: 700; }
+/* el árbol de un ejemplo de los apuntes: nodos de jugador, de azar y conjuntos de información */
+.mc-nodo { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.4; }
+.mc-nodo.max { fill: var(--maze-soft); stroke: var(--maze); }
+.mc-nodo.min { fill: color-mix(in srgb, var(--blinky) 14%, var(--surface)); stroke: var(--blinky); }
+.mc-nodo.azar { fill: var(--pill-soft); stroke: var(--pill-ink); }
+.mc-conjunto { fill: none; stroke: var(--inky); stroke-width: 1.6; stroke-dasharray: 5 3; }
+.mc-podada { stroke: var(--line); stroke-dasharray: 3 3; }
+/* juegos que usan MCTS: imágenes de dos en dos, de una en una en el móvil */
+.capturas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem 1.6rem; margin: 0 0 1.6rem; align-items: start; }
+.capturas figure { margin: 0; max-width: none; }
+@media (max-width: 640px) { .capturas { grid-template-columns: minmax(0, 1fr); } }
+/* un texto que cruzan las ramas: un borde del color del fondo lo separa de ellas */
+.mc-halo { paint-order: stroke; stroke: var(--surface-2); stroke-width: 5px; stroke-linejoin: round; }
+/* alfa-beta: la ventana de cada nodo, el nodo en el que se está y los que se podan */
+.mc-ab { font-size: 9.5px; fill: var(--ink-3); }
+.mc-ab.vivo { fill: var(--pill-ink); font-weight: 700; }
+.mc-nodo.actual { stroke: var(--pill-ink); stroke-width: 2.6; }
+.mc-nodo.podado { fill: var(--surface); stroke: var(--line); stroke-dasharray: 3 3; }
+.mc-ban .mc-t { font-size: 13px; }
+.mc-ban .mc-maq-nom { font-size: 17px; }
+.mc-c4 { max-width: 28rem; margin: 0 auto; }

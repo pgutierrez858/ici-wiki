@@ -13,6 +13,7 @@
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
 <link rel="stylesheet" href="../assets/css/ici.css">
 <script src="../assets/js/tema.js"></script>
 </head>
@@ -399,7 +400,7 @@ traza.resumen();</code></pre></div>
               <tr><td>Con dos salidas iguales gana siempre la misma, o una distinta en cada ejecución.</td><td>Un empate. Con el <code>MaxActionSelector</code> del ejemplo gana la primera del array; con uno que recorra el <code>HashMap</code> de salidas, cualquiera. Ved la <a href="#empates">sección&nbsp;5</a>.</td></tr>
               <tr><td>Un fantasma que no existe hace huir a Ms.&nbsp;Pac-Man.</td><td>Un <code>-1</code> como distancia, fuera de los términos: vale "cerca" con un 1. "No hay" tiene que ser un número dentro del rango, como <code>LEJOS</code>.</td></tr>
               <tr><td>Las entradas valen siempre lo mismo, o lo del turno anterior.</td><td>Atributos del <code>Input</code> inicializados en la declaración, que pisan lo que calcula <code>parseInput</code>; o una variable que no se manda en algún turno. Ved <a href="borroso-paso-a-paso.html#entradas">las entradas</a>.</td></tr>
-              <tr><td>Una regla con <code>NOT</code> se activa mucho más de lo que esperabais.</td><td><code>NOT lejos</code> no es <code>cerca</code>: es 1&nbsp;−&nbsp;μ, y vale algo en todo el tramo en que <code>lejos</code> no es 1. El <a href="borroso-paso-a-paso.html#paso4">paso&nbsp;4</a> del ejemplo.</td></tr>
+              <tr><td>Una regla con <code>NOT</code> se activa mucho más de lo que esperabais.</td><td><code>NOT lejos</code> no es <code>cerca</code>: es <!--tex 1 - \mu --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">1 - \mu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span><!--/tex-->, y vale algo en todo el tramo en que <code>lejos</code> no es 1. El <a href="borroso-paso-a-paso.html#paso4">paso&nbsp;4</a> del ejemplo.</td></tr>
               <tr><td>Una regla con <code>OR</code> y <code>AND</code> se activa cuando no debería.</td><td>jFuzzyLogic lee de izquierda a derecha, sin precedencia. Paréntesis.</td></tr>
               <tr><td>Con <code>METHOD : MM</code> salen valores absurdos, cerca de 0.</td><td>Un error de jFuzzyLogic 3.2 con la media de los máximos. Usad <code>COG</code>.</td></tr>
               <tr><td><code>TrazaBorrosa</code> o un <code>ConsoleFuzzyEngineObserver</code> enganchados en la entrega.</td><td>Escriben en cada turno y ralentizan el concurso. Fuera antes de subir el zip.</td></tr>
@@ -454,7 +455,7 @@ traza.resumen();</code></pre></div>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 11 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
