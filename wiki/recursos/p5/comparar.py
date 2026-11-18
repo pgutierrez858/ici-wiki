@@ -1,4 +1,4 @@
-"""Comparar versiones: cada versión juega contra los mismos rivales, desde las mismas
+"""Comparar versiones: cada versión (de MCTS, de alfa-beta o vuestra) juega contra los mismos rivales, desde las mismas
 aperturas y con los dos colores, y sale una tabla con los puntos.
 
 Cambiad lo de MAYÚSCULAS y ejecutad (en VS Code, "Comparar versiones" en Ejecutar y depurar).
@@ -12,11 +12,16 @@ import chess
 
 from ajedrez import AlfaBeta, Aleatorio, Voraz, jugar, puntos
 from grupoYY.mcts import MCTS
+from grupoYY.minimax import Minimax
 
 # Cada versión, con un nombre corto. Una función que crea el jugador (por eso el lambda).
+# Para probar un parámetro, la misma clase con otro valor; para probar una heurística, la vuestra:
+#     "mcts-c07": lambda: MCTS(c=0.7),
+#     "ab3": lambda: Minimax(profundidad=3),
+#     "ab2-centro": lambda: Minimax(evaluar=evaluar_centro),
 VERSIONES = {
-    "v0": lambda: MCTS(),
-    # "v1": lambda: MCTS(c=0.7),
+    "mcts": lambda: MCTS(),
+    "ab2": lambda: Minimax(profundidad=2),
 }
 
 RIVALES = {
@@ -37,7 +42,7 @@ APERTURAS = {
     "Inglesa": "c4 e5 Nc3 Nf6",
 }
 
-TIEMPO = 0.3          # segundos por jugada (en el concurso, 1)
+TIEMPO = 0.3          # segundos por jugada
 MAX_MEDIAS = 120      # medias jugadas desde la apertura; después decide el material
 PROCESOS = max(1, (os.cpu_count() or 2) // 2)
 

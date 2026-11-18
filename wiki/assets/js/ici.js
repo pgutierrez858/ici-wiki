@@ -249,4 +249,34 @@
       ul.parentNode.insertBefore(b, ul.nextSibling);
     }
   });
+
+  /* ---------- marcador de puntos ----------
+     Un [data-marcador="10"] suma los data-puntos de las casillas tachadas de
+     sus listas. Las de data-grupo="retos" cuentan como mucho tres, y entre
+     todas como mucho la mitad del total: son las misiones de la práctica. */
+  [].slice.call(document.querySelectorAll('[data-marcador]')).forEach(function (m) {
+    var maximo = Number(m.getAttribute('data-marcador')) || 10;
+    var total = m.querySelector('[data-total]'), barra = m.querySelector('[data-barra]'), msg = m.querySelector('[data-mensaje]');
+    var inicial = msg ? msg.textContent : '';
+    function num(x) { return String(Math.round(x * 100) / 100).replace('.', ','); }
+    function cuenta() {
+      var base = 0, retos = [];
+      [].slice.call(m.querySelectorAll('li[data-puntos]')).forEach(function (li) {
+        var c = li.querySelector('input[type=checkbox]');
+        if (!c || !c.checked) return;
+        var v = Number(li.getAttribute('data-puntos'));
+        if (li.getAttribute('data-grupo') === 'retos') retos.push(v); else base += v;
+      });
+      retos.sort(function (a, b) { return b - a; });
+      var deRetos = Math.min(maximo / 2, retos.slice(0, 3).reduce(function (a, b) { return a + b; }, 0));
+      var t = Math.min(maximo, base + deRetos);
+      total.textContent = num(t);
+      barra.style.width = (100 * t / maximo) + '%';
+      m.classList.toggle('lleno', t >= maximo);
+      if (msg) msg.textContent = t >= maximo ? '¡Práctica completa!'
+        : retos.length > 3 ? 'Ya tenéis más de tres retos: cuentan los tres que más valen.' : inicial;
+    }
+    m.addEventListener('change', cuenta);
+    cuenta();
+  });
 })();

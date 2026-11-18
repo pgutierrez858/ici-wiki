@@ -17,7 +17,7 @@ import chess
 
 VALOR = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 0}
 
-# Por encima de esto, una jugada se pierde por tiempo en el concurso.
+# Por encima de esto (veces el tiempo por jugada), una jugada va fuera de tiempo.
 MARGEN = 1.5
 
 
@@ -37,7 +37,7 @@ def jugar(blancas, negras, tiempo=1.0, max_medias=200, fen=chess.STARTING_FEN,
     motivo      por qué terminó, en una frase
     max_medias  límite de medias jugadas (una de blancas o una de negras). Al llegar,
                 gana quien tenga 3 o más puntos de material de ventaja; si no, tablas.
-    estricto    True en el concurso: una excepción, una jugada ilegal o pasarse de
+    estricto    con True, una excepción, una jugada ilegal o pasarse de
                 MARGEN veces el tiempo pierde la partida. Con False, las excepciones
                 saltan (para que veáis dónde) y el tiempo sólo avisa.
     al_mover    función (tablero, jugada, jugador, segundos) que se llama tras cada jugada

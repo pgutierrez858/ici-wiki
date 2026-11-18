@@ -200,8 +200,8 @@
           Lo que fija el juego es el <strong>tiempo por decisión</strong>:
         </p>
         <ul>
-          <li><strong>En la práctica</strong>, 1 segundo por jugada, y pasar de 1,5 pierde la partida. Por eso la plantilla
-            para al 90&nbsp;% del tiempo: el margen es para no pasarse.</li>
+          <li><strong>En la práctica</strong>, el que le deis: 0,3 segundos por jugada en <code>comparar.py</code>, 1 o 2 en
+            la ventana. La plantilla para al 90&nbsp;% del tiempo, para no pasarse.</li>
           <li><strong>En un juego por turnos</strong>, el jugador espera unos segundos como mucho, y si hay varios rivales,
             se los reparten entre todos.</li>
           <li><strong>En tiempo real</strong>, a 60 fotogramas por segundo, cada fotograma dura <!--tex 1000 / 60 \approx 16,7 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1000</mn><mi mathvariant="normal">/</mi><mn>60</mn><mo>≈</mo><mn>16,7</mn></mrow><annotation encoding="application/x-tex">1000 / 60 \approx 16{,}7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1000/60</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">16</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">7</span></span></span></span><!--/tex-->
@@ -314,8 +314,8 @@
 \text{AlfaBeta(4)} &amp; 2{,}57\ \text{s}
 \end{array}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:4.8em;vertical-align:-2.15em;"></span><span class="mord"><span class="mtable"><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(1)</span></span></span></span><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(2)</span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(3)</span></span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(4)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">003</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">013</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">25</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">57</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span></span></span></span></span></span></span></div><!--/TEX-->
         <p>
-          Cada media jugada más multiplica el tiempo, aquí entre 4 y 20 veces. A 1 segundo por jugada, <code>AlfaBeta(4)</code>
-          perdería las partidas por tiempo en el medio juego, aunque en la posición inicial tarde 0,66&nbsp;s. Por eso los
+          Cada media jugada más multiplica el tiempo, aquí entre 4 y 20 veces. Con 1 segundo por jugada, <code>AlfaBeta(4)</code>
+          se pasaría en el medio juego, aunque en la posición inicial tarde 0,66&nbsp;s. Por eso los
           programas de verdad no buscan a profundidad fija, sino con <strong>profundización iterativa</strong>: buscan a
           profundidad 1, luego a 2, luego a 3, hasta que se acaba el reloj, y juegan lo que dijo la última búsqueda
           completa. Parece un desperdicio repetir los niveles de arriba, pero cuestan poco al lado del último, y cada
@@ -593,7 +593,7 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
             <li><!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> es tan bueno como la evaluación. Con sólo material, el efecto horizonte vuelve: si la captura
               está un nivel por debajo de lo que ha crecido el árbol, <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> no la ve.</li>
             <li>Una respuesta sin probar no cuenta. Si probáis antes las capturas al expandir (la sección 04 y las ideas de la
-              <a href="../mcts-paso-a-paso.html#vuestro">guía</a>), las respuestas peligrosas entran pronto en el árbol y <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> las ve antes.</li>
+              <a href="../mcts-paso-a-paso.html#retos">guía</a>), las respuestas peligrosas entran pronto en el árbol y <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> las ve antes.</li>
             <li>Al final se sigue devolviendo la jugada más visitada. <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> cambia qué se visita, no cómo se elige.</li>
           </ul>
         </div>
@@ -614,8 +614,7 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
           construyen cada uno su árbol desde la misma posición, y al final se suman las visitas de cada jugada. En Python
           tienen que ser procesos (<code>multiprocessing</code>) y no hilos, porque los hilos no ejecutan código Python a la
           vez. En la práctica no se usa: el <a href="../../practicas/practica-5.html">enunciado</a> pide un jugador sin hilos
-          ni procesos, porque en el concurso se juegan muchas partidas a la vez en la misma máquina y cada jugador tiene que
-          pensar con un solo núcleo, en igualdad de condiciones.
+          ni procesos.
         </p>
       </section>
 
@@ -642,8 +641,8 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
         <div class="note tip">
           <span class="note-label">En la práctica</span>
           <p>
-            La <a href="../mcts-paso-a-paso.html">guía paso a paso</a> os lleva hasta el MCTS básico. A partir de ahí, cada
-            mejora es una versión nueva que se mide contra la anterior con los mismos rivales, como en las prácticas de antes.
+            La <a href="../mcts-paso-a-paso.html">guía paso a paso</a> os lleva hasta el MCTS básico, y propone retos para
+            seguir. Cada mejora es una versión nueva que se mide contra la anterior con los mismos rivales, como en las prácticas de antes.
             Una mejora que en teoría ayuda y en vuestras medidas no, se descarta, y eso también se cuenta en el diario.
           </p>
         </div>
@@ -698,7 +697,7 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

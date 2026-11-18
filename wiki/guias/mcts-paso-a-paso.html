@@ -6,8 +6,8 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>MCTS paso a paso · Guías · ICI</title>
-<meta name="description" content="La guía de la Práctica 5: un jugador de ajedrez con Monte Carlo Tree Search en Python, montado en seis pasos con VS Code, cada uno con su comprobación, y después medido contra rivales de referencia y mejorado con ideas propias.">
+<title>Práctica 5 paso a paso · Guías · ICI</title>
+<meta name="description" content="La guía de la Práctica 5: dos jugadores de ajedrez en Python con VS Code, minimax con poda alfa-beta y Monte Carlo Tree Search, paso a paso y con su comprobación; después, experimentos con profundidades, parámetros y heurísticas, y once retos para mejorarlos.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
@@ -52,18 +52,17 @@
     <span aria-hidden="true">/</span>
     <a href="index.html">Guías</a>
     <span aria-hidden="true">/</span>
-    <span>MCTS paso a paso</span>
+    <span>Práctica 5 paso a paso</span>
   </nav>
 
   <header class="masthead">
     <h1>
-      MCTS paso a paso
-      <span class="thin">La Práctica&nbsp;5 guiada: un jugador de ajedrez en Python, en seis huecos que se rellenan y se comprueban.</span>
+      Práctica 5 paso a paso
+      <span class="thin">Alfa-beta y MCTS en ajedrez, en Python: dos jugadores que se escriben por pasos, y después lo vuestro.</span>
     </h1>
     <p class="standfirst">
-      Del proyecto descargado a un MCTS que gana a un rival aleatorio: instalar Python y VS Code, lo justo de
-      python-chess, las cuatro fases del algoritmo escritas una a una con su comprobación, y cómo verlo jugar y medirlo.
-      Al final, la parte que es de cada grupo: qué se le puede cambiar a un MCTS y qué problema ataca cada cambio.
+      Un minimax con poda alfa-beta en tres pasos y un MCTS en seis, cada uno con su comprobación. Después,
+      experimentar con ellos y mejorarlos con alguno de los retos.
     </p>
   </header>
 
@@ -71,10 +70,47 @@
     <main>
 
       <p>
-        Antes de esta guía, leed en los apuntes del tema&nbsp;5 la página de
-        <a href="tema5/mcts.html">Monte Carlo Tree Search</a>: qué es un bandido multibrazo, de dónde sale UCB1 y qué
-        hace cada una de las cuatro fases. Aquí se programan sin volver a explicar la teoría desde cero.
+        La práctica tiene cuatro partes. Las dos primeras son guiadas y traen la solución plegada; las otras dos son
+        vuestras. La guía entera vale 5 puntos y los retos, otros 5 (el reparto está en el
+        <a href="../practicas/practica-5.html#evaluacion">enunciado</a>):
       </p>
+      <ol>
+        <li><a href="#alfabeta">Minimax con alfa-beta</a>, en tres pasos.</li>
+        <li><a href="#mcts">MCTS</a>, en seis pasos.</li>
+        <li><a href="#experimentar">Experimentar</a> con los dos: profundidades, parámetros y una heurística.</li>
+        <li><a href="#retos">Retos</a> a vuestra elección, de los once que se proponen o vuestros.</li>
+      </ol>
+      <p>
+        Antes de empezar, leed en los apuntes <a href="tema5/juegos.html">juegos por turnos</a> y
+        <a href="tema5/mcts.html">Monte Carlo Tree Search</a>: aquí no se vuelve a explicar la teoría.
+      </p>
+
+      <div class="marcador" data-marcador="10">
+        <div class="marcador-cabeza">
+          <span class="marcador-titulo">Vuestro marcador</span>
+          <span class="marcador-total"><b data-total>0</b> / 10</span>
+        </div>
+        <div class="marcador-barra" aria-hidden="true"><span data-barra></span></div>
+        <p class="marcador-nota" data-mensaje>Tachad lo que tengáis hecho. Se queda guardado en este navegador.</p>
+        <ul class="check marcador-guia" data-guardar="p5-marcador-guia">
+          <li data-puntos="2"><a href="#alfabeta">Alfa-beta</a>: A1 a A3 en <code>BIEN</code> · 2</li>
+          <li data-puntos="2"><a href="#mcts">MCTS</a>: M1 a M6 en <code>BIEN</code> · 2</li>
+          <li data-puntos="1"><a href="#experimentar">Experimentos</a>: uno con cada algoritmo · 1</li>
+        </ul>
+        <ul class="check marcador-retos" data-guardar="p5-marcador-retos">
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto1">1 · El rival también elige</a></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto2">2 · Vuestra heurística</a></li>
+            <li data-puntos="1.75" data-grupo="retos"><img src="../assets/img/misiones/cristal-azul.webp" alt="" width="22" height="22"> <a href="#reto3">3 · Mates primero</a></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto4">4 · Simulaciones que capturan</a></li>
+            <li data-puntos="1.75" data-grupo="retos"><img src="../assets/img/misiones/cristal-azul.webp" alt="" width="22" height="22"> <a href="#reto5">5 · Gestionar el tiempo</a></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto6">6 · Reaprovechar el árbol</a></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto7">7 · Profundización iterativa</a></li>
+            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto8">8 · Tabla de transposiciones</a></li>
+            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto9">9 · Búsqueda de quietud</a></li>
+            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto10">10 · Minimax implícito</a></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto11">11 · Un híbrido</a></li>
+        </ul>
+      </div>
 
       <section id="proyecto">
         <div class="sec-head">
@@ -82,9 +118,9 @@
           <h2 class="sec">El proyecto de partida</h2>
         </div>
         <p>
-          Esta práctica es en <strong>Python</strong>, y el entorno es el <strong>ajedrez</strong>. Las reglas del ajedrez (qué jugadas son legales, cuándo hay mate, el enroque, la
-          captura al paso) las pone la biblioteca <a href="https://python-chess.readthedocs.io/">python-chess</a>, así
-          que vosotros sólo os ocupáis de decidir. Todo lo demás viene en una carpeta lista para abrir en VS Code.
+          Esta práctica es en <strong>Python</strong>, y el entorno es el <strong>ajedrez</strong>. Las reglas (jugadas
+          legales, mate, enroque, captura al paso) las pone la biblioteca
+          <a href="https://python-chess.readthedocs.io/">python-chess</a>; vosotros sólo decidís qué jugar.
         </p>
         <ul class="links">
           <li>
@@ -92,8 +128,8 @@
               <span class="lt"><code>ICI-Practica5.zip</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
               <span class="lm">Una carpeta para VS Code</span>
               <span class="ld">
-                La plantilla del MCTS con sus seis huecos, el programa que comprueba cada paso, la ventana para ver
-                partidas y jugar contra vuestro jugador, el banco para comparar versiones y los rivales de referencia.
+                Las plantillas de los dos jugadores, las comprobaciones de cada paso, una ventana para ver partidas y jugar,
+                el banco para comparar versiones y los rivales de referencia.
               </span>
             </a>
           </li>
@@ -105,69 +141,54 @@
             <h3 class="label">Instalarlo todo, una vez</h3>
             <ol>
               <li>
-                <strong>Python 3.10 o más nuevo.</strong> Si no lo tenéis, de
-                <a href="https://www.python.org/downloads/">python.org</a>. En Windows, en la primera pantalla del
-                instalador marcad <strong>"Add python.exe to PATH"</strong>: si no, la terminal no lo encuentra.
+                <strong>Python 3.10 o más nuevo</strong>, de <a href="https://www.python.org/downloads/">python.org</a>.
+                En Windows, marcad <strong>"Add python.exe to PATH"</strong> en la primera pantalla del instalador.
               </li>
-              <li>
-                <strong>VS Code</strong>, y dentro, la extensión <strong>Python</strong> de Microsoft (en la barra de la
-                izquierda, Extensiones, buscad "Python"). Trae el depurador.
-              </li>
+              <li><strong>VS Code</strong>, con la extensión <strong>Python</strong> de Microsoft.</li>
               <li>
                 Descomprimid el zip y abrid <strong>la carpeta <code>ICI-Practica5</code></strong> con
-                <span class="path">File &gt; Open Folder…</span>. Tiene que ser esa carpeta y no la de encima: los
-                lanzadores de <code>.vscode/launch.json</code> buscan los programas en la carpeta abierta.
+                <span class="path">File &gt; Open Folder…</span>. Esa carpeta, no la de encima.
               </li>
               <li>
-                <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> en Mac),
-                <span class="path">Python: Create Environment &gt; Venv</span>, elegid vuestro Python y marcad
-                <code>requirements.txt</code>. VS Code crea una carpeta <code>.venv</code> con un Python sólo para esta
-                práctica y le instala <code>chess</code> y <code>pygame-ce</code>. Tarda un minuto.
+                <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> (<kbd>Cmd</kbd> en Mac),
+                <span class="path">Python: Create Environment &gt; Venv</span>, vuestro Python y
+                <code>requirements.txt</code>. Crea una carpeta <code>.venv</code> con <code>chess</code> y
+                <code>pygame-ce</code>.
               </li>
               <li>
-                Comprobad que VS Code usa ese Python: abajo a la derecha, con un <code>.py</code> abierto, tiene que poner
-                algo como <code>3.12.4 ('.venv': venv)</code>. Si no, clic ahí y elegid el de <code>.venv</code>.
+                Abajo a la derecha, con un <code>.py</code> abierto, tiene que poner algo como
+                <code>3.12.4 ('.venv': venv)</code>. Si no, clic ahí y elegid el de <code>.venv</code>.
               </li>
               <li>
-                Abrid <span class="path">Ejecutar y depurar</span> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>), elegid
-                <strong>Ver partida</strong> en el desplegable de arriba y pulsad <kbd>F5</kbd>. Se abre la ventana con el
-                tablero y, enseguida, el panel de la derecha dice <code>Error: NotImplementedError</code>, porque
-                <code>MCTS</code> está sin hacer. Si llega ahí, el entorno está bien.
+                <span class="path">Ejecutar y depurar</span> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>),
+                <strong>Ver partida</strong> y <kbd>F5</kbd>. Si se abre una ventana con una partida entre Voraz y
+                AlfaBeta2, el entorno está bien.
               </li>
             </ol>
-            <p>
-              Para comprobar la ventana sin vuestro código, cambiad en <code>ver_partida.py</code> la línea
-              <code>BLANCAS = MCTS()</code> por <code>BLANCAS = Aleatorio()</code> y volved a lanzarlo: se juega una
-              partida entera entre Aleatorio y Voraz.
-            </p>
           </div>
         </div>
 
         <h3 class="label">Los lanzadores</h3>
-        <p>
-          En <span class="path">Ejecutar y depurar</span> hay cinco. Todos se lanzan con <kbd>F5</kbd> y se paran en los
-          puntos de ruptura que pongáis.
-        </p>
         <div class="table-scroll">
           <table class="ancha">
             <thead><tr><th scope="col">Lanzador</th><th scope="col">Qué hace</th></tr></thead>
             <tbody>
-              <tr><td><strong>Comprobar paso…</strong></td><td>Pregunta qué paso (del 1 al 6) y lo comprueba con <code>comprobar.py</code>. Es el que más vais a usar.</td></tr>
-              <tr><td><strong>Comprobar todos los pasos</strong></td><td>Todos en orden, hasta el primero que esté sin hacer o que falle.</td></tr>
+              <tr><td><strong>Comprobar paso…</strong></td><td>Pregunta un paso (de <code>a1</code> a <code>m6</code>) y lo comprueba. Es el que más vais a usar.</td></tr>
+              <tr><td><strong>Comprobar todos los pasos</strong></td><td>Los nueve, y dice de cada uno si está bien, mal o sin hacer.</td></tr>
               <tr><td><strong>Ver partida</strong></td><td>Una partida en la ventana, con los jugadores de <code>ver_partida.py</code>.</td></tr>
-              <tr><td><strong>Jugar contra el MCTS</strong></td><td>Vosotros con el ratón contra vuestro MCTS (<code>jugar_contra.py</code>).</td></tr>
+              <tr><td><strong>Jugar contra vuestro jugador</strong></td><td>Vosotros con el ratón (<code>jugar_contra.py</code>).</td></tr>
               <tr><td><strong>Comparar versiones</strong></td><td>Vuestras versiones contra los rivales de referencia, con una tabla de puntos (<code>comparar.py</code>).</td></tr>
             </tbody>
           </table>
         </div>
         <p>
-          Sin VS Code, lo mismo desde una terminal abierta en la carpeta, con el entorno activado:
+          Sin VS Code, lo mismo desde una terminal en la carpeta:
         </p>
 <pre><code>python -m venv .venv
 .venv\Scripts\activate             <span class="c"># Windows</span>
 source .venv/bin/activate          <span class="c"># Mac y Linux</span>
 pip install -r requirements.txt
-python comprobar.py 1
+python comprobar.py a1
 python ver_partida.py</code></pre>
 
         <h3 class="label">Qué hay en la carpeta</h3>
@@ -175,75 +196,44 @@ python ver_partida.py</code></pre>
           <table class="ancha">
             <thead><tr><th scope="col">Archivo</th><th scope="col">Qué es</th></tr></thead>
             <tbody>
-              <tr><td><code>grupoYY/mcts.py</code></td><td>Vuestro MCTS. Lo que se rellena en los <a href="#pasos">seis pasos</a>.</td></tr>
-              <tr><td><code>grupoYY/__init__.py</code></td><td><code>jugador()</code>: la versión que va al concurso.</td></tr>
-              <tr><td><code>comprobar.py</code></td><td>Comprueba cada paso con casos escritos a mano: <code>python comprobar.py 3</code>.</td></tr>
-              <tr><td><code>ver_partida.py</code></td><td>Una partida en una ventana, con lo que pensó cada jugador al lado.</td></tr>
-              <tr><td><code>jugar_contra.py</code></td><td>Vosotros contra vuestro MCTS.</td></tr>
-              <tr><td><code>comparar.py</code></td><td>Versiones contra los rivales de referencia, desde ocho aperturas y con los dos colores.</td></tr>
+              <tr><td><code>grupoYY/minimax.py</code></td><td>Vuestro minimax con alfa-beta: <a href="#alfabeta">la primera parte</a>.</td></tr>
+              <tr><td><code>grupoYY/mcts.py</code></td><td>Vuestro MCTS: <a href="#mcts">la segunda parte</a>.</td></tr>
+              <tr><td><code>grupoYY/__init__.py</code></td><td><code>jugador()</code>: la versión que entregáis como la vuestra.</td></tr>
+              <tr><td><code>comprobar.py</code></td><td>Comprueba cada paso: <code>python comprobar.py a2</code>.</td></tr>
+              <tr><td><code>ver_partida.py</code>, <code>jugar_contra.py</code></td><td>Ver una partida, o jugarla vosotros.</td></tr>
+              <tr><td><code>comparar.py</code></td><td>Versiones contra los rivales, desde ocho aperturas y con los dos colores.</td></tr>
               <tr><td><code>ajedrez/</code></td><td>El entorno: partidas, rivales y ventana. <strong>No se modifica.</strong></td></tr>
-              <tr><td><code>.vscode/launch.json</code></td><td>Los cinco lanzadores.</td></tr>
             </tbody>
           </table>
         </div>
 
         <div class="note trap">
-          <span class="note-label">"python" no se reconoce como un comando</span>
-          <p>
-            En Windows, Python se instaló sin marcar "Add python.exe to PATH". Volved a lanzar el instalador,
-            <strong>Modify</strong>, y marcadlo. Mientras tanto, <code>py</code> suele funcionar en su lugar:
-            <code>py -m venv .venv</code>.
-          </p>
-        </div>
-        <div class="note trap">
-          <span class="note-label">ModuleNotFoundError: No module named 'chess'</span>
-          <p>
-            VS Code está usando un Python que no es el de <code>.venv</code>. Mirad abajo a la derecha qué intérprete
-            sale y cambiadlo, o <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, <span class="path">Python: Select
-            Interpreter</span>. En la terminal, lo mismo: si el prompt no empieza por <code>(.venv)</code>, el entorno
-            no está activado.
-          </p>
-        </div>
-        <div class="note trap">
-          <span class="note-label">PowerShell no deja activar el entorno</span>
-          <p>
-            Si <code>.venv\Scripts\activate</code> dice que "la ejecución de scripts está deshabilitada", una vez:
-            <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>, y abrid otra terminal. Desde los
-            lanzadores de VS Code no hace falta activar nada.
-          </p>
-        </div>
-        <div class="note tip">
-          <span class="note-label">En Mac con el Python de Homebrew</span>
-          <p>
-            El Python de Homebrew viene sin <code>tkinter</code>, y por eso la ventana usa <strong>pygame-ce</strong>,
-            que se instala con <code>pip</code> como cualquier otra biblioteca y no necesita nada del sistema. Si al
-            instalar <code>requirements.txt</code> pygame-ce falla, casi siempre es un Python demasiado nuevo para el
-            que todavía no hay versión: cread el entorno con un Python un poco más antiguo (3.12 o 3.13).
-          </p>
+          <span class="note-label">Si algo no arranca</span>
+          <ul>
+            <li><strong>"python" no se reconoce como un comando</strong> (Windows): reinstalad marcando "Add python.exe to
+              PATH". Mientras, <code>py</code> suele funcionar en su lugar.</li>
+            <li><strong>No module named 'chess'</strong>: VS Code usa otro Python. Elegid el de <code>.venv</code> abajo a
+              la derecha, o con <span class="path">Python: Select Interpreter</span>.</li>
+            <li><strong>PowerShell no deja activar el entorno</strong>: una vez,
+              <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>. Desde los lanzadores no hace falta.</li>
+            <li><strong>pygame-ce no se instala</strong>: vuestro Python es demasiado nuevo. Cread el entorno con 3.12 o
+              3.13.</li>
+          </ul>
         </div>
 
-        <h3 class="label">Depurar: mirar el árbol por dentro</h3>
+        <h3 class="label">Depurar</h3>
         <p>
-          Lo que más ayuda en esta práctica es <strong>parar el programa y mirar el árbol</strong>. Poned un punto de
-          ruptura con <kbd>F9</kbd> (o clic a la izquierda del número de línea) en la última línea de
-          <code>elegir</code>, lanzad <strong>Comprobar paso…</strong> con el 6 y, cuando se pare, desplegad
-          <code>raiz</code> en el panel <strong>Variables</strong>: veréis sus <code>hijos</code>, las
-          <code>visitas</code> y el <code>valor</code> de cada uno, y podéis bajar por el árbol tanto como queráis.
-          <kbd>F10</kbd> avanza una línea, <kbd>F11</kbd> entra en la función, <kbd>F5</kbd> sigue hasta el siguiente
-          punto. En la <strong>Consola de depuración</strong> se puede escribir Python con las variables de ese
-          momento: <code>[(h.jugada.uci(), h.visitas) for h in raiz.hijos]</code>.
+          Lo que más ayuda es parar el programa y mirar el árbol. Poned un punto de ruptura (<kbd>F9</kbd>) en la última
+          línea de <code>elegir</code> del MCTS, lanzad <strong>Comprobar paso…</strong> con <code>m6</code>, y en el
+          panel <strong>Variables</strong> desplegad <code>raiz</code>: sus hijos, sus visitas, su valor. En la
+          <strong>Consola de depuración</strong> se puede escribir Python con las variables de ese momento, por ejemplo
+          <code>[(h.jugada.uci(), h.visitas) for h in raiz.hijos]</code>.
         </p>
-        <div class="note tip">
-          <span class="note-label">Si preferís Jupyter</span>
-          <p>
-            También se puede, aunque la guía está pensada para VS Code. Cread el notebook dentro de
-            <code>ICI-Practica5</code>, para que <code>from grupoYY.mcts import MCTS</code> funcione, y usad
-            <code>%run comprobar.py 3</code> para comprobar un paso. La ventana de pygame no hace falta: en un notebook,
-            un <code>chess.Board</code> que quede como última línea de una celda se pinta solo como un tablero.
-            Lo único que no va bien es <code>comparar.py</code>, que reparte las partidas entre procesos: lanzadlo desde
-            una terminal.
-          </p>
-        </div>
+        <p>
+          Con Jupyter también se puede: cread el notebook dentro de <code>ICI-Practica5</code> y usad
+          <code>%run comprobar.py m3</code>. Sólo <code>comparar.py</code>, que usa varios procesos, hay que lanzarlo
+          desde una terminal.
+        </p>
       </section>
 
       <section id="python-chess">
@@ -251,9 +241,6 @@ python ver_partida.py</code></pre>
           <span class="num">02</span>
           <h2 class="sec">python-chess en cinco minutos</h2>
         </div>
-        <p>
-          De toda la biblioteca, os basta con esto:
-        </p>
 <pre><code><span class="k">import</span> chess
 <span class="k">from</span> ajedrez <span class="k">import</span> material
 
@@ -273,28 +260,157 @@ material(t, chess.WHITE)               <span class="c"># material de blancas men
 chess.Move.from_uci(<span class="s">"e2e4"</span>)            <span class="c"># una jugada escrita a mano</span>
 t.san(jugadas[<span class="n">0</span>])                      <span class="c"># la jugada en notación de ajedrez: "Nh3"</span></code></pre>
         <p>
-          <code>material</code> viene de la carpeta <code>ajedrez</code>: cuenta peón 1, caballo y alfil 3, torre 5 y
-          dama 9, y resta lo de un color de lo del otro. Al empezar vale 0, y si las blancas tienen una dama de más,
-          <code>material(t, chess.WHITE)</code> vale 9 y <code>material(t, chess.BLACK)</code>, −9.
+          <code>material</code> viene de la carpeta <code>ajedrez</code>: peón 1, caballo y alfil 3, torre 5, dama 9, lo
+          de un color menos lo del otro. Con una dama blanca de más, <code>material(t, chess.WHITE)</code> vale 9 y
+          <code>material(t, chess.BLACK)</code>, −9.
         </p>
         <div class="note trap">
           <span class="note-label">Mateado es el que tiene el turno</span>
           <p>
-            Cuando <code>t.is_checkmate()</code> es verdad, el que está mateado es <code>t.turn</code>: el que tendría
-            que mover y no puede. El que ha ganado es <code>not t.turn</code>. Este detalle decide si el paso&nbsp;1
-            sale bien o al revés.
+            Si <code>t.is_checkmate()</code> es verdad, el mateado es <code>t.turn</code> y el que ha ganado,
+            <code>not t.turn</code>. Este detalle decide si los pasos A1 y M1 salen bien o al revés.
           </p>
         </div>
       </section>
 
-      <section id="nodo">
+      <section id="alfabeta">
         <div class="sec-head">
           <span class="num">03</span>
-          <h2 class="sec">El árbol: la clase Nodo</h2>
+          <h2 class="sec">Primera parte: minimax con alfa-beta</h2>
         </div>
         <p>
-          La plantilla ya trae el nodo hecho. Cada nodo es una posición del árbol, y guarda cómo se llegó a ella y lo que
-          se sabe de ella hasta ahora:
+          El jugador clásico: mirarlo todo hasta una profundidad fija, valorar con una heurística las posiciones donde se
+          corta y subir los valores con minimax. Está en <code>grupoYY/minimax.py</code>, con tres huecos. La clase
+          <code>Minimax</code>, que prueba cada jugada y se queda con la mejor, ya viene hecha.
+        </p>
+        <p>
+          Después de cada hueco, <strong>Comprobar paso…</strong> con su nombre. Sale <code>A2: BIEN</code>, o
+          <code>A2: MAL.</code> con lo que esperaba y lo que ha salido. Intentadlo antes de abrir la solución.
+        </p>
+
+        <div class="step" id="pasoA1">
+          <span class="step-num">A1</span>
+          <div class="step-body">
+            <h3 class="label">Evaluar una posición</h3>
+            <p>
+              La heurística de serie es la más básica posible: el material. Si la partida ha terminado no hace falta
+              estimar: un mate vale <code>MATE</code> (1000) o <code>-MATE</code>, y unas tablas, 0.
+            </p>
+            <p>
+              <strong>Pista:</strong> primero el mate, luego las tablas, y si no, <code>material(tablero, color)</code>.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="k">def</span> evaluar(tablero, color):
+    <span class="k">if</span> tablero.is_checkmate():
+        <span class="k">return</span> -MATE <span class="k">if</span> tablero.turn == color <span class="k">else</span> MATE
+    <span class="k">if</span> tablero.is_stalemate() <span class="k">or</span> tablero.is_insufficient_material():
+        <span class="k">return</span> <span class="n">0</span>
+    <span class="k">return</span> material(tablero, color)</code></pre>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="step" id="pasoA2">
+          <span class="step-num">A2</span>
+          <div class="step-body">
+            <h3 class="label">Minimax</h3>
+            <p>
+              <code>minimax(tablero, profundidad, color)</code> devuelve lo que vale la posición para <code>color</code>,
+              el que decide en la raíz. Donde mueve <code>color</code> (MAX), el mayor valor de los hijos; donde mueve el
+              rival (MIN), el menor. Con profundidad 0 o la partida acabada, <code>evaluar</code>.
+            </p>
+            <p>
+              La comprobación usa un peón envenenado: la dama blanca puede comerse el peón de d5, pero lo defiende el de
+              e6. A profundidad 1, comer parece ganar un peón (+8); a profundidad 2 se ve que os comen la dama, y lo mejor
+              es no comer (+7).
+            </p>
+            <p>
+              <strong>Pista:</strong> <code>tablero.push(jugada)</code>, la llamada con <code>profundidad - 1</code> y
+              <code>tablero.pop()</code>. Pasad <code>evaluar</code> en la llamada recursiva: así podréis probar otras
+              heurísticas más adelante.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="k">def</span> minimax(tablero, profundidad, color, evaluar=evaluar):
+    <span class="k">if</span> profundidad == <span class="n">0</span> <span class="k">or</span> tablero.is_game_over():
+        <span class="k">return</span> evaluar(tablero, color)
+    valores = []
+    <span class="k">for</span> jugada <span class="k">in</span> tablero.legal_moves:
+        tablero.push(jugada)
+        valores.append(minimax(tablero, profundidad - <span class="n">1</span>, color, evaluar))
+        tablero.pop()
+    <span class="k">return</span> max(valores) <span class="k">if</span> tablero.turn == color <span class="k">else</span> min(valores)</code></pre>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="step" id="pasoA3">
+          <span class="step-num">A3</span>
+          <div class="step-body">
+            <h3 class="label">Alfa-beta</h3>
+            <p>
+              La poda de los apuntes: <code>alfa</code>, lo que MAX ya tiene asegurado; <code>beta</code>, lo que MIN ya
+              tiene asegurado. En un nodo de MAX cada hijo puede subir <code>alfa</code>, en uno de MIN puede bajar
+              <code>beta</code>, y cuando <code>alfa &gt;= beta</code> sobran los hijos que quedan. Si no lo tenéis claro,
+              repasad la <a href="tema5/juegos.html#alfabeta">traza paso a paso</a>. Recorred los hijos con
+              <code>ordenar</code>, que pone las capturas primero y así se poda antes.
+            </p>
+            <p>
+              La comprobación mira que dé lo mismo que <code>minimax</code> evaluando menos posiciones. Desde la posición
+              inicial, a profundidad 3, minimax evalúa 8&#8239;902 y alfa-beta, 519.
+            </p>
+            <details class="detras">
+              <summary>Si os atascáis</summary>
+              <div style="padding:0 1.1rem .4rem">
+<pre><code><span class="k">def</span> alfabeta(tablero, profundidad, color, alfa=-math.inf, beta=math.inf, evaluar=evaluar):
+    <span class="k">if</span> profundidad == <span class="n">0</span> <span class="k">or</span> tablero.is_game_over():
+        <span class="k">return</span> evaluar(tablero, color)
+    <span class="k">if</span> tablero.turn == color:                        <span class="c"># MAX</span>
+        mejor = -math.inf
+        <span class="k">for</span> jugada <span class="k">in</span> ordenar(tablero, list(tablero.legal_moves)):
+            tablero.push(jugada)
+            mejor = max(mejor, alfabeta(tablero, profundidad - <span class="n">1</span>, color, alfa, beta, evaluar))
+            tablero.pop()
+            alfa = max(alfa, mejor)
+            <span class="k">if</span> alfa &gt;= beta:
+                <span class="k">break</span>
+        <span class="k">return</span> mejor
+    mejor = math.inf                                   <span class="c"># MIN</span>
+    <span class="k">for</span> jugada <span class="k">in</span> ordenar(tablero, list(tablero.legal_moves)):
+        tablero.push(jugada)
+        mejor = min(mejor, alfabeta(tablero, profundidad - <span class="n">1</span>, color, alfa, beta, evaluar))
+        tablero.pop()
+        beta = min(beta, mejor)
+        <span class="k">if</span> alfa &gt;= beta:
+            <span class="k">break</span>
+    <span class="k">return</span> mejor</code></pre>
+              </div>
+            </details>
+          </div>
+        </div>
+        <p>
+          Ya tenéis un jugador: <code>Minimax(profundidad=2)</code> mira su jugada y la respuesta, y
+          <code>Minimax(poda=False)</code> usa minimax a secas. Ponedlo en <code>ver_partida.py</code> y miradlo jugar.
+        </p>
+      </section>
+
+      <section id="mcts">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Segunda parte: MCTS</h2>
+        </div>
+        <p>
+          El segundo jugador reparte el tiempo en miles de iteraciones de cuatro fases y hace crecer el árbol hacia lo que
+          promete. Está en <code>grupoYY/mcts.py</code>, con seis huecos, de <code>m1</code> a <code>m6</code>.
+        </p>
+        <h3 class="label" id="nodo">El nodo</h3>
+        <p>
+          La plantilla trae la clase <code>Nodo</code> hecha:
         </p>
 <pre><code><span class="k">class</span> Nodo:
     <span class="k">def</span> __init__(self, tablero, padre=<span class="k">None</span>, jugada=<span class="k">None</span>):
@@ -304,60 +420,23 @@ t.san(jugadas[<span class="n">0</span>])                      <span class="c"># 
         self.sin_probar = list(tablero.legal_moves)   <span class="c"># las jugadas que todavía no tienen hijo</span>
         random.shuffle(self.sin_probar)
         self.visitas = <span class="n">0</span>                              <span class="c"># N: cuántas simulaciones han pasado por aquí</span>
-        self.valor = <span class="n">0.0</span>                              <span class="c"># W: la suma de sus recompensas...</span>
-        self.color = <span class="k">not</span> tablero.turn                 <span class="c"># ...vistas por quien hizo `jugada`</span></code></pre>
+        self.valor = <span class="n">0.0</span>                              <span class="c"># W: la suma de sus recompensas</span>
+        self.color = <span class="k">not</span> tablero.turn                 <span class="c"># quien hizo `jugada` (os hará falta en el reto 1)</span></code></pre>
         <p>
-          Llamamos <strong>N</strong> a las visitas de un nodo y <strong>W</strong> a la suma de las recompensas que
-          ha recibido; su media, W/N, es lo bien que le va. Dos cosas que conviene entender antes de seguir:
-        </p>
-        <ul>
-          <li>
-            <strong>El nodo no guarda el tablero.</strong> Sólo la jugada. En cada iteración se parte de una copia del
-            tablero de la raíz y se van haciendo las jugadas de los nodos por los que se baja. Guardar un tablero por
-            nodo gastaría mucha memoria con miles de nodos.
-          </li>
-          <li>
-            <strong><code>color</code> es quien hizo la jugada que lleva al nodo</strong>, no a quién le toca en él.
-            Como el tablero que recibe el constructor ya tiene la jugada hecha, el que movió es
-            <code>not tablero.turn</code>. Y <code>valor</code> se suma desde el punto de vista de ese color. Es lo que
-            hace que la selección funcione igual para blancas y para negras, y se ve en el
-            <a href="#paso5">paso&nbsp;5</a>.
-          </li>
-        </ul>
-      </section>
-
-      <section id="pasos">
-        <div class="sec-head">
-          <span class="num">04</span>
-          <h2 class="sec">Seis huecos, paso a paso</h2>
-        </div>
-        <p>
-          Cada función de <code>grupoYY/mcts.py</code> con <code>raise NotImplementedError</code> es un hueco. Se
-          rellenan en orden, y después de cada uno se lanza <strong>Comprobar paso…</strong> con su número. Si todo va
-          bien sale <code>Paso 3: BIEN</code>; si no, <code>Paso 3: MAL.</code> seguido de lo que esperaba y lo que ha
-          salido. No paséis al siguiente hasta tener el <code>BIEN</code>: cada paso se apoya en los anteriores.
-        </p>
-        <p>
-          Cada paso trae la idea, una pista y, plegada, la solución. Intentadlo antes de abrirla: son entre tres y doce
-          líneas cada uno, y escribirlas es la mejor forma de entender el algoritmo. Lo que se evalúa de verdad es lo que
-          hagáis <a href="#vuestro">después</a>.
+          <strong>N</strong> son las visitas y <strong>W</strong>, la suma de recompensas; W/N es lo bien que le va. El nodo
+          no guarda el tablero, sólo la jugada: en cada iteración se copia el tablero de la raíz y se van haciendo las
+          jugadas al bajar. <code>color</code> es quien hizo la jugada que lleva al nodo; os hará falta en el
+          <a href="#reto1">reto 1</a>.
         </p>
 
-        <div class="step" id="paso1">
-          <span class="step-num">1</span>
+        <div class="step" id="pasoM1">
+          <span class="step-num">M1</span>
           <div class="step-body">
-            <h3 class="label">La recompensa: cuánto le gusta una posición a un color</h3>
+            <h3 class="label">La recompensa</h3>
             <p>
-              Cada simulación termina en una posición, y hay que convertirla en un número entre 0 (perdida) y 1 (ganada)
-              para un color dado. Si la partida ha terminado es fácil: mate, 0 o 1; ahogado o material insuficiente,
-              tablas, 0,5. Si no ha terminado, porque cortamos la simulación antes (lo veréis en el
-              <a href="#paso4">paso&nbsp;4</a>), hay que estimar quién va mejor, y la estimación más sencilla es el
-              material.
-            </p>
-            <p>
-              Pero el material no está entre 0 y 1: va de −39 a 39. Para llevarlo a esa escala se usa una
-              <strong>sigmoide</strong>: <!--tex 1 / (1 + e^{-m/3}) --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi><mi mathvariant="normal">/</mi><mn>3</mn></mrow></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">1 / (1 + e^{-m/3})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.138em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">m</span><span class="mord mtight">/3</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><!--/tex-->, donde <!--tex m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> es el material del color que pregunta. Con
-              material igualado da 0,5, crece con cada pieza de ventaja y nunca llega del todo a 1:
+              El mismo material del paso A1, pero llevado a una escala de 0 (perdida) a 1 (ganada) con una
+              <strong>sigmoide</strong>: <!--tex 1 / (1 + e^{-m/3}) --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>m</mi><mi mathvariant="normal">/</mi><mn>3</mn></mrow></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">1 / (1 + e^{-m/3})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.138em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">m</span><span class="mord mtight">/3</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><!--/tex-->, con <!--tex m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> el material
+              del color que pregunta. Mate, 0 o 1; ahogado o material insuficiente, 0,5.
             </p>
 <pre class="cuenta">m = 0    (igualado)           0,50
 m = 1    (un peón más)        0,58
@@ -366,22 +445,9 @@ m = 5    (una torre más)      0,84
 m = 9    (una dama más)       0,95
 m = −3   (un caballo menos)   0,27</pre>
             <p>
-              Por qué así y no de otra forma. Las recompensas tienen que estar en la misma escala que ganar y perder,
-              porque UCB1 suma la media con un término de exploración pensado para valores entre 0 y 1 (el
-              <a href="#paso2">paso&nbsp;2</a>). La sigmoide además hace que <strong>un mate valga siempre más que
-              cualquier ventaja de material</strong>: un 1 exacto contra un 0,95 como mucho. Y el 3 que divide a m
-              decide lo deprisa que sube la curva: con un número más pequeño, un peón de más ya parecería casi una
-              victoria. Es la primera decisión de diseño que podréis cambiar más adelante.
-            </p>
-            <p>
-              <strong>Pista:</strong> mirad primero si hay mate, con el aviso de la
-              <a href="#python-chess">sección anterior</a> sobre quién es el mateado; después las tablas; y si no, la
-              fórmula, con <code>math.exp</code>.
-            </p>
-            <p>
-              <strong>Qué comprueba:</strong> el mate del loco (las negras dan mate en la segunda jugada) tiene que dar 1
-              a las negras y 0 a las blancas; un rey ahogado, 0,5; la posición inicial, 0,5; una dama de más, 0,953 para
-              las blancas y lo que falta hasta 1 para las negras.
+              Hace falta esa escala porque UCB1 suma la media con un término pensado para valores entre 0 y 1. Además, un
+              mate (1) vale siempre más que cualquier ventaja (0,95 como mucho). El 3 decide lo deprisa que sube la curva,
+              y es un parámetro que podéis tocar.
             </p>
             <details class="detras">
               <summary>Si os atascáis</summary>
@@ -397,20 +463,14 @@ m = −3   (un caballo menos)   0,27</pre>
           </div>
         </div>
 
-        <div class="step" id="paso2">
-          <span class="step-num">2</span>
+        <div class="step" id="pasoM2">
+          <span class="step-num">M2</span>
           <div class="step-body">
             <h3 class="label">Selección: UCB1</h3>
             <p>
-              Para bajar por el árbol, en cada nodo hay que elegir un hijo. Si se elige siempre el de mejor media, una
-              jugada que tuvo mala suerte en sus primeras simulaciones no se vuelve a probar nunca; si se elige al azar,
-              se malgastan simulaciones en jugadas malas. <strong>UCB1</strong> reparte entre las dos cosas: a la media
-              de cada hijo le suma un premio que crece cuanto menos se ha probado ese hijo. Es el
-              <a href="tema5/mcts.html">bandido multibrazo de los apuntes</a>, aplicado en cada nodo.
-            </p>
-            <p>
-              Para un hijo <!--tex h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span><!--/tex--> de un padre <!--tex p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span><!--/tex-->, con <!--tex W_h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">W_h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> y <!--tex N_h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">N_h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> el valor y las visitas del hijo,
-              <!--tex N_p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">N_p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> las visitas del padre y <!--tex c --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span><!--/tex--> la constante de exploración:
+              Para un hijo <!--tex h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span><!--/tex--> de un padre <!--tex p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span><!--/tex-->, con <!--tex W_h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">W_h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> y
+              <!--tex N_h --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">N_h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> el valor y las visitas del hijo, <!--tex N_p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">N_p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--> las visitas del padre y
+              <!--tex c --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span><!--/tex--> la constante de exploración (1,4 en la plantilla):
             </p>
 <!--TEX \mathrm{UCB1}(h) \;=\; \underbrace{\frac{W_h}{N_h}}_{\text{explotar}} \;+\; \underbrace{c\,\sqrt{\frac{\ln N_p}{N_h}}}_{\text{explorar}} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">U</mi><mi mathvariant="normal">C</mi><mi mathvariant="normal">B</mi><mn>1</mn></mrow><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>=</mo><mtext>  </mtext><munder><munder><mfrac><msub><mi>W</mi><mi>h</mi></msub><msub><mi>N</mi><mi>h</mi></msub></mfrac><mo stretchy="true">⏟</mo></munder><mtext>explotar</mtext></munder><mtext>  </mtext><mo>+</mo><mtext>  </mtext><munder><munder><mrow><mi>c</mi><mtext> </mtext><msqrt><mfrac><mrow><mi>ln</mi><mo>⁡</mo><msub><mi>N</mi><mi>p</mi></msub></mrow><msub><mi>N</mi><mi>h</mi></msub></mfrac></msqrt></mrow><mo stretchy="true">⏟</mo></munder><mtext>explorar</mtext></munder></mrow><annotation encoding="application/x-tex">\mathrm{UCB1}(h) \;=\; \underbrace{\frac{W_h}{N_h}}_{\text{explotar}} \;+\; \underbrace{c\,\sqrt{\frac{\ln N_p}{N_h}}}_{\text{explorar}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm">UCB1</span></span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.6665em;vertical-align:-2.3062em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-1.1902em;"><span class="pstrut" style="height:3.3603em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">explotar</span></span></span></span></span><span style="top:-3.3603em;"><span class="pstrut" style="height:3.3603em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span class="svg-align" style="top:-1.8763em;"><span class="pstrut" style="height:3.3603em;"></span><span class="katex-stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMinYMin slice"><path d="M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13
  35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688
@@ -442,23 +502,8 @@ c-2,6,-10,9,-24,9
 c-8,0,-12,-0.7,-12,-2z M1001 80
 h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8384em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4864em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.3086em;"><span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
             <p>
-              Con <!--tex c = 0 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span><!--/tex--> sólo cuenta la media. Cuanto mayor es c, más se prueban las jugadas poco visitadas. La
-              plantilla usa <!--tex c = 1,4 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>=</mo><mn>1,4</mn></mrow><annotation encoding="application/x-tex">c = 1{,}4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span></span></span></span><!--/tex-->, que es más o menos <!--tex \sqrt{2} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mn>2</mn></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">2</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
-c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
-c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
-c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
-s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
-c69,-144,104.5,-217.7,106.5,-221
-l0 -0
-c5.3,-9.3,12,-14,20,-14
-H400000v40H845.2724
-s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
-c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span></span></span></span><!--/tex-->, el valor de la teoría para recompensas entre 0 y 1.
-            </p>
-            <p>
-              Es el caso de la comprobación: un padre con 20 visitas y dos hijos, A con 6 de valor en 10 visitas y B con
-              4 en 5:
+              El caso de la comprobación: un padre con 20 visitas, A con 6 de valor en 10 visitas y B con 4 en 5. Gana B,
+              que tiene mejor media y menos visitas:
             </p>
 <!--TEX \begin{aligned}
 \ln 20 &= 2,996 \\[10pt]
@@ -502,16 +547,8 @@ c-2,6,-10,9,-24,9
 c-8,0,-12,-0.7,-12,-2z M1001 80
 h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7884em;"><span></span></span></span></span></span></span></span><span style="top:1.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">774</span></span></span><span style="top:3.0784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">084</span></span></span><span style="top:4.5784em;"><span class="pstrut" style="height:3.6516em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">884</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">gana B</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:8.59em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
             <p>
-              B gana por las dos razones: tiene mejor media y menos visitas. Si a B le bajamos el valor a 1 (media 0,2)
-              y ponemos c&nbsp;=&nbsp;0, gana A, porque sólo cuenta la media.
-            </p>
-            <p>
-              <strong>Pista:</strong> <code>ucb1</code> es la fórmula tal cual, con <code>math.sqrt</code> y
-              <code>math.log</code>; las visitas del padre están en <code>hijo.padre.visitas</code>.
-              <code>seleccionar</code> es una línea: <code>max</code> sobre <code>nodo.hijos</code> con un
-              <code>key</code>. No hace falta preocuparse de los hijos con 0 visitas (que darían una división por cero):
-              sólo se selecciona entre hijos de un nodo que ya no tiene jugadas sin probar, y todos sus hijos tienen al
-              menos la visita de cuando se crearon.
+              <strong>Pista:</strong> las visitas del padre están en <code>hijo.padre.visitas</code>.
+              <code>seleccionar</code> es una línea: <code>max</code> sobre <code>nodo.hijos</code> con un <code>key</code>.
             </p>
             <details class="detras">
               <summary>Si os atascáis</summary>
@@ -529,30 +566,17 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
           </div>
         </div>
 
-        <div class="step" id="paso3">
-          <span class="step-num">3</span>
+        <div class="step" id="pasoM3">
+          <span class="step-num">M3</span>
           <div class="step-body">
-            <h3 class="label">Expansión: un hijo nuevo</h3>
+            <h3 class="label">Expansión</h3>
             <p>
-              Cuando la selección llega a un nodo que todavía tiene jugadas sin probar, el árbol crece por ahí:
-              <strong>un hijo nuevo por iteración</strong>, no todos a la vez. Así el árbol sólo se hace grande por donde
-              las simulaciones dicen que merece la pena, y las ramas malas se quedan con uno o dos nodos.
+              Un hijo nuevo por iteración: sacar una jugada de <code>nodo.sin_probar</code>, hacerla en
+              <code>tablero</code>, crear el <code>Nodo</code> hijo, añadirlo a <code>nodo.hijos</code> y devolverlo.
             </p>
             <p>
-              <code>expandir(nodo, tablero)</code> saca una jugada de <code>nodo.sin_probar</code>, la hace en
-              <code>tablero</code> (que es la copia de esta iteración, con las jugadas de la selección ya hechas), crea el
-              <code>Nodo</code> hijo con ese tablero, lo añade a <code>nodo.hijos</code> y lo devuelve.
-            </p>
-            <p>
-              <strong>Pista:</strong> <code>sin_probar</code> ya está barajada desde el constructor, así que
-              <code>pop()</code> saca una al azar. El orden importa: primero <code>tablero.push</code> y después
-              <code>Nodo(tablero, …)</code>, para que el hijo calcule sus jugadas legales y su <code>color</code> en la
-              posición de después de la jugada.
-            </p>
-            <p>
-              <strong>Qué comprueba:</strong> desde la posición inicial, que devuelva un <code>Nodo</code> que está en
-              <code>raiz.hijos</code> y cuyo padre es la raíz, que en <code>sin_probar</code> queden 19 jugadas y no esté
-              la del hijo, que la jugada esté hecha en el tablero y que el hijo sea de color blanco.
+              <strong>Pista:</strong> <code>sin_probar</code> ya está barajada, así que <code>pop()</code> saca una al
+              azar. Primero <code>tablero.push</code> y después <code>Nodo(tablero, …)</code>.
             </p>
             <details class="detras">
               <summary>Si os atascáis</summary>
@@ -568,140 +592,86 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
           </div>
         </div>
 
-        <div class="step" id="paso4">
-          <span class="step-num">4</span>
+        <div class="step" id="pasoM4">
+          <span class="step-num">M4</span>
           <div class="step-body">
-            <h3 class="label">Simulación: jugar al azar, y cortar</h3>
+            <h3 class="label">Simulación</h3>
             <p>
-              Desde el nodo nuevo se juega al azar para tener una idea de cuánto vale. En los apuntes la simulación
-              llega hasta el final de la partida, y en el tres en raya o el Go es lo normal. En ajedrez no funciona:
-              una partida entre dos jugadores que mueven al azar dura cientos de jugadas y casi siempre acaba en tablas.
-              Cada simulación sería lentísima y diría poco.
+              En ajedrez, jugar al azar hasta el final no sirve: son cientos de jugadas y casi siempre acaba en tablas. Así
+              que se juegan como mucho <code>profundidad</code> medias jugadas al azar (10 en la plantilla) y se evalúa lo
+              que quede con <code>recompensa</code>, para <code>color</code>, que es siempre el que decide en la raíz.
             </p>
             <p>
-              Así que se corta: como mucho <code>profundidad</code> medias jugadas al azar (10 en la plantilla) y, donde
-              se quede, se evalúa con <code>recompensa</code>, que para eso estima con el material. Si antes no quedan
-              jugadas legales (mate o ahogado), se para ahí, y <code>recompensa</code> da el valor exacto.
-            </p>
-            <p>
-              <code>simular</code> devuelve siempre la recompensa <strong>para las blancas</strong>. Elegir un color fijo
-              simplifica el paso siguiente: allí cada nodo la traduce a su punto de vista.
-            </p>
-            <p>
-              <strong>Pista:</strong> un <code>for</code> de <code>profundidad</code> vueltas; en cada una, las jugadas
-              legales en una lista; si está vacía, <code>break</code>; si no, <code>random.choice</code> y
-              <code>push</code>. Al salir, <code>recompensa(tablero, chess.WHITE)</code>.
-            </p>
-            <p>
-              <strong>Qué comprueba:</strong> que devuelva un número entre 0 y 1 y no juegue más de 10 medias jugadas;
-              que con profundidad 0 no juegue nada y devuelva 0,5 en la posición inicial; que con un mate ya dado devuelva
-              0 (las blancas están mateadas); y que con una dama blanca de más pase de 0,9.
+              <strong>Pista:</strong> un <code>for</code>; en cada vuelta, si no hay jugadas legales, <code>break</code>; si
+              no, <code>random.choice</code> y <code>push</code>. Usad la <code>recompensa</code> que llega como
+              parámetro.
             </p>
             <details class="detras">
               <summary>Si os atascáis</summary>
               <div style="padding:0 1.1rem .4rem">
-<pre><code><span class="k">def</span> simular(tablero, profundidad):
+<pre><code><span class="k">def</span> simular(tablero, profundidad, color, recompensa=recompensa):
     <span class="k">for</span> _ <span class="k">in</span> range(profundidad):
         jugadas = list(tablero.legal_moves)
         <span class="k">if</span> <span class="k">not</span> jugadas:
             <span class="k">break</span>
         tablero.push(random.choice(jugadas))
-    <span class="k">return</span> recompensa(tablero, chess.WHITE)</code></pre>
+    <span class="k">return</span> recompensa(tablero, color)</code></pre>
               </div>
             </details>
           </div>
         </div>
 
-        <div class="step" id="paso5">
-          <span class="step-num">5</span>
+        <div class="step" id="pasoM5">
+          <span class="step-num">M5</span>
           <div class="step-body">
-            <h3 class="label">Retropropagación: cada nodo, desde su punto de vista</h3>
+            <h3 class="label">Retropropagación</h3>
             <p>
-              El resultado de la simulación sube desde el nodo nuevo hasta la raíz, y cada nodo del camino suma una
-              visita y la recompensa. Lo delicado es <strong>de quién es la recompensa</strong>.
-            </p>
-            <p>
-              Pensad en la selección. En un nodo donde mueven las negras, <code>seleccionar</code> elige el hijo de
-              mayor UCB1, es decir, el de mejor media. Para que eso sea lo que quieren las negras, la media de esos hijos
-              tiene que estar contada <strong>desde el punto de vista de las negras</strong>, que son quienes hicieron la
-              jugada de cada hijo. Por eso cada nodo guarda <code>color</code>, el de quien movió para llegar a él, y
-              suma la recompensa vista por ese color:
-            </p>
-<pre class="cuenta">si nodo.color es blanco   suma  r_blancas
-si nodo.color es negro    suma  1 − r_blancas</pre>
-            <p>
-              El caso de la comprobación: raíz, <code>e4</code> (una jugada de blancas) y <code>e5</code> (de negras),
-              con una simulación que da 0,8 a las blancas:
-            </p>
-<pre class="cuenta">e5    lo jugaron las negras    suma 1 − 0,8 = 0,2
-e4    lo jugaron las blancas   suma 0,8
-raíz  (su valor no se usa)     suma lo que toque; sólo cuentan sus visitas</pre>
-            <p>
-              Así, el mismo <code>max</code> sirve en todos los niveles: cada jugador elige lo que es mejor para él. Es
-              la misma idea que el minimax de los apuntes (cada uno maximiza lo suyo), escrita con medias en vez de con
-              máximos y mínimos.
-            </p>
-            <div class="note trap">
-              <span class="note-label">El fallo más típico de todo MCTS</span>
-              <p>
-                Sumar <code>r_blancas</code> en todos los nodos. No da ningún error, el programa juega, y las negras eligen
-                en el árbol las jugadas que <strong>mejor les vienen a las blancas</strong>: el MCTS se ayuda a perder en
-                la mitad de los niveles. La comprobación del paso&nbsp;5 está para pillarlo.
-              </p>
-            </div>
-            <p>
-              <strong>Pista:</strong> un <code>while nodo is not None</code> que sube con <code>nodo = nodo.padre</code>.
+              El resultado sube del nodo nuevo a la raíz, y cada nodo del camino suma una visita y la recompensa. En esta
+              versión todo el árbol cuenta desde el que decide en la raíz: todos suman la misma <code>r</code>.
             </p>
             <details class="detras">
               <summary>Si os atascáis</summary>
               <div style="padding:0 1.1rem .4rem">
-<pre><code><span class="k">def</span> retropropagar(nodo, r_blancas):
+<pre><code><span class="k">def</span> retropropagar(nodo, r):
     <span class="k">while</span> nodo <span class="k">is not</span> <span class="k">None</span>:
         nodo.visitas += <span class="n">1</span>
-        nodo.valor += r_blancas <span class="k">if</span> nodo.color == chess.WHITE <span class="k">else</span> <span class="n">1</span> - r_blancas
+        nodo.valor += r
         nodo = nodo.padre</code></pre>
               </div>
             </details>
+            <div class="note trap">
+              <span class="note-label">Lo que esta versión hace mal, a propósito</span>
+              <p>
+                En los niveles del rival, la selección también elige lo mejor para vosotros: el árbol supone un rival que
+                os ayuda. Es <a href="tema5/mcts.html#punto-de-vista">el error típico de los apuntes</a>. Lo dejamos así
+                porque es lo más sencillo, y arreglarlo es el <a href="#reto1">reto 1</a>.
+              </p>
+            </div>
           </div>
         </div>
 
-        <div class="step" id="paso6">
-          <span class="step-num">6</span>
+        <div class="step" id="pasoM6">
+          <span class="step-num">M6</span>
           <div class="step-body">
-            <h3 class="label">El bucle: las cuatro fases, una y otra vez</h3>
+            <h3 class="label">El bucle</h3>
             <p>
-              <code>elegir(tablero, tiempo)</code> es lo que llama la partida cada vez que os toca mover. Crea la raíz
-              y repite iteraciones hasta que se acaba el tiempo (o hasta <code>iteraciones</code>, si se ha dado, que es
-              lo que usan las comprobaciones para no depender de la velocidad del ordenador). Cada iteración:
+              <code>elegir</code> repite iteraciones hasta que se acaba el tiempo. En cada una:
             </p>
             <ol>
-              <li><strong>Selección.</strong> Desde la raíz, mientras el nodo no tenga jugadas sin probar y sí tenga hijos, bajar al hijo que diga <code>seleccionar</code> y hacer su jugada en <code>t</code>.</li>
-              <li><strong>Expansión.</strong> Si al nodo donde se ha parado le quedan jugadas sin probar, <code>expandir</code>, y seguir desde el hijo nuevo.</li>
-              <li><strong>Simulación.</strong> <code>simular</code> desde <code>t</code>.</li>
-              <li><strong>Retropropagación</strong> desde el nodo donde se ha quedado.</li>
+              <li><strong>Selección:</strong> mientras el nodo no tenga jugadas sin probar y sí tenga hijos, bajar con <code>seleccionar</code> y hacer la jugada en <code>t</code>.</li>
+              <li><strong>Expansión:</strong> si quedan jugadas sin probar, <code>expandir</code>.</li>
+              <li><strong>Simulación</strong> desde <code>t</code>.</li>
+              <li><strong>Retropropagación</strong> desde el nodo al que se ha llegado.</li>
             </ol>
             <p>
-              Lo de antes y lo de después del bucle ya está en la plantilla: <code>t</code> es una copia nueva del
-              tablero en cada iteración, con <code>copy(stack=False)</code> porque copiar el historial de la partida en
-              cada vuelta es lento. Al final se rellenan las <code>estadisticas</code> que pinta la ventana y se devuelve
-              <strong>la jugada más visitada</strong>, no la de mejor media: una jugada con dos visitas y media 1 puede
-              ser pura suerte, y una con 800 visitas está bien medida.
+              Lo de antes y después del bucle ya está: una copia del tablero por iteración y, al final, la jugada
+              <strong>más visitada</strong>, no la de mejor media, que con pocas visitas puede ser suerte. Si se llega a un
+              mate, no hay nada que expandir ni simular, y la recompensa sale exacta: por eso los mates se encuentran
+              enseguida.
             </p>
             <p>
-              Hay un caso que se resuelve solo. Si la selección llega a una posición <strong>terminal</strong> (mate o
-              ahogado), no tiene jugadas sin probar ni hijos: el bucle de selección para, no se expande, y
-              <code>simular</code> no puede jugar nada y devuelve la recompensa exacta. Por eso un mate se encuentra
-              tan deprisa: cada visita a ese nodo da un 1 limpio y sin ruido.
-            </p>
-            <p>
-              <strong>Pista:</strong> son siete líneas en lugar del <code>raise</code>. La primera,
-              <code>while not nodo.sin_probar and nodo.hijos:</code>.
-            </p>
-            <p>
-              <strong>Qué comprueba:</strong> tres posiciones con un mate en una (una de ellas con negras) en las que tiene
-              que dar mate, una dama regalada que tiene que comerse, que con 1 segundo no tarde más de 1,2, cuántas
-              iteraciones hace en ese segundo, y dos partidas contra Aleatorio de las que tiene que sacar al menos 1,5
-              puntos. Esto último tarda unos 20 segundos.
+              <strong>Pista:</strong> siete líneas; la primera, <code>while not nodo.sin_probar and nodo.hijos:</code>. La
+              comprobación juega dos partidas contra Aleatorio y tarda unos 20 segundos.
             </p>
             <details class="detras">
               <summary>Si os atascáis</summary>
@@ -723,19 +693,7 @@ raíz  (su valor no se usa)     suma lo que toque; sólo cuentan sus visitas</pr
         <span class="k">break</span></code></pre>
               </div>
             </details>
-            <p>
-              Con los seis pasos en <code>BIEN</code>, <strong>Comprobar todos los pasos</strong> tiene que darlos todos
-              seguidos.
-            </p>
           </div>
-        </div>
-        <div class="note trap">
-          <span class="note-label">Lo que se pierde con stack=False</span>
-          <p>
-            La copia sin historial no sabe qué posiciones se han repetido, así que dentro del árbol no se detectan las
-            tablas por repetición. La partida de verdad sí las detecta. Para empezar da igual; si veis que vuestro MCTS
-            repite jugadas en una posición ganada y se deja empatar, ya sabéis por dónde mirar.
-          </p>
         </div>
       </section>
 
@@ -744,212 +702,310 @@ raíz  (su valor no se usa)     suma lo que toque; sólo cuentan sus visitas</pr
           <span class="num">05</span>
           <h2 class="sec">Verlo jugar y medirlo</h2>
         </div>
-
-        <div class="step" id="paso7">
-          <span class="step-num">7</span>
-          <div class="step-body">
-            <h3 class="label">Verlo, jugar contra él y medirlo</h3>
-            <p>
-              <strong>Ver partida</strong>, con <code>BLANCAS = MCTS()</code> y <code>NEGRAS = Voraz()</code> como viene.
-              Las flechas son las tres jugadas más visitadas por el último que ha movido, y la gruesa es la elegida. A la
-              derecha, lo que pensó: cada jugada con sus visitas (la barra) y su valor medio, y cuántas iteraciones le dio
-              tiempo a hacer. <kbd>Espacio</kbd> pausa, <kbd>&#8594;</kbd> avanza una jugada en pausa y <kbd>Esc</kbd>
-              sale. Mirad cuándo duda (barras parecidas) y cuándo lo tiene claro (una barra muy por encima de las demás).
-            </p>
-            <p>
-              <strong>Jugar contra el MCTS</strong>: clic en una pieza y clic en la casilla; los peones coronan siempre
-              a dama. Con 2 segundos por jugada es más flojo de lo que parece al principio, y jugar contra él es la forma
-              más rápida de ver qué no entiende.
-            </p>
-            <p>
-              <strong>Comparar versiones</strong> juega cada versión de <code>VERSIONES</code> contra los tres rivales de
-              referencia, desde ocho aperturas y una vez con cada color: 16 partidas por rival. Con 0,3 segundos por
-              jugada y 120 medias jugadas como mucho, y después decide el material. Los rivales son:
-            </p>
-            <div class="table-scroll">
-              <table class="ancha">
-                <thead><tr><th scope="col">Rival</th><th scope="col">Cómo juega</th></tr></thead>
-                <tbody>
-                  <tr><td><code>Aleatorio</code></td><td>Una jugada legal cualquiera.</td></tr>
-                  <tr><td><code>Voraz</code></td><td>Da mate si puede; si no, la captura más valiosa; si no hay ninguna, al azar. No mira qué le contestan.</td></tr>
-                  <tr><td><code>AlfaBeta2</code></td><td>Minimax con poda alfa-beta a dos medias jugadas (la suya y la respuesta), contando sólo material. No deja una pieza colgada a la primera.</td></tr>
-                  <tr><td><code>AlfaBeta(3)</code></td><td>Lo mismo a tres. No viene en la lista; añadidlo si queréis un reto más.</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <p>
-              Con la solución de esta guía, tal cual, sale esto:
-            </p>
-<pre class="cuenta">                 Aleatorio                 Voraz             AlfaBeta2         TOTAL
-v0        100% ±0 (16-0-0)      72% ±20 (10-3-3)        0% ±0 (0-0-16)       57% ±14</pre>
-            <p>
-              Cada casilla es el porcentaje de puntos (1 por victoria, ½ por tablas), con dos errores típicos de margen y,
-              entre paréntesis, ganadas, tablas y perdidas. Contra Aleatorio gana siempre; contra Voraz, casi tres de
-              cada cuatro; contra AlfaBeta2 no saca nada. Tardó 1,3 minutos en un ordenador de 18 núcleos, con 9
-              procesos; en un portátil, contad con entre 3 y 5 minutos.
-            </p>
-            <div class="note mine">
-              <span class="note-label">Qué quiere decir el ±</span>
-              <p>
-                Con 16 partidas por rival, un 72&nbsp;% ±20 quiere decir "algo entre el 52 y el 92&nbsp;%". Si una
-                versión nueva saca un 80&nbsp;% contra Voraz, no habéis demostrado nada: los intervalos se solapan casi
-                enteros. Contra AlfaBeta2, en cambio, pasar del 0 al 30&nbsp;% sí se ve. Para afinar más, más aperturas o
-                más tiempo, sabiendo que la pasada tarda más.
-              </p>
-            </div>
-            <h3 class="label">Un experimento antes de seguir: ¿por qué cortar?</h3>
-            <p>
-              El paso&nbsp;4 corta la simulación a 10 medias jugadas. Comprobad vosotros por qué. En la posición inicial y
-              con 0,9 segundos de búsqueda, estas son las iteraciones que salen según <code>profundidad</code>:
-            </p>
-<pre class="cuenta">profundidad 0       24 838 iteraciones   (sin simulación: evalúa el nodo nuevo y ya)
-profundidad 5        7 287
-profundidad 10       4 442
-profundidad 20       2 373
-profundidad 1000        93   (en la práctica, hasta el final de la partida)</pre>
-            <p>
-              Hasta el final salen 93 simulaciones para repartir entre 20 jugadas: menos de cinco por jugada, y casi
-              todas acaban en tablas. Meted dos versiones en <code>comparar.py</code>, una con
-              <code>MCTS(profundidad=1000)</code> y otra con la de siempre, y mirad la diferencia. Es la primera entrada
-              de vuestro diario.
-            </p>
-<pre><code>VERSIONES = {
-    <span class="s">"v0"</span>: <span class="k">lambda</span>: MCTS(),
-    <span class="s">"hasta-el-final"</span>: <span class="k">lambda</span>: MCTS(profundidad=<span class="n">1000</span>),
-}</code></pre>
-          </div>
+        <ul>
+          <li>
+            <strong>Ver partida:</strong> poned vuestros jugadores en <code>ver_partida.py</code>, por ejemplo
+            <code>BLANCAS = MCTS()</code> y <code>NEGRAS = Minimax(profundidad=2)</code>. Del MCTS se ven las jugadas que
+            más ha visitado. <kbd>Espacio</kbd> pausa, <kbd>&#8594;</kbd> avanza y <kbd>Esc</kbd> sale.
+          </li>
+          <li><strong>Jugar contra vuestro jugador:</strong> la forma más rápida de ver qué no entiende.</li>
+          <li>
+            <strong>Comparar versiones:</strong> cada versión contra los rivales, 16 partidas por rival (ocho aperturas,
+            los dos colores), 0,3 segundos por jugada. Tarda unos minutos.
+          </li>
+        </ul>
+        <p>
+          Los rivales son <code>Aleatorio</code>, <code>Voraz</code> (la captura más valiosa, sin mirar qué le contestan) y
+          <code>AlfaBeta2</code> (lo mismo que vuestro <code>Minimax(profundidad=2)</code>). Con las soluciones de la guía
+          sale esto:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Versión</th><th scope="col">Contra Voraz</th><th scope="col">Contra AlfaBeta2</th></tr></thead>
+            <tbody>
+              <tr><td><code>MCTS()</code></td><td>94&nbsp;% (14-2-0)</td><td>0&nbsp;% (0-0-16)</td></tr>
+              <tr><td><code>Minimax(profundidad=2)</code></td><td>100&nbsp;% (16-0-0)</td><td>62&nbsp;% (8-4-4)</td></tr>
+              <tr><td><code>Minimax(profundidad=3)</code></td><td>100&nbsp;% (16-0-0)</td><td>100&nbsp;% (16-0-0)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Porcentaje de puntos, y entre paréntesis ganadas, tablas y perdidas. El MCTS es flojo en táctica porque hace la
+          media de las respuestas: si de 30 sólo una os come la dama, las otras 29 la tapan. Minimax mira todas y se queda
+          con la peor.
+        </p>
+        <div class="note mine">
+          <span class="note-label">El margen</span>
+          <p>
+            Con 16 partidas, el ± que da <code>comparar.py</code> es de unos 20 puntos. Pasar del 72 al 80&nbsp;% no
+            demuestra nada; pasar del 0 al 30&nbsp;% contra AlfaBeta2, sí.
+          </p>
         </div>
       </section>
 
-      <section id="vuestro">
+      <section id="experimentar">
         <div class="sec-head">
           <span class="num">06</span>
-          <h2 class="sec">Vuestro MCTS</h2>
+          <h2 class="sec">Tercera parte: experimentad</h2>
         </div>
         <p>
-          Hasta aquí todos los grupos tienen el mismo jugador. A partir de aquí empieza lo vuestro, que es lo que se
-          evalúa: qué le cambiáis, por qué, y si lo podéis demostrar con <code>comparar.py</code>.
-        </p>
-        <p>
-          Un dato para orientarse: en ajedrez, un MCTS con simulaciones al azar es <strong>flojo en táctica</strong>.
-          Hace la media de lo que pasa después de una jugada, y si de 30 respuestas posibles sólo una os come la dama, las
-          otras 29 tapan esa. AlfaBeta2 no comete ese error nunca: mira todas las respuestas y se queda con la peor. Casi
-          todas las ideas de abajo atacan ese problema desde un lado distinto.
+          Cada experimento es una versión más en <code>VERSIONES</code> y una pasada de <code>comparar.py</code>. Haced
+          al menos uno con cada algoritmo y apuntad en las notas qué salió.
         </p>
 
-        <div class="step" id="paso8">
-          <span class="step-num">8</span>
-          <div class="step-body">
-            <h3 class="label">Ideas, de la más sencilla a la más difícil</h3>
-            <div class="table-scroll">
-              <table class="ancha" style="min-width:42rem">
-                <thead><tr><th scope="col">Idea</th><th scope="col">Qué problema ataca</th><th scope="col">Qué hay que tocar</th></tr></thead>
-                <tbody>
-                  <tr>
-                    <td><strong>Ajustar c y la profundidad</strong></td>
-                    <td>Explora demasiado (o demasiado poco) y simula demasiado largo (o corto).</td>
-                    <td>Sólo los parámetros de <code>MCTS(…)</code>. Sirve para aprender a medir; no esperéis grandes saltos.</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Vuestra evaluación</strong></td>
-                    <td>El material solo no sabe nada de ajedrez: un caballo en el centro vale lo mismo que en una esquina.</td>
-                    <td><code>recompensa</code>: tablas de posición por pieza, peones doblados o pasados, el rey protegido, la escala de la sigmoide. Aquí entra vuestro conocimiento de ajedrez.</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Simulaciones con conocimiento</strong></td>
-                    <td>Al azar, nadie captura lo que está colgado, así que la simulación no castiga dejarse piezas.</td>
-                    <td><code>simular</code>: preferir capturas, y entre ellas la pieza más valiosa con el atacante más barato (se llama MVV-LVA). Más lenta por jugada, así que cortad antes.</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Mates en una al expandir</strong></td>
-                    <td>Una jugada que da mate puede tardar en probarse si hay 40 jugadas sin probar delante.</td>
-                    <td><code>expandir</code> o el constructor de <code>Nodo</code>: probar primero las jugadas que dan mate (o jaque, o capturan).</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Respaldo minimax implícito</strong></td>
-                    <td>La media tapa la respuesta que os come la dama.</td>
-                    <td>Cada nodo guarda además un valor minimax con las evaluaciones de sus hijos, y la selección usa una mezcla de la media y ese valor.</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Reutilizar el árbol</strong></td>
-                    <td>Cada jugada se empieza de cero, y se tira lo que se pensó en la anterior.</td>
-                    <td><code>elegir</code>: guardar la raíz en el objeto y, en la jugada siguiente, empezar desde el nieto que corresponda a lo que se jugó.</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Gestionar el tiempo</strong></td>
-                    <td>Se piensa lo mismo con una sola jugada legal que en el momento clave de la partida.</td>
-                    <td><code>elegir</code>: contestar al momento si sólo hay una jugada, parar antes si una jugada ya tiene casi todas las visitas. El límite del concurso sigue siendo 1 segundo por jugada.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p>
-              Para que sepáis por dónde van los tiros, esto es lo que medimos al preparar la práctica contra AlfaBeta2,
-              con las mismas 16 partidas de <code>comparar.py</code> y 0,3 segundos por jugada. Son pocas partidas, así que
-              tomadlo como orientación, con unos ±20 puntos de margen:
-            </p>
-<pre class="cuenta">la solución de esta guía                                     0 %
-simulación con capturas primero                           6 – 16 %
-minimax implícito + simulación con capturas              25 – 28 %
-respaldo minimax puro sobre evaluaciones, sin simular        59 %</pre>
-            <p>
-              La última es legítima. El jugador sigue siendo un MCTS mientras estén las cuatro fases: selección con UCB1,
-              expansión de un hijo por iteración, una evaluación del nodo nuevo (que puede ser una simulación de cero
-              jugadas) y retropropagación. Lo que cambia es qué se guarda al subir. Mezclar MCTS con evaluaciones y con
-              ideas de minimax es justo lo que hacen los programas más fuertes; los apuntes lo cuentan en
-              <a href="tema5/mejoras.html">Mejoras de MCTS</a>.
-            </p>
-          </div>
-        </div>
-
-        <h3 class="label" id="versiones">Cómo organizar las versiones</h3>
+        <h3 class="label">La profundidad de alfa-beta</h3>
         <p>
-          Cada versión tiene que seguir existiendo cuando hagáis la siguiente, para poder medirlas una contra otra. Hay dos
-          formas cómodas. Si la diferencia es un número, un parámetro:
+          Probad profundidad 1, 2, 3 y 4, y mirad lo que tarda cada jugada. En un medio juego con 37 jugadas legales,
+          profundidad 3 tarda 0,06&nbsp;s y profundidad 4, 0,56&nbsp;s. Sin poda, profundidad 3 tarda 0,36&nbsp;s. ¿Por qué
+          cada nivel cuesta tanto?
         </p>
 <pre><code>VERSIONES = {
-    <span class="s">"v0"</span>: <span class="k">lambda</span>: MCTS(),
-    <span class="s">"v1"</span>: <span class="k">lambda</span>: MCTS(c=<span class="n">0.7</span>, profundidad=<span class="n">6</span>),
+    <span class="s">"ab1"</span>: <span class="k">lambda</span>: Minimax(profundidad=<span class="n">1</span>),
+    <span class="s">"ab2"</span>: <span class="k">lambda</span>: Minimax(profundidad=<span class="n">2</span>),
+    <span class="s">"ab3"</span>: <span class="k">lambda</span>: Minimax(profundidad=<span class="n">3</span>),
+}</code></pre>
+
+        <h3 class="label">Los mandos del MCTS</h3>
+        <ul>
+          <li><code>profundidad</code> de la simulación: 0, 2, 10, 25. Con 0 no simula y cada hoja vale su evaluación.</li>
+          <li><code>c</code>: 0,3, 1,4 y 3. Mirad cómo cambian las barras en <strong>Ver partida</strong>.</li>
+          <li>El tiempo: <code>TIEMPO</code> a 0,1 y a 1 en <code>comparar.py</code>. El MCTS mejora con el tiempo; el
+            minimax mira su profundidad tarde lo que tarde.</li>
+        </ul>
+        <p>
+          Los apuntes tienen <a href="tema5/mejoras.html#mandos">nuestras medidas</a>, con otra versión del MCTS. Mirad si
+          con la vuestra pasa lo mismo.
+        </p>
+
+        <h3 class="label">Una heurística</h3>
+        <p>
+          Un ejemplo muy básico: ocupar el centro es bueno. Sumad al material las piezas propias en las cuatro casillas
+          centrales, menos las del rival, con un peso pequeño:
+        </p>
+<pre><code><span class="k">from</span> ajedrez <span class="k">import</span> material
+<span class="k">from</span> grupoYY.minimax <span class="k">import</span> MATE, evaluar
+
+CENTRO = [chess.D4, chess.E4, chess.D5, chess.E5]
+
+
+<span class="k">def</span> centro(tablero, color):
+    <span class="c">"""Piezas propias en el centro menos las del rival."""</span>
+    total = <span class="n">0</span>
+    <span class="k">for</span> casilla <span class="k">in</span> CENTRO:
+        pieza = tablero.piece_at(casilla)
+        <span class="k">if</span> pieza:
+            total += <span class="n">1</span> <span class="k">if</span> pieza.color == color <span class="k">else</span> -<span class="n">1</span>
+    <span class="k">return</span> total
+
+
+<span class="k">def</span> evaluar_centro(tablero, color):
+    v = evaluar(tablero, color)             <span class="c"># el material, o ±MATE, o 0 en tablas</span>
+    <span class="k">if</span> abs(v) == MATE:
+        <span class="k">return</span> v
+    <span class="k">return</span> v + <span class="n">0.1</span> * centro(tablero, color)</code></pre>
+        <p>
+          Se usa con <code>Minimax(evaluar=evaluar_centro)</code>. Para el MCTS, una <code>recompensa_centro</code> como
+          la del paso M1 con <code>material(tablero, color) + 0.1 * centro(tablero, color)</code> dentro de la sigmoide, y
+          <code>MCTS(recompensa=recompensa_centro)</code>. Con esta heurística no medimos ninguna diferencia: es un ejemplo
+          de cómo se mete una, no de una buena.
+        </p>
+      </section>
+
+      <section id="retos">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Cuarta parte: los retos</h2>
+        </div>
+        <p>
+          Los retos son misiones, y cada una da un cristal. Entre todos dan los otros 5 puntos de la práctica, y cuentan
+          como mucho tres:
+        </p>
+        <ul class="cristales" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+          <li><img src="../assets/img/misiones/cristal-azul.webp" alt="" width="56" height="56"><span><b>Azul</b>muy sencillo · 1,75</span></li>
+          <li><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="56" height="56"><span><b>Violeta</b>fácil · 2,5</span></li>
+          <li><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="56" height="56"><span><b>Dorado</b>difícil · 5</span></li>
+        </ul>
+        <p>
+          Un dorado, dos violetas o tres azules ya llegan a 5. Una misión cuenta si la habéis probado y medido, aunque no
+          mejore nada. También vale una vuestra: preguntadme antes de qué color es.
+        </p>
+        <div class="misiones">
+          <article class="mision" id="reto1">
+            <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
+            <div>
+              <h4>1 · El rival también elige <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h4>
+              <p>Haced que, en los niveles del rival, la selección elija lo que peor os viene a vosotros, como haría un rival de verdad. Los apuntes lo explican en <a href="tema5/mcts.html#punto-de-vista">quién gana en cada nodo</a>.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> una versión del MCTS que alterna en la selección, enfrentada en <code>comparar.py</code> al MCTS de la guía.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Comparad <code>nodo.color</code> con <code>self.yo</code>: si los hijos los jugó el rival, para él valen <code>1 - media</code>. Lo más corto es redefinir <code>seleccionar</code> en una clase hija. Contra los rivales de referencia apenas se nota; enfrentadlo al MCTS de la guía (a nosotros nos ganó el 66&nbsp;%).</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto2">
+            <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
+            <div>
+              <h4>2 · Vuestra heurística <span class="valor">+2,5</span> <span class="chip free">Los dos</span></h4>
+              <p>Lo que sepáis de ajedrez, metido en <code>evaluar</code> o en <code>recompensa</code>: peones que avanzan, movilidad, el par de alfiles, el rey protegido, o un valor por pieza y casilla.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> una heurística con al menos un término vuestro, medida contra el material solo.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Como <code>evaluar_centro</code>: el material más vuestros términos, con pesos pequeños. <code>tablero.pieces(chess.PAWN, color)</code> da las casillas de los peones, y <code>chess.square_rank(casilla)</code>, su fila. Cada término cuesta tiempo en cada hoja: medidlo también.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto3">
+            <img src="../assets/img/misiones/cristal-azul.webp" alt="Cristal azul" width="80" height="80" loading="lazy">
+            <div>
+              <h4>3 · Mates primero <span class="valor">+1,75</span> <span class="chip free">Los dos</span></h4>
+              <p>En el MCTS, una jugada que da mate puede esperar detrás de cuarenta sin probar. En alfa-beta, el orden decide cuánto se poda. Probad antes las jugadas que dan jaque.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> los jaques probados antes de las demás jugadas, en uno de los dos jugadores, y medido.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p><code>tablero.gives_check(jugada)</code> dice si una jugada da jaque. Añadidlo a <code>ordenar</code>, y en el MCTS ordenad <code>sin_probar</code> en el constructor de <code>Nodo</code>.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto4">
+            <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
+            <div>
+              <h4>4 · Simulaciones que capturan <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h4>
+              <p>Al azar, una pieza colgada casi nunca se come. Haced que la simulación capture cuando pueda.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> una simulación que captura, medida contra la de la guía.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Con <code>tablero.is_capture(jugada)</code>: la mayoría de las veces, la captura de la pieza más valiosa; alguna vez, al azar. Cada jugada sale más cara, así que probad también a cortar antes.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto5">
+            <img src="../assets/img/misiones/cristal-azul.webp" alt="Cristal azul" width="80" height="80" loading="lazy">
+            <div>
+              <h4>5 · Gestionar el tiempo <span class="valor">+1,75</span> <span class="chip free">Los dos</span></h4>
+              <p>Pensar lo mismo con una sola jugada legal que en el momento clave es malgastar tiempo.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> una regla de tiempo como mínimo, con cuánto tiempo ahorra y si cambia los puntos.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Con una jugada legal, contestad al momento. En el MCTS, parad si una jugada tiene tantas visitas que las demás ya no la alcanzan. En alfa-beta, más profundidad cuando quedan pocas piezas.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto6">
+            <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
+            <div>
+              <h4>6 · Reaprovechar el árbol del MCTS <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h4>
+              <p>Tras vuestra jugada y la del rival, la posición nueva ya estaba en el árbol anterior, dos niveles más abajo. Empezad desde ahí.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> el árbol reutilizado de una jugada a otra, con cuántas visitas trae la raíz al empezar, y medido.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Guardad la raíz en el objeto. La última jugada del rival es <code>tablero.peek()</code>: buscad ese nieto, quitadle el padre y usadlo como raíz. Si no está, de cero.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto7">
+            <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
+            <div>
+              <h4>7 · Profundización iterativa <span class="valor">+2,5</span> <span class="chip free">Alfa-beta</span></h4>
+              <p>Una profundidad fija tarda poco en unas posiciones y mucho en otras. Buscad a profundidad 1, luego 2, luego 3, mientras quede tiempo, y jugad lo que dijo la última búsqueda completa.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> un <code>Minimax</code> que sube la profundidad mientras le quede tiempo, sin pasarse, medido contra uno de profundidad fija.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>No empecéis una búsqueda si no cabe una unas diez veces más larga que la anterior. Y mirad primero la mejor jugada de la búsqueda anterior: así se poda más.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto8">
+            <img src="../assets/img/misiones/cristal-dorado.webp" alt="Cristal dorado" width="80" height="80" loading="lazy">
+            <div>
+              <h4>8 · Tabla de transposiciones <span class="valor">+5</span> <span class="chip free">Alfa-beta</span></h4>
+              <p>A la misma posición se llega por caminos distintos, y alfa-beta la calcula cada vez. Guardad lo calculado.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> una tabla de transposiciones, con cuántas posiciones se ahorra, y medida.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Un diccionario en el objeto con <code>chess.polyglot.zobrist_hash(tablero)</code> como clave (con <code>import chess.polyglot</code>). Empezad guardando lo que devuelve <code>evaluar</code>, que es seguro. Un valor de una búsqueda que se cortó sólo es una cota: no lo guardéis como exacto.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto9">
+            <img src="../assets/img/misiones/cristal-dorado.webp" alt="Cristal dorado" width="80" height="80" loading="lazy">
+            <div>
+              <h4>9 · Búsqueda de quietud <span class="valor">+5</span> <span class="chip free">Alfa-beta</span></h4>
+              <p>Si el corte cae en medio de un cambio de piezas, la evaluación se equivoca. Al llegar a profundidad 0, seguid mirando sólo las capturas hasta que la posición se calme.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> la búsqueda de quietud, medida contra el mismo jugador sin ella.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Una función como <code>alfabeta</code> que sólo recorre capturas y no tiene profundidad. Empieza con la evaluación de la posición tal cual, porque quien mueve siempre puede no capturar.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto10">
+            <img src="../assets/img/misiones/cristal-dorado.webp" alt="Cristal dorado" width="80" height="80" loading="lazy">
+            <div>
+              <h4>10 · Minimax implícito <span class="valor">+5</span> <span class="chip free">MCTS</span></h4>
+              <p>Que cada nodo del MCTS guarde también lo que diría minimax, y que la selección mezcle las dos cosas. Está explicado en los apuntes, con una demo: <a href="tema5/mejoras.html#minimax">minimax implícito</a>. Es lo que más subió contra AlfaBeta2 cuando preparamos la práctica.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> el minimax implícito, con un peso elegido midiendo, contra el MCTS de la guía y contra AlfaBeta2.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Necesita el reto 1. Un atributo más en <code>Nodo</code>, que se rellena al expandir y se recalcula al retropropagar, y una <code>seleccionar</code> que mezcla con un peso. Empezad con 0,8.</p>
+              </details>
+            </div>
+          </article>
+          <article class="mision" id="reto11">
+            <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
+            <div>
+              <h4>11 · Un híbrido <span class="valor">+2,5</span> <span class="chip free">Los dos</span></h4>
+              <p>El MCTS falla en táctica y alfa-beta no ve lejos. Por ejemplo: un MCTS que, en vez de simular al azar, valora el nodo nuevo con un alfa-beta de profundidad 1 o 2.</p>
+              <p class="entrega"><b>Para conseguirlo:</b> el híbrido, medido contra los dos jugadores de la guía.</p>
+              <details class="pista">
+                <summary>Pista</summary>
+                <p>Redefinid <code>simular</code> en una clase hija: vuestro <code>alfabeta</code> con el color de la raíz, y el resultado pasado por la sigmoide. Cada iteración será más cara: mirad cuántas salen.</p>
+              </details>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="versiones">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Cómo organizar las versiones</h2>
+        </div>
+        <p>
+          Cada versión tiene que seguir existiendo cuando hagáis la siguiente, para poder compararlas. Si cambia un
+          parámetro o la heurística, basta con crear el jugador con otro valor:
+        </p>
+<pre><code>VERSIONES = {
+    <span class="s">"mcts"</span>: <span class="k">lambda</span>: MCTS(),
+    <span class="s">"mcts-c07"</span>: <span class="k">lambda</span>: MCTS(c=<span class="n">0.7</span>, profundidad=<span class="n">4</span>),
+    <span class="s">"ab3-centro"</span>: <span class="k">lambda</span>: Minimax(profundidad=<span class="n">3</span>, evaluar=evaluar_centro),
 }</code></pre>
         <p>
-          Si cambia una fase, una clase nueva que hereda de <code>MCTS</code> y sólo redefine lo que cambia. Para eso
-          están los cuatro métodos de <code>MCTS</code> que llaman a las funciones de los pasos 2 a 5
-          (<code>self.seleccionar</code>, <code>self.expandir</code>, <code>self.simular</code> y
-          <code>self.retropropagar</code>): <code>elegir</code> usa los métodos, y la <code>v0</code> sigue igual:
+          Si cambia cómo funciona, una clase que hereda y redefine sólo lo que cambia. En <code>MCTS</code>, las cuatro
+          fases son métodos; en <code>Minimax</code>, <code>valor</code> y <code>elegir</code>:
         </p>
-<pre><code><span class="k">class</span> MCTSCapturas(MCTS):
-    <span class="c">"""v2: simulación que prefiere capturas."""</span>
+<pre><code><span class="k">class</span> MCTSAlterno(MCTS):
+    <span class="c">"""Reto 1: el rival también elige."""</span>
 
-    <span class="k">def</span> simular(self, tablero):
+    <span class="k">def</span> seleccionar(self, nodo):
         ...                               <span class="c"># vuestra versión</span></code></pre>
         <p>
-          Y en <code>comparar.py</code>, <code>"v2": lambda: MCTSCapturas()</code>, con la clase importada arriba junto a
-          la otra: <code>from grupoYY.mcts import MCTS, MCTSCapturas</code>. Un <code>.py</code> por versión dentro de <code>grupoYY/</code> también vale, si os
-          resulta más claro.
+          Para enfrentar dos versiones vuestras, meted la anterior en <code>RIVALES</code>, por ejemplo
+          <code>"mcts-guía": lambda: MCTS()</code>. Así se ven diferencias que contra Voraz o AlfaBeta2 no salen.
         </p>
         <div class="note trap">
           <span class="note-label">Al poner vuestra letra</span>
           <p>
-            Renombrad la carpeta <code>grupoYY</code> con vuestra letra cuando queráis, pero los cuatro programas de
-            fuera la importan por su nombre: <code>comprobar.py</code>, <code>ver_partida.py</code>,
-            <code>jugar_contra.py</code> y <code>comparar.py</code>. Con <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd>
-            (buscar y reemplazar en todos los ficheros) se cambian de una vez. Dentro del paquete, importad con un punto
-            (<code>from .mcts import MCTS</code>), y así no depende del nombre.
-          </p>
-        </div>
-        <div class="note tip">
-          <span class="note-label">Y a partir de aquí, el bucle de siempre</span>
-          <p>
-            Mirad partidas con <strong>Ver partida</strong> hasta encontrar algo que hace mal, escribid en el diario qué
-            es y qué vais a cambiar, haced una versión con ese cambio y medidla contra la anterior. Lo que se pide está
-            en <a href="../practicas/practica-5.html#como-trabajar">el enunciado</a>.
+            Si renombráis <code>grupoYY</code>, cambiad también los <code>import</code> de <code>comprobar.py</code>,
+            <code>ver_partida.py</code>, <code>jugar_contra.py</code> y <code>comparar.py</code>
+            (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> los cambia de una vez). Dentro del paquete, importad con un
+            punto: <code>from .mcts import MCTS</code>.
           </p>
         </div>
       </section>
 
       <nav class="pager" aria-label="Práctica 5">
         <a class="pager-prev" href="../practicas/practica-5.html"><span class="pager-l">El enunciado</span><span class="pager-t">Práctica 5</span></a>
-        <a class="pager-next" href="tema5/mcts.html"><span class="pager-l">Los apuntes</span><span class="pager-t">Monte Carlo Tree Search</span></a>
+        <a class="pager-next" href="tema5/index.html"><span class="pager-l">Los apuntes</span><span class="pager-t">Juegos por turnos</span></a>
       </nav>
 
     </main>
@@ -961,17 +1017,19 @@ respaldo minimax puro sobre evaluaciones, sin simular        59 %</pre>
           <ol>
             <li><a href="#proyecto">El proyecto de partida</a></li>
             <li><a href="#python-chess">python-chess</a></li>
-            <li><a href="#nodo">La clase Nodo</a></li>
-            <li><a href="#pasos">Seis huecos</a></li>
+            <li><a href="#alfabeta">Primera parte: alfa-beta</a></li>
+            <li><a href="#mcts">Segunda parte: MCTS</a></li>
             <li><a href="#medir">Verlo jugar y medirlo</a></li>
-            <li><a href="#vuestro">Vuestro MCTS</a></li>
+            <li><a href="#experimentar">Tercera parte: experimentad</a></li>
+            <li><a href="#retos">Cuarta parte: los retos</a></li>
+            <li><a href="#versiones">Las versiones</a></li>
           </ol>
         </nav>
         <nav aria-labelledby="de-la-practica">
           <h2 id="de-la-practica">Práctica 5</h2>
           <ol>
             <li><a href="../practicas/practica-5.html"><span>00</span>El enunciado</a></li>
-            <li><a href="mcts-paso-a-paso.html" aria-current="page"><span>01</span>MCTS paso a paso</a></li>
+            <li><a href="mcts-paso-a-paso.html" aria-current="page"><span>01</span>Práctica 5 paso a paso</a></li>
           </ol>
         </nav>
         <div class="note mine rail-nota">
@@ -997,7 +1055,7 @@ respaldo minimax puro sobre evaluaciones, sin simular        59 %</pre>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 17 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

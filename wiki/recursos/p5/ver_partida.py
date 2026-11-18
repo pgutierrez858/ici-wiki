@@ -3,9 +3,12 @@
 from ajedrez import AlfaBeta, Aleatorio, Voraz
 from ajedrez.ventana import ver
 from grupoYY.mcts import MCTS
+from grupoYY.minimax import Minimax
 
-BLANCAS = MCTS()
-NEGRAS = Voraz()
+# Con el proyecto recién descargado, dos rivales de referencia. Cuando tengáis los pasos hechos,
+# poned los vuestros: MCTS(), Minimax(profundidad=2), u otra versión.
+BLANCAS = Voraz()
+NEGRAS = AlfaBeta(2)
 TIEMPO = 1.0        # segundos por jugada
 
 if __name__ == "__main__":
