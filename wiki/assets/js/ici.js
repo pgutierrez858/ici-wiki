@@ -250,6 +250,37 @@
     }
   });
 
+  /* ---------- listas barajadas ----------
+     Una lista con data-barajar sale en un orden al azar, el mismo siempre en
+     este navegador, y las misiones a las que enlaza se ponen en ese orden:
+     así no todos los grupos las hacen en el mismo. Va después de las casillas,
+     que se guardan por su posición original. */
+  [].slice.call(document.querySelectorAll('ul[data-barajar]')).forEach(function (ul) {
+    var clave = 'ici-orden:' + ul.getAttribute('data-barajar');
+    var lis = [].slice.call(ul.children);
+    var ids = lis.map(function (li) {
+      var a = li.querySelector('a[href^="#"]');
+      return a ? a.getAttribute('href').slice(1) : '';
+    });
+    var orden = null;
+    try { orden = JSON.parse(localStorage.getItem(clave)); } catch (e) {}
+    var vale = Array.isArray(orden) && orden.length === ids.length &&
+      ids.every(function (id) { return orden.indexOf(id) > -1; });
+    if (!vale) {   // primera visita, o la lista ha cambiado: se baraja y se guarda
+      orden = ids.slice();
+      for (var i = orden.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1)), t = orden[i];
+        orden[i] = orden[j]; orden[j] = t;
+      }
+      try { localStorage.setItem(clave, JSON.stringify(orden)); } catch (e) {}
+    }
+    orden.forEach(function (id) {
+      ul.appendChild(lis[ids.indexOf(id)]);
+      var destino = id && document.getElementById(id);
+      if (destino) destino.parentNode.appendChild(destino);
+    });
+  });
+
   /* ---------- marcador de puntos ----------
      Un [data-marcador="10"] suma los data-puntos de las casillas tachadas de
      sus listas. Las de data-grupo="retos" cuentan como mucho tres, y entre
@@ -278,5 +309,28 @@
     }
     m.addEventListener('change', cuenta);
     cuenta();
+  });
+
+  /* ---------- misiones con su casilla ----------
+     Cada .mision enlazada desde una lista para tachar lleva una casilla
+     "Hecha" que es la misma que la de la lista: marcar una marca la otra. */
+  [].slice.call(document.querySelectorAll('.check.tachar li a[href^="#"]')).forEach(function (a) {
+    var mision = document.getElementById(a.getAttribute('href').slice(1));
+    var origen = a.closest('li').querySelector('input[type=checkbox]');
+    if (!mision || !mision.classList.contains('mision') || !origen) return;
+    var label = document.createElement('label');
+    label.className = 'hecha';
+    var caja = document.createElement('input');
+    caja.type = 'checkbox';
+    label.appendChild(caja);
+    label.appendChild(document.createTextNode('Hecha'));
+    (mision.querySelector('h4') || mision).appendChild(label);
+    function pinta() { caja.checked = origen.checked; mision.classList.toggle('mision-hecha', origen.checked); }
+    caja.addEventListener('change', function () {
+      origen.checked = caja.checked;
+      origen.dispatchEvent(new Event('change', { bubbles: true }));   // guarda y recuenta el marcador
+    });
+    origen.addEventListener('change', pinta);
+    pinta();
   });
 })();

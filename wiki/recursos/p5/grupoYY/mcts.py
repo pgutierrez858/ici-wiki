@@ -26,7 +26,7 @@ class Nodo:
         random.shuffle(self.sin_probar)
         self.visitas = 0                              # N: cuántas simulaciones han pasado por aquí
         self.valor = 0.0                              # W: la suma de sus recompensas
-        self.color = not tablero.turn                 # quien hizo `jugada` (os hará falta en el reto 1)
+        self.color = not tablero.turn                 # quien hizo `jugada` (os hará falta en el reto "El rival también elige")
 
 
 # ---------------------------------------------------------------- paso M1
@@ -70,7 +70,7 @@ def retropropagar(nodo, r):
     """Sube desde `nodo` hasta la raíz sumando a cada nodo una visita y la recompensa `r`.
 
     Todo el árbol cuenta desde el mismo jugador, el que decide en la raíz. Es lo más sencillo,
-    y tiene un fallo que podéis arreglar en el reto 1."""
+    y tiene un fallo que podéis arreglar en el reto "El rival también elige"."""
     raise NotImplementedError("M5: retropropagar")
 
 
