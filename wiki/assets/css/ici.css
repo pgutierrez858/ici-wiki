@@ -2567,3 +2567,29 @@ figure.lab-uno { max-width: 17rem; }
 .mc-ban .mc-t { font-size: 13px; }
 .mc-ban .mc-maq-nom { font-size: 17px; }
 .mc-c4 { max-width: 28rem; margin: 0 auto; }
+
+/* Tableros de ajedrez estáticos (guía de la P5). Colores fijos, como una foto. */
+.tableros { display: flex; flex-wrap: wrap; gap: 1rem 1.25rem; max-width: none; }
+.tableros > div { width: 12.5rem; }
+.tableros p { font-family: var(--f-display); font-size: .82rem; line-height: 1.35; color: var(--ink-2); margin: .45rem 0 0; }
+.tablero { display: grid; grid-template-columns: .9rem repeat(8, 1fr); border-radius: 3px; }
+.tablero span { aspect-ratio: 1; display: grid; place-items: center; }
+.tablero .c { background: #E3E8FB; }
+.tablero .o { background: #8E9BD0; }
+.tablero .c.m { background: #F6DC8A; }
+.tablero .o.m { background: #DDB64A; }
+.tablero b { font-size: 1.45rem; line-height: 1; font-weight: 400; font-family: "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", sans-serif; }
+.tablero b.n { color: #14192B; }
+.tablero b.w { color: #FFFFFF; -webkit-text-stroke: 1px #14192B; paint-order: stroke fill; }
+.tablero i { font: 500 .62rem/1 var(--f-mono); font-style: normal; color: var(--ink-3); display: grid; place-items: center; padding-top: .15rem; }
+
+/* Gráficas en SVG estático (la sigmoide de la P5). */
+.grafica { display: block; width: 100%; height: auto; overflow: visible; }
+.grafica .rejilla { stroke: var(--line-soft); stroke-width: 1; }
+.grafica .eje { font: 500 12px var(--f-mono); fill: var(--ink-3); }
+.grafica .nota { font: 600 12.5px var(--f-display); fill: var(--ink-2); stroke: var(--ground); stroke-width: 4px; stroke-linejoin: round; paint-order: stroke fill; }
+.grafica .nota.tenue { fill: var(--ink-3); font-weight: 500; }
+.grafica .mate { stroke: var(--ok); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.grafica .sig { fill: none; stroke: var(--maze); stroke-width: 3; stroke-linejoin: round; }
+.grafica .otra { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-dasharray: 2 4; opacity: .7; }
+.grafica .punto { fill: var(--pill); stroke: var(--surface); stroke-width: 2; }
