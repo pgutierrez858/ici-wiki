@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 4 · Resultados del concurso · ICI</title>
+<meta name="description" content="Cierre del concurso de la Práctica 4: los dos rankings de todos contra todos, el punto extra de cada grupo y la tabla completa, con las dos entradas de MCM_NRR_PGP.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../presentacion.html">Presentación</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Guías</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <a href="practica-4.html">Práctica 4</a>
+    <span aria-hidden="true">/</span>
+    <span>Resultados</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      El concurso de la lógica borrosa
+      <span class="thin">Cómo quedó la Práctica 4, con un grupo que jugó dos veces.</span>
+    </h1>
+    <p class="standfirst">
+      Los once grupos han jugado todos contra todos con la versión que eligieron: cada Ms.&nbsp;Pac-Man
+      contra los fantasmas de toda la clase, 300 partidas por emparejamiento. Esta vez hay doce entradas y
+      no once, porque MCM_NRR_PGP ganó el Kahoot y presentó dos parejas de controladores; juegan las dos y
+      al grupo le cuenta la que mejor nota saca. Aquí están los dos rankings, el punto extra y la tabla
+      completa.
+    </p>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Partidas</dt>
+      <dd>43&#8239;200<small>12 × 12 emparejamientos, 300 cada uno</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Mejor Ms. Pac-Man</dt>
+      <dd>8&#8239;771<small>APF_DGR_JPC_SBV, con muchísima ventaja</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Mejores fantasmas</dt>
+      <dd>4&#8239;050<small>MCM_NRR_PGP, empatados en la práctica con HLI_EJB_CSB y ABC_HD_VMM_SVU</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Fuera del concurso</dt>
+      <dd>0<small>sin excepciones ni entregas tardías</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="rankings">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Los dos rankings</h2>
+        </div>
+        <p>
+          Las reglas son las de siempre, las de
+          <a href="../guias/competicion.html#ranking">la guía de la competición</a>: la puntuación de una
+          Ms.&nbsp;Pac-Man es la media de su fila, lo que saca contra los fantasmas de toda la clase, y la de
+          unos fantasmas es la media de su columna, lo que dejan sacar. Con doce entradas, cada media sale
+          de 3&#8239;600 partidas.
+        </p>
+        <!--P4:PAC-->
+        <div class="table-scroll">
+          <table class="ranking">
+            <caption>Ranking de Ms. Pac-Man · más es mejor</caption>
+            <thead><tr><th scope="col">Puesto</th><th scope="col">Grupo</th><th scope="col" class="num-col">Media</th><th scope="col" class="num-col">Error típico</th><th scope="col" class="num-col">Medio punto</th></tr></thead>
+            <tbody>
+              <tr><td class="num-col">1</td><th scope="row">APF_DGR_JPC_SBV</th><td class="num-col">8&#8239;771</td><td class="num-col">±&#8239;63</td><td class="num-col">0,50</td></tr>
+              <tr><td class="num-col">2</td><th scope="row">MCM_NRR_PGP_2</th><td class="num-col">6&#8239;206</td><td class="num-col">±&#8239;48</td><td class="num-col">0,31</td></tr>
+              <tr><td class="num-col">3</td><th scope="row">ASP_AAM</th><td class="num-col">6&#8239;064</td><td class="num-col">±&#8239;53</td><td class="num-col">0,30</td></tr>
+              <tr><td class="num-col">4</td><th scope="row">VRC_MS_WFJ</th><td class="num-col">6&#8239;048</td><td class="num-col">±&#8239;45</td><td class="num-col">0,30</td></tr>
+              <tr><td class="num-col">5</td><th scope="row">MCM_NRR_PGP_1</th><td class="num-col">5&#8239;762</td><td class="num-col">±&#8239;43</td><td class="num-col">0,28</td></tr>
+              <tr><td class="num-col">6</td><th scope="row">DIE_IEO_ARN_EM</th><td class="num-col">5&#8239;603</td><td class="num-col">±&#8239;52</td><td class="num-col">0,27</td></tr>
+              <tr><td class="num-col">7</td><th scope="row">HLI_EJB_CSB</th><td class="num-col">5&#8239;370</td><td class="num-col">±&#8239;35</td><td class="num-col">0,25</td></tr>
+              <tr><td class="num-col">8</td><th scope="row">ABC_HD_VMM_SVU</th><td class="num-col">4&#8239;486</td><td class="num-col">±&#8239;45</td><td class="num-col">0,19</td></tr>
+              <tr><td class="num-col">9</td><th scope="row">PBA_JMN</th><td class="num-col">4&#8239;219</td><td class="num-col">±&#8239;37</td><td class="num-col">0,17</td></tr>
+              <tr><td class="num-col">10</td><th scope="row">GBB_ZZ_JYP_GLV</th><td class="num-col">3&#8239;985</td><td class="num-col">±&#8239;39</td><td class="num-col">0,15</td></tr>
+              <tr><td class="num-col">11</td><th scope="row">GIRM_OGA_LIN_LING</th><td class="num-col">2&#8239;604</td><td class="num-col">±&#8239;29</td><td class="num-col">0,05</td></tr>
+              <tr><td class="num-col">12</td><th scope="row">JJAF</th><td class="num-col">1&#8239;961</td><td class="num-col">±&#8239;18</td><td class="num-col">0,00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!--/P4:PAC-->
+        <!--P4:GHO-->
+        <div class="table-scroll">
+          <table class="ranking">
+            <caption>Ranking de fantasmas · menos es mejor</caption>
+            <thead><tr><th scope="col">Puesto</th><th scope="col">Grupo</th><th scope="col" class="num-col">Media</th><th scope="col" class="num-col">Error típico</th><th scope="col" class="num-col">Medio punto</th></tr></thead>
+            <tbody>
+              <tr><td class="num-col">1</td><th scope="row">MCM_NRR_PGP_2</th><td class="num-col">4&#8239;050</td><td class="num-col">±&#8239;36</td><td class="num-col">0,50</td></tr>
+              <tr><td class="num-col">2</td><th scope="row">HLI_EJB_CSB</th><td class="num-col">4&#8239;088</td><td class="num-col">±&#8239;40</td><td class="num-col">0,49</td></tr>
+              <tr><td class="num-col">3</td><th scope="row">ABC_HD_VMM_SVU</th><td class="num-col">4&#8239;090</td><td class="num-col">±&#8239;33</td><td class="num-col">0,49</td></tr>
+              <tr><td class="num-col">4</td><th scope="row">MCM_NRR_PGP_1</th><td class="num-col">4&#8239;250</td><td class="num-col">±&#8239;39</td><td class="num-col">0,47</td></tr>
+              <tr><td class="num-col">5</td><th scope="row">GIRM_OGA_LIN_LING</th><td class="num-col">4&#8239;484</td><td class="num-col">±&#8239;46</td><td class="num-col">0,44</td></tr>
+              <tr><td class="num-col">6</td><th scope="row">DIE_IEO_ARN_EM</th><td class="num-col">4&#8239;632</td><td class="num-col">±&#8239;44</td><td class="num-col">0,42</td></tr>
+              <tr><td class="num-col">7</td><th scope="row">APF_DGR_JPC_SBV</th><td class="num-col">4&#8239;831</td><td class="num-col">±&#8239;40</td><td class="num-col">0,39</td></tr>
+              <tr><td class="num-col">8</td><th scope="row">GBB_ZZ_JYP_GLV</th><td class="num-col">5&#8239;360</td><td class="num-col">±&#8239;54</td><td class="num-col">0,32</td></tr>
+              <tr><td class="num-col">9</td><th scope="row">VRC_MS_WFJ</th><td class="num-col">5&#8239;469</td><td class="num-col">±&#8239;53</td><td class="num-col">0,30</td></tr>
+              <tr><td class="num-col">10</td><th scope="row">ASP_AAM</th><td class="num-col">5&#8239;971</td><td class="num-col">±&#8239;68</td><td class="num-col">0,23</td></tr>
+              <tr><td class="num-col">11</td><th scope="row">PBA_JMN</th><td class="num-col">6&#8239;237</td><td class="num-col">±&#8239;72</td><td class="num-col">0,19</td></tr>
+              <tr><td class="num-col">12</td><th scope="row">JJAF</th><td class="num-col">7&#8239;617</td><td class="num-col">±&#8239;49</td><td class="num-col">0,00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!--/P4:GHO-->
+
+        <h3 class="label">Lo que se lee en las dos tablas</h3>
+        <p>
+          <strong>En Ms.&nbsp;Pac-Man, APF_DGR_JPC_SBV gana de calle.</strong> Saca 2&#8239;565 puntos más que
+          la segunda, la Ms.&nbsp;Pac-Man de MCM_NRR_PGP_2, y eso no hay azar que lo explique:
+        </p>
+        <!--TEX \begin{aligned}
+\text{diferencia:}\quad & 8\,771 - 6\,206 \\
+&= 2\,565 \\[10pt]
+\text{error de la resta:}\quad & \sqrt{63^2 + 48^2} \\
+&= \sqrt{6\,273} \\
+&= 79 \\[10pt]
+\text{cociente:}\quad & \frac{2\,565}{79} \\
+&\approx 32\ \text{errores típicos} \quad\Rightarrow\ \text{no es azar}
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>diferencia:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>8</mn><mtext> </mtext><mn>771</mn><mo>−</mo><mn>6</mn><mtext> </mtext><mn>206</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><mtext> </mtext><mn>565</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>error de la resta:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><msqrt><mrow><msup><mn>63</mn><mn>2</mn></msup><mo>+</mo><msup><mn>48</mn><mn>2</mn></msup></mrow></msqrt></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msqrt><mrow><mn>6</mn><mtext> </mtext><mn>273</mn></mrow></msqrt></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>79</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>cociente:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mfrac><mrow><mn>2</mn><mtext> </mtext><mn>565</mn></mrow><mn>79</mn></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>≈</mo><mn>32</mn><mtext> </mtext><mrow><mtext>errores t</mtext><mover accent="true"><mtext>ı</mtext><mo>ˊ</mo></mover><mtext>picos</mtext></mrow><mspace width="1em"/><mo>⇒</mo><mtext> no es azar</mtext></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+\text{diferencia:}\quad &amp; 8\,771 - 6\,206 \\
+&amp;= 2\,565 \\[10pt]
+\text{error de la resta:}\quad &amp; \sqrt{63^2 + 48^2} \\
+&amp;= \sqrt{6\,273} \\
+&amp;= 79 \\[10pt]
+\text{cociente:}\quad &amp; \frac{2\,565}{79} \\
+&amp;\approx 32\ \text{errores típicos} \quad\Rightarrow\ \text{no es azar}
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:13.3458em;vertical-align:-6.4229em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:6.9229em;"><span style="top:-9.4043em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord text"><span class="mord">diferencia:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-7.9043em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span><span style="top:-5.1821em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord text"><span class="mord">error de la resta:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-3.566em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span><span style="top:-2.066em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span><span style="top:0.9155em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord text"><span class="mord">cociente:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:2.7415em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:6.4229em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:6.9229em;"><span style="top:-9.4043em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">771</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">206</span></span></span><span style="top:-7.9043em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">565</span></span></span><span style="top:-5.1821em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0623em;"><span class="svg-align" style="top:-3.2em;"><span class="pstrut" style="height:3.2em;"></span><span class="mord" style="padding-left:1em;"><span class="mord">6</span><span class="mord"><span class="mord">3</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">4</span><span class="mord"><span class="mord">8</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span><span style="top:-3.0223em;"><span class="pstrut" style="height:3.2em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.28em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.28em" viewBox="0 0 400000 1296" preserveAspectRatio="xMinYMin slice"><path d="M263,681c0.7,0,18,39.7,52,119
+c34,79.3,68.167,158.7,102.5,238c34.3,79.3,51.8,119.3,52.5,120
+c340,-704.7,510.7,-1060.3,512,-1067
+l0 -0
+c4.7,-7.3,11,-11,19,-11
+H40000v40H1012.3
+s-271.3,567,-271.3,567c-38.7,80.7,-84,175,-136,283c-52,108,-89.167,185.3,-111.5,232
+c-22.3,46.7,-33.8,70.3,-34.5,71c-4.7,4.7,-12.3,7,-23,7s-12,-1,-12,-1
+s-109,-253,-109,-253c-72.7,-168,-109.3,-252,-110,-252c-10.7,8,-22,16.7,-34,26
+c-22,17.3,-33.3,26,-34,26s-26,-26,-26,-26s76,-59,76,-59s76,-60,76,-60z
+M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1777em;"><span></span></span></span></span></span></span></span><span style="top:-3.566em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9561em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">6</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">273</span></span></span><span style="top:-2.9161em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.0839em;"><span></span></span></span></span></span></span></span><span style="top:-2.066em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">79</span></span></span><span style="top:0.9155em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">79</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">565</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:2.7415em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">32</span><span class="mspace"> </span><span class="mord text"><span class="mord">errores t</span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord latin_fallback">ı</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">picos</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">no es azar</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:6.4229em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Es la misma cuenta de la Práctica 2: si la diferencia es mayor que dos errores típicos, es real.
+          Aquí es mayor que treinta. Por detrás, del segundo al cuarto puesto (MCM_NRR_PGP_2, ASP_AAM y
+          VRC_MS_WFJ) están a menos de 160 puntos entre sí, así que ese trozo del ranking hay que leerlo con
+          más cuidado.
+        </p>
+        <p>
+          <strong>En fantasmas pasa lo contrario: arriba hay un empate a tres.</strong> MCM_NRR_PGP_2,
+          HLI_EJB_CSB y ABC_HD_VMM_SVU dejan sacar entre 4&#8239;050 y 4&#8239;090 puntos, y entre el primero
+          y el segundo la diferencia no llega a un error típico:
+        </p>
+        <!--TEX \begin{aligned}
+\text{diferencia:}\quad & 4\,088 - 4\,050 \\
+&= 38 \\[10pt]
+\text{error de la resta:}\quad & \sqrt{40^2 + 36^2} \\
+&= \sqrt{2\,896} \\
+&= 54 \\[10pt]
+\text{cociente:}\quad & \frac{38}{54} \\
+&\approx 0{,}7\ \text{errores típicos} \quad\Rightarrow\ \text{puede ser azar}
+\end{aligned} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>diferencia:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mn>4</mn><mtext> </mtext><mn>088</mn><mo>−</mo><mn>4</mn><mtext> </mtext><mn>050</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>38</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>error de la resta:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><msqrt><mrow><msup><mn>40</mn><mn>2</mn></msup><mo>+</mo><msup><mn>36</mn><mn>2</mn></msup></mrow></msqrt></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msqrt><mrow><mn>2</mn><mtext> </mtext><mn>896</mn></mrow></msqrt></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>54</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>cociente:</mtext><mspace width="1em"/></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mfrac><mn>38</mn><mn>54</mn></mfrac></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>≈</mo><mn>0,7</mn><mtext> </mtext><mrow><mtext>errores t</mtext><mover accent="true"><mtext>ı</mtext><mo>ˊ</mo></mover><mtext>picos</mtext></mrow><mspace width="1em"/><mo>⇒</mo><mtext> puede ser azar</mtext></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+\text{diferencia:}\quad &amp; 4\,088 - 4\,050 \\
+&amp;= 38 \\[10pt]
+\text{error de la resta:}\quad &amp; \sqrt{40^2 + 36^2} \\
+&amp;= \sqrt{2\,896} \\
+&amp;= 54 \\[10pt]
+\text{cociente:}\quad &amp; \frac{38}{54} \\
+&amp;\approx 0{,}7\ \text{errores típicos} \quad\Rightarrow\ \text{puede ser azar}
+\end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:13.3458em;vertical-align:-6.4229em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:6.9229em;"><span style="top:-9.4043em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord text"><span class="mord">diferencia:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-7.9043em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span><span style="top:-5.1821em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord text"><span class="mord">error de la resta:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-3.566em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span><span style="top:-2.066em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span><span style="top:0.9155em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord text"><span class="mord">cociente:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:2.7415em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:6.4229em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:6.9229em;"><span style="top:-9.4043em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">088</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">050</span></span></span><span style="top:-7.9043em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">38</span></span></span><span style="top:-5.1821em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0623em;"><span class="svg-align" style="top:-3.2em;"><span class="pstrut" style="height:3.2em;"></span><span class="mord" style="padding-left:1em;"><span class="mord">4</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">3</span><span class="mord"><span class="mord">6</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span><span style="top:-3.0223em;"><span class="pstrut" style="height:3.2em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.28em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.28em" viewBox="0 0 400000 1296" preserveAspectRatio="xMinYMin slice"><path d="M263,681c0.7,0,18,39.7,52,119
+c34,79.3,68.167,158.7,102.5,238c34.3,79.3,51.8,119.3,52.5,120
+c340,-704.7,510.7,-1060.3,512,-1067
+l0 -0
+c4.7,-7.3,11,-11,19,-11
+H40000v40H1012.3
+s-271.3,567,-271.3,567c-38.7,80.7,-84,175,-136,283c-52,108,-89.167,185.3,-111.5,232
+c-22.3,46.7,-33.8,70.3,-34.5,71c-4.7,4.7,-12.3,7,-23,7s-12,-1,-12,-1
+s-109,-253,-109,-253c-72.7,-168,-109.3,-252,-110,-252c-10.7,8,-22,16.7,-34,26
+c-22,17.3,-33.3,26,-34,26s-26,-26,-26,-26s76,-59,76,-59s76,-60,76,-60z
+M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1777em;"><span></span></span></span></span></span></span></span><span style="top:-3.566em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9561em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">896</span></span></span><span style="top:-2.9161em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.0839em;"><span></span></span></span></span></span></span></span><span style="top:-2.066em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">54</span></span></span><span style="top:0.9155em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">54</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">38</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:2.7415em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">7</span><span class="mspace"> </span><span class="mord text"><span class="mord">errores t</span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord latin_fallback">ı</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">picos</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">puede ser azar</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:6.4229em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Con otras semillas el orden de esos tres podría cambiar. Al punto extra le da igual: los tres se
+          llevan prácticamente el medio punto entero.
+        </p>
+
+        <h3 class="label">El punto extra</h3>
+        <p>
+          Medio punto por cada ranking, con la fórmula de
+          <a href="../guias/competicion.html#punto-extra">la guía</a>: el mejor se lleva el medio punto
+          entero, el peor se queda a cero y los demás reciben la parte proporcional a lo cerca que quedaron
+          del mejor. Cada medio punto se redondea a dos decimales antes de sumar, y el punto extra va aparte
+          de la nota de la práctica.
+        </p>
+        <p>
+          Las dos entradas de MCM_NRR_PGP juegan y puntúan como cualquier otra, así que también cuentan para
+          escalar el medio punto de los demás. Al grupo le cuenta la entrada que más suma: la 2
+          (<code>mspacman-v7</code> con <code>ghosts-v5</code>), con 0,81 frente al 0,75 de la 1. La otra sale
+          en la tabla, en gris.
+        </p>
+        <!--P4:EXTRA-->
+        <div class="table-scroll">
+          <table class="ranking">
+            <caption>El punto extra de cada grupo</caption>
+            <thead><tr><th scope="col">Grupo</th><th scope="col">Ms. Pac-Man</th><th scope="col">Fantasmas</th><th scope="col" class="num-col">Punto extra</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">APF_DGR_JPC_SBV</th><td><span class="puesto">1.º de 12</span> 0,50</td><td><span class="puesto">7.º de 12</span> 0,39</td><td class="num-col"><strong>0,89</strong></td></tr>
+              <tr><th scope="row">MCM_NRR_PGP_2</th><td><span class="puesto">2.º de 12</span> 0,31</td><td><span class="puesto">1.º de 12</span> 0,50</td><td class="num-col"><strong>0,81</strong></td></tr>
+              <tr class="fuera"><th scope="row">MCM_NRR_PGP_1</th><td><span class="puesto">5.º de 12</span> 0,28</td><td><span class="puesto">4.º de 12</span> 0,47</td><td class="num-col">0,75 <span class="puesto">no cuenta</span></td></tr>
+              <tr><th scope="row">HLI_EJB_CSB</th><td><span class="puesto">7.º de 12</span> 0,25</td><td><span class="puesto">2.º de 12</span> 0,49</td><td class="num-col"><strong>0,74</strong></td></tr>
+              <tr><th scope="row">DIE_IEO_ARN_EM</th><td><span class="puesto">6.º de 12</span> 0,27</td><td><span class="puesto">6.º de 12</span> 0,42</td><td class="num-col"><strong>0,69</strong></td></tr>
+              <tr><th scope="row">ABC_HD_VMM_SVU</th><td><span class="puesto">8.º de 12</span> 0,19</td><td><span class="puesto">3.º de 12</span> 0,49</td><td class="num-col"><strong>0,68</strong></td></tr>
+              <tr><th scope="row">VRC_MS_WFJ</th><td><span class="puesto">4.º de 12</span> 0,30</td><td><span class="puesto">9.º de 12</span> 0,30</td><td class="num-col"><strong>0,60</strong></td></tr>
+              <tr><th scope="row">ASP_AAM</th><td><span class="puesto">3.º de 12</span> 0,30</td><td><span class="puesto">10.º de 12</span> 0,23</td><td class="num-col"><strong>0,53</strong></td></tr>
+              <tr><th scope="row">GIRM_OGA_LIN_LING</th><td><span class="puesto">11.º de 12</span> 0,05</td><td><span class="puesto">5.º de 12</span> 0,44</td><td class="num-col"><strong>0,49</strong></td></tr>
+              <tr><th scope="row">GBB_ZZ_JYP_GLV</th><td><span class="puesto">10.º de 12</span> 0,15</td><td><span class="puesto">8.º de 12</span> 0,32</td><td class="num-col"><strong>0,47</strong></td></tr>
+              <tr><th scope="row">PBA_JMN</th><td><span class="puesto">9.º de 12</span> 0,17</td><td><span class="puesto">11.º de 12</span> 0,19</td><td class="num-col"><strong>0,36</strong></td></tr>
+              <tr><th scope="row">JJAF</th><td><span class="puesto">12.º de 12</span> 0,00</td><td><span class="puesto">12.º de 12</span> 0,00</td><td class="num-col"><strong>0,00</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!--/P4:EXTRA-->
+        <p class="apunte">
+          La cifra que vale es la del Campus Virtual. Si no coincide con la de esta tabla, escribidme.
+        </p>
+      </section>
+
+      <section id="tabla">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">La tabla completa</h2>
+        </div>
+        <p>
+          Cada casilla es la media de 300 partidas de una Ms.&nbsp;Pac-Man (fila) contra unos fantasmas
+          (columna). Las filas van ordenadas de la mejor Ms.&nbsp;Pac-Man a la peor y las columnas, de los
+          mejores fantasmas a los peores, así que las cifras más altas quedan arriba a la derecha y las más
+          bajas, abajo a la izquierda. En gris, cada entrada contra sí misma.
+        </p>
+        <!--P4:MATRIZ-->
+        <div class="table-scroll matriz-scroll">
+          <table class="matriz">
+            <caption>Media de 300 partidas en cada casilla · filas: Ms. Pac-Man; columnas: fantasmas</caption>
+            <thead><tr><th scope="col"><span class="sr-only">Ms. Pac-Man contra fantasmas</span></th><th scope="col">MCM_NRR_PGP_2</th><th scope="col">HLI_EJB_CSB</th><th scope="col">ABC_HD_VMM_SVU</th><th scope="col">MCM_NRR_PGP_1</th><th scope="col">GIRM_OGA_LIN_LING</th><th scope="col">DIE_IEO_ARN_EM</th><th scope="col">APF_DGR_JPC_SBV</th><th scope="col">GBB_ZZ_JYP_GLV</th><th scope="col">VRC_MS_WFJ</th><th scope="col">ASP_AAM</th><th scope="col">PBA_JMN</th><th scope="col">JJAF</th><th scope="col" class="media">Media</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">APF_DGR_JPC_SBV</th><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas MCM_NRR_PGP_2">6&#8239;368</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas HLI_EJB_CSB">7&#8239;452</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas ABC_HD_VMM_SVU">5&#8239;943</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas MCM_NRR_PGP_1">6&#8239;740</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas GIRM_OGA_LIN_LING">8&#8239;291</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas DIE_IEO_ARN_EM">8&#8239;511</td><td class="num-col propia" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas APF_DGR_JPC_SBV">7&#8239;620</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas GBB_ZZ_JYP_GLV">9&#8239;803</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas VRC_MS_WFJ">9&#8239;375</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas ASP_AAM">12&#8239;775</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas PBA_JMN">12&#8239;739</td><td class="num-col" title="Ms. Pac-Man APF_DGR_JPC_SBV contra los fantasmas JJAF">9&#8239;636</td><td class="num-col media">8&#8239;771</td></tr>
+              <tr><th scope="row">MCM_NRR_PGP_2</th><td class="num-col propia" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas MCM_NRR_PGP_2">5&#8239;022</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas HLI_EJB_CSB">5&#8239;114</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas ABC_HD_VMM_SVU">5&#8239;177</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas MCM_NRR_PGP_1">5&#8239;301</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas GIRM_OGA_LIN_LING">5&#8239;360</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas DIE_IEO_ARN_EM">5&#8239;131</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas APF_DGR_JPC_SBV">5&#8239;261</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas GBB_ZZ_JYP_GLV">6&#8239;840</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas VRC_MS_WFJ">6&#8239;408</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas ASP_AAM">7&#8239;510</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas PBA_JMN">8&#8239;260</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_2 contra los fantasmas JJAF">9&#8239;084</td><td class="num-col media">6&#8239;206</td></tr>
+              <tr><th scope="row">ASP_AAM</th><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas MCM_NRR_PGP_2">4&#8239;128</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas HLI_EJB_CSB">3&#8239;895</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas ABC_HD_VMM_SVU">3&#8239;976</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas MCM_NRR_PGP_1">4&#8239;103</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas GIRM_OGA_LIN_LING">6&#8239;820</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas DIE_IEO_ARN_EM">5&#8239;754</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas APF_DGR_JPC_SBV">5&#8239;979</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas GBB_ZZ_JYP_GLV">5&#8239;228</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas VRC_MS_WFJ">7&#8239;791</td><td class="num-col propia" title="Ms. Pac-Man ASP_AAM contra los fantasmas ASP_AAM">7&#8239;889</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas PBA_JMN">8&#8239;559</td><td class="num-col" title="Ms. Pac-Man ASP_AAM contra los fantasmas JJAF">8&#8239;651</td><td class="num-col media">6&#8239;064</td></tr>
+              <tr><th scope="row">VRC_MS_WFJ</th><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas MCM_NRR_PGP_2">4&#8239;821</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas HLI_EJB_CSB">4&#8239;971</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas ABC_HD_VMM_SVU">4&#8239;388</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas MCM_NRR_PGP_1">5&#8239;030</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas GIRM_OGA_LIN_LING">5&#8239;376</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas DIE_IEO_ARN_EM">5&#8239;747</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas APF_DGR_JPC_SBV">5&#8239;193</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas GBB_ZZ_JYP_GLV">6&#8239;703</td><td class="num-col propia" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas VRC_MS_WFJ">6&#8239;262</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas ASP_AAM">7&#8239;882</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas PBA_JMN">8&#8239;317</td><td class="num-col" title="Ms. Pac-Man VRC_MS_WFJ contra los fantasmas JJAF">7&#8239;880</td><td class="num-col media">6&#8239;048</td></tr>
+              <tr><th scope="row">MCM_NRR_PGP_1</th><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas MCM_NRR_PGP_2">4&#8239;596</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas HLI_EJB_CSB">4&#8239;775</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas ABC_HD_VMM_SVU">5&#8239;082</td><td class="num-col propia" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas MCM_NRR_PGP_1">4&#8239;761</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas GIRM_OGA_LIN_LING">4&#8239;888</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas DIE_IEO_ARN_EM">4&#8239;788</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas APF_DGR_JPC_SBV">5&#8239;075</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas GBB_ZZ_JYP_GLV">5&#8239;983</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas VRC_MS_WFJ">5&#8239;567</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas ASP_AAM">6&#8239;880</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas PBA_JMN">7&#8239;230</td><td class="num-col" title="Ms. Pac-Man MCM_NRR_PGP_1 contra los fantasmas JJAF">9&#8239;519</td><td class="num-col media">5&#8239;762</td></tr>
+              <tr><th scope="row">DIE_IEO_ARN_EM</th><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas MCM_NRR_PGP_2">3&#8239;454</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas HLI_EJB_CSB">3&#8239;592</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas ABC_HD_VMM_SVU">4&#8239;141</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas MCM_NRR_PGP_1">3&#8239;760</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas GIRM_OGA_LIN_LING">5&#8239;864</td><td class="num-col propia" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas DIE_IEO_ARN_EM">4&#8239;907</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas APF_DGR_JPC_SBV">6&#8239;227</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas GBB_ZZ_JYP_GLV">5&#8239;537</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas VRC_MS_WFJ">7&#8239;184</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas ASP_AAM">6&#8239;711</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas PBA_JMN">6&#8239;978</td><td class="num-col" title="Ms. Pac-Man DIE_IEO_ARN_EM contra los fantasmas JJAF">8&#8239;881</td><td class="num-col media">5&#8239;603</td></tr>
+              <tr><th scope="row">HLI_EJB_CSB</th><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas MCM_NRR_PGP_2">5&#8239;057</td><td class="num-col propia" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas HLI_EJB_CSB">5&#8239;270</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas ABC_HD_VMM_SVU">4&#8239;729</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas MCM_NRR_PGP_1">5&#8239;561</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas GIRM_OGA_LIN_LING">4&#8239;456</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas DIE_IEO_ARN_EM">4&#8239;766</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas APF_DGR_JPC_SBV">4&#8239;811</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas GBB_ZZ_JYP_GLV">6&#8239;146</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas VRC_MS_WFJ">5&#8239;662</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas ASP_AAM">6&#8239;111</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas PBA_JMN">6&#8239;586</td><td class="num-col" title="Ms. Pac-Man HLI_EJB_CSB contra los fantasmas JJAF">5&#8239;287</td><td class="num-col media">5&#8239;370</td></tr>
+              <tr><th scope="row">ABC_HD_VMM_SVU</th><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas MCM_NRR_PGP_2">4&#8239;714</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas HLI_EJB_CSB">4&#8239;576</td><td class="num-col propia" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas ABC_HD_VMM_SVU">5&#8239;068</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas MCM_NRR_PGP_1">5&#8239;014</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas GIRM_OGA_LIN_LING">1&#8239;323</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas DIE_IEO_ARN_EM">4&#8239;910</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas APF_DGR_JPC_SBV">5&#8239;977</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas GBB_ZZ_JYP_GLV">6&#8239;089</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas VRC_MS_WFJ">4&#8239;543</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas ASP_AAM">2&#8239;082</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas PBA_JMN">1&#8239;748</td><td class="num-col" title="Ms. Pac-Man ABC_HD_VMM_SVU contra los fantasmas JJAF">7&#8239;787</td><td class="num-col media">4&#8239;486</td></tr>
+              <tr><th scope="row">PBA_JMN</th><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas MCM_NRR_PGP_2">3&#8239;547</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas HLI_EJB_CSB">3&#8239;170</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas ABC_HD_VMM_SVU">3&#8239;562</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas MCM_NRR_PGP_1">3&#8239;602</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas GIRM_OGA_LIN_LING">3&#8239;471</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas DIE_IEO_ARN_EM">3&#8239;667</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas APF_DGR_JPC_SBV">3&#8239;707</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas GBB_ZZ_JYP_GLV">4&#8239;438</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas VRC_MS_WFJ">3&#8239;753</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas ASP_AAM">4&#8239;669</td><td class="num-col propia" title="Ms. Pac-Man PBA_JMN contra los fantasmas PBA_JMN">5&#8239;048</td><td class="num-col" title="Ms. Pac-Man PBA_JMN contra los fantasmas JJAF">7&#8239;993</td><td class="num-col media">4&#8239;219</td></tr>
+              <tr><th scope="row">GBB_ZZ_JYP_GLV</th><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas MCM_NRR_PGP_2">3&#8239;275</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas HLI_EJB_CSB">2&#8239;971</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas ABC_HD_VMM_SVU">3&#8239;070</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas MCM_NRR_PGP_1">3&#8239;436</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas GIRM_OGA_LIN_LING">3&#8239;905</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas DIE_IEO_ARN_EM">3&#8239;401</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas APF_DGR_JPC_SBV">3&#8239;527</td><td class="num-col propia" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas GBB_ZZ_JYP_GLV">3&#8239;492</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas VRC_MS_WFJ">4&#8239;652</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas ASP_AAM">4&#8239;411</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas PBA_JMN">4&#8239;616</td><td class="num-col" title="Ms. Pac-Man GBB_ZZ_JYP_GLV contra los fantasmas JJAF">7&#8239;066</td><td class="num-col media">3&#8239;985</td></tr>
+              <tr><th scope="row">GIRM_OGA_LIN_LING</th><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas MCM_NRR_PGP_2">2&#8239;005</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas HLI_EJB_CSB">1&#8239;899</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas ABC_HD_VMM_SVU">2&#8239;281</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas MCM_NRR_PGP_1">2&#8239;112</td><td class="num-col propia" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas GIRM_OGA_LIN_LING">2&#8239;070</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas DIE_IEO_ARN_EM">2&#8239;295</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas APF_DGR_JPC_SBV">2&#8239;531</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas GBB_ZZ_JYP_GLV">2&#8239;322</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas VRC_MS_WFJ">2&#8239;305</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas ASP_AAM">2&#8239;696</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas PBA_JMN">2&#8239;698</td><td class="num-col" title="Ms. Pac-Man GIRM_OGA_LIN_LING contra los fantasmas JJAF">6&#8239;032</td><td class="num-col media">2&#8239;604</td></tr>
+              <tr><th scope="row">JJAF</th><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas MCM_NRR_PGP_2">1&#8239;608</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas HLI_EJB_CSB">1&#8239;378</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas ABC_HD_VMM_SVU">1&#8239;660</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas MCM_NRR_PGP_1">1&#8239;582</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas GIRM_OGA_LIN_LING">1&#8239;982</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas DIE_IEO_ARN_EM">1&#8239;704</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas APF_DGR_JPC_SBV">2&#8239;060</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas GBB_ZZ_JYP_GLV">1&#8239;734</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas VRC_MS_WFJ">2&#8239;132</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas ASP_AAM">2&#8239;038</td><td class="num-col" title="Ms. Pac-Man JJAF contra los fantasmas PBA_JMN">2&#8239;070</td><td class="num-col propia" title="Ms. Pac-Man JJAF contra los fantasmas JJAF">3&#8239;585</td><td class="num-col media">1&#8239;961</td></tr>
+              <tr class="media"><th scope="row">Media</th><td class="num-col">4&#8239;050</td><td class="num-col">4&#8239;088</td><td class="num-col">4&#8239;090</td><td class="num-col">4&#8239;250</td><td class="num-col">4&#8239;484</td><td class="num-col">4&#8239;632</td><td class="num-col">4&#8239;831</td><td class="num-col">5&#8239;360</td><td class="num-col">5&#8239;469</td><td class="num-col">5&#8239;971</td><td class="num-col">6&#8239;237</td><td class="num-col">7&#8239;617</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!--/P4:MATRIZ-->
+        <p>
+          Merece la pena buscar vuestra fila y vuestra columna: la media resume, pero las casillas dicen
+          contra quién se pierde. La casilla más baja de la tabla es de 1&#8239;323 puntos (ABC_HD_VMM_SVU
+          contra los fantasmas de GIRM_OGA_LIN_LING) y la más alta, de 12&#8239;775 (APF_DGR_JPC_SBV contra
+          los de ASP_AAM).
+        </p>
+        <div class="note mine">
+          <span class="note-label">Qué se ha tocado del código para jugar</span>
+          <p>
+            Lo mismo que en las prácticas anteriores: el paquete, para que todas las entregas convivan en un
+            proyecto, y lo que devuelve <code>getName()</code>, porque el evaluador indexa la tabla por ese
+            nombre. Y, como con los <code>.clp</code>, la ruta de los <code>.fcl</code>, que es texto y se mueve
+            con el paquete. En GBB_ZZ_JYP_GLV esa ruta apuntaba a <code>grupoGKPG/</code>, el paquete de su
+            Práctica 3, y los <code>.fcl</code> estaban en otra carpeta: tal cual no cargaban, y para jugar se
+            ha corregido. Las dos entradas de MCM_NRR_PGP son dos copias del mismo paquete, cada una con la
+            pareja de versiones que elige su diario.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#rankings">Los dos rankings</a></li>
+            <li><a href="#tabla">La tabla completa</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El enunciado</span>
+          <p style="margin:0">
+            <a href="practica-4.html">Práctica 4 · Razonamiento borroso</a>.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Las reglas del concurso</span>
+          <p style="margin:0">
+            <a href="../guias/competicion.html">Cómo se mide, cómo se calcula el ranking y de dónde sale el
+            punto extra</a>.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>
