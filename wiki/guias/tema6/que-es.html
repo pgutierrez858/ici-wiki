@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Recordar en vez de razonar · Tema 6 · ICI</title>
+<meta name="description" content="Qué es el razonamiento basado en casos: resolver un problema nuevo con la solución de uno viejo parecido. Qué es un caso, el ciclo de las cuatro R (recuperar, reutilizar, revisar y retener), en qué se diferencia de las reglas, la lógica borrosa y MCTS, y dónde se usa, dentro y fuera de los videojuegos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 6</a>
+    <span aria-hidden="true">/</span>
+    <span>Recordar en vez de razonar</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 6 · 01 · Razonamiento basado en casos</p>
+    <h1>
+      Recordar en vez de razonar
+      <span class="thin">Un problema nuevo se resuelve como se resolvió otro parecido.</span>
+    </h1>
+    <p class="standfirst">
+      Qué es un caso y qué partes tiene, el ciclo de las cuatro R con un ejemplo de Ms. Pac-Man, qué cambia respecto a
+      las máquinas de estados, las reglas, la lógica borrosa y MCTS, y dónde se usa esta idea (en juegos y fuera de ellos).
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        Hasta ahora, en todo lo que habéis hecho alguien tenía que saber cómo se juega y escribirlo: en la máquina de
+        estados escribíais las transiciones, en la Práctica&nbsp;3 las reglas y en la 4 los conjuntos borrosos con sus
+        reglas. En la Práctica&nbsp;5 ya no le decíais al programa qué jugada hacer, pero sí le hacían falta las reglas del
+        juego para poder simular el futuro.
+      </p>
+      <p>
+        El <strong>razonamiento basado en casos</strong> (case-based reasoning, o CBR) va por otro lado, que es acordarse
+        de lo que pasó. Cada vez que Ms. Pac-Man toma una decisión se apunta cómo estaba la partida, qué hizo y cómo le
+        fue, y cuando llega a una situación nueva busca en su memoria la más parecida y hace lo que le funcionó allí.
+      </p>
+
+      <section id="idea" data-corto="La idea">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Una idea que ya usáis sin darle nombre</h2>
+        </div>
+        <p>
+          Es lo que hace un médico que ve unos síntomas y piensa "esto ya lo he visto, y en aquel paciente era tal cosa", o
+          un mecánico que reconoce un ruido. Y es lo que hacéis vosotros cuando jugáis: en cada cruce no os ponéis a razonar
+          desde cero, reconocéis la situación porque ya la habéis vivido.
+        </p>
+        <p>
+          Veamos un ejemplo con números. Ms. Pac-Man llega a un cruce y tiene apuntadas tres situaciones de partidas
+          anteriores. Para no complicarlo, cada situación se describe sólo con dos cosas, a cuántos pasos está el fantasma
+          más cercano y a cuántos la píldora de poder más cercana:
+        </p>
+        <figure class="wide">
+          <figcaption>Tres situaciones guardadas y la de ahora. Cada barra es una distancia, en pasos por el laberinto</figcaption>
+          <svg class="explica" viewBox="0 0 640 250" role="img" aria-label="Cuatro fichas. Caso 1: fantasma a 70 pasos, píldora a 60; comió pastillas y ganó 120 puntos. Caso 2: fantasma a 10, píldora a 55; huyó y ganó 30. Caso 3: fantasma a 15, píldora a 8; fue a la píldora y ganó 450. Ahora: fantasma a 12, píldora a 40, y no se sabe qué hacer.">
+            <g transform="translate(0,0)">
+              <text x="8" y="22" class="mc-t">caso 1</text>
+              <path d="M78 28 87 23A10 10 0 1 0 87 33Z" class="cb-pac"/>
+              <rect x="98" y="16" width="140" height="10" rx="2" class="cb-huir"/><text x="244" y="25" class="mc-t">fantasma 70</text>
+              <rect x="98" y="31" width="120" height="10" rx="2" class="cb-pild"/><text x="244" y="40" class="mc-t">píldora 60</text>
+              <text x="380" y="33" class="mc-t">comió pastillas · +120 puntos</text>
+            </g>
+            <g transform="translate(0,56)">
+              <text x="8" y="22" class="mc-t">caso 2</text>
+              <path d="M78 28 87 23A10 10 0 1 0 87 33Z" class="cb-pac"/>
+              <rect x="98" y="16" width="20" height="10" rx="2" class="cb-huir"/><text x="244" y="25" class="mc-t">fantasma 10</text>
+              <rect x="98" y="31" width="110" height="10" rx="2" class="cb-pild"/><text x="244" y="40" class="mc-t">píldora 55</text>
+              <text x="380" y="33" class="mc-t">huyó · +30 puntos</text>
+            </g>
+            <g transform="translate(0,112)">
+              <text x="8" y="22" class="mc-t">caso 3</text>
+              <path d="M78 28 87 23A10 10 0 1 0 87 33Z" class="cb-pac"/>
+              <rect x="98" y="16" width="30" height="10" rx="2" class="cb-huir"/><text x="244" y="25" class="mc-t">fantasma 15</text>
+              <rect x="98" y="31" width="16" height="10" rx="2" class="cb-pild"/><text x="244" y="40" class="mc-t">píldora 8</text>
+              <text x="380" y="33" class="mc-t">fue a la píldora · +450 puntos</text>
+            </g>
+            <line x1="8" x2="632" y1="180" y2="180" class="mc-rej"/>
+            <g transform="translate(0,186)">
+              <text x="8" y="22" class="mc-t" font-weight="700">ahora</text>
+              <path d="M78 28 87 23A10 10 0 1 0 87 33Z" class="cb-pac"/>
+              <rect x="98" y="16" width="24" height="10" rx="2" class="cb-huir"/><text x="244" y="25" class="mc-t">fantasma 12</text>
+              <rect x="98" y="31" width="80" height="10" rx="2" class="cb-pild"/><text x="244" y="40" class="mc-t">píldora 40</text>
+              <text x="380" y="33" class="mc-t">¿qué hago?</text>
+            </g>
+          </svg>
+        </figure>
+        <p>
+          A ojo, la situación de ahora se parece más al caso&nbsp;2: el fantasma está casi igual de cerca (12 pasos frente a
+          10) y en los dos la píldora queda lejos (40 frente a 55). El caso&nbsp;3 tiene el fantasma a una distancia parecida,
+          pero allí la píldora estaba a 8 pasos y ahora está a 40, y no es lo mismo ir a por ella. Así que Ms. Pac-Man huye,
+          como en el caso&nbsp;2.
+        </p>
+        <p>
+          Fijaos en que nadie ha escrito la regla "si el fantasma está cerca y la píldora lejos, huye", está
+          escondida en los casos. Lo que sí hay que escribir es qué quiere decir que dos situaciones "se parezcan", y de eso
+          va casi todo el tema (en la <a href="similitud.html">página siguiente</a> hacemos esta misma cuenta con números).
+        </p>
+      </section>
+
+      <section id="caso" data-corto="Qué es un caso">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Qué es un caso</h2>
+        </div>
+        <p>
+          Un <strong>caso</strong> es una experiencia concreta, apuntada en tres partes <!--cite recio-cbr-intro | transp. 18--><span class="cita">[<a href="#ref-recio-cbr-intro" id="cita-recio-cbr-intro">1</a>, transp. 18]</span><!--/cite-->:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Parte</th><th scope="col">Qué guarda</th><th scope="col">En el caso&nbsp;2 de arriba</th></tr></thead>
+            <tbody>
+              <tr><td>Descripción (el problema)</td><td>Cómo era la situación, con los atributos con los que luego se compara.</td><td>fantasma a 10, píldora a 55</td></tr>
+              <tr><td>Solución</td><td>Qué se hizo.</td><td>huir</td></tr>
+              <tr><td>Resultado</td><td>Cómo salió, para saber si conviene repetirlo.</td><td>+30 puntos</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Los casos se guardan todos juntos en la <strong>base de casos</strong>, que es la memoria del sistema y ocupa el
+          sitio que tenía la base de reglas en la Práctica&nbsp;3. Allí el conocimiento eran generalizaciones escritas a mano
+          ("si pasa esto, haz aquello"), y aquí son ejemplos.
+        </p>
+        <p>
+          A la situación de ahora, la que todavía no tiene solución, se le llama <strong>consulta</strong> (query). Tiene la
+          misma forma que la descripción de un caso, para poder compararlas atributo a atributo.
+        </p>
+        <div class="note tip">
+          <span class="note-label">En la práctica</span>
+          <p>
+            En jCOLIBRI, la librería que vais a usar, cada parte es una clase vuestra (<code>MsPacManDescription</code>,
+            <code>MsPacManSolution</code> y <code>MsPacManResult</code>), y la base de casos es un fichero CSV con un caso
+            por línea. Lo tenéis en la <a href="jcolibri.html">página 05</a>.
+          </p>
+        </div>
+      </section>
+
+      <section id="ciclo" data-corto="Las cuatro R">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El ciclo de las cuatro R</h2>
+        </div>
+        <p>
+          Agnar Aamodt y Enric Plaza describieron en 1994 cómo funciona un sistema basado en casos como un ciclo de cuatro
+          pasos (que en inglés empiezan todos por R), y se sigue contando así <!--cite aamodt-plaza--><span class="cita">[<a href="#ref-aamodt-plaza" id="cita-aamodt-plaza">2</a>]</span><!--/cite-->:
+        </p>
+        <figure class="wide">
+          <figcaption>El ciclo de las cuatro R. La base de casos está en el centro: de ella se recupera y en ella se retiene</figcaption>
+          <svg class="explica" viewBox="0 0 640 330" role="img" aria-label="Ciclo de cuatro pasos alrededor de la base de casos. Arriba a la izquierda, recuperar: buscar los casos más parecidos a la consulta. Arriba a la derecha, reutilizar: usar su solución. Abajo a la derecha, revisar: ver cómo salió. Abajo a la izquierda, retener: guardar el caso nuevo. Una flecha une cada paso con el siguiente.">
+            <defs><marker id="cb-punta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" class="cb-punta"/></marker></defs>
+            <text x="320" y="22" class="mc-t mc-centro">consulta: la situación de ahora</text>
+            <path d="M320 30 C 300 48, 230 52, 200 62" class="cb-flecha"/>
+            <rect x="40" y="62" width="200" height="74" rx="6" class="cb-fase"/>
+            <text x="140" y="88" class="cb-fase-t">1 · Recuperar</text>
+            <text x="140" y="108" class="mc-t mc-centro">buscar los casos</text>
+            <text x="140" y="122" class="mc-t mc-centro">más parecidos</text>
+            <rect x="400" y="62" width="200" height="74" rx="6" class="cb-fase"/>
+            <text x="500" y="88" class="cb-fase-t">2 · Reutilizar</text>
+            <text x="500" y="108" class="mc-t mc-centro">usar su solución,</text>
+            <text x="500" y="122" class="mc-t mc-centro">adaptada si hace falta</text>
+            <rect x="400" y="220" width="200" height="74" rx="6" class="cb-fase"/>
+            <text x="500" y="246" class="cb-fase-t">3 · Revisar</text>
+            <text x="500" y="266" class="mc-t mc-centro">ver cómo salió</text>
+            <text x="500" y="280" class="mc-t mc-centro">y apuntarlo</text>
+            <rect x="40" y="220" width="200" height="74" rx="6" class="cb-fase"/>
+            <text x="140" y="246" class="cb-fase-t">4 · Retener</text>
+            <text x="140" y="266" class="mc-t mc-centro">guardar el caso nuevo</text>
+            <text x="140" y="280" class="mc-t mc-centro">(o no)</text>
+            <ellipse cx="320" cy="178" rx="78" ry="34" class="cb-base"/>
+            <text x="320" y="176" class="cb-fase-t">base de casos</text>
+            <text x="320" y="194" class="mc-t mc-centro">la memoria</text>
+            <path d="M244 99 L396 99" class="cb-flecha"/>
+            <text x="320" y="92" class="mc-t mc-centro">caso parecido</text>
+            <path d="M500 140 L500 216" class="cb-flecha"/>
+            <text x="508" y="182" class="mc-t">acción que se juega</text>
+            <path d="M396 257 L244 257" class="cb-flecha"/>
+            <text x="320" y="250" class="mc-t mc-centro">caso con su resultado</text>
+            <path d="M200 216 C 220 200, 236 196, 252 192" class="cb-flecha"/>
+            <path d="M252 166 C 232 158, 214 150, 200 140" class="cb-flecha"/>
+          </svg>
+        </figure>
+        <ol>
+          <li><strong>Recuperar</strong> (retrieve). Se compara la consulta con los casos de la base y nos quedamos con el
+            más parecido, o con los <var>k</var> más parecidos. Es la <a href="similitud.html">página 02</a>.</li>
+          <li><strong>Reutilizar</strong> (reuse). De ellos se saca una solución para ahora, ya sea copiando la del más
+            parecido, votando entre varios o adaptándola a lo que ha cambiado. Es la <a href="reutilizar.html">página 03</a>.</li>
+          <li><strong>Revisar</strong> (revise). Se mira cómo salió esa solución y se apunta como resultado del caso nuevo.</li>
+          <li><strong>Retener</strong> (retain). Se decide si el caso nuevo se guarda en la base, y si se guarda, la próxima
+            vez que pase algo parecido se recuperará. Revisar y retener están en la <a href="revisar-retener.html">página 04</a>.</li>
+        </ol>
+        <p>
+          En Ms. Pac-Man el ciclo da una vuelta en cada cruce. Al llegar a uno se describe la situación (la consulta), se
+          recuperan los casos parecidos y se elige el movimiento, y unos cruces más tarde, cuando ya se sabe cuántos puntos
+          ha ganado o si la han cazado, se revisa y se guarda. Con cada partida la base tiene más casos y hay menos
+          situaciones que Ms. Pac-Man no haya visto nunca, que es otra forma de decir que aprende (y sin entrenar ningún
+          modelo).
+        </p>
+      </section>
+
+      <section id="comparar" data-corto="Frente a lo anterior">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Frente a lo que ya habéis hecho</h2>
+        </div>
+        <p>
+          Para verlo en pequeño, salgamos un momento del juego con un ejemplo: recomendar un vino para una comida. Con reglas, alguien tiene
+          que saber escribirlas, y cada vez que sale una excepción hay que añadir otra regla con su grado de certeza:
+        </p>
+        <pre class="pseudo"><b>si</b> el ingrediente principal es carne                     <b>entonces</b> tinto   (certeza 90)
+<b>si</b> el ingrediente principal es ave <b>y</b> no lleva pavo        <b>entonces</b> blanco  (certeza 90)
+<b>si</b> el ingrediente principal es ave <b>y</b> lleva pavo           <b>entonces</b> tinto   (certeza 80)
+<b>si</b> el ingrediente principal es pescado                   <b>entonces</b> blanco
+<b>si</b> no es pescado <b>y</b> lleva salsa de tomate                  <b>entonces</b> tinto
+…</pre>
+        <p>Con casos, basta con apuntar lo que sirvió un sumiller otras veces:</p>
+        <pre class="pseudo">pavo asado             → sauvignon blanc
+ternera strogonoff     → gewürztraminer
+pollo al curry         → valpolicella
+lenguado a la meunière → pinot noir
+paella                 → gamay</pre>
+        <p>
+          Ante un plato nuevo, basta con buscar el más parecido de la lista. Al sumiller le cuesta mucho dar reglas, pero contar lo
+          que sirvió en cada comida no le cuesta nada <!--cite recio-cbr-intro | transp. 7--><span class="cita">[<a href="#ref-recio-cbr-intro">1</a>, transp. 7]</span><!--/cite-->. Con lo que ya
+          conocéis, la comparación queda así:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Técnica</th><th scope="col">Dónde está el conocimiento</th><th scope="col">Quién lo pone</th><th scope="col">Ante una situación que nadie previó</th><th scope="col">Mejora jugando</th></tr></thead>
+            <tbody>
+              <tr><td>Máquina de estados</td><td>Estados y transiciones</td><td>Vosotros</td><td>Hace lo que diga el estado en que esté</td><td>No</td></tr>
+              <tr><td>Reglas</td><td>Reglas si-entonces</td><td>Vosotros</td><td>Si no se dispara ninguna regla, nada</td><td>No</td></tr>
+              <tr><td>Lógica borrosa</td><td>Conjuntos y reglas borrosas</td><td>Vosotros</td><td>Interpola entre reglas, así que se degrada poco a poco</td><td>No</td></tr>
+              <tr><td>MCTS</td><td>Las reglas del juego, para simular</td><td>Quien programa el juego</td><td>Simula y lo descubre</td><td>Dentro de cada jugada, no entre partidas</td></tr>
+              <tr><td>Casos</td><td>Ejemplos concretos y la medida de similitud</td><td>Las partidas jugadas (y vosotros, la similitud)</td><td>Usa el caso más parecido, aunque se parezca poco</td><td>Sí, cada partida añade casos</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Por un lado, con CBR no hace falta saber explicar cómo se juega. A los expertos les cuesta muchísimo poner por
+          escrito lo que saben (es el cuello de botella de la adquisición del conocimiento <!--cite recio-cbr-intro | transp. 8--><span class="cita">[<a href="#ref-recio-cbr-intro">1</a>, transp. 8]</span><!--/cite-->, que ya sufristeis escribiendo
+          reglas), y en cambio apuntar lo que hicieron en cada situación es fácil. Además aprende con el uso, sin tocar el
+          código (basta con seguir jugando y guardando), y se explica con ejemplos: "huyo porque en una situación casi igual
+          huir salió bien" lo entiende cualquiera, y se puede comprobar abriendo el caso.
+        </p>
+        <p>
+          Por otro, todo depende de la similitud. Si "parecido" está mal definido, recupera casos que no tienen nada que ver,
+          así que el conocimiento que antes poníais en las reglas ahora va en qué atributos se comparan, con qué pesos y con
+          qué funciones. Al principio no sabe nada (con la base vacía no hay qué recuperar, y a esto se le llama el arranque
+          en frío), la base crece y cada decisión la compara con todos los casos, y ante algo que no ha pasado nunca el caso
+          "más parecido" puede ser muy distinto... y lo va a usar igual si no se lo impedís.
+        </p>
+        <div class="note mine">
+          <span class="note-label">No es todo o nada</span>
+          <p>
+            Lo que habéis escrito en las prácticas anteriores se puede seguir usando: un controlador de reglas o borroso
+            sirve para generar los primeros casos (jugando con él y apuntando lo que hace) y también para decidir cuando la
+            base no tiene nada parecido. Está en la <a href="reutilizar.html#sin-caso">página 03</a>.
+          </p>
+        </div>
+      </section>
+
+      <section id="usos" data-corto="Dónde se usa">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Dónde se usa</h2>
+        </div>
+        <p>
+          La idea viene de la psicología cognitiva. A principios de los ochenta, Roger Schank propuso que la memoria humana
+          se organiza en episodios que se nos vienen a la cabeza cuando algo se les parece <!--cite schank-memoria--><span class="cita">[<a href="#ref-schank-memoria" id="cita-schank-memoria">3</a>]</span><!--/cite-->, y Janet Kolodner lo convirtió en
+          una forma de construir sistemas, que recogió en su libro <cite>Case-Based Reasoning</cite> (1993) <!--cite kolodner-cbr--><span class="cita">[<a href="#ref-kolodner-cbr" id="cita-kolodner-cbr">4</a>]</span><!--/cite-->. Algunos ejemplos
+          conocidos:
+        </p>
+        <ul>
+          <li>CHEF (Kristian Hammond, 1986) inventaba recetas de cocina china adaptando otras que ya conocía, y guardaba
+            también los fallos para no repetirlos <!--cite hammond-chef--><span class="cita">[<a href="#ref-hammond-chef" id="cita-hammond-chef">5</a>]</span><!--/cite-->.</li>
+          <li>CLAVIER (Lockheed, principios de los noventa) decidía cómo colocar piezas de material compuesto dentro de un
+            autoclave para curarlas. Nadie sabía escribir las reglas de "qué cabe con qué", pero las cargas que habían salido
+            bien estaban apuntadas <!--cite hennessy-clavier--><span class="cita">[<a href="#ref-hennessy-clavier" id="cita-hennessy-clavier">6</a>]</span><!--/cite-->.</li>
+          <li>Muchos servicios de atención al cliente, como el de Compaq en los noventa <!--cite acorn-walden-smart--><span class="cita">[<a href="#ref-acorn-walden-smart" id="cita-acorn-walden-smart">7</a>]</span><!--/cite-->, recuperan ante una llamada las
+            incidencias parecidas que ya se resolvieron, y muchas herramientas de soporte siguen funcionando así.</li>
+          <li>Los recomendadores ("si te gustó este restaurante, este otro se le parece") usan una similitud entre productos
+            como la que vais a escribir vosotros <!--cite smyth-recomendacion--><span class="cita">[<a href="#ref-smyth-recomendacion" id="cita-smyth-recomendacion">8</a>]</span><!--/cite-->.</li>
+        </ul>
+        <p>Y en juegos:</p>
+        <ul>
+          <li>Darmok (Santiago Ontañón y otros, 2007) jugaba a <cite>Wargus</cite>, un clon libre de
+            <cite>Warcraft&nbsp;II</cite>. Aprendía viendo jugar a una persona, partiendo sus partidas en planes con el
+            objetivo de cada uno, y luego recuperaba y adaptaba esos planes en partidas nuevas <!--cite ontanon-darmok--><span class="cita">[<a href="#ref-ontanon-darmok" id="cita-ontanon-darmok">9</a>]</span><!--/cite-->.</li>
+          <li>En RoboCup, el equipo del IIIA-CSIC (Raquel Ros, Josep Lluís Arcos y Ramon López de Mántaras) y Manuela Veloso
+            usaron casos para elegir jugadas coordinadas entre los perros robot AIBO de la liga de cuatro patas, según dónde
+            estaban la pelota, los compañeros y los rivales (lo publicaron en 2009 <!--cite ros-robocup--><span class="cita">[<a href="#ref-ros-robocup" id="cita-ros-robocup">10</a>]</span><!--/cite-->).</li>
+          <li>Michael Floyd y Babak Esfandiari construyeron jLOAF, un marco para hacer agentes que aprenden observando a otro
+            jugador <!--cite floyd-jloaf--><span class="cita">[<a href="#ref-floyd-jloaf" id="cita-floyd-jloaf">11</a>]</span><!--/cite-->. Lo que guardan es lo mismo que vais a guardar vosotros: qué veía el jugador y qué hizo.</li>
+        </ul>
+        <p>
+          Si os suena a <strong>k vecinos más cercanos</strong> (k-nearest neighbours, k-NN) de aprendizaje automático <!--cite cover-hart-knn--><span class="cita">[<a href="#ref-cover-hart-knn" id="cita-cover-hart-knn">12</a>]</span><!--/cite-->, es
+          normal, porque k-NN es la parte de recuperar y reutilizar de un sistema de casos (sin revisar ni retener). Y la idea
+          de recuperar lo más parecido vuelve en el bloque final del curso, cuando busquemos palabras cercanas en un espacio
+          de embeddings, sólo que ahí la similitud ya no la escribís vosotros.
+        </p>
+        <div class="note tip">
+          <span class="note-label">jCOLIBRI es de aquí</span>
+          <p>
+            La librería que vais a usar la desarrolla desde hace veinte años el grupo GAIA de esta facultad (Juan A.
+            Recio-García, Belén Díaz-Agudo y Pedro A. González-Calero, entre otros) <!--cite recio-jcolibri2--><span class="cita">[<a href="#ref-recio-jcolibri2" id="cita-recio-jcolibri2">13</a>]</span><!--/cite-->, que es la misma gente que adaptó el
+
+            simulador de Ms. Pac-Man.
+          </p>
+        </div>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-recio-cbr-intro">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: introducción</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-intro" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-aamodt-plaza">A. Aamodt y E. Plaza. "Case-Based Reasoning: Foundational Issues, Methodological Variations, and System Approaches". <em>AI Communications 7(1), 39–59</em>, 1994. <a class="volver" href="#cita-aamodt-plaza" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-schank-memoria">R. C. Schank. <em>Dynamic Memory: A Theory of Reminding and Learning in Computers and People</em>. Cambridge University Press, 1982. <a class="volver" href="#cita-schank-memoria" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-kolodner-cbr">J. Kolodner. <em>Case-Based Reasoning</em>. Morgan Kaufmann, 1993. <a class="volver" href="#cita-kolodner-cbr" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-hammond-chef">K. J. Hammond. "CHEF: A Model of Case-Based Planning". <em>Proceedings of AAAI-86, 267–271</em>, 1986. <a class="volver" href="#cita-hammond-chef" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-hennessy-clavier">D. Hennessy y D. Hinkle. "Applying Case-Based Reasoning to Autoclave Loading". <em>IEEE Expert 7(5), 21–26</em>, 1992. <a class="volver" href="#cita-hennessy-clavier" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-acorn-walden-smart">T. L. Acorn y S. H. Walden. "SMART: Support Management Automated Reasoning Technology for Compaq Customer Service". <em>Proceedings of IAAI-92, 3–18, AAAI</em>, 1992. <a class="volver" href="#cita-acorn-walden-smart" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-smyth-recomendacion">B. Smyth. "Case-Based Recommendation". <em>The Adaptive Web, LNCS 4321, 342–376, Springer</em>, 2007. <a class="volver" href="#cita-smyth-recomendacion" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-ontanon-darmok">S. Ontañón, K. Mishra, N. Sugandh y A. Ram. "Case-Based Planning and Execution for Real-Time Strategy Games". <em>ICCBR 2007, LNCS 4626, Springer</em>, 2007. <a class="volver" href="#cita-ontanon-darmok" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-ros-robocup">R. Ros, J. L. Arcos, R. López de Mántaras y M. Veloso. "A Case-Based Approach for Coordinated Action Selection in Robot Soccer". <em>Artificial Intelligence 173(9–10), 1014–1039</em>, 2009. <a class="volver" href="#cita-ros-robocup" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-floyd-jloaf">M. W. Floyd y B. Esfandiari. "A Case-Based Reasoning Framework for Developing Agents Using Learning by Observation". <em>IEEE 23rd International Conference on Tools with Artificial Intelligence (ICTAI), 531–538</em>, 2011. <a class="volver" href="#cita-floyd-jloaf" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-cover-hart-knn">T. M. Cover y P. E. Hart. "Nearest Neighbor Pattern Classification". <em>IEEE Transactions on Information Theory 13(1), 21–27</em>, 1967. <a class="volver" href="#cita-cover-hart-knn" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-jcolibri2">J. A. Recio-García, P. A. González-Calero y B. Díaz-Agudo. "jCOLIBRI2: A Framework for Building Case-Based Reasoning Systems". <em>Science of Computer Programming 79, 126–145</em>, 2014. <a class="volver" href="#cita-recio-jcolibri2" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema 6">
+        <a class="pager-prev" href="index.html"><span class="pager-l">Anterior</span><span class="pager-t">Índice del tema</span></a>
+        <a class="pager-next" href="similitud.html"><span class="pager-l">Siguiente</span><span class="pager-t">Recuperar: la similitud</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#idea">La idea</a></li>
+            <li><a href="#caso">Qué es un caso</a></li>
+            <li><a href="#ciclo">Las cuatro R</a></li>
+            <li><a href="#comparar">Frente a lo anterior</a></li>
+            <li><a href="#usos">Dónde se usa</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 6</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html" aria-current="page"><span>01</span>Recordar en vez de razonar</a></li>
+            <li><a href="similitud.html"><span>02</span>Recuperar: la similitud</a></li>
+            <li><a href="reutilizar.html"><span>03</span>Reutilizar y adaptar</a></li>
+            <li><a href="revisar-retener.html"><span>04</span>Revisar, retener y olvidar</a></li>
+            <li><a href="jcolibri.html"><span>05</span>CBR en Ms. Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

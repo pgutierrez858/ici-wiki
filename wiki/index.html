@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="assets/css/ici.css">
@@ -26,8 +27,7 @@
   COLOR      Restringido: papel + azul laberinto. Los cuatro fantasmas y la píldora
              sólo codifican estructura del curso: un color por bloque, nunca bajo texto.
   PRIMER     El titular, la franja de datos vivos (clase, entrega, entorno) y el
-  IMPACTO    calendario: quince semanas donde un tramo sigue a oscuras.
-  MOMENTO    El tramo sin entorno anunciado: fondo de píldoras sin comer y un barrido lento.
+  IMPACTO    calendario: quince semanas, cada bloque con su entorno.
   MODO       Leer / Operar. La consulta rápida gana siempre a la expresión.
 -->
 
@@ -46,10 +46,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="index.html" aria-current="page">Inicio</a></li>
-        <li><a href="presentacion.html">Presentación</a></li>
         <li><a href="calendario.html">Calendario</a></li>
         <li><a href="practicas/index.html">Prácticas</a></li>
-        <li><a href="guias/index.html">Guías</a></li>
+        <li><a href="guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -65,18 +64,43 @@
       <span class="thin">Optativa · Facultad de Informática, UCM · Curso 2026&#8239;–&#8239;2027</span>
     </h1>
     <p class="standfirst">
-      Aquí se escribe la inteligencia de un personaje de videojuego y luego hay que responder de ella:
-      qué sabe, cómo lo tiene representado y por qué decidió lo que decidió. El curso entero son prácticas
-      sobre entornos de juego que se pueden ejecutar, y las técnicas que usamos son <strong>simbólicas</strong>:
-      reglas, estados, lógica borrosa, búsqueda y casos.
+      En esta asignatura vais a escribir la inteligencia de personajes de videojuego, y luego os tocará
+      explicarla: qué sabe el personaje, cómo lo tiene representado y por qué decidió lo que decidió. Todo el
+      curso son prácticas sobre entornos de juego que se pueden ejecutar, y las técnicas que usamos son
+      <strong>simbólicas</strong> (reglas, estados, lógica borrosa, búsqueda y casos).
     </p>
     <div class="byline">
       <span><strong>Pablo Gutiérrez Sánchez</strong></span>
       <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
       <span>Despacho 409</span>
       <span>Dpto. de Ingeniería del Software e Inteligencia Artificial</span>
+      <span><a href="presentacion.html">Presentación de la asignatura <span aria-hidden="true">→</span></a></span>
     </div>
   </header>
+
+  <!--ICI:AHORA-->
+  <section class="ahora" aria-labelledby="ahora-t">
+    <h2 class="ahora-t" id="ahora-t">Ahora</h2>
+    <ol class="ahora-pills">
+      <li class="ap" data-ap="done" data-b="p0" data-start="2026-09-07" data-due="2026-09-20" data-name="Práctica 0" data-enun="practicas/practica-0.html" data-tema="Tutorial" data-guia="guias/eclipse.html" data-guia-txt="Guía de instalación"><a href="practicas/practica-0.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P0</span><span class="sr-only">Práctica 0 · Tutorial, cerrada</span></a></li>
+      <li class="ap" data-ap="done" data-b="p1" data-start="2026-09-21" data-due="2026-10-04" data-name="Práctica 1" data-enun="practicas/practica-1.html" data-tema="Algorítmica" data-guia="guias/competicion.html" data-guia-txt="Guía de la competición" data-apuntes="guias/tema2/index.html"><a href="practicas/practica-1.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P1</span><span class="sr-only">Práctica 1 · Algorítmica, cerrada</span></a></li>
+      <li class="ap" data-ap="done" data-b="p2" data-start="2026-10-05" data-due="2026-10-18" data-name="Práctica 2" data-enun="practicas/practica-2.html" data-hito="2026-10-11" data-hito-txt="diseño" data-tema="Máquinas de estados" data-apuntes="guias/tema2/maquinas-estados.html"><a href="practicas/practica-2.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P2</span><span class="sr-only">Práctica 2 · Máquinas de estados, cerrada</span></a></li>
+      <li class="ap" data-ap="done" data-b="p3" data-start="2026-10-19" data-due="2026-11-01" data-name="Práctica 3" data-enun="practicas/practica-3.html" data-tema="Sistemas de reglas" data-guia="guias/reglas-paso-a-paso.html" data-guia-txt="Guía paso a paso" data-apuntes="guias/tema3/index.html"><a href="practicas/practica-3.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P3</span><span class="sr-only">Práctica 3 · Sistemas de reglas, cerrada</span></a></li>
+      <li class="ap" data-ap="done" data-b="p4" data-start="2026-11-02" data-due="2026-11-16" data-name="Práctica 4" data-enun="practicas/practica-4.html" data-tema="Razonamiento borroso" data-guia="guias/borroso-paso-a-paso.html" data-guia-txt="Guía paso a paso" data-apuntes="guias/tema4/index.html"><a href="practicas/practica-4.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P4</span><span class="sr-only">Práctica 4 · Razonamiento borroso, cerrada</span></a></li>
+      <li class="ap" data-ap="now" data-objetivo data-b="p5" data-start="2026-11-17" data-due="2026-11-29" data-name="Práctica 5" data-enun="practicas/practica-5.html" data-tema="Juegos por turnos" data-guia="guias/mcts-paso-a-paso.html" data-guia-txt="Guía paso a paso" data-apuntes="guias/tema5/index.html"><a href="practicas/practica-5.html" aria-current="step"><span class="ap-dot" aria-hidden="true"><svg class="ap-pac" viewBox="0 0 26 26" aria-hidden="true" focusable="false"><path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/><path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/></svg><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P5</span><span class="sr-only">Práctica 5 · Juegos por turnos, en curso</span></a></li>
+      <li class="ap" data-ap="soon" data-b="cb" data-start="2026-11-30" data-due="2026-12-13" data-name="Práctica 6" data-enun="practicas/practica-6.html" data-hito="2026-12-06" data-hito-txt="diseño" data-tema="Razonamiento basado en casos" data-guia="guias/tema6/jcolibri.html" data-guia-txt="Guía de la plantilla" data-apuntes="guias/tema6/index.html"><a href="practicas/practica-6.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P6</span><span class="sr-only">Práctica 6 · Razonamiento basado en casos, abre el 30 nov</span></a></li>
+      <li class="ap" data-ap="soon" data-b="bn" data-start="2026-12-14" data-due="2026-12-20" data-name="Bonus" data-due-txt="Por anunciar" data-tema="Juegos de lenguaje" data-apuntes="guias/bonus/index.html"><span class="ap-a"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">B</span><span class="sr-only">Bonus · Juegos de lenguaje, por abrir</span></span></li>
+    </ol>
+    <div class="ahora-now">
+      <p class="ahora-txt"><b data-ahora-name>Práctica 5 · Juegos por turnos</b> <span data-ahora-when>Entrega el dom 29 noviembre</span> <span data-ahora-rel>quedan 4 días</span></p>
+      <ul class="ahora-links">
+        <li><a data-ahora-enun href="practicas/practica-5.html">Enunciado <span aria-hidden="true">→</span></a></li>
+        <li><a data-ahora-guia href="guias/mcts-paso-a-paso.html">Guía paso a paso <span aria-hidden="true">→</span></a></li>
+        <li><a data-ahora-apuntes href="guias/tema5/index.html">Apuntes <span aria-hidden="true">→</span></a></li>
+      </ul>
+    </div>
+  </section>
+  <!--/ICI:AHORA-->
 
   <dl class="facts">
     <div class="fact">
@@ -84,12 +108,8 @@
       <dd>Miércoles y jueves<small>14:00&#8239;–&#8239;16:00 · teoría y laboratorio juntos</small></dd>
     </div>
     <div class="fact">
-      <dt>Próxima entrega</dt>
-      <dd><span data-next-due>dom 20 septiembre</span><small><span data-next-due-rel>Quedan 12 días</span> · <span data-next-name>Práctica 0</span></small></dd>
-    </div>
-    <div class="fact">
-      <dt>Entorno</dt>
-      <dd>Ms. Pac-Man<small>Hasta el 15 de noviembre</small></dd>
+      <dt>Entornos</dt>
+      <dd>Ms. Pac-Man<small>Todas menos la P5, que va en ajedrez</small></dd>
     </div>
     <div class="fact">
       <dt>Evaluación</dt>
@@ -112,41 +132,41 @@
             Para ello, serán capaces de entender el proceso de adquisición, representación y uso del
             conocimiento."
           </p>
-          <footer>Objetivo de la guía docente</footer>
+          <footer>Objetivo de la guía docente <!--cite recio-presentacion | transp. 15--><span class="cita">[<a href="#ref-recio-presentacion" id="cita-recio-presentacion">1</a>, transp. 15]</span><!--/cite--></footer>
         </blockquote>
 
         <p style="margin-top:1.4rem">
-          En Inteligencia Artificial se trabaja con dos familias de técnicas muy distintas. La
-          <strong>subsimbólica</strong> (redes neuronales, aprendizaje profundo, modelos de lenguaje)
-          aprende de los datos y es la que ha crecido en los últimos años. La <strong>simbólica</strong>
-          representa el conocimiento de forma explícita y razona sobre él con reglas, estados, ontologías,
-          casos o grados de verdad.
+          En Inteligencia Artificial hay, por lo general, dos familias de técnicas muy distintas. Por un lado,
+          la <strong>subsimbólica</strong> (redes neuronales, aprendizaje profundo, modelos de lenguaje), que
+          aprende de los datos y es la que más ha crecido en los últimos años; por otro, la
+          <strong>simbólica</strong>, que representa el conocimiento de forma explícita y razona sobre él con
+          reglas, estados, ontologías, casos o grados de verdad <!--cite recio-presentacion | transp. 8--><span class="cita">[<a href="#ref-recio-presentacion">1</a>, transp. 8]</span><!--/cite-->.
         </p>
         <p>
           Un modelo de lenguaje no sabe explicar por qué eligió una jugada, cuesta mucho ejecutarlo a
-          60&nbsp;fotogramas por segundo y no se puede corregir a mano cuando falla. Un comportamiento
+          60&nbsp;fotogramas por segundo y no se puede corregir a mano cuando falla. En cambio, un comportamiento
           simbólico se puede leer y depurar, se ajusta con el diseñador delante y se ejecuta en
           microsegundos. Por eso la industria del videojuego sigue construyendo casi todos sus personajes
-          así, y por eso la parte difícil de la asignatura no es programar, sino <em>decidir qué
-          conocimiento hace falta y cómo se escribe</em>.
+          así, y por eso diría que lo difícil de la asignatura está en <em>decidir qué conocimiento
+          hace falta y cómo se escribe</em>, más que en programarlo.
         </p>
 
         <div class="split two" style="margin-top:1.6rem">
           <div>
-            <h3>Qué vas a saber hacer al acabar</h3>
+            <h3>Qué vais a saber hacer al acabar</h3>
             <ul>
               <li>Extraer el conocimiento de un dominio de juego a partir de la observación y del propio motor.</li>
               <li>Elegir la representación adecuada: estados, reglas, conjuntos borrosos, casos, árboles de búsqueda.</li>
-              <li>Implementarla en Java sobre un motor que no controlas, con el reloj en contra.</li>
+              <li>Implementarla (en Java casi siempre, en Python en la práctica de ajedrez) sobre un motor que no controláis, con el reloj en contra.</li>
               <li>Medir si el comportamiento es bueno, y defender por qué.</li>
             </ul>
           </div>
           <div>
             <h3>Confusiones habituales</h3>
             <ul>
-              <li>Aquí el conocimiento se escribe, no se entrena: no es una asignatura de aprendizaje automático.</li>
-              <li>El motor te lo dan hecho, así que no vas a programar un videojuego.</li>
-              <li>Si sigues el curso no hay examen: la nota sale de lo que entregas y de cómo lo defiendes en clase.</li>
+              <li>Aquí el conocimiento se escribe a mano y no se entrena (no es una asignatura de aprendizaje automático).</li>
+              <li>El motor os lo damos hecho, así que no vais a programar un videojuego.</li>
+              <li>Si seguís el curso no hay examen: la nota sale de lo que entregáis y de cómo lo defendéis en clase.</li>
             </ul>
           </div>
         </div>
@@ -157,14 +177,14 @@
           <h2 class="sec">Cómo funciona el curso</h2>
         </div>
         <p>
-          La asignatura es una sucesión de <strong>bloques de dos semanas</strong>. Cada bloque introduce una
-          técnica de representación, la aplica a un entorno de juego y termina con una entrega en domingo.
-          Las sesiones de miércoles y jueves mezclan teoría y laboratorio: se explica lo justo, se trabaja en
-          clase, se revisa el avance de cada grupo y ahí mismo se defienden las prácticas.
+          La asignatura va por <strong>bloques de dos semanas</strong>. En cada bloque vemos una técnica de
+          representación, la aplicamos a un entorno de juego y terminamos con una entrega en domingo. Las
+          sesiones de miércoles y jueves mezclan teoría y laboratorio: explico lo justo, trabajáis en clase,
+          reviso el avance de cada grupo y ahí mismo se defienden las prácticas.
         </p>
         <p>
-          Todos los bloques recorren el mismo ciclo, que es el esqueleto de la ingeniería del conocimiento y
-          lo que de verdad se aprende en el curso:
+          Todos los bloques siguen el mismo ciclo, que es el de la ingeniería del conocimiento y, diría, lo
+          que de verdad os vais a llevar del curso <!--cite recio-presentacion | transp. 18--><span class="cita">[<a href="#ref-recio-presentacion">1</a>, transp. 18]</span><!--/cite-->:
         </p>
         <div class="table-scroll">
           <table>
@@ -173,10 +193,10 @@
               <tr><th scope="col">Fase</th><th scope="col">Pregunta</th><th scope="col">Qué produce</th></tr>
             </thead>
             <tbody>
-              <tr><th scope="row">Adquisición</th><td>¿Qué sabe un buen jugador que el programa no sabe?</td><td>Observaciones, casos, entrevistas contigo mismo jugando.</td></tr>
+              <tr><th scope="row">Adquisición</th><td>¿Qué sabe un buen jugador que el programa no sabe?</td><td>Observaciones, casos, entrevistas con vosotros mismos jugando.</td></tr>
               <tr><th scope="row">Conceptualización</th><td>¿Cuáles son las entidades, situaciones y decisiones?</td><td>Vocabulario del dominio: estados, variables, acciones.</td></tr>
               <tr><th scope="row">Formalización</th><td>¿En qué modelo cabe ese conocimiento?</td><td>FSM, reglas, conjuntos borrosos, casos, árbol de búsqueda.</td></tr>
-              <tr><th scope="row">Implementación</th><td>¿Cómo se ejecuta dentro del presupuesto de tiempo?</td><td>Controlador en Java sobre el motor del entorno.</td></tr>
+              <tr><th scope="row">Implementación</th><td>¿Cómo se ejecuta dentro del presupuesto de tiempo?</td><td>Controlador en Java (o en Python, en el ajedrez) sobre el motor del entorno.</td></tr>
               <tr><th scope="row">Evaluación</th><td>¿Es mejor que la alternativa, y por qué?</td><td>Partidas, métricas, comparación, defensa en clase.</td></tr>
             </tbody>
           </table>
@@ -197,9 +217,9 @@
           <h2 class="sec">Los entornos</h2>
         </div>
         <p>
-          Hasta mediados de noviembre trabajamos sobre <strong>Ms.&nbsp;Pac-Man</strong>, con el motor de la
+          Casi todo el curso trabajamos sobre <strong>Ms.&nbsp;Pac-Man</strong>, con el motor de la
           competición <em>Ms. Pac-Man vs Ghost Team</em>, que se desarrolló en la Universidad de Essex para
-          el congreso IEEE&nbsp;CIG y que en la Facultad está adaptado para la asignatura. Programarás los
+          el congreso IEEE&nbsp;CIG <!--cite williams-mspacman--><span class="cita">[<a href="#ref-williams-mspacman" id="cita-williams-mspacman">2</a>]</span><!--/cite--> y que en la Facultad está adaptado para la asignatura <!--cite gaia-mspacman--><span class="cita">[<a href="#ref-gaia-mspacman" id="cita-gaia-mspacman">3</a>]</span><!--/cite-->. Programaréis los
           dos bandos: a Ms.&nbsp;Pac-Man por un lado y a los cuatro fantasmas por otro, que son un problema
           bastante distinto porque tienen que coordinarse entre ellos.
         </p>
@@ -209,15 +229,15 @@
                alt="Ventana del simulador de Ms. Pac-Man: el laberinto con sus píldoras, los cuatro fantasmas encerrados en la casilla central, Ms. Pac-Man en la parte baja, y la puntuación, el nivel y el tiempo en el borde inferior.">
         </figure>
         <p>
-          El <strong>16 de noviembre cambiamos de entorno</strong>, y el nuevo lo elegís vosotros en parte:
-          antes de llegar ahí paso una <strong>encuesta</strong> para ver a qué jugáis y preparar un entorno
-          que le apetezca a la mayoría. Lo que ya está decidido es el contenido de ese tramo:
-          <strong>juegos por turnos</strong>, modelos <em>forward</em>, minimax con poda alfa-beta y
+          El <strong>17 de noviembre cambiamos de entorno</strong> y nos pasamos al <strong>ajedrez</strong>
+          (en Python, con la biblioteca python-chess, que se encarga de las reglas) para trabajar los
+          <strong>juegos por turnos</strong>: modelos <em>forward</em>, minimax con poda alfa-beta y
           búsqueda de Monte Carlo en árbol.
         </p>
         <p>
           Después, del 30 de noviembre al 13 de diciembre, llega el <strong>razonamiento basado en
-          casos</strong>, que es la última técnica simbólica del curso. Y la última semana es un
+          casos</strong>, que es la última técnica simbólica del curso, y para ella volvemos a
+          Ms.&nbsp;Pac-Man (así se puede comparar con lo que hicisteis con reglas y con lógica borrosa). Y la última semana es un
           <strong>bloque extra</strong> con <strong>Código Secreto</strong> sobre la mesa, el único de todo
           el curso donde las técnicas no son simbólicas, porque ahí lo que hay que manejar es lenguaje.
         </p>
@@ -225,10 +245,10 @@
           <span class="note-label">Por qué se cambia de entorno</span>
           <p>
             Un comportamiento que sólo funciona en un laberinto no demuestra gran cosa. El conocimiento que
-            modelas, del tipo "huir cuando el fantasma está cerca y no es comestible", tiene que sobrevivir
-            al cambio de dominio, y la única forma de comprobarlo es cambiar de dominio. Cuando cambia el
-            juego, lo que aprendiste sobre cómo se representa el conocimiento te sigue valiendo; los trucos
-            que servían para este laberinto se quedan aquí.
+            modeláis, del tipo "huir cuando el fantasma está cerca y no es comestible", tiene que sobrevivir
+            al cambio de dominio, y la única forma de comprobarlo es cambiando de dominio. Cuando cambia el
+            juego, lo que habéis aprendido sobre cómo se representa el conocimiento os sigue valiendo, y los
+            trucos que servían sólo para este laberinto se quedan por el camino.
           </p>
         </div>
         <div class="table-scroll">
@@ -239,15 +259,21 @@
             <tbody>
               <tr>
                 <th scope="row">Ms. Pac-Man</th>
-                <td class="num-col">7 sep – 15 nov</td>
+                <td class="num-col">7 sep – 16 nov</td>
                 <td>0 a 4</td>
                 <td>Tiempo real, dos bandos asimétricos y una decisión por <em>tick</em>. Se ve todo el laberinto, salvo en la práctica 4.</td>
               </tr>
               <tr>
-                <th scope="row"><span class="chip soon">Por encuesta</span></th>
-                <td class="num-col">16 nov – 13 dic</td>
-                <td>5 y 6</td>
+                <th scope="row">Ajedrez</th>
+                <td class="num-col">17 – 29 nov</td>
+                <td>5</td>
                 <td>Juego por turnos: el árbol de decisiones es enorme y hay un presupuesto de tiempo por jugada.</td>
+              </tr>
+              <tr>
+                <th scope="row">Ms. Pac-Man</th>
+                <td class="num-col">30 nov – 13 dic</td>
+                <td>6</td>
+                <td>Vuelta al laberinto, esta vez guardando partidas y recuperando la más parecida.</td>
               </tr>
               <tr>
                 <th scope="row">Código Secreto</th>
@@ -271,10 +297,10 @@
         </p>
         <!--ICI:BLOCKS-->
         <ol class="blocks">
-          <li class="blk" data-b="p0" data-start="2026-09-07" data-due="2026-09-20" data-name="Práctica 0">
+          <li class="blk" data-b="p0" data-start="2026-09-07" data-due="2026-09-20" data-name="Práctica 0" data-enun="practicas/practica-0.html">
             <span class="blk-num" aria-hidden="true">00</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practicas/practica-0.html">Práctica 0 · Tutorial</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practicas/practica-0.html">Práctica 0 · Tutorial</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">El simulador, el ciclo de una partida y los primeros comportamientos, todavía a mano.</p>
             </div>
             <div class="blk-meta">
@@ -284,13 +310,13 @@
             </div>
             <ul class="blk-links">
               <li><a href="practicas/practica-0.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 1 · Ingeniería del conocimiento</span></li>
+              <li><a href="guias/eclipse.html">Guía de instalación <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p1" data-start="2026-09-21" data-due="2026-10-04" data-name="Práctica 1">
+          <li class="blk" data-b="p1" data-start="2026-09-21" data-due="2026-10-04" data-name="Práctica 1" data-enun="practicas/practica-1.html">
             <span class="blk-num" aria-hidden="true">01</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practicas/practica-1.html">Práctica 1 · Algorítmica</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practicas/practica-1.html">Práctica 1 · Algorítmica</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">Movimiento y búsqueda de caminos en el laberinto: la solución directa, y por qué no escala.</p>
             </div>
             <div class="blk-meta">
@@ -300,14 +326,15 @@
             </div>
             <ul class="blk-links">
               <li><a href="practicas/practica-1.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="guias/tema1/index.html">Apuntes · Tema 2 <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 2 · Búsqueda y movimiento</span></li>
+              <li><a href="guias/competicion.html">Guía de la competición <span aria-hidden="true">→</span></a></li>
+              <li><a href="guias/tema2/index.html">Apuntes · Tema 2 · IA para videojuegos <span aria-hidden="true">→</span></a></li>
+              <li><a href="practicas/practica-1-resultados.html">Resultados <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p2" data-start="2026-10-05" data-due="2026-10-18" data-name="Práctica 2" data-hito="2026-10-11" data-hito-txt="diseño">
+          <li class="blk" data-b="p2" data-start="2026-10-05" data-due="2026-10-18" data-name="Práctica 2" data-enun="practicas/practica-2.html" data-hito="2026-10-11" data-hito-txt="diseño">
             <span class="blk-num" aria-hidden="true">02</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practicas/practica-2.html">Práctica 2 · Máquinas de estados</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practicas/practica-2.html">Práctica 2 · Máquinas de estados</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">Comportamientos como estados y transiciones: diseño, jerarquía y depuración de una FSM.</p>
             </div>
             <div class="blk-meta">
@@ -318,14 +345,14 @@
             </div>
             <ul class="blk-links">
               <li><a href="practicas/practica-2.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="guias/tema1/maquinas-estados.html">Apuntes · Máquinas de estados <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 2 · Máquinas de estados</span></li>
+              <li><a href="guias/tema2/maquinas-estados.html">Apuntes · Tema 2 · Máquinas de estados <span aria-hidden="true">→</span></a></li>
+              <li><a href="practicas/practica-2-resultados.html">Resultados <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p3" data-start="2026-10-19" data-due="2026-11-01" data-name="Práctica 3">
+          <li class="blk" data-b="p3" data-start="2026-10-19" data-due="2026-11-01" data-name="Práctica 3" data-enun="practicas/practica-3.html">
             <span class="blk-num" aria-hidden="true">03</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practicas/practica-3.html">Práctica 3 · Sistemas de reglas</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practicas/practica-3.html">Práctica 3 · Sistemas de reglas</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">Conocimiento declarativo con Jess: hechos, reglas, motor de inferencia y encadenamiento.</p>
             </div>
             <div class="blk-meta">
@@ -335,14 +362,15 @@
             </div>
             <ul class="blk-links">
               <li><a href="practicas/practica-3.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="guias/tema2/index.html">Apuntes · Sistemas de reglas <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 3 · Sistemas de reglas</span></li>
+              <li><a href="guias/reglas-paso-a-paso.html">Guía paso a paso <span aria-hidden="true">→</span></a></li>
+              <li><a href="guias/tema3/index.html">Apuntes · Tema 3 · Sistemas de reglas <span aria-hidden="true">→</span></a></li>
+              <li><a href="practicas/practica-3-resultados.html">Resultados <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p4" data-start="2026-11-02" data-due="2026-11-16" data-name="Práctica 4">
+          <li class="blk" data-b="p4" data-start="2026-11-02" data-due="2026-11-16" data-name="Práctica 4" data-enun="practicas/practica-4.html">
             <span class="blk-num" aria-hidden="true">04</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practicas/practica-4.html">Práctica 4 · Razonamiento borroso</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practicas/practica-4.html">Práctica 4 · Razonamiento borroso</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">Decisiones con magnitudes imprecisas: conjuntos borrosos, reglas lingüísticas e inferencia.</p>
             </div>
             <div class="blk-meta">
@@ -352,11 +380,12 @@
             </div>
             <ul class="blk-links">
               <li><a href="practicas/practica-4.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="guias/tema2/borroso.html">Apuntes · Razonamiento borroso <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 4 · Razonamiento borroso</span></li>
+              <li><a href="guias/borroso-paso-a-paso.html">Guía paso a paso <span aria-hidden="true">→</span></a></li>
+              <li><a href="guias/tema4/index.html">Apuntes · Tema 4 · Razonamiento borroso <span aria-hidden="true">→</span></a></li>
+              <li><a href="practicas/practica-4-resultados.html">Resultados <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p5" data-start="2026-11-17" data-due="2026-11-29" data-name="Práctica 5">
+          <li class="blk" data-b="p5" data-start="2026-11-17" data-due="2026-11-29" data-name="Práctica 5" data-enun="practicas/practica-5.html">
             <span class="blk-num" aria-hidden="true">05</span>
             <div class="blk-main">
               <h3 class="blk-title"><a href="practicas/practica-5.html">Práctica 5 · Juegos por turnos</a> <span class="chip now" data-state>En curso</span></h3>
@@ -369,24 +398,26 @@
             </div>
             <ul class="blk-links">
               <li><a href="practicas/practica-5.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="guias/tema5/index.html">Apuntes · Juegos por turnos <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 5 · Juegos por turnos</span></li>
+              <li><a href="guias/mcts-paso-a-paso.html">Guía paso a paso <span aria-hidden="true">→</span></a></li>
+              <li><a href="guias/tema5/index.html">Apuntes · Tema 5 · Juegos por turnos <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="cb" data-start="2026-11-30" data-due="2026-12-13" data-name="Práctica 6" data-due-txt="Por anunciar">
+          <li class="blk" data-b="cb" data-start="2026-11-30" data-due="2026-12-13" data-name="Práctica 6" data-enun="practicas/practica-6.html" data-hito="2026-12-06" data-hito-txt="diseño">
             <span class="blk-num" aria-hidden="true">06</span>
             <div class="blk-main">
-              <h3 class="blk-title">Práctica 6 · Razonamiento basado en casos <span class="chip soon" data-state>Por abrir</span></h3>
+              <h3 class="blk-title"><a href="practicas/practica-6.html">Práctica 6 · Razonamiento basado en casos</a> <span class="chip soon" data-state>Abre el 30 nov</span></h3>
               <p class="blk-desc">En vez de escribir reglas, guardar partidas: recuperar el caso más parecido, adaptar su solución y aprender del resultado.</p>
             </div>
             <div class="blk-meta">
-              <span>Entrega <b>Por anunciar</b></span>
-              <span class="env">Entorno: Por anunciar</span>
+              <span>Diseño <b>dom 6 diciembre</b></span>
+              <span>Entrega <b>dom 13 diciembre</b></span>
+              <span class="env">Entorno: Ms. Pac-Man</span>
               <span>Grupos</span>
             </div>
             <ul class="blk-links">
-              <li><span class="off">Enunciado por publicar</span></li>
-              <li><span class="off">Tema 6 · Razonamiento basado en casos</span></li>
+              <li><a href="practicas/practica-6.html">Enunciado <span aria-hidden="true">→</span></a></li>
+              <li><a href="guias/tema6/jcolibri.html">Guía de la plantilla <span aria-hidden="true">→</span></a></li>
+              <li><a href="guias/tema6/index.html">Apuntes · Tema 6 · Razonamiento basado en casos <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
           <li class="blk" data-b="bn" data-start="2026-12-14" data-due="2026-12-20" data-name="Bonus" data-due-txt="Por anunciar">
@@ -402,7 +433,7 @@
             </div>
             <ul class="blk-links">
               <li><span class="off">Enunciado por publicar</span></li>
-              <li><span class="off">Bonus · Juegos de lenguaje</span></li>
+              <li><a href="guias/bonus/index.html">Apuntes · Bonus · Juegos de lenguaje <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
         </ol>
@@ -419,8 +450,7 @@
         </div>
         <p>
           Los temas van ordenados igual que las prácticas, de forma que cada técnica se explica justo
-          antes de tener que usarla, y al final hay un bloque extra. Los conceptos con página propia están enlazados desde
-          <span class="off" data-gate="teoria" data-href="teoria/index.html">Teoría</span>.
+          antes de tener que usarla, y al final hay un bloque extra. Cada tema enlaza a sus apuntes.
         </p>
         <ol class="temario">
           <li id="t1">
@@ -430,7 +460,7 @@
               <p>Sistemas basados en conocimiento. Modelos de representación: lógicos, estructurados e
                 imprecisos. Adquisición y reusabilidad del conocimiento.</p>
             </div>
-            <div class="t-tags"><span class="off" data-gate="teoria" data-href="teoria/index.html#tema-1">Conceptos <span aria-hidden="true">→</span></span><span class="off">Práctica 0</span></div>
+            <div class="t-tags"><a href="presentacion.html">Presentación <span aria-hidden="true">→</span></a><span class="off">Práctica 0</span></div>
           </li>
           <li id="t2">
             <span class="t-num">Tema 2</span>
@@ -439,7 +469,7 @@
               <p>Búsqueda de caminos y movimiento. Diseño de comportamientos y toma de decisiones.
                 Máquinas de estados finitos y jerárquicas.</p>
             </div>
-            <div class="t-tags"><span class="off" data-gate="teoria" data-href="teoria/index.html#tema-2">Conceptos <span aria-hidden="true">→</span></span><span class="off">Prácticas 1 y 2</span></div>
+            <div class="t-tags"><a href="guias/tema2/index.html">Apuntes <span aria-hidden="true">→</span></a><span class="off">Prácticas 1 y 2</span></div>
           </li>
           <li id="t3">
             <span class="t-num">Tema 3</span>
@@ -448,7 +478,7 @@
               <p>Hechos y reglas. Motores de inferencia, encadenamiento hacia delante y hacia atrás,
                 resolución de conflictos. Aplicación práctica con Jess.</p>
             </div>
-            <div class="t-tags"><span class="off" data-gate="teoria" data-href="teoria/index.html#tema-3">Conceptos <span aria-hidden="true">→</span></span><span class="off">Práctica 3</span></div>
+            <div class="t-tags"><a href="guias/tema3/index.html">Apuntes <span aria-hidden="true">→</span></a><span class="off">Práctica 3</span></div>
           </li>
           <li id="t4">
             <span class="t-num">Tema 4</span>
@@ -457,7 +487,7 @@
               <p>Conjuntos borrosos y variables lingüísticas. Reglas borrosas, inferencia y
                 desdifuminación. Aplicación práctica con jFuzzyLogic.</p>
             </div>
-            <div class="t-tags"><span class="off" data-gate="teoria" data-href="teoria/index.html#tema-4">Conceptos <span aria-hidden="true">→</span></span><span class="off">Práctica 4</span></div>
+            <div class="t-tags"><a href="guias/tema4/index.html">Apuntes <span aria-hidden="true">→</span></a><span class="off">Práctica 4</span></div>
           </li>
           <li id="t5">
             <span class="t-num">Tema 5</span>
@@ -466,7 +496,7 @@
               <p>Modelos <em>forward</em> y simulación. Minimax y poda alfa-beta. Búsqueda de Monte Carlo
                 en árbol (MCTS) y UCT. Presupuestos de tiempo y anytime.</p>
             </div>
-            <div class="t-tags"><span class="off" data-gate="teoria" data-href="teoria/index.html#tema-5">Conceptos <span aria-hidden="true">→</span></span><span class="off">Práctica 5</span></div>
+            <div class="t-tags"><a href="guias/tema5/index.html">Apuntes <span aria-hidden="true">→</span></a><span class="off">Práctica 5</span></div>
           </li>
           <li id="t6">
             <span class="t-num">Tema 6</span>
@@ -475,7 +505,7 @@
               <p>Memoria y aprendizaje a partir de experiencia. El ciclo de las cuatro R, medidas de
                 similitud y adaptación. Aplicaciones a distintos tipos de videojuego.</p>
             </div>
-            <div class="t-tags"><span class="off" data-gate="teoria" data-href="teoria/index.html#tema-6">Conceptos <span aria-hidden="true">→</span></span><span class="off">Cierre del curso</span></div>
+            <div class="t-tags"><a href="guias/tema6/index.html">Apuntes <span aria-hidden="true">→</span></a><span class="off">Práctica 6</span></div>
           </li>
           <li id="tbonus">
             <span class="t-num">Bonus</span>
@@ -485,7 +515,7 @@
                 decisiones con riesgo, con Código Secreto como entorno. Las únicas técnicas del curso que no
                 son simbólicas.</p>
             </div>
-            <div class="t-tags"><span class="off" data-gate="teoria" data-href="teoria/index.html#bonus">Conceptos <span aria-hidden="true">→</span></span><span class="off">Última semana</span></div>
+            <div class="t-tags"><a href="guias/bonus/index.html">Apuntes <span aria-hidden="true">→</span></a><span class="off">Última semana</span></div>
           </li>
         </ol>
       </section>
@@ -496,13 +526,13 @@
         </div>
         <p>
           <strong>Evaluación continua, 100&#8239;% prácticas.</strong> La nota sale de lo que se entrega y de
-          la defensa en clase; no hay examen para quien sigue el curso con normalidad. La nota final es la
-          media de las calificaciones de las prácticas.
+          la defensa en clase; no hay examen si seguís el curso con normalidad. La nota final es la
+          media de las calificaciones de las prácticas <!--cite recio-presentacion | transp. 34--><span class="cita">[<a href="#ref-recio-presentacion">1</a>, transp. 34]</span><!--/cite-->.
         </p>
         <ul>
           <li>
             La <strong>Práctica&nbsp;0</strong> es individual y no puntúa: sirve para tener el entorno
-            funcionando y perderle el miedo al motor. Aun así se entrega.
+            funcionando y perderle el miedo al motor, aunque hay que entregarla igualmente.
           </li>
           <li>
             El resto se hacen <strong>en grupo</strong>. Cada enunciado fija el tamaño del grupo, el
@@ -518,7 +548,7 @@
           </li>
           <li>
             Las clases son presenciales y en ellas se revisa el avance y se defienden las prácticas, así
-            que <strong>asistir cuenta</strong>. Quien no siga el curso de forma presencial tendrá que
+            que <strong>asistir cuenta</strong>. Si no seguís el curso de forma presencial, tendréis que
             entregar las prácticas individualmente y superar además una prueba teórico-práctica.
           </li>
         </ul>
@@ -532,7 +562,7 @@
           <p>
             Al ser una asignatura enteramente práctica se hace control de plagio sobre el código, entre
             grupos y contra entregas de cursos anteriores. En caso de plagio se aplica estrictamente la
-            normativa de la UCM. Preguntar, comparar ideas y discutir estrategias es parte del curso, y
+            normativa de la UCM <!--cite recio-presentacion | transp. 40--><span class="cita">[<a href="#ref-recio-presentacion">1</a>, transp. 40]</span><!--/cite-->. Preguntar, comparar ideas y discutir estrategias es parte del curso, y
             lo que no vale es entregar código que no habéis escrito vosotros.
           </p>
         </div>
@@ -540,23 +570,23 @@
           <span class="note-label">Modelos de lenguaje</span>
           <p>
             Se pueden usar para las prácticas, con dos condiciones. La primera es que cada entrega venga
-            con un <strong>documento de uso</strong>: qué modelo has usado, para qué parte y con qué
-            <em>prompts</em>. La segunda es que <strong>entiendas todo lo que entregas</strong>, porque en
-            la defensa se pregunta por cualquier línea.
+            con un <strong>documento de uso</strong>: qué modelo habéis usado, para qué parte y con qué
+            <em>prompts</em>. La segunda es que <strong>entendáis todo lo que entregáis</strong>, porque en
+            la defensa os puedo preguntar por cualquier línea.
           </p>
           <p>
             Los vais a usar toda la carrera, así que más vale aprender a usarlos bien.
-            Si quieres ayuda para escribir mejores <em>prompts</em>, pídela. Y ten en cuenta el criterio de
-            fondo de la asignatura: pesa bastante más el diseño del sistema que el código en sí.
+            Si queréis ayuda para escribir mejores <em>prompts</em>, pedídmela. Y tened en cuenta el criterio
+            de fondo de la asignatura: pesa bastante más el diseño del sistema que el código en sí.
           </p>
         </div>
 
         <h3>Convocatoria extraordinaria</h3>
         <p>
-          Quien la necesite entregará individualmente una serie de <strong>prácticas
-          extraordinarias</strong> fijadas por el profesor: modificaciones o ampliaciones de las ordinarias.
+          Si la necesitáis, tendréis que entregar individualmente una serie de <strong>prácticas
+          extraordinarias</strong> que os indicaré yo (modificaciones o ampliaciones de las ordinarias).
           Su enunciado indicará los criterios para superar la convocatoria. Cualquier detalle de evaluación
-          que no esté aquí se publica en el Campus Virtual.
+          que no esté aquí se publica en el Campus Virtual <!--cite recio-presentacion | transp. 35--><span class="cita">[<a href="#ref-recio-presentacion">1</a>, transp. 35]</span><!--/cite-->.
         </p>
       </section>
 
@@ -565,9 +595,10 @@
           <h2 class="sec">Herramientas</h2>
         </div>
         <p>
-          El motor está escrito en <strong>Java</strong> y para las prácticas sólo hacen falta
-          construcciones básicas del lenguaje: clases, colecciones y control de flujo. El ritmo de las
-          primeras semanas es deliberadamente lento para que nadie se quede atrás con las herramientas.
+          El motor de Ms.&nbsp;Pac-Man está escrito en <strong>Java</strong> y para las prácticas sólo hacen
+          falta construcciones básicas del lenguaje: clases, colecciones y control de flujo. La práctica de
+          ajedrez va en <strong>Python</strong>, con lo justo del lenguaje también. Las primeras
+          semanas vamos despacio a propósito, para que nadie se quede atrás con las herramientas.
         </p>
         <div class="table-scroll">
           <table>
@@ -575,17 +606,18 @@
               <tr><th scope="col">Herramienta</th><th scope="col">Versión</th><th scope="col">Para qué</th></tr>
             </thead>
             <tbody>
-              <tr><th scope="row">Eclipse IDE</th><td>for Java Developers</td><td>Entorno recomendado, desde <a href="https://eclipseide.org/">eclipseide.org</a>. Puedes usar otro, pero el soporte en clase será sobre Eclipse.</td></tr>
+              <tr><th scope="row">Eclipse IDE</th><td>for Java Developers</td><td>Entorno recomendado, desde <a href="https://eclipseide.org/">eclipseide.org</a>. Podéis usar otro, pero en clase el soporte será sobre Eclipse.</td></tr>
               <tr><th scope="row">Java</th><td>21 o superior</td><td>No hace falta instalarlo aparte: el propio instalador de Eclipse lo descarga si no lo encuentra.</td></tr>
               <tr><th scope="row"><code>Jess</code></th><td><code>jess.jar</code></td><td>Motor de reglas, en la Práctica 3.</td></tr>
               <tr><th scope="row"><code>jFuzzyLogic</code></th><td><code>jFuzzyLogic.jar</code></td><td>Lógica borrosa, en la Práctica 4.</td></tr>
+              <tr><th scope="row">Python</th><td>3.10 o superior</td><td>Para la Práctica 5, con VS Code y su extensión de Python. Lo que hay que instalar (python-chess) viene en el <code>requirements.txt</code> de la plantilla.</td></tr>
             </tbody>
           </table>
         </div>
         <p>
           La instalación paso a paso, con los errores típicos y cómo salir de ellos, está en la guía
-          <a href="guias/eclipse.html" data-gate="guias">Ms. Pac-Man en Eclipse</a>. Reserva media hora
-          la primera vez, casi toda de descargas.
+          <a href="guias/eclipse.html" data-gate="guias">Ms. Pac-Man en Eclipse</a>. Reservad media hora
+          la primera vez (casi toda se va en descargas).
         </p>
       </section>
 
@@ -598,7 +630,7 @@
           bastante más que las prácticas. Con los mismos controladores que vais a escribir aquí se organiza
           un concurso internacional de comportamientos para Ms.&nbsp;Pac-Man, y existe una versión física,
           <strong>RoboPacMan</strong>, en la que el controlador conduce un coche pequeño por un laberinto
-          impreso en el suelo en lugar de mover un <em>sprite</em> por la pantalla.
+          impreso en el suelo en lugar de mover un <em>sprite</em> por la pantalla <!--cite recio-presentacion | transp. 47–50--><span class="cita">[<a href="#ref-recio-presentacion">1</a>, transp. 47–50]</span><!--/cite-->.
         </p>
         <figure>
           <figcaption>El coche de RoboPacMan, movido por un controlador como los de las prácticas</figcaption>
@@ -689,17 +721,28 @@
           <div>
             <h3>Cómo localizarme</h3>
             <p>
-              Sin horario fijo de tutorías: es más cómodo para todos <strong>concertar cita por
-              correo</strong> o preguntarme directamente en clase, que es donde estaré dos tardes por
-              semana. Si te viene mejor, la tutoría puede ser <strong>online</strong>.
+              No tengo horario fijo de tutorías: es más cómodo para todos <strong>concertar cita por
+              correo</strong> o preguntarme directamente en clase, que es donde estoy dos tardes por
+              semana. Si os viene mejor, la tutoría puede ser <strong>online</strong>.
             </p>
             <p class="apunte">
-              Para dudas de código, trae el error completo y el proyecto abierto: se resuelve en dos minutos
-              en vez de en tres correos.
+              Para dudas de código, traed el error completo y el proyecto abierto, que así se resuelve en dos
+              minutos en vez de en tres correos.
             </p>
           </div>
         </div>
       </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-recio-presentacion">J. A. Recio-García. <em>Presentación de la asignatura</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-presentacion" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-williams-mspacman">P. R. Williams, D. Perez-Liebana y S. M. Lucas. "Ms. Pac-Man Versus Ghost Team CIG 2016 Competition". <em>IEEE Conference on Computational Intelligence and Games (CIG)</em>, 2016. <a class="volver" href="#cita-williams-mspacman" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-gaia-mspacman">Grupo GAIA, UCM. <em>Ms. Pac-Man vs Ghosts (versión de la asignatura)</em>. 2026. <a href="https://gaia.fdi.ucm.es/research/mspacman/">gaia.fdi.ucm.es/research/mspacman</a> <a class="volver" href="#cita-gaia-mspacman" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
 
     </main>
 
@@ -718,6 +761,7 @@
             <li><a href="#proyeccion">Más allá de la asignatura</a></li>
             <li><a href="#recursos">Recursos</a></li>
             <li><a href="#profesor">Profesor y tutorías</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <p class="rail-note">
@@ -741,7 +785,7 @@
       <a href="index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

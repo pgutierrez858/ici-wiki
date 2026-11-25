@@ -15,6 +15,7 @@
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/ici-wiki/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/ici-wiki/assets/css/ici.css">
@@ -22,7 +23,7 @@
 </head>
 <body data-page="">
 
-<!-- Esta página NO lleva los marcadores <!--ICI:...--> a propósito: Pages la
+<!-- Esta página NO lleva los marcadores ICI:NAV ni ICI:FOOT a propósito: Pages la
      sirve desde cualquier ruta que no exista, así que necesita rutas absolutas
      (/ici-wiki/assets/...) en vez de las relativas que genera
      tools/build.mjs. Si cambia la navegación, hay que actualizarla aquí. -->
@@ -41,10 +42,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="/ici-wiki/index.html">Inicio</a></li>
-        <li><a href="/ici-wiki/presentacion.html">Presentación</a></li>
         <li><a href="/ici-wiki/calendario.html">Calendario</a></li>
         <li><a href="/ici-wiki/practicas/index.html">Prácticas</a></li>
-        <li><a href="/ici-wiki/guias/index.html">Guías</a></li>
+        <li><a href="/ici-wiki/guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -55,23 +55,42 @@
   <header class="masthead tall">
     <h1>
       Este pasillo no existe
-      <span class="thin">La página que buscas no está aquí.</span>
+      <span class="thin">La página que buscáis no está aquí.</span>
     </h1>
     <p class="standfirst">
-      Puede que el enunciado todavía no esté publicado, porque cada práctica se publica al empezar su
-      bloque, o que el enlace sea antiguo. Desde aquí llegas a todo:
+      Os habéis metido en un callejón sin salida (y el fantasma tampoco sabe salir de él). A lo mejor el enlace es
+      antiguo, o el enunciado todavía no está publicado, porque cada práctica se publica al empezar su bloque.
     </p>
   </header>
 
   <div class="cols solo" id="contenido" tabindex="-1">
-    <main>
-      <ul class="links">
-        <li><a href="/ici-wiki/index.html"><span class="lt">La asignatura<span class="arrow" aria-hidden="true">→</span></span><span class="lm">Inicio</span><span class="ld">Objetivos, temario, evaluación y recursos.</span></a></li>
-        <li><a href="/ici-wiki/presentacion.html"><span class="lt">Presentación<span class="arrow" aria-hidden="true">→</span></span><span class="lm">Primera clase</span><span class="ld">Las diapositivas del primer día: temario, entornos y evaluación.</span></a></li>
-        <li><a href="/ici-wiki/calendario.html"><span class="lt">Calendario<span class="arrow" aria-hidden="true">→</span></span><span class="lm">Fechas</span><span class="ld">Las quince semanas del curso y sus entregas.</span></a></li>
-        <li><a href="/ici-wiki/practicas/index.html"><span class="lt">Prácticas<span class="arrow" aria-hidden="true">→</span></span><span class="lm">Índice</span><span class="ld">Los bloques del curso y las reglas de entrega.</span></a></li>
-        <li><a href="/ici-wiki/guias/index.html"><span class="lt">Guías<span class="arrow" aria-hidden="true">→</span></span><span class="lm">Apuntes</span><span class="ld">Los apuntes de cada tema, el entorno y la clase Game.</span></a></li>
-      </ul>
+    <main class="nf">
+      <!-- Dibujo: los pasillos son enlaces para el ratón; con teclado y lector de pantalla
+           se sale por la lista de al lado, que lleva los mismos destinos. -->
+      <svg class="nf-mapa" viewBox="0 0 300 224" aria-hidden="true" focusable="false">
+        <rect class="nf-suelo" x="0" y="22" width="300" height="180"/>
+        <path class="nf-muro" d="M0 22h20v20h-20zM20 22h20v20h-20zM60 22h20v20h-20zM80 22h20v20h-20zM100 22h20v20h-20zM120 22h20v20h-20zM140 22h20v20h-20zM180 22h20v20h-20zM200 22h20v20h-20zM220 22h20v20h-20zM240 22h20v20h-20zM260 22h20v20h-20zM280 22h20v20h-20zM0 42h20v20h-20zM20 42h20v20h-20zM60 42h20v20h-20zM80 42h20v20h-20zM100 42h20v20h-20zM120 42h20v20h-20zM140 42h20v20h-20zM180 42h20v20h-20zM200 42h20v20h-20zM220 42h20v20h-20zM240 42h20v20h-20zM260 42h20v20h-20zM280 42h20v20h-20zM0 62h20v20h-20zM20 62h20v20h-20zM120 62h20v20h-20zM140 62h20v20h-20zM180 62h20v20h-20zM200 62h20v20h-20zM220 62h20v20h-20zM240 62h20v20h-20zM260 62h20v20h-20zM280 62h20v20h-20zM0 82h20v20h-20zM20 82h20v20h-20zM60 82h20v20h-20zM80 82h20v20h-20zM120 82h20v20h-20zM140 82h20v20h-20zM180 82h20v20h-20zM200 82h20v20h-20zM220 82h20v20h-20zM240 82h20v20h-20zM260 82h20v20h-20zM280 82h20v20h-20zM0 102h20v20h-20zM20 102h20v20h-20zM280 102h20v20h-20zM0 122h20v20h-20zM20 122h20v20h-20zM40 122h20v20h-20zM60 122h20v20h-20zM80 122h20v20h-20zM120 122h20v20h-20zM140 122h20v20h-20zM160 122h20v20h-20zM180 122h20v20h-20zM220 122h20v20h-20zM240 122h20v20h-20zM260 122h20v20h-20zM280 122h20v20h-20zM0 142h20v20h-20zM20 142h20v20h-20zM40 142h20v20h-20zM60 142h20v20h-20zM80 142h20v20h-20zM220 142h20v20h-20zM240 142h20v20h-20zM260 142h20v20h-20zM280 142h20v20h-20zM0 162h20v20h-20zM20 162h20v20h-20zM40 162h20v20h-20zM60 162h20v20h-20zM80 162h20v20h-20zM120 162h20v20h-20zM140 162h20v20h-20zM160 162h20v20h-20zM180 162h20v20h-20zM220 162h20v20h-20zM240 162h20v20h-20zM260 162h20v20h-20zM280 162h20v20h-20zM0 182h20v20h-20zM20 182h20v20h-20zM40 182h20v20h-20zM60 182h20v20h-20zM80 182h20v20h-20zM120 182h20v20h-20zM140 182h20v20h-20zM160 182h20v20h-20zM180 182h20v20h-20zM220 182h20v20h-20zM240 182h20v20h-20zM260 182h20v20h-20zM280 182h20v20h-20z"/>
+        <g class="nf-pi"><circle cx="50" cy="32" r="1.7"/><circle cx="50" cy="52" r="1.7"/><circle cx="50" cy="72" r="1.7"/><circle cx="50" cy="92" r="1.7"/><circle cx="170" cy="32" r="1.7"/><circle cx="170" cy="52" r="1.7"/><circle cx="170" cy="72" r="1.7"/><circle cx="170" cy="92" r="1.7"/><circle cx="110" cy="132" r="1.7"/><circle cx="110" cy="152" r="1.7"/><circle cx="110" cy="172" r="1.7"/><circle cx="110" cy="192" r="1.7"/><circle cx="210" cy="132" r="1.7"/><circle cx="210" cy="152" r="1.7"/><circle cx="210" cy="172" r="1.7"/><circle cx="210" cy="192" r="1.7"/></g>
+        <path class="nf-pac" d="M230 112 236.93 108A8 8 0 1 0 236.93 116Z"/>
+        <g class="nf-fantasma">
+          <path class="nf-gh" d="M263 120v-8a7 7 0 0 1 14 0v8l-2.33-2l-2.33 2l-2.33-2l-2.33 2l-2.33-2l-2.35 2z"/>
+          <ellipse class="nf-ojo" cx="267" cy="111" rx="2.2" ry="2.7"/><ellipse class="nf-ojo" cx="273" cy="111" rx="2.2" ry="2.7"/>
+          <g class="nf-pupilas"><circle cx="265.8" cy="111.4" r="1.25"/><circle cx="271.8" cy="111.4" r="1.25"/></g>
+        </g>
+        <a class="nf-salida" href="/ici-wiki/index.html" tabindex="-1"><rect x="14" y="0" width="72" height="62"/><text x="50" y="15">INICIO</text></a>
+        <a class="nf-salida" href="/ici-wiki/practicas/index.html" tabindex="-1"><rect x="134" y="0" width="72" height="62"/><text x="170" y="15">PRÁCTICAS</text></a>
+        <a class="nf-salida" href="/ici-wiki/calendario.html" tabindex="-1"><rect x="72" y="162" width="76" height="62"/><text x="110" y="216">CALENDARIO</text></a>
+        <a class="nf-salida" href="/ici-wiki/guias/index.html" tabindex="-1"><rect x="174" y="162" width="72" height="62"/><text x="210" y="216">APUNTES</text></a>
+      </svg>
+
+      <nav aria-label="Salidas">
+        <ul class="links">
+          <li><a href="/ici-wiki/index.html"><span class="lt">Inicio<span class="arrow" aria-hidden="true">→</span></span><span class="lm">La asignatura</span><span class="ld">Objetivos, temario, evaluación y recursos.</span></a></li>
+          <li><a href="/ici-wiki/calendario.html"><span class="lt">Calendario<span class="arrow" aria-hidden="true">→</span></span><span class="lm">Fechas</span><span class="ld">Las quince semanas del curso y sus entregas.</span></a></li>
+          <li><a href="/ici-wiki/practicas/index.html"><span class="lt">Prácticas<span class="arrow" aria-hidden="true">→</span></span><span class="lm">Enunciados</span><span class="ld">Los bloques del curso, sus enunciados y las reglas de entrega.</span></a></li>
+          <li><a href="/ici-wiki/guias/index.html"><span class="lt">Apuntes<span class="arrow" aria-hidden="true">→</span></span><span class="lm">Temas y guías</span><span class="ld">Los apuntes de cada tema, las guías paso a paso y el entorno.</span></a></li>
+        </ul>
+      </nav>
     </main>
   </div>
 

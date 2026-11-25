@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>CBR en Ms. Pac-Man · Tema 6 · ICI</title>
+<meta name="description" content="La plantilla de la Práctica 6 clase por clase: cómo se reparte un caso en tres clases de jCOLIBRI, cómo es una línea del CSV de la base, el ciclo que se ejecuta en cada cruce, dónde se configura la similitud y sus pesos, qué hay que tocar para añadir un atributo, y cómo se entrena y se mide, con las cifras de la plantilla tal cual.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 6</a>
+    <span aria-hidden="true">/</span>
+    <span>CBR en Ms. Pac-Man</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 6 · 05 · Razonamiento basado en casos</p>
+    <h1>
+      CBR en Ms. Pac-Man
+      <span class="thin">Las cuatro R de las páginas anteriores, en las clases de la plantilla.</span>
+    </h1>
+    <p class="standfirst">
+      Qué clase hace cada cosa, cómo se guarda un caso en el CSV, qué pasa en cada cruce, dónde se cambian la similitud y
+      los pesos, los cuatro sitios que hay que tocar para añadir un atributo y cómo se entrena y se mide. Al final, lo que
+      la plantilla hace de la forma más simple, que es por donde empezar a mejorarla.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="piezas" data-corto="Las piezas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué clase hace cada cosa</h2>
+        </div>
+        <p>
+          Todo está en <code>es.ucm.fdi.ici.c2627.practica6.grupoYY</code>. Las clases de <code>CBRengine/</code> son
+          utilidades que no hace falta tocar, y lo vuestro está en <code>mspacman/</code>.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Idea del tema</th><th scope="col">Clase</th><th scope="col">Qué hace</th></tr></thead>
+            <tbody>
+              <tr><td>Descripción del caso</td><td><code>MsPacManDescription</code></td><td>Los atributos que se comparan: <code>score</code>, <code>time</code>, <code>nearestPPill</code>, <code>nearestGhost</code> y <code>edibleGhost</code>.</td></tr>
+              <tr><td>Solución</td><td><code>MsPacManSolution</code></td><td>El movimiento elegido, <code>action</code>.</td></tr>
+              <tr><td>Resultado</td><td><code>MsPacManResult</code></td><td>Los puntos ganados en los 3 cruces siguientes, <code>score</code>.</td></tr>
+              <tr><td>Consulta</td><td><code>MsPacManInput</code></td><td>Mira el <code>Game</code> y rellena una descripción. Es la clase <code>Input</code> de las prácticas 3 y 4.</td></tr>
+              <tr><td>Recuperar y reutilizar</td><td><code>MsPacManCBRengine</code></td><td>La similitud (en <code>configure</code>), y la búsqueda y la decisión (en <code>cycle</code> y <code>reuse</code>).</td></tr>
+              <tr><td>Revisar y retener</td><td><code>MsPacManStorageManager</code></td><td>La cola de 3 cruces, el resultado y el guardado.</td></tr>
+              <tr><td>Base de casos</td><td><code>CachedLinearCaseBase</code></td><td>Los casos en memoria durante la partida. Los nuevos se escriben al acabarla.</td></tr>
+              <tr><td>El fichero</td><td><code>CustomPlainTextConnector</code> y <code>plaintextconfig.xml</code></td><td>Lee y escribe el CSV, con las columnas en el orden que dice el XML.</td></tr>
+              <tr><td>El controlador</td><td><code>MsPacMan</code></td><td>Lo junta todo: carga la base al empezar, da una vuelta al ciclo en cada cruce y guarda al terminar.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Las tres clases del caso implementan <code>CaseComponent</code> de jCOLIBRI <!--cite recio-jcolibri2--><span class="cita">[<a href="#ref-recio-jcolibri2" id="cita-recio-jcolibri2">1</a>]</span><!--/cite-->, que pide un atributo <code>id</code>
+          y un getter y un setter por campo, y nada más <!--cite recio-cbr-jcolibri | transp. 9–10--><span class="cita">[<a href="#ref-recio-cbr-jcolibri" id="cita-recio-cbr-jcolibri">2</a>, transp. 9–10]</span><!--/cite-->. jCOLIBRI lee y escribe los campos por su nombre, así que
+          <strong>el nombre del campo, el del método y el del XML tienen que coincidir</strong>.
+        </p>
+      </section>
+
+      <section id="csv" data-corto="Un caso en el CSV">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Un caso en el CSV</h2>
+        </div>
+        <p>
+          La base de casos contra cada rival es un fichero de texto con un caso por línea. Contra
+          <code>GhostsAggressive</code>, por ejemplo, está en <code>cbrdata/grupoYY/mspacman/GhostsAggressive.csv</code>
+          (dentro de la carpeta del proyecto). Una línea:
+        </p>
+        <pre>2,50,20,28,650,false,UP,90</pre>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Columna</th><th scope="col">Valor</th><th scope="col">Parte</th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><code>id</code></td><td>2</td><td>todas</td><td>El número del caso. Se escribe una vez y se copia a las tres partes al leer.</td></tr>
+              <tr><td><code>score</code></td><td>50</td><td>descripción</td><td>Puntos al llegar al cruce.</td></tr>
+              <tr><td><code>time</code></td><td>20</td><td>descripción</td><td>Tics de partida.</td></tr>
+              <tr><td><code>nearestPPill</code></td><td>28</td><td>descripción</td><td>Pasos hasta la píldora de poder más cercana.</td></tr>
+              <tr><td><code>nearestGhost</code></td><td>650</td><td>descripción</td><td>Pasos hasta el fantasma más cercano. 650 es el tope, y quiere decir que no había ninguno fuera de la casa.</td></tr>
+              <tr><td><code>edibleGhost</code></td><td>false</td><td>descripción</td><td>Si ese fantasma era comestible.</td></tr>
+              <tr><td><code>action</code></td><td>UP</td><td>solución</td><td>El movimiento elegido.</td></tr>
+              <tr><td><code>score</code></td><td>90</td><td>resultado</td><td>Puntos ganados hasta tres cruces después. Se llama igual que el de la descripción, pero es el campo de <code>MsPacManResult</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          El orden lo da <code>plaintextconfig.xml</code>: primero el id, y luego los <code>&lt;Map&gt;</code> de la
+          descripción, los de la solución y los del resultado, cada uno en el orden en que aparece. Como es texto, podéis
+          abrirlo, contar casos con una hoja de cálculo o borrar a mano los que sobren, y para depurar viene muy bien (si
+          Ms. Pac-Man hace algo raro, buscad en el CSV el caso que recuperó).
+        </p>
+        <div class="note trap">
+          <span class="note-label">Si cambiáis la descripción, el CSV viejo ya no vale</span>
+          <p>
+            El conector lee las columnas por posición, así que si añadís o quitáis un atributo, los ficheros que ya teníais
+            tienen otra forma y se van a leer mal, sin avisar. Borrad <code>cbrdata/grupoYY/</code> (o cambiad de carpeta)
+            cada vez que cambie la descripción, y volved a entrenar.
+          </p>
+        </div>
+      </section>
+
+      <section id="cruce" data-corto="En cada cruce">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Lo que pasa en cada cruce</h2>
+        </div>
+        <ol>
+          <li>Antes de la partida, <code>preCompute(rival)</code> recibe el nombre de la clase de los fantasmas y carga su
+            CSV en memoria.</li>
+          <li>En cada tic, <code>getMove</code> mira si Ms. Pac-Man está en un cruce, y si no lo está devuelve
+            <code>NEUTRAL</code>, con lo que sigue por el pasillo como iba.</li>
+          <li>En un cruce, <code>MsPacManInput</code> construye la consulta y el motor da una vuelta al ciclo:
+            <pre class="pseudo"><span class="var">eval</span> = <span class="fn">NNScoringMethod.evaluateSimilarity</span>(casos, consulta, simConfig)   <span class="var">// recuperar: la similitud con todos</span>
+<span class="var">mejor</span> = <span class="fn">SelectCases.selectTopKRR</span>(<span class="var">eval</span>, 1)                         <span class="var">// el más parecido</span>
+<span class="var">acción</span> = su solución, o el plan B si sim &lt; 0,7 o resultado &lt; 100      <span class="var">// reutilizar (el plan B de la plantilla: al azar)</span>
+<span class="fn">storageManager.reviseAndRetain</span>(caso nuevo con la consulta y la acción)   <span class="var">// a la cola</span></pre>
+          </li>
+          <li>Tres cruces después, el caso sale de la cola, se le pone como resultado la diferencia de puntos y pasa a la
+            base.</li>
+          <li>Al acabar la partida, <code>postCompute</code> revisa lo que quede en la cola y
+            <code>CachedLinearCaseBase.close()</code> añade al CSV los casos nuevos.</li>
+        </ol>
+        <p>
+          Para cambiar cómo se recupera, mirad <code>selectTopKRR(eval, k)</code>: con un <var>k</var> mayor devuelve los
+          <var>k</var> mejores, cada uno con su caso (<code>get_case()</code>) y su similitud (<code>getEval()</code>), y con
+          eso se puede escribir cualquiera de las votaciones de la <a href="reutilizar.html#votar">página 03</a>.
+        </p>
+      </section>
+
+      <section id="similitud" data-corto="La similitud">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Dónde se cambian la similitud y los pesos</h2>
+        </div>
+        <p>Todo está en el <code>configure()</code> de <code>MsPacManCBRengine</code>:</p>
+        <pre><code>simConfig = new NNConfig();
+simConfig.setDescriptionSimFunction(new Average());                 // la media pesada
+simConfig.addMapping(new Attribute("nearestGhost", MsPacManDescription.class), new Interval(650));
+simConfig.addMapping(new Attribute("edibleGhost",  MsPacManDescription.class), new Equal());
+// ...</code></pre>
+        <p>
+          Cada <code>addMapping</code> dice qué similitud local usa un atributo <!--cite recio-cbr-jcolibri | transp. 27–29--><span class="cita">[<a href="#ref-recio-cbr-jcolibri">2</a>, transp. 27–29]</span><!--/cite-->. Un atributo
+ de la descripción sin su
+          <code>addMapping</code> no cuenta en la similitud, que es la forma más rápida de probar qué pasa sin él. Para darle
+          un peso:
+        </p>
+        <pre><code>simConfig.setWeight(new Attribute("nearestGhost", MsPacManDescription.class), 3.0);</code></pre>
+        <p>
+          Sin <code>setWeight</code> cada atributo pesa 1, así que en la plantilla los puntos y el tiempo pesan lo mismo que el
+          fantasma más cercano.
+        </p>
+      </section>
+
+      <section id="atributo" data-corto="Añadir un atributo">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Añadir un atributo: cuatro sitios</h2>
+        </div>
+        <p>Por ejemplo, el tiempo que le queda al fantasma comestible más cercano, al que llamaremos <code>edibleTime</code>:</p>
+        <ol>
+          <li>En <code>MsPacManDescription</code>, el campo <code>Integer edibleTime</code> con <code>getEdibleTime</code> y
+            <code>setEdibleTime</code> (y en <code>toString</code>, si queréis verlo).</li>
+          <li>En <code>MsPacManInput</code>, calcularlo en <code>parseInput</code> (con
+            <code>game.getGhostEdibleTime(g)</code>) y ponerlo en la descripción en <code>getQuery</code>.</li>
+          <li>En <code>plaintextconfig.xml</code>, un <code>&lt;Map&gt;edibleTime&lt;/Map&gt;</code> dentro de
+            <code>DescriptionMappings</code>.</li>
+          <li>En <code>MsPacManCBRengine.configure</code>, su <code>addMapping</code> con un rango que tenga sentido (el tiempo
+            de comestible no pasa de 200 tics).</li>
+        </ol>
+        <p>
+          Y borrar los CSV viejos. Si os olvidáis del paso 3, el atributo se calcula y se compara durante la partida pero no
+          se guarda, y los casos que se lean del fichero lo tendrán vacío (con lo que su similitud en ese atributo será 0).
+        </p>
+      </section>
+
+      <section id="medir" data-corto="Entrenar y medir">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Entrenar y medir</h2>
+        </div>
+        <p>La plantilla trae cuatro programas para lanzar como Java Application:</p>
+        <ul>
+          <li><code>Entrenar</code> juega sin pantalla 20 partidas contra cada uno de los cinco fantasmas de referencia,
+            aprendiendo sobre la marcha, y os dice cuántos casos tenía cada base antes y después. Se le puede pasar otro número de partidas como
+            argumento, y cada vez que lo lanzáis la base sigue creciendo desde donde se quedó.</li>
+          <li><code>Comparar</code> es el banco de las prácticas 3 y 4, con las mismas partidas para cada versión. Aquí la
+            v0 es Ms. Pac-Man con la base vacía (o sea, al azar en cada cruce) y la v1 la que tiene la base que haya dejado
+            <code>Entrenar</code>. Ninguna de las dos escribe en los CSV mientras compara.</li>
+          <li><code>Curva</code> mide si aprende: vacía una base aparte, juega 50 partidas seguidas contra un rival
+            aprendiendo, y apunta en un CSV los puntos, los casos, el tiempo por decisión y la duración de cada partida. Juega
+            con el plan B apagado, como el concurso (con <code>planB</code> como cuarto argumento, encendido). Es la medida de
+            la <a href="../../practicas/practica-6.html#curvas">Práctica&nbsp;6</a>.</li>
+          <li><code>VerPartida</code> os enseña una partida en pantalla.</li>
+        </ul>
+        <p>
+          Con la plantilla tal cual, estas son las medias de puntos frente a la Ms. Pac-Man al azar, contra los cinco rivales
+          juntos:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Partidas de entrenamiento por rival</th><th scope="col">Casos por rival</th><th scope="col">v0, al azar</th><th scope="col">v1, con casos</th><th scope="col">Diferencia</th></tr></thead>
+            <tbody>
+              <tr><td>20</td><td>de 600 a 1&#8239;300</td><td>1512</td><td>1545</td><td>+33, ruido</td></tr>
+              <tr><td>100</td><td>de 3&#8239;100 a 6&#8239;600</td><td>1532</td><td>1582</td><td>+51, ruido</td></tr>
+              <tr><td>unas 500</td><td>de 15&#8239;000 a 53&#8239;000</td><td>1521</td><td>1615</td><td>+94, ya se nota</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          (En las tres filas, dos errores típicos de la diferencia son unos 59 puntos, y por debajo de eso no se distingue de
+          la suerte.) Con quinientas partidas y decenas de miles de casos, la versión con casos apenas juega mejor que tirar
+          una moneda en cada cruce. La plantilla lo hace todo de la forma más simple, y en la sección siguiente está por qué
+          (y por dónde mejorarla).
+        </p>
+      </section>
+
+      <section id="mejorar" data-corto="Por dónde mejorar">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Lo que la plantilla hace de la forma más simple</h2>
+        </div>
+        <p>Cada punto lleva a la página donde se explica la alternativa:</p>
+        <ul>
+          <li>Describe con atributos que a lo mejor no ayudan (los puntos y el tiempo) y deja fuera otros que sí (por dónde
+            viene el fantasma, cuánto le queda de comestible). <a href="similitud.html#atributos">Página 02</a>.</li>
+          <li>Pesa todo igual y usa rangos grandes, con lo que casi todo se parece a casi todo.
+            <a href="similitud.html#global">Página 02</a>.</li>
+          <li>Copia un solo vecino, y si ese vecino salió mal (menos de 100 puntos) juega al azar. Contra
+            <code>GhostsAggressive</code>, tres de cada cuatro casos de la base acaban con menos de 100 puntos, así que la
+            mayoría de las decisiones siguen siendo al azar. <a href="reutilizar.html#votar">Página 03</a>.</li>
+          <li>Guarda movimientos absolutos, también los imposibles. <a href="reutilizar.html#adaptar">Página 03</a>.</li>
+          <li>No castiga morir, porque el resultado son sólo puntos. <a href="revisar-retener.html#revisar">Página 04</a>.</li>
+          <li>Lo guarda todo, y la base sólo crece. <a href="revisar-retener.html#retener">Página 04</a>.</li>
+          <li>Aprende desde cero y al azar, cuando ya tenéis controladores de reglas y borrosos que juegan bien.
+            <a href="revisar-retener.html#frio">Página 04</a>.</li>
+        </ul>
+        <div class="note mine">
+          <span class="note-label">Antes de cambiar nada</span>
+          <p>
+            Medid la plantilla con <code>Comparar</code> y apuntad la cifra. Después, cambiad una cosa cada vez y volved a
+            medir, como en las prácticas 3 y 4. Y acordaos de que cada cambio en la descripción o en el resultado obliga a
+            vaciar la base y entrenar otra vez, así que os recomiendo entrenar con pocas partidas para descartar ideas y con
+            muchas sólo para las que funcionan.
+          </p>
+        </div>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-recio-jcolibri2">J. A. Recio-García, P. A. González-Calero y B. Díaz-Agudo. "jCOLIBRI2: A Framework for Building Case-Based Reasoning Systems". <em>Science of Computer Programming 79, 126–145</em>, 2014. <a class="volver" href="#cita-recio-jcolibri2" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-cbr-jcolibri">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: jCOLIBRI</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-jcolibri" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema 6">
+        <a class="pager-prev" href="revisar-retener.html"><span class="pager-l">Anterior</span><span class="pager-t">Revisar, retener y olvidar</span></a>
+        <a class="pager-next" href="index.html#resumen"><span class="pager-l">Siguiente</span><span class="pager-t">Lo que hay que llevarse</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#piezas">Las piezas</a></li>
+            <li><a href="#csv">Un caso en el CSV</a></li>
+            <li><a href="#cruce">En cada cruce</a></li>
+            <li><a href="#similitud">La similitud</a></li>
+            <li><a href="#atributo">Añadir un atributo</a></li>
+            <li><a href="#medir">Entrenar y medir</a></li>
+            <li><a href="#mejorar">Por dónde mejorar</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 6</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Recordar en vez de razonar</a></li>
+            <li><a href="similitud.html"><span>02</span>Recuperar: la similitud</a></li>
+            <li><a href="reutilizar.html"><span>03</span>Reutilizar y adaptar</a></li>
+            <li><a href="revisar-retener.html"><span>04</span>Revisar, retener y olvidar</a></li>
+            <li><a href="jcolibri.html" aria-current="page"><span>05</span>CBR en Ms. Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

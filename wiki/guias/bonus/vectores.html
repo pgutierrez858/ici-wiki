@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Palabras como vectores · Tema bonus · ICI</title>
+<meta name="description" content="Embeddings para Código Secreto: de contar con qué palabras sale cada una a los vectores de fastText, el coseno con sus cuentas paso a paso, cómo ordena el tablero el que adivina y las pegas de los vectores (palabras con dos sentidos, contrarios que salen cerca y sesgos del texto), con ejemplos interactivos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema bonus</a>
+    <span aria-hidden="true">/</span>
+    <span>Palabras como vectores</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema bonus · 02 · Juegos de lenguaje</p>
+    <h1>
+      Palabras como vectores
+      <span class="thin">Dime con quién andas y te diré qué significas.</span>
+    </h1>
+    <p class="standfirst">
+      Para que una máquina juegue a Código Secreto, lo primero es que sepa cuánto se parecen dos palabras. Veamos de dónde sale ese número, primero con un ejemplo de juguete en dos dimensiones y luego con los vectores de verdad que usa el simulador.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="idea" data-corto="La idea">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Dime con quién andas</h2>
+        </div>
+        <p>
+          Supongamos por un momento que cogemos muchísimo texto y contamos, para cada palabra, cuántas veces sale cerca de
+          otras dos: "agua" y "dinero". Con tres palabras, por cada mil frases en las que aparecen, podría salir algo así:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Palabra</th><th scope="col">Veces cerca de "agua"</th><th scope="col">Veces cerca de "dinero"</th></tr></thead>
+            <tbody>
+              <tr><td>playa</td><td>4</td><td>1</td></tr>
+              <tr><td>arena</td><td>3</td><td>1</td></tr>
+              <tr><td>cajero</td><td>0</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Cada fila es una lista de dos números, o sea un vector: playa&nbsp;=&nbsp;(4,&nbsp;1), arena&nbsp;=&nbsp;(3,&nbsp;1)
+          y cajero&nbsp;=&nbsp;(0,&nbsp;4). Si los dibujamos como flechas que salen del origen, las palabras que se usan en
+          frases parecidas apuntan hacia el mismo sitio:
+        </p>
+        <figure>
+          <figcaption>Las tres palabras como flechas. El ángulo entre dos flechas dice cuánto se parecen</figcaption>
+          <svg class="explica" viewBox="0 0 400 300" role="img" aria-label="Plano con dos ejes: hacia la derecha, veces cerca de agua; hacia arriba, veces cerca de dinero. Playa es una flecha hasta el punto 4, 1 y arena hasta el 3, 1: casi superpuestas, con un ángulo muy pequeño entre ellas. Cajero es una flecha vertical hasta el 0, 4, con un ángulo grande respecto a las otras dos.">
+            <defs><marker id="cn-punta" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" class="cn-punta"/></marker></defs>
+            <line x1="60" y1="250" x2="330" y2="250" class="cn-eje"/>
+            <line x1="60" y1="250" x2="60" y2="40" class="cn-eje"/>
+            <text x="330" y="290" class="mc-t mc-dcha">veces cerca de "agua"</text>
+            <text x="68" y="44" class="mc-t">veces cerca de "dinero"</text>
+            <g class="mc-t">
+              <text x="105" y="266" class="mc-centro">1</text><text x="150" y="266" class="mc-centro">2</text>
+              <text x="195" y="266" class="mc-centro">3</text><text x="240" y="266" class="mc-centro">4</text>
+              <text x="52" y="209" class="mc-dcha">1</text><text x="52" y="164" class="mc-dcha">2</text>
+              <text x="52" y="119" class="mc-dcha">3</text><text x="52" y="74" class="mc-dcha">4</text>
+            </g>
+            <path d="M 157 225.8 A 100 100 0 0 0 154.9 218.4" class="cn-arco grueso"/>
+            <line x1="160" y1="224" x2="246" y2="240" class="cn-arco largo"/>
+            <path d="M 60 190 A 60 60 0 0 1 116.9 231" class="cn-arco largo"/>
+            <text x="80" y="176" class="mc-t cn-t-arco">ángulo grande</text>
+            <text x="250" y="244" class="mc-t cn-t-arco">ángulo pequeño</text>
+            <line x1="60" y1="250" x2="240" y2="205" class="cn-vec" marker-end="url(#cn-punta)"/>
+            <line x1="60" y1="250" x2="195" y2="205" class="cn-vec b" marker-end="url(#cn-punta)"/>
+            <line x1="60" y1="250" x2="60" y2="70" class="cn-vec c" marker-end="url(#cn-punta)"/>
+            <text x="248" y="202" class="mc-t cn-t-vec">playa (4, 1)</text>
+            <text x="182" y="192" class="mc-t cn-t-vec mc-dcha">arena (3, 1)</text>
+            <text x="70" y="82" class="mc-t cn-t-vec">cajero (0, 4)</text>
+          </svg>
+        </figure>
+        <p>
+          Esta es la idea de toda la página, y es más vieja que los ordenadores: el lingüista John R. Firth la resumió en 1957
+          como "conocerás una palabra por las compañías que frecuenta" <!--cite firth-1957--><span class="cita">[<a href="#ref-firth-1957" id="cita-firth-1957">1</a>]</span><!--/cite-->. No hace falta que nadie le explique a la máquina qué es
+          una playa, porque basta con ver que sale en las mismas frases que la arena y en frases distintas que el cajero.
+        </p>
+      </section>
+
+      <section id="coseno" data-corto="El coseno">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">El coseno: cuánto se parecen dos flechas</h2>
+        </div>
+        <p>
+          Para medir el parecido no se usa la distancia entre las puntas de las flechas, sino el <strong>ángulo</strong> que
+          forman. Si un blog de viajes nombra la playa diez veces más que el resto de textos, su flecha sería (40,&nbsp;10):
+          mucho más larga, pero apuntando exactamente hacia el mismo sitio. La dirección es lo que dice qué significa una
+          palabra, y la longitud sólo dice lo mucho que se usa.
+        </p>
+        <p>
+          Formalmente, si llamamos <var>u</var> y <var>v</var> a los vectores de dos palabras, <var>d</var> al número de
+          componentes que tiene cada uno, y <var>u</var><sub>1</sub>, …, <var>u</var><sub><var>d</var></sub> a los números de
+          <var>u</var> (igual con <var>v</var>), el coseno del ángulo entre los dos es <!--cite salton-vsm--><span class="cita">[<a href="#ref-salton-vsm" id="cita-salton-vsm">2</a>]</span><!--/cite-->:
+        </p>
+<!--TEX \cos(u, v) = \frac{u_1 v_1 + u_2 v_2 + \cdots + u_d v_d}{\lVert u \rVert \cdot \lVert v \rVert}
+\qquad \text{con} \qquad \lVert u \rVert = \sqrt{u_1^2 + u_2^2 + \cdots + u_d^2} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msub><mi>u</mi><mn>1</mn></msub><msub><mi>v</mi><mn>1</mn></msub><mo>+</mo><msub><mi>u</mi><mn>2</mn></msub><msub><mi>v</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mo>+</mo><msub><mi>u</mi><mi>d</mi></msub><msub><mi>v</mi><mi>d</mi></msub></mrow><mrow><mo stretchy="false">∥</mo><mi>u</mi><mo stretchy="false">∥</mo><mo>⋅</mo><mo stretchy="false">∥</mo><mi>v</mi><mo stretchy="false">∥</mo></mrow></mfrac><mspace width="2em"/><mtext>con</mtext><mspace width="2em"/><mo stretchy="false">∥</mo><mi>u</mi><mo stretchy="false">∥</mo><mo>=</mo><msqrt><mrow><msubsup><mi>u</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>u</mi><mn>2</mn><mn>2</mn></msubsup><mo>+</mo><mo>⋯</mo><mo>+</mo><msubsup><mi>u</mi><mi>d</mi><mn>2</mn></msubsup></mrow></msqrt></mrow><annotation encoding="application/x-tex">\cos(u, v) = \frac{u_1 v_1 + u_2 v_2 + \cdots + u_d v_d}{\lVert u \rVert \cdot \lVert v \rVert}
+\qquad \text{con} \qquad \lVert u \rVert = \sqrt{u_1^2 + u_2^2 + \cdots + u_d^2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">cos</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1963em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">∥</span><span class="mord mathnormal">u</span><span class="mclose">∥</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mopen">∥</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">∥</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="minner">⋯</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:2em;"></span><span class="mord text"><span class="mord">con</span></span><span class="mspace" style="margin-right:2em;"></span><span class="mopen">∥</span><span class="mord mathnormal">u</span><span class="mclose">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.84em;vertical-align:-0.5588em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2812em;"><span class="svg-align" style="top:-3.8em;"><span class="pstrut" style="height:3.8em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7959em;"><span style="top:-2.4337em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span><span style="top:-3.0448em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2663em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7959em;"><span style="top:-2.4337em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span><span style="top:-3.0448em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2663em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="minner">⋯</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7959em;"><span style="top:-2.3987em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span><span style="top:-3.0448em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3013em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.2412em;"><span class="pstrut" style="height:3.8em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.88em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.88em" viewBox="0 0 400000 1944" preserveAspectRatio="xMinYMin slice"><path d="M983 90
+l0 -0
+c4,-6.7,10,-10,18,-10 H400000v40
+H1013.1s-83.4,268,-264.1,840c-180.7,572,-277,876.3,-289,913c-4.7,4.7,-12.7,7,-24,7
+s-12,0,-12,0c-1.3,-3.3,-3.7,-11.7,-7,-25c-35.3,-125.3,-106.7,-373.3,-214,-744
+c-10,12,-21,25,-33,39s-32,39,-32,39c-6,-5.3,-15,-14,-27,-26s25,-30,25,-30
+c26.7,-32.7,52,-63,76,-91s52,-60,52,-60s208,722,208,722
+c56,-175.3,126.3,-397.3,211,-666c84.7,-268.7,153.8,-488.2,207.5,-658.5
+c53.7,-170.3,84.5,-266.8,92.5,-289.5z
+M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5588em;"><span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Es decir, se multiplican los números de las dos palabras posición a posición, se suma todo, y se divide entre lo
+          largas que son las dos flechas (<span class="nowrap">‖<var>u</var>‖</span> es la longitud de <var>u</var>). Así la
+          longitud no cuenta y sólo queda el ángulo. Para ilustrarlo, hagamos las dos cuentas del dibujo:
+        </p>
+<pre class="cuenta">coseno(playa, arena)
+  arriba:  4 · 3 + 1 · 1   = 13
+  ‖playa‖: √(4² + 1²) = √17 = 4,12
+  ‖arena‖: √(3² + 1²) = √10 = 3,16
+  coseno:  13 / (4,12 · 3,16) = 13 / 13,04 = 1,00
+
+coseno(playa, cajero)
+  arriba:   4 · 0 + 1 · 4    = 4
+  ‖cajero‖: √(0² + 4²) = √16 = 4
+  coseno:   4 / (4,12 · 4) = 4 / 16,49 = 0,24</pre>
+        <p>
+          El coseno va de −1 a 1. Un 1 es la misma dirección (playa y arena, casi), un 0 es que no tienen nada que ver, y
+          un número negativo es que apuntan hacia lados contrarios. Con palabras reales casi todo sale entre −0,3 y 0,8.
+        </p>
+        <h3>Los vectores de verdad</h3>
+        <p>
+          Nadie cuenta a mano con "agua" y "dinero": los vectores que usamos tienen 300 números por palabra, y esos 300
+          números no tienen nombre. Los aprende un programa leyendo miles de millones de frases, ajustando el vector de cada
+          palabra para que sirva para adivinar qué palabras salen a su alrededor. A estos vectores se les llama
+          <strong>vectores de palabras</strong> (word embeddings). Los primeros que se usaron de forma masiva fueron los de
+          word2vec, de 2013 <!--cite mikolov-word2vec--><span class="cita">[<a href="#ref-mikolov-word2vec" id="cita-mikolov-word2vec">3</a>]</span><!--/cite-->, y los nuestros son los de fastText en castellano <!--cite grave-fasttext--><span class="cita">[<a href="#ref-grave-fasttext" id="cita-grave-fasttext">4</a>]</span><!--/cite-->, aprendidos
+          sobre páginas web y la Wikipedia, que Facebook AI Research publica con licencia CC&nbsp;BY-SA&nbsp;3.0.
+        </p>
+        <p>
+          Para que quepan en la página me he quedado con 239 palabras de tablero y unas 8&nbsp;500 pistas posibles, y he
+          comprimido los 300 números a 64 (con un análisis de componentes principales, que guarda las direcciones en las que
+          más varían). Los cosenos cambian un poco respecto a los originales, pero da igual: el que da pistas y el que adivina
+          usan exactamente los mismos, que es lo que importa.
+        </p>
+        <p>
+          64 números no se pueden dibujar, pero sí se pueden "aplastar" a dos (otra vez con componentes principales, ahora
+          sólo con estas 21 palabras) para hacerse una idea de cómo se reparten. Nadie le ha dicho a la máquina qué grupos
+          hay, y aun así salen solos:
+        </p>
+        <figure class="wide">
+          <figcaption>21 palabras de los vectores del simulador, aplastadas a dos dimensiones. Los colores los he puesto yo después</figcaption>
+          <svg class="explica" viewBox="0 0 600 340" role="img" aria-label="Mapa de veintiuna palabras proyectadas en dos dimensiones. Forman cuatro grupos separados: las del mar (playa, arena, isla, costa, barco, ola), las del dinero (banco, dinero, cajero, préstamo, euro), los animales (gato, perro, tigre, león, ratón) y el tiempo (frío, calor, nieve, invierno, verano).">
+<rect x="1" y="1" width="598" height="338" rx="4" class="cn-mapa-fondo"/>
+<circle cx="548" cy="215" r="4.5" class="cn-mapa-p g0"/><text x="556" y="219" class="mc-t cn-mapa-t">playa</text>
+<circle cx="486" cy="171" r="4.5" class="cn-mapa-p g0"/><text x="494" y="175" class="mc-t cn-mapa-t">arena</text>
+<circle cx="524" cy="215" r="4.5" class="cn-mapa-p g0"/><text x="516" y="219" class="mc-t cn-mapa-t mc-dcha">isla</text>
+<circle cx="550" cy="222" r="4.5" class="cn-mapa-p g0"/><text x="558" y="239" class="mc-t cn-mapa-t">costa</text>
+<circle cx="380" cy="228" r="4.5" class="cn-mapa-p g0"/><text x="388" y="232" class="mc-t cn-mapa-t">barco</text>
+<circle cx="543" cy="162" r="4.5" class="cn-mapa-p g0"/><text x="551" y="166" class="mc-t cn-mapa-t">ola</text>
+<circle cx="229" cy="290" r="4.5" class="cn-mapa-p g1"/><text x="237" y="294" class="mc-t cn-mapa-t">banco</text>
+<circle cx="236" cy="277" r="4.5" class="cn-mapa-p g1"/><text x="244" y="281" class="mc-t cn-mapa-t">dinero</text>
+<circle cx="186" cy="278" r="4.5" class="cn-mapa-p g1"/><text x="178" y="282" class="mc-t cn-mapa-t mc-dcha">cajero</text>
+<circle cx="225" cy="278" r="4.5" class="cn-mapa-p g1"/><text x="233" y="269" class="mc-t cn-mapa-t">préstamo</text>
+<circle cx="319" cy="256" r="4.5" class="cn-mapa-p g1"/><text x="327" y="260" class="mc-t cn-mapa-t">euro</text>
+<circle cx="50" cy="92" r="4.5" class="cn-mapa-p g2"/><text x="42" y="96" class="mc-t cn-mapa-t mc-dcha">gato</text>
+<circle cx="86" cy="94" r="4.5" class="cn-mapa-p g2"/><text x="94" y="85" class="mc-t cn-mapa-t">perro</text>
+<circle cx="135" cy="94" r="4.5" class="cn-mapa-p g2"/><text x="143" y="98" class="mc-t cn-mapa-t">tigre</text>
+<circle cx="110" cy="98" r="4.5" class="cn-mapa-p g2"/><text x="118" y="115" class="mc-t cn-mapa-t">león</text>
+<circle cx="70" cy="120" r="4.5" class="cn-mapa-p g2"/><text x="78" y="124" class="mc-t cn-mapa-t">ratón</text>
+<circle cx="442" cy="50" r="4.5" class="cn-mapa-p g3"/><text x="434" y="54" class="mc-t cn-mapa-t mc-dcha">frío</text>
+<circle cx="471" cy="83" r="4.5" class="cn-mapa-p g3"/><text x="463" y="87" class="mc-t cn-mapa-t mc-dcha">calor</text>
+<circle cx="495" cy="73" r="4.5" class="cn-mapa-p g3"/><text x="503" y="77" class="mc-t cn-mapa-t">nieve</text>
+<circle cx="459" cy="60" r="4.5" class="cn-mapa-p g3"/><text x="467" y="64" class="mc-t cn-mapa-t">invierno</text>
+<circle cx="484" cy="105" r="4.5" class="cn-mapa-p g3"/><text x="492" y="109" class="mc-t cn-mapa-t">verano</text>
+</svg>
+        </figure>
+        <p>
+          Fijaos en BARCO, que queda a medio camino entre el mar y el dinero, y en BANCO, metido entre el dinero aunque
+          también sea un sitio para sentarse. Lo veremos en las pegas. Mientras, probad vosotros con el coseno:
+        </p>
+        <div class="demo" data-cn="coseno">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h3>El coseno entre dos palabras, y sus vecinas</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Con los vectores del simulador, coseno(playa, arena) = 0,51 y coseno(playa, barco) = 0,31.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section id="sumar" data-corto="Sumar y restar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Sumar y restar significados</h2>
+        </div>
+        <p>
+          Como son vectores, se pueden sumar y restar, y lo curioso es que el resultado sigue teniendo sentido. El ejemplo
+          famoso <!--cite mikolov-regularidades--><span class="cita">[<a href="#ref-mikolov-regularidades" id="cita-mikolov-regularidades">5</a>]</span><!--/cite--> es coger el vector de "rey", quitarle el de "hombre", sumarle el de "mujer" y
+          buscar la palabra más cercana al resultado:
+        </p>
+<pre class="cuenta">rey − hombre + mujer       → reina      (coseno 0,78)
+verano + frío − calor      → invierno   (0,83)
+playa + nieve − arena      → esquiar    (0,68)
+perro + gatito − gato      → cachorro   (0,91)</pre>
+        <p>
+          Esto significa que en los vectores hay "direcciones" con significado: de hombre a mujer, de calor a frío, de adulto
+          a cría. Nadie las ha programado, salen de cómo se usan las palabras.
+        </p>
+        <p>
+          Para Código Secreto la operación que más nos interesa es la más tonta, que es <strong>sumar sin restar</strong>. La
+          suma de playa e isla (o su media, que apunta hacia el mismo sitio) es un vector "entre las dos", y la palabra más
+          cercana a ese punto es BAHÍA, con 0,84, seguida de costa. O sea, una pista para dos cartas a la vez. Con queso y
+          cebolla sale mozzarella, y luego mantequilla. Es la primera estrategia de la página siguiente, y también la más
+          ingenua, porque no mira qué otras cartas hay en la mesa.
+        </p>
+        <div class="demo" data-cn="suma">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h3>Sumar y restar palabras</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Con los vectores del simulador, rey − hombre + mujer da reina, y playa + isla da bahía.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section id="tablero" data-corto="Ordenar el tablero">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Del coseno al tablero</h2>
+        </div>
+        <p>
+          Con el coseno, el agente ya puede hacer algo: coger la pista, calcular su coseno con cada carta que queda y
+          <strong>ordenarlas de más a menos parecidas</strong>. Si la pista era "COSTA&nbsp;2", toca las dos primeras. Para
+          verlo, vamos a usar un tablero pequeño de 8 cartas, el mismo de toda la página siguiente. Sois el equipo rojo, y
+          vuestras son PLAYA, ISLA y PIRATA:
+        </p>
+        <figure class="cn-fig narrow-tab">
+          <figcaption>El tablero pequeño, con la tarjeta a la vista</figcaption>
+          <div class="cn-tablero" style="--cols:4"><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">PLAYA</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">BARCO</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">LUNA</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">ISLA</span></div><div class="cn-carta cn-X clave"><span class="cn-tipo">asesino</span><span class="cn-w">TIBURÓN</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">PIRATA</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">GATO</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">BANCO</span></div></div>
+        </figure>
+        <p>
+          Si fuerais personas, la primera pista que se os ocurriría seguramente sería MAR: la playa, la isla y los piratas
+          tienen que ver con el mar. Veamos cómo lo ordena el agente:
+        </p>
+        <figure class="cn-fig">
+          <figcaption>El tablero ordenado por coseno con MAR (aquí con tres decimales, porque hay empate a dos)</figcaption>
+          <ol class="cn-ranking"><li class="cn-fila cn-A"><span class="w">BARCO</span><span class="barra"><i style="width:100.0%"></i></span><span class="num">0,538</span><span class="tipo">azul</span></li><li class="cn-fila cn-R"><span class="w">PLAYA</span><span class="barra"><i style="width:99.5%"></i></span><span class="num">0,535</span><span class="tipo">rojo</span></li><li class="cn-fila cn-R"><span class="w">ISLA</span><span class="barra"><i style="width:93.2%"></i></span><span class="num">0,502</span><span class="tipo">rojo</span></li><li class="cn-fila cn-X"><span class="w">TIBURÓN</span><span class="barra"><i style="width:69.3%"></i></span><span class="num">0,373</span><span class="tipo">asesino</span></li><li class="cn-fila cn-N"><span class="w">LUNA</span><span class="barra"><i style="width:54.4%"></i></span><span class="num">0,293</span><span class="tipo">neutral</span></li><li class="cn-fila cn-R"><span class="w">PIRATA</span><span class="barra"><i style="width:54.0%"></i></span><span class="num">0,291</span><span class="tipo">rojo</span></li><li class="cn-fila cn-A"><span class="w">BANCO</span><span class="barra"><i style="width:16.5%"></i></span><span class="num">0,089</span><span class="tipo">azul</span></li><li class="cn-fila cn-N"><span class="w">GATO</span><span class="barra"><i style="width:0.0%"></i></span><span class="num">−0,030</span><span class="tipo">neutral</span></li></ol>
+        </figure>
+        <p>
+          ...Pues efectivamente, para los vectores MAR se parece un pelín más a BARCO (0,538) que a PLAYA (0,535). Vuestro
+          agente tocaría primero BARCO, que es azul, y el turno se acabaría ahí regalándole una carta al rival. Y detrás, el
+          TIBURÓN (el asesino) con 0,37 está por encima de PIRATA, con 0,29. Comparad con COSTA:
+        </p>
+        <figure class="cn-fig">
+          <figcaption>El tablero ordenado por coseno con COSTA. La línea discontinua es dónde para el agente con "COSTA 2"</figcaption>
+          <ol class="cn-ranking"><li class="cn-fila cn-R"><span class="w">ISLA</span><span class="barra"><i style="width:100.0%"></i></span><span class="num">0,78</span><span class="tipo">rojo</span></li><li class="cn-fila cn-R"><span class="w">PLAYA</span><span class="barra"><i style="width:81.2%"></i></span><span class="num">0,64</span><span class="tipo">rojo</span></li><li class="cn-fila cn-R cn-corte"><span class="w">PIRATA</span><span class="barra"><i style="width:36.9%"></i></span><span class="num">0,29</span><span class="tipo">rojo</span></li><li class="cn-fila cn-A"><span class="w">BARCO</span><span class="barra"><i style="width:34.4%"></i></span><span class="num">0,27</span><span class="tipo">azul</span></li><li class="cn-fila cn-N"><span class="w">LUNA</span><span class="barra"><i style="width:28.7%"></i></span><span class="num">0,22</span><span class="tipo">neutral</span></li><li class="cn-fila cn-X"><span class="w">TIBURÓN</span><span class="barra"><i style="width:23.6%"></i></span><span class="num">0,18</span><span class="tipo">asesino</span></li><li class="cn-fila cn-A"><span class="w">BANCO</span><span class="barra"><i style="width:0.6%"></i></span><span class="num">0,01</span><span class="tipo">azul</span></li><li class="cn-fila cn-N"><span class="w">GATO</span><span class="barra"><i style="width:0.0%"></i></span><span class="num">−0,25</span><span class="tipo">neutral</span></li></ol>
+        </figure>
+        <p>
+          Con COSTA las dos primeras son vuestras y con mucha ventaja (0,64 frente a 0,27 de BARCO). La tercera también es
+          vuestra (PIRATA, 0,29), pero por los pelos: si dijerais "COSTA&nbsp;3" dependeríais de una diferencia de 0,02. Toda
+          la página siguiente va de decidir eso. Mientras, jugad con el tablero:
+        </p>
+        <div class="demo" data-cn="ranking">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h3>Cómo ordena el agente el tablero pequeño con vuestra pista</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Con MAR la primera es BARCO (0,538), que es del rival; con COSTA salen ISLA (0,78) y PLAYA (0,64), y luego PIRATA (0,29) y BARCO (0,27).</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Una prueba rápida</span>
+          <p>
+            Probad PEZ: el TIBURÓN sale primero con 0,82, así que cualquier pista de animales marinos aquí es jugarse la
+            partida. Y probad VACACIONES, que para una persona va con PLAYA e ISLA y para los vectores sólo con PLAYA.
+          </p>
+        </div>
+      </section>
+
+      <section id="pegas" data-corto="Las pegas">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Lo que hay que saber de los vectores</h2>
+        </div>
+        <p>
+          Los vectores funcionan sorprendentemente bien para lo poco que cuestan (multiplicar y sumar), pero tienen pegas que
+          en Código Secreto se notan enseguida:
+        </p>
+        <ul>
+          <li>Una palabra, un vector, aunque tenga dos sentidos. Las vecinas de BANCO son cajero, sindicato, despacho, banquero..., todas de dinero. Sin embargo coseno(banco, parque) = 0,40, casi lo mismo que coseno(banco, dinero) = 0,41: el vector es una mezcla de los dos sentidos. Las cartas con dos sentidos (BANCO, GATO, LLAVE, PILA, MUÑECA...) son justo donde las personas sacan las mejores pistas, y donde la máquina se lía.</li>
+          <li>Los contrarios salen cerca. La palabra más cercana a FRÍO es calor, con 0,79. Tiene lógica (se dicen en las mismas frases: "hace frío", "hace calor"), pero significa que el coseno mide "de qué se habla", no "qué es lo mismo". En el juego no es malo del todo, porque CALOR es una pista perfectamente válida para FRÍO.</li>
+          <li>Heredan lo que hay en el texto. Si en internet ciertas profesiones salen casi siempre con un género, los vectores lo aprenden, y con ello los prejuicios (hay un artículo muy conocido de 2016 sobre esto <!--cite bolukbasi-sesgo--><span class="cita">[<a href="#ref-bolukbasi-sesgo" id="cita-bolukbasi-sesgo">6</a>]</span><!--/cite-->)
+. En el simulador, además, he tenido que quitar de las pistas una lista de tacos e insultos, porque el texto es de internet y la máquina los diría tan tranquila.</li>
+          <li>Lo que no está, no existe. La máquina se sabe unas 8&nbsp;800 palabras, en minúscula y casi todas en singular. Nombres propios (los vectores los guardan con mayúscula y aquí no están), expresiones de varias palabras o palabras nuevas no las conoce, y una persona las usaría sin pensar.</li>
+        </ul>
+        <p>
+          En general, los vectores son buenos para decir "esto va con esto" y malos para decir por qué. Con eso, y con el
+          ordenar el tablero de esta página, ya tenemos lo necesario para programar las estrategias.
+        </p>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-firth-1957">J. R. Firth. "A Synopsis of Linguistic Theory, 1930–1955". <em>Studies in Linguistic Analysis, 1–32, Blackwell</em>, 1957. <a class="volver" href="#cita-firth-1957" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-salton-vsm">G. Salton, A. Wong y C. S. Yang. "A Vector Space Model for Automatic Indexing". <em>Communications of the ACM 18(11), 613–620</em>, 1975. <a class="volver" href="#cita-salton-vsm" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-mikolov-word2vec">T. Mikolov, K. Chen, G. Corrado y J. Dean. "Efficient Estimation of Word Representations in Vector Space". <em>arXiv:1301.3781</em>, 2013. <a href="https://arxiv.org/abs/1301.3781">arxiv.org/abs/1301.3781</a> <a class="volver" href="#cita-mikolov-word2vec" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-grave-fasttext">E. Grave, P. Bojanowski, P. Gupta, A. Joulin y T. Mikolov. "Learning Word Vectors for 157 Languages". <em>Proceedings of LREC 2018</em>, 2018. <a href="https://fasttext.cc/docs/en/crawl-vectors.html">fasttext.cc/docs/en/crawl-vectors.html</a> <a class="volver" href="#cita-grave-fasttext" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-mikolov-regularidades">T. Mikolov, W. Yih y G. Zweig. "Linguistic Regularities in Continuous Space Word Representations". <em>Proceedings of NAACL-HLT 2013, 746–751</em>, 2013. <a href="https://aclanthology.org/N13-1090/">aclanthology.org/N13-1090</a> <a class="volver" href="#cita-mikolov-regularidades" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-bolukbasi-sesgo">T. Bolukbasi, K.-W. Chang, J. Zou, V. Saligrama y A. Kalai. "Man is to Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings". <em>NeurIPS 2016</em>, 2016. <a class="volver" href="#cita-bolukbasi-sesgo" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema bonus">
+        <a class="pager-prev" href="que-es.html"><span class="pager-l">Anterior</span><span class="pager-t">Código Secreto como problema</span></a>
+        <a class="pager-next" href="estrategias.html"><span class="pager-l">Siguiente</span><span class="pager-t">Estrategias</span></a>
+      </nav>
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#idea">La idea</a></li>
+            <li><a href="#coseno">El coseno</a></li>
+            <li><a href="#sumar">Sumar y restar</a></li>
+            <li><a href="#tablero">Ordenar el tablero</a></li>
+            <li><a href="#pegas">Las pegas</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema bonus</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Código Secreto como problema</a></li>
+            <li><a href="vectores.html" aria-current="page"><span>02</span>Palabras como vectores</a></li>
+            <li><a href="estrategias.html"><span>03</span>Estrategias</a></li>
+            <li><a href="modelos-lenguaje.html"><span>04</span>Con un modelo de lenguaje</a></li>
+            <li><a href="simulador.html"><span>05</span>El simulador</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/codenames-datos.js" defer></script>
+<script src="../../assets/js/codenames.js" defer></script>
+</body>
+</html>

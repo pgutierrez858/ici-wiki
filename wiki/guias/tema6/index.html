@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Tema 6 · Razonamiento basado en casos · ICI</title>
+<meta name="description" content="Tema 6 de ICI: razonamiento basado en casos. Qué es un caso, el ciclo de las cuatro R, la similitud local y global, los k vecinos, reutilizar y adaptar, revisar con una ventana de cruces, qué casos retener y olvidar, y cómo se hace todo en Ms. Pac-Man con jCOLIBRI, con ejemplos interactivos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <span>Tema 6</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Razonamiento basado en casos
+      <span class="thin">Guardar experiencias en vez de escribir reglas.</span>
+    </h1>
+    <p class="standfirst">
+      Los apuntes del tema&nbsp;6, en cinco páginas cortas. Esta vez no le decimos a Ms. Pac-Man cómo jugar, la dejamos
+      acordarse: cada decisión se apunta con su resultado, y ante una situación nueva busca la más parecida que ya vivió.
+      Es la técnica de la Práctica&nbsp;6, que volvemos a hacer en el laberinto y esta vez con jCOLIBRI.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Tema</dt>
+      <dd>06<small>Razonamiento basado en casos</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Práctica asociada</dt>
+      <dd><a href="../../practicas/practica-6.html">Práctica 6</a><small>Ms. Pac-Man con casos, en Java</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Antes de leer</dt>
+      <dd>Prácticas 3 y 4<small>Vuelven las clases Input y las acciones</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="paginas" data-corto="Las páginas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Las páginas</h2>
+        </div>
+        <p>
+          Van en el orden del ciclo: la primera cuenta la idea, las tres siguientes van por las cuatro R una a una, y la
+          última repasa la plantilla de la práctica clase por clase.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="que-es.html">
+              <span class="lt">01 · Recordar en vez de razonar<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 5 secciones</span>
+              <span class="ld">Un problema nuevo resuelto con uno viejo, qué es un caso, el ciclo de las cuatro R, qué cambia frente a reglas, lógica borrosa y MCTS, y dónde se usa (de las recetas de CHEF a Wargus y RoboCup).</span>
+            </a>
+          </li>
+          <li>
+            <a href="similitud.html">
+              <span class="lt">02 · Recuperar: la similitud<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplo interactivo</span>
+              <span class="ld">Qué atributos describen una situación, la similitud de cada uno y su media pesada con las cuentas paso a paso, los k vecinos, el rango que se vuelve negativo y lo que cuesta buscar.</span>
+            </a>
+          </li>
+          <li>
+            <a href="reutilizar.html">
+              <span class="lt">03 · Reutilizar y adaptar<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con dibujos</span>
+              <span class="ld">Copiar, votar o elegir por el resultado de cada acción, explorar para no quedarse con lo primero, guardar la solución en relativo (con las acciones de las prácticas 3 y 4) y qué hacer sin ningún caso parecido.</span>
+            </a>
+          </li>
+          <li>
+            <a href="revisar-retener.html">
+              <span class="lt">04 · Revisar, retener y olvidar<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplos interactivos</span>
+              <span class="ld">El resultado que llega tarde y la ventana de cruces, a quién se le da el mérito, qué guardar y qué olvidar, cómo arrancar con la base vacía y por qué una base por rival.</span>
+            </a>
+          </li>
+          <li>
+            <a href="jcolibri.html">
+              <span class="lt">05 · CBR en Ms. Pac-Man<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · Práctica 6</span>
+              <span class="ld">La plantilla con jCOLIBRI clase por clase: el caso en tres clases, el CSV de la base, la configuración de la similitud, el ciclo en cada cruce y dónde se revisa y se guarda.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="resumen" data-corto="Lo que hay que llevarse">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Lo que hay que llevarse</h2>
+        </div>
+        <ol>
+          <li>Un sistema basado en casos resuelve un problema nuevo con la solución del caso más parecido que ya resolvió, y el conocimiento está en los ejemplos en vez de en reglas escritas a mano.</li>
+          <li>Un caso tiene descripción (la situación), solución (lo que se hizo) y resultado (cómo salió). A la situación de ahora la llamamos consulta.</li>
+          <li>El ciclo es recuperar los parecidos, reutilizar su solución, revisar cómo salió y retener el caso nuevo. En Ms. Pac-Man da una vuelta en cada cruce.</li>
+          <li>La similitud se calcula atributo a atributo (intervalo para números, igualdad para el resto) y se junta con una media pesada. Los atributos, los rangos y los pesos son donde ponéis vuestro conocimiento.</li>
+          <li>El intervalo de jCOLIBRI no se para en 0, así que con un rango corto o un valor como <code>Integer.MAX_VALUE</code> sale negativo y estropea la media.</li>
+          <li>Mejor <var>k</var> vecinos que uno, y diría que mejor elegir la acción por su resultado medio que por cuántas veces se hizo, explorando de vez en cuando (como en el bandido del tema&nbsp;5).</li>
+          <li>Guardar la solución en relativo ("alejarse del fantasma") hace que se adapte sola a cada cruce, y las acciones de las prácticas 3 y 4 sirven justo para eso.</li>
+          <li>En un juego el resultado llega tarde, se revisa con una ventana de cruces y morir tiene que costar. Retener todo hace la base grande y lenta, y guardar lo que falla o lo nuevo (y olvidar el ruido) la hace mejor.</li>
+        </ol>
+        <div class="note mine">
+          <span class="note-label">Y en la práctica</span>
+          <p>
+            La plantilla de la <a href="../../practicas/practica-6.html">Práctica&nbsp;6</a> trae una Ms. Pac-Man que ya hace el ciclo completo con jCOLIBRI, pero de la
+            forma más simple (copia el caso más parecido y lo guarda todo). Mejorarla es cosa vuestra, y en estas páginas
+            tenéis por dónde tirar.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#paginas">Las páginas</a></li>
+            <li><a href="#resumen">Lo que hay que llevarse</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 6</h2>
+          <ol>
+            <li><a href="index.html" aria-current="page"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Recordar en vez de razonar</a></li>
+            <li><a href="similitud.html"><span>02</span>Recuperar: la similitud</a></li>
+            <li><a href="reutilizar.html"><span>03</span>Reutilizar y adaptar</a></li>
+            <li><a href="revisar-retener.html"><span>04</span>Revisar, retener y olvidar</a></li>
+            <li><a href="jcolibri.html"><span>05</span>CBR en Ms. Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

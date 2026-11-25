@@ -44,6 +44,7 @@ APERTURAS = {
 
 TIEMPO = 0.3          # segundos por jugada
 MAX_MEDIAS = 120      # medias jugadas desde la apertura; después decide el material
+RELOJ = None          # segundos de reloj por partida para cada jugador (None: sin reloj). En el concurso, 1 s y 60 s
 PROCESOS = max(1, (os.cpu_count() or 2) // 2)
 
 
@@ -58,7 +59,7 @@ def una_partida(version, rival, apertura, color):
     """Juega una partida y devuelve los puntos de la versión (1, 0.5 o 0) y cómo acabó."""
     yo, otro = VERSIONES[version](), RIVALES[rival]()
     blancas, negras = (yo, otro) if color == chess.WHITE else (otro, yo)
-    resultado, motivo, _ = jugar(blancas, negras, TIEMPO, MAX_MEDIAS, fen_de(APERTURAS[apertura]))
+    resultado, motivo, _ = jugar(blancas, negras, TIEMPO, MAX_MEDIAS, fen_de(APERTURAS[apertura]), reloj=RELOJ)
     return version, rival, puntos(resultado, color), motivo
 
 

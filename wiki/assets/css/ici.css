@@ -289,6 +289,8 @@ img, svg { max-width: 100%; }
   }
   .site-nav ul { padding: .2rem 0 .3rem; }
   .theme { margin-left: auto; }
+  /* en el móvil la cabecera son dos filas: pegajosa se comía un séptimo de la pantalla */
+  .site { position: static; }
 }
 
 /* ============================================================
@@ -314,9 +316,11 @@ img, svg { max-width: 100%; }
 /* en pantallas táctiles, los controles que se usan con el dedo crecen hasta
    una altura cómoda sin cambiar nada en escritorio */
 @media (pointer: coarse) {
-  .theme { padding: .7rem .8rem; }
-  .crumbs a { padding-block: .55rem; }
+  .theme { padding: .7rem .8rem; min-height: 44px; }
+  .crumbs a { padding-block: .55rem; min-height: 44px; display: inline-flex; align-items: center; }
   .site-nav a { padding-block: .7rem; }
+  .demo-btn { min-height: 44px; }
+  .demo input[type="range"] { min-height: 44px; }
 }
 .crumbs span[aria-hidden] { color: var(--line); }
 
@@ -939,7 +943,7 @@ footer.page .credito { font-size: .82rem; }
 [data-b="p2"]   { --b: var(--clyde);  --b-soft: color-mix(in oklab, var(--clyde)  20%, var(--surface)); }
 [data-b="p3"]   { --b: var(--blinky); --b-soft: color-mix(in oklab, var(--blinky) 20%, var(--surface)); }
 [data-b="p4"]   { --b: var(--pinky);  --b-soft: color-mix(in oklab, var(--pinky)  20%, var(--surface)); }
-[data-b="p5"]   { --b: var(--ink);    --b-soft: color-mix(in oklab, var(--ink)    14%, var(--surface)); }
+[data-b="p5"]   { --b: var(--sue);    --b-soft: color-mix(in oklab, var(--sue)    20%, var(--surface)); }
 [data-b="mx"]   { --b: var(--ink-3);    --b-soft: var(--mx-ground); }
 [data-b="cb"]   { --b: var(--pill-ink); --b-soft: color-mix(in oklab, var(--pill)   26%, var(--surface)); }
 [data-b="bn"]   { --b: var(--ok);       --b-soft: color-mix(in oklab, var(--ok)     18%, var(--surface)); }
@@ -956,7 +960,7 @@ footer.page .credito { font-size: .82rem; }
   :root:not([data-theme="light"]) [data-b="p2"] { --b-soft: color-mix(in oklab, var(--clyde) 24%, var(--surface)); }
   :root:not([data-theme="light"]) [data-b="p3"] { --b-soft: color-mix(in oklab, var(--blinky) 24%, var(--surface)); }
   :root:not([data-theme="light"]) [data-b="p4"] { --b-soft: color-mix(in oklab, var(--pinky) 24%, var(--surface)); }
-  :root:not([data-theme="light"]) [data-b="p5"] { --b-soft: color-mix(in oklab, var(--ink) 18%, var(--surface)); }
+  :root:not([data-theme="light"]) [data-b="p5"] { --b-soft: color-mix(in oklab, var(--sue) 24%, var(--surface)); }
   :root:not([data-theme="light"]) [data-b="mx"] { --b-soft: var(--mx-ground); }
   :root:not([data-theme="light"]) [data-b="cb"] { --b-soft: color-mix(in oklab, var(--pill) 26%, var(--surface)); }
   :root:not([data-theme="light"]) [data-b="bn"] { --b-soft: color-mix(in oklab, var(--ok) 26%, var(--surface)); }
@@ -967,10 +971,120 @@ footer.page .credito { font-size: .82rem; }
   :root[data-theme="dark"] [data-b="p2"] { --b-soft: color-mix(in oklab, var(--clyde) 24%, var(--surface)); }
   :root[data-theme="dark"] [data-b="p3"] { --b-soft: color-mix(in oklab, var(--blinky) 24%, var(--surface)); }
   :root[data-theme="dark"] [data-b="p4"] { --b-soft: color-mix(in oklab, var(--pinky) 24%, var(--surface)); }
-  :root[data-theme="dark"] [data-b="p5"] { --b-soft: color-mix(in oklab, var(--ink) 18%, var(--surface)); }
+  :root[data-theme="dark"] [data-b="p5"] { --b-soft: color-mix(in oklab, var(--sue) 24%, var(--surface)); }
   :root[data-theme="dark"] [data-b="mx"] { --b-soft: var(--mx-ground); }
   :root[data-theme="dark"] [data-b="cb"] { --b-soft: color-mix(in oklab, var(--pill) 26%, var(--surface)); }
   :root[data-theme="dark"] [data-b="bn"] { --b-soft: color-mix(in oklab, var(--ok) 26%, var(--surface)); }
+
+/* ============================================================
+   5b. Franja "Ahora" (portada y prácticas) y color de la P5
+   Una píldora por bloque: las cerradas, comidas (hueco con
+   filete); la cuña de Ms. Pac-Man delante de la píldora de
+   poder, que es la del bloque en curso. Nada se mueve al
+   cargar: la cuña sólo mastica en hover o foco.
+   ============================================================ */
+
+/* Sue, el fantasma morado de Ms. Pac-Man: el color de la P5 (antes --ink, que la apagaba) */
+:root { --sue: #7440B5; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --sue: #B99CF6; } }
+:root[data-theme="dark"] { --sue: #B99CF6; }
+
+.ahora {
+  margin-top: var(--gap);
+  max-width: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px 4px 0 0;
+  padding: .9rem 1.05rem 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: .55rem 2rem;
+}
+/* la franja y los datos clave se leen como una sola pieza */
+.ahora + .facts { margin-top: -1px; border-radius: 0 0 4px 4px; }
+.ahora-t {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: .66rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.ahora-pills {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  /* las paredes del pasillo: la fila se lee como un tramo del laberinto */
+  --pared: color-mix(in srgb, var(--maze) 38%, transparent);
+  background:
+    linear-gradient(var(--pared), var(--pared)) 0 .02rem / 100% 1px no-repeat,
+    linear-gradient(var(--pared), var(--pared)) 0 1.72rem / 100% 1px no-repeat;
+}
+.ap { margin: 0; }
+.ap a, .ap .ap-a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .3rem;
+  min-height: 2.75rem;
+  padding: .3rem 0;
+  border-radius: 3px;
+  text-decoration: none;
+  color: var(--ink-2);
+}
+.ap a:hover { background: var(--surface-2); }
+.ap-dot { height: 1.15rem; display: flex; align-items: center; justify-content: center; gap: .18rem; }
+.ap-pill { width: .55rem; height: .55rem; border-radius: 50%; background: var(--b); flex: none; }
+.ap[data-ap="done"] .ap-pill { background: transparent; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--b) 55%, var(--line)); }
+.ap[data-objetivo] .ap-pill { width: 1rem; height: 1rem; box-shadow: 0 0 0 1px var(--due-ring); }
+.ap-num { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .06em; font-variant-numeric: tabular-nums; line-height: 1; }
+.ap[data-ap="done"] .ap-num { color: var(--ink-3); }
+.ap[data-objetivo] .ap-num { color: var(--ink); font-weight: 700; }
+.ap-pac { width: 1.05rem; height: 1.05rem; flex: none; overflow: visible; }
+.ap-pac .pac { fill: var(--pill); }
+.ap-pac .pac-b { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .ap a:hover .pac-a, .ap a:focus-visible .pac-a { animation: chomp-a .34s steps(1) 3; }
+  .ap a:hover .pac-b, .ap a:focus-visible .pac-b { animation: chomp-b .34s steps(1) 3; }
+}
+.ahora-now { min-width: 0; display: flex; flex-direction: column; gap: .2rem; }
+.ahora-txt { margin: 0; max-width: none; font-family: var(--f-display); font-weight: 500; font-size: 1rem; line-height: 1.35; color: var(--ink-2); }
+.ahora-txt b { display: block; font-weight: 700; font-size: 1.08rem; color: var(--ink); letter-spacing: -.012em; }
+.ahora-txt [data-ahora-rel] { font-weight: 700; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ahora-txt [data-ahora-when]:has(+ [data-ahora-rel]:not(:empty))::after { content: ","; }
+.ahora-links { list-style: none; margin: 0; padding: 0; max-width: none; display: flex; flex-wrap: wrap; gap: 0 1.1rem; font-family: var(--f-mono); font-size: .72rem; letter-spacing: .04em; }
+.ahora-links li { margin: 0; }
+.ahora-links a { display: inline-block; padding-block: .3rem; text-decoration: none; }
+.ahora-links a:hover { text-decoration: underline; }
+@media (min-width: 860px) {
+  .ahora { grid-template-columns: minmax(0, 27rem) minmax(0, 1fr); align-items: center; }
+  .ahora-t { grid-column: 1 / -1; }
+  .ahora-now { border-left: 1px solid var(--line-soft); padding-left: 2rem; }
+}
+@media (pointer: coarse) { .ahora-links a { padding-block: .75rem; } }
+/* sin la ficha de la entrega quedan tres datos: en dos columnas, el último ocupa la fila entera */
+@media (max-width: 563px) { .ahora + .facts:not(:has(> .fact-wide)) > .fact:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+
+/* la ficha del paquete de prácticas/index: entera, con su botón de copiar */
+.facts:has(> .fact-wide) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fact-wide { grid-column: 1 / -1; }
+@media (min-width: 860px) {
+  .facts:has(> .fact-wide) { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); }
+  .fact-wide { grid-column: auto; }
+}
+.fact .codigo { margin: .15rem 0 .1rem; }
+/* corta sólo en los puntos (<wbr> en el HTML), nunca a mitad de palabra */
+.fact pre.fact-pre { margin: 0; padding: .45rem 3rem .45rem .7rem; font-size: .82rem; white-space: pre-wrap; }
+.fact .copiar { top: 50%; transform: translateY(-50%); }
+@media (pointer: coarse) { .fact pre.fact-pre { min-height: 2.9rem; padding-right: 3.4rem; display: flex; align-items: center; } }
+
+/* los enlaces de la nota del raíl van dentro de la frase, no en bloque como el índice */
+.rail .rail-note a, .rail .note a { display: inline; padding: 0; font: inherit; color: var(--maze); text-decoration: underline; text-decoration-color: var(--line); }
+.rail .rail-note a:hover, .rail .note a:hover { text-decoration-color: currentColor; }
 
 /* ============================================================
    6. Los bloques del curso (lista, no tarjetas)
@@ -1307,6 +1421,17 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
    lateral, y anterior / siguiente al pie, que es lo que queda en móvil */
 .rail a[aria-current="page"] { color: var(--ink); font-weight: 700; }
 .rail a[aria-current="page"] span { color: var(--ink); }
+/* citas [1] y la lista de referencias del final (las genera tools/build.mjs) */
+.cita { white-space: nowrap; font-size: .85em; color: var(--ink-3); }
+.cita a { color: var(--maze); text-decoration: none; }
+.cita a:hover { text-decoration: underline; }
+.referencias ol { padding-left: 2.2rem; font-size: .92rem; color: var(--ink-2); }
+.referencias li { margin-bottom: .5rem; padding: .15rem .4rem; border-radius: 4px; scroll-margin-top: 6rem; overflow-wrap: anywhere; }
+.referencias li::marker { content: "[" counter(list-item) "]  "; font-family: var(--f-mono); font-size: .8rem; color: var(--ink-3); }
+.referencias li:target { background: var(--pill-soft); }
+.referencias a.volver { text-decoration: none; color: var(--maze); }
+[id^="cita-"] { scroll-margin-top: 6rem; }
+
 .pager {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1335,6 +1460,71 @@ h2 code, h3 code, h4 code, figcaption code, .note-label code, thead th code,
 .pager-prev .pager-l::before { content: "← "; color: var(--maze); }
 .pager-next .pager-l::after { content: " →"; color: var(--maze); }
 .pager a:hover .pager-t { color: var(--maze); }
+
+/* ============================================================
+   Apuntes: el índice de apuntes, el índice de la página en móvil
+   y las píldoras de lectura. Los dos últimos los crea ici.js:
+   sin JavaScript no existen y la página queda como antes.
+   ============================================================ */
+
+/* índice de apuntes: a partir de 780 px, título y etiqueta a la izquierda y
+   la descripción a la derecha con su medida, sin medio ancho vacío */
+.guia-p > h3:first-child { margin-top: 0; }
+.guia-p + .guia-p { margin-top: 2.25rem; }
+.guia-p h3 .chip { vertical-align: .15em; margin-left: .35rem; }
+.links.indice a { grid-template-columns: minmax(0, 1fr); }
+.links.indice .lm { white-space: normal; }
+@media (min-width: 780px) {
+  .links.indice { max-width: none; }
+  .links.indice a { grid-template-columns: minmax(12rem, 18rem) minmax(0, var(--measure)); grid-template-rows: auto 1fr; gap: .3rem 2.25rem; align-items: start; justify-content: start; }
+  .links.indice .lt { grid-column: 1; grid-row: 1; }
+  .links.indice .lm { grid-column: 1; grid-row: 2; white-space: normal; }
+  .links.indice .ld { grid-column: 2; grid-row: 1 / span 2; }
+}
+
+/* índice de la página por debajo de 1020 px, donde no hay raíl */
+.indice-movil { border-top: 1px solid var(--line); }
+.indice-movil > summary {
+  cursor: pointer;
+  padding: .85rem 0;
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--maze);
+}
+.indice-movil nav { padding-bottom: .9rem; }
+.indice-movil-h { font-family: var(--f-mono); font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); margin: .3rem 0 .4rem; }
+.indice-movil ol, .indice-movil ul { list-style: none; margin: 0; padding: 0; max-width: none; }
+.indice-movil li { border-top: 1px solid var(--line-soft); margin: 0; }
+.indice-movil a { display: block; padding: .55rem 0; font-family: var(--f-display); font-size: .92rem; font-weight: 500; line-height: 1.3; color: var(--ink-2); text-decoration: none; }
+.indice-movil a:hover { color: var(--maze); }
+.indice-movil a:has(> span) { display: grid; grid-template-columns: 1.9rem minmax(0, 1fr); gap: 0 .45rem; align-items: baseline; }
+.indice-movil a em, .indice-movil a span { font-family: var(--f-mono); font-style: normal; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--maze); }
+.indice-movil a em { display: block; }
+.indice-movil a[aria-current="page"], .indice-movil a[aria-current="page"] span { color: var(--ink); font-weight: 700; }
+@media (min-width: 1020px) { .indice-movil { display: none; } }
+@media (pointer: coarse) { .indice-movil a { padding-block: .8rem; } }
+
+/* píldoras de lectura al pie de los apuntes: una por página del tema, en el
+   color del bloque; la leída, comida (hueco); la actual, Ms. Pac-Man; y la
+   de poder, que se enciende con el tema completo */
+.pildoras { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem 1rem; max-width: none; }
+.pildoras-txt { margin: 0; font-family: var(--f-mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.pildoras ol { list-style: none; display: flex; flex-wrap: wrap; align-items: center; margin: 0; padding: 0; max-width: none; }
+.pildoras li { margin: 0; display: flex; }
+.pildoras a { display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; }
+.pildora { display: block; width: .5rem; height: .5rem; border-radius: 50%; background: var(--b); }
+.pildora.comida { background: transparent; box-shadow: inset 0 0 0 1px var(--ink-3); }
+.pildora-pac { width: 1.05rem; height: 1.05rem; fill: var(--pill); stroke: var(--due-ring); stroke-width: 1.2; }
+.pildora-poder span { display: block; width: .95rem; height: .95rem; margin-left: .3rem; border-radius: 50%; border: 1px dashed var(--ink-3); }
+.pildoras.completo .pildora-poder span { background: var(--pill); border: 1px solid var(--due-ring); }
+@media (prefers-reduced-motion: no-preference) {
+  .pildora { transition: transform .15s cubic-bezier(.16,1,.3,1); }
+  .pildoras a:hover .pildora { transform: scale(1.5); }
+}
+@media (pointer: coarse) { .pildoras a { width: 2.75rem; height: 2.75rem; } }
+@media print { .indice-movil, .pildoras { display: none; } }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -1434,7 +1624,7 @@ table caption {
   padding: 1rem 1.1rem;
 }
 .mision img { width: 4.5rem; height: 4.5rem; }
-.mision h4, .enemigo h4 {
+.mision h4, .mision h3, .enemigo h4 {
   font-family: var(--f-display);
   font-weight: 600;
   font-size: 1.04rem;
@@ -1443,15 +1633,23 @@ table caption {
   color: var(--ink);
   margin: 0 0 .4rem;
 }
-.mision h4 .chip { vertical-align: .15em; margin-left: .3rem; }
+.mision h4 .chip, .mision h3 .chip { vertical-align: .15em; margin-left: .3rem; }
 .valor { font-family: var(--f-mono); font-size: .82rem; font-weight: 500; color: var(--ok); margin-left: .25rem; white-space: nowrap; }
 .mision p { font-size: .95rem; margin: 0 0 .5rem; }
 .mision p:last-child { margin: 0; }
 .mision .entrega { color: var(--ink-2); }
 .mision .entrega b { color: var(--ink); font-weight: 600; }
-@media (max-width: 520px) {
-  .mision { grid-template-columns: 3rem minmax(0, 1fr); gap: .75rem; padding: .85rem .9rem; }
-  .mision img { width: 3rem; height: 3rem; }
+/* en móvil el cristal se encoge y se pone en línea con el título, y el
+   texto ocupa todo el ancho de la tarjeta */
+@media (max-width: 559px) {
+  .mision { grid-template-columns: 2.25rem minmax(0, 1fr); gap: .5rem .7rem; padding: .85rem .9rem; }
+  .mision img { width: 2.25rem; height: 2.25rem; grid-column: 1; grid-row: 1; }
+  .mision > div { display: contents; }
+  .mision > div > * { grid-column: 1 / -1; }
+  .mision > div > :is(h3, h4):first-child { grid-column: 2; grid-row: 1; align-self: center; margin: 0; line-height: 1.5; }
+  .mision :is(h3, h4) .chip { margin-left: 0; white-space: nowrap; }
+  .mision :is(h3, h4) .valor { margin-left: 0; margin-right: .3rem; }
+  .mision :is(h3, h4) .hecha { float: none; display: flex; width: fit-content; margin: .35rem 0 0; }
 }
 
 /* una pista dentro de una misión: plegada y discreta */
@@ -1466,7 +1664,8 @@ table caption {
 .marcador-total { font-family: var(--f-mono); font-size: .9rem; color: var(--ink-3); }
 .marcador-total b { font-family: var(--f-display); font-size: 1.9rem; font-weight: 700; color: var(--ink); }
 .marcador-barra { height: .55rem; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin: .45rem 0 .5rem; }
-.marcador-barra span { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--maze); transition: width .5s cubic-bezier(.2, .8, .2, 1); }
+/* se llena con scaleX (ici.js), que no recalcula la maqueta en cada paso */
+.marcador-barra span { display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: left; background: var(--maze); transition: transform .5s cubic-bezier(.2, .8, .2, 1); }
 .marcador.lleno .marcador-barra span { background: var(--pill); }
 .marcador-nota { font-size: .85rem; color: var(--ink-3); margin: 0 0 .5rem; }
 .marcador .check { margin: 0 0 .6rem; }
@@ -2101,6 +2300,8 @@ figure.lab-uno { max-width: 17rem; }
   margin-bottom: .25rem;
 }
 .demo-head h4 { margin: 0; font-size: 1rem; }
+/* el título del ejemplo es un h3 (va bajo el h2 de la sección) con el aspecto del h4 */
+.demo-head h3 { margin: 0; font-family: var(--f-mono); font-weight: 500; font-size: 1rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
 .demo-stage { background: var(--surface-2); }
 .demo-svg { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
 .demo-nojs { margin: 0; padding: 1rem .9rem; font-size: .92rem; color: var(--ink-3); max-width: none; }
@@ -2481,7 +2682,7 @@ figure.lab-uno { max-width: 17rem; }
 .bz-mat tr.bz-sup th, .bz-mat tr.bz-sup td { border-top: 1.5px solid var(--ink-3); font-weight: 700; color: var(--ink); }
 .bz-celda { font: inherit; color: var(--ink); background: none; border: 0; padding: .28rem .5rem; width: 100%; cursor: pointer; }
 .bz-celda:hover { background: var(--surface-2); }
-.bz-celda[aria-pressed="true"] { background: var(--pill); color: var(--ink); font-weight: 700; }
+.bz-celda[aria-pressed="true"] { background: var(--pill-soft); color: var(--ink); box-shadow: inset 0 0 0 2px var(--pill-ink); font-weight: 700; }
 .bz-celda:focus-visible { outline: 2px solid var(--maze); outline-offset: -2px; }
 .bz-op { font-family: var(--f-mono); font-size: 1.1rem; color: var(--ink-3); }
 .bz-par { display: flex; align-items: center; gap: .7rem; min-width: 0; }
@@ -2506,6 +2707,13 @@ figure.lab-uno { max-width: 17rem; }
 .mc-svg { cursor: default; }
 .mc-t { font-family: var(--f-mono); font-size: 10.5px; fill: var(--ink-2); }
 .mc-centro { text-anchor: middle; }
+/* tema 6: la similitud no es transitiva (tres figuras) */
+.sim-rojo { fill: var(--blinky); }
+.sim-azul { fill: var(--maze); }
+.sim-si { fill: none; stroke: var(--ok); stroke-width: 2; }
+.sim-no { fill: none; stroke: var(--bad); stroke-width: 2; stroke-dasharray: 6 4; }
+.mc-t.sim-si-t { fill: var(--ok); font-weight: 700; }
+.mc-t.sim-no-t { fill: var(--bad); font-weight: 700; }
 .mc-dcha { text-anchor: end; }
 .mc-tenue { fill: var(--ink-3); color: var(--ink-3); }
 .mc-ucb { fill: var(--pill-ink); font-weight: 700; }
@@ -2541,11 +2749,24 @@ figure.lab-uno { max-width: 17rem; }
 .mc-c4-hueco.ultima { stroke: var(--ink); stroke-width: 3; }
 .mc-c4-zona { fill: transparent; cursor: pointer; }
 .mc-c4-zona:hover { fill: var(--ink); fill-opacity: .06; }
-.mc-det { min-width: 30rem; font-variant-numeric: tabular-nums; }
-.mc-det td, .mc-det th { text-align: center; }
-.mc-det td.mejor { background: var(--pill-soft); font-weight: 700; }
-.mc-det .mc-palo { font-size: 1.15rem; }
-.mc-det .mc-medias th, .mc-det .mc-medias td { border-top: 1.5px solid var(--ink-3); font-weight: 700; }
+/* determinizar: el mundo inventado frente a la mesa de verdad */
+.det-svg .mc-t { font-size: 13px; }
+.det-svg .det-titulo { font-family: var(--f-display); font-size: 15px; font-weight: 700; fill: var(--ink); }
+.det-svg .det-izq { text-anchor: start; }
+.det-svg .det-num { font-weight: 700; fill: var(--ink); }
+.det-svg .det-ok { fill: var(--ok); font-weight: 700; }
+.det-svg .det-mal { fill: var(--bad); font-weight: 700; }
+.det-carta { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.5; }
+.det-dorso { fill: var(--maze); stroke: var(--ink-3); stroke-width: 1.5; }
+.det-palo { font-size: 44px; text-anchor: middle; }
+.det-rojo { fill: var(--blinky); }
+.det-negro { fill: var(--ink); }
+.det-q { font-family: var(--f-display); font-size: 36px; font-weight: 800; text-anchor: middle; fill: #fff; }
+.det-sep { stroke: var(--line); stroke-width: 1; }
+.det-fondo { fill: var(--surface); stroke: var(--line); }
+.det-cree { fill: var(--pill); }
+.det-mesa { fill: var(--maze); }
+.det-b { fill: var(--ink-3); }
 /* el árbol de un ejemplo de los apuntes: nodos de jugador, de azar y conjuntos de información */
 .mc-nodo { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.4; }
 .mc-nodo.max { fill: var(--maze-soft); stroke: var(--maze); }
@@ -2636,3 +2857,293 @@ figure.lab-uno { max-width: 17rem; }
 .mision .tableros > div:only-child { width: 14rem; }
 .mision .tableros p { margin-top: .55rem; }
 .mision .pseudo { white-space: pre-wrap; font-size: .9rem; margin: .5rem 0 0; }
+
+/* ---- tema 6: razonamiento basado en casos (assets/js/cbr.js) ----
+   Las tres acciones de los ejemplos con tres colores de fantasma, y además
+   con tres formas (triángulo, cuadrado, círculo) para que no dependa sólo del
+   color. La consulta, en amarillo de píldora con filo oscuro. */
+.cb-svg { cursor: crosshair; max-width: 46rem; margin: 0 auto; }
+.cb-svg:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.cb-t { font-family: var(--f-mono); font-size: 10.5px; fill: var(--ink-2); }
+.cb-centro { text-anchor: middle; }
+.cb-dcha { text-anchor: end; }
+.cb-tenue { fill: var(--ink-3); }
+.cb-eje { fill: var(--ink-3); }
+.cb-fondo { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+.cb-rej { stroke: var(--line-soft); stroke-width: 1; }
+.cb-caso { stroke: var(--surface); stroke-width: 1.2; }
+.cb-huir { fill: var(--blinky); }
+.cb-pild { fill: var(--maze); }
+.cb-comer { fill: var(--ok); }
+.cb-region { stroke: none; opacity: .16; }
+.cb-consulta { fill: var(--pill); stroke: var(--ink); stroke-width: 1.6; }
+.cb-anillo { fill: none; stroke: var(--pill-ink); stroke-width: 2; }
+.cb-hilo { stroke: var(--pill-ink); stroke-width: 1.2; stroke-dasharray: 3 2; }
+.cb-leyenda { display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; margin: 0; padding: .5rem .9rem; border-top: 1px solid var(--line-soft); font: 500 .74rem/1.4 var(--f-mono); color: var(--ink-2); max-width: none; }
+.cb-leyenda span { display: inline-flex; align-items: center; gap: .3rem; }
+.cb-cuentas { margin: 0; border: 0; border-top: 1px solid var(--line-soft); border-radius: 0; background: var(--surface); font-size: .74rem; line-height: 1.6; white-space: pre; overflow-x: auto; }
+.cb-linea { stroke: var(--ink-3); stroke-width: 1.5; }
+.cb-cero { stroke: var(--line); stroke-width: 1; }
+.cb-cruce { fill: var(--surface); stroke: var(--maze); stroke-width: 2; cursor: pointer; }
+.cb-cruce.sel { fill: var(--pill); stroke: var(--ink); }
+.cb-cruce.fin { stroke: var(--ink-3); stroke-dasharray: 2 2; cursor: default; }
+.cb-cruce:focus-visible { outline: none; stroke: var(--focus); stroke-width: 3; }
+.cb-ventana { fill: var(--pill-soft); stroke: var(--pill-ink); stroke-width: 1; stroke-dasharray: 3 2; }
+.cb-evento { font-size: 9.5px; }
+.cb-bueno { fill: var(--ok); font-weight: 700; }
+.cb-muerte { fill: var(--bad); font-weight: 700; }
+.cb-barra { fill: var(--maze); opacity: .55; }
+.cb-barra.mala { fill: var(--bad); }
+.cb-barra.sel { opacity: 1; }
+.cb-tabla { font-variant-numeric: tabular-nums; margin: 0; }
+.cb-tabla td + td, .cb-tabla th + th { text-align: right; }
+/* el ciclo de las cuatro R y los diagramas estáticos del tema */
+.cb-fase { fill: var(--surface-2); stroke: var(--maze); stroke-width: 1.6; }
+.cb-fase-t { font: 700 14px var(--f-display); fill: var(--ink); text-anchor: middle; }
+.cb-flecha { fill: none; stroke: var(--ink-3); stroke-width: 1.6; marker-end: url(#cb-punta); }
+.cb-punta { fill: var(--ink-3); }
+.cb-base { fill: var(--pill-soft); stroke: var(--pill-ink); stroke-width: 1.6; }
+.cb-pac { fill: var(--pill); stroke: var(--pill-ink); stroke-width: 1; }
+.cb-muro { fill: var(--maze-soft); stroke: var(--maze); stroke-width: 1.4; }
+.cb-fantasma { fill: var(--blinky); }
+.cb-ruta { fill: none; stroke: var(--ok); stroke-width: 2.4; marker-end: url(#cb-punta-ok); }
+.cb-ruta.mala { stroke: var(--bad); marker-end: url(#cb-punta-mal); }
+
+/* ---- tema bonus: Código Secreto (assets/js/codenames.js) ----
+   Los colores de la tarjeta: rojo, azul, neutral y el asesino. Cada carta con
+   color lleva además su nombre escrito en una esquina, para que no dependa
+   sólo del color. La carta con la clave a la vista lleva un marco grueso de su
+   color; descubierta, va rellena. */
+:root { --cn-r: #B03A2E; --cn-a: #28527A; --cn-n: #9C8B6E; --cn-x: #14192B; --cn-papel: #FBF7EE; --cn-tinta: #14192B; --cn-sobre: #FFFFFF; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --cn-r: #E06A5C; --cn-a: #6E9BD8; --cn-n: #A3937A; --cn-x: #05070D; --cn-papel: #232A40; --cn-tinta: #E7EBF6; --cn-sobre: #0C1020; }
+}
+:root[data-theme="dark"] { --cn-r: #E06A5C; --cn-a: #6E9BD8; --cn-n: #A3937A; --cn-x: #05070D; --cn-papel: #232A40; --cn-tinta: #E7EBF6; --cn-sobre: #0C1020; }
+.demo-bar[hidden] { display: none; }
+.cn-tablero { display: grid; grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr)); gap: .4rem; padding: .8rem .9rem; max-width: 46rem; margin: 0 auto; }
+.cn-carta {
+  position: relative; min-height: 3.6rem; display: grid; place-items: center; padding: .9rem .25rem .45rem;
+  border: 1px solid var(--line); border-radius: 4px; background: var(--cn-papel); color: var(--cn-tinta);
+  font: 650 .8rem/1.1 var(--f-display); letter-spacing: .04em; text-align: center; overflow-wrap: anywhere; hyphens: auto;
+}
+button.cn-carta { cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
+button.cn-carta:hover { border-color: var(--ink); }
+button.cn-carta:active { transform: scale(.97); }
+button.cn-carta:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.cn-tipo { position: absolute; top: .2rem; left: .3rem; font: 500 .52rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; opacity: .9; }
+.cn-carta.clave.cn-R { box-shadow: inset 0 0 0 3px var(--cn-r); background: color-mix(in srgb, var(--cn-r) 12%, var(--cn-papel)); }
+.cn-carta.clave.cn-A { box-shadow: inset 0 0 0 3px var(--cn-a); background: color-mix(in srgb, var(--cn-a) 12%, var(--cn-papel)); }
+.cn-carta.clave.cn-N { box-shadow: inset 0 0 0 3px var(--cn-n); }
+.cn-carta.clave.cn-X { box-shadow: inset 0 0 0 3px var(--cn-x); background: color-mix(in srgb, var(--cn-x) 22%, var(--cn-papel)); }
+.cn-carta.clave .cn-tipo { color: var(--ink-2); }
+.cn-carta.vista { color: var(--cn-sobre); border-color: transparent; }
+.cn-carta.vista.cn-X { color: #fff; border-color: var(--ink-3); }
+.cn-carta.vista.cn-R { background: var(--cn-r); }
+.cn-carta.vista.cn-A { background: var(--cn-a); }
+.cn-carta.vista.cn-N { background: var(--cn-n); }
+.cn-carta.vista.cn-X { background: var(--cn-x); }
+.cn-carta.vista .cn-w { opacity: .8; }
+.cn-carta.marca { outline: 3px solid var(--pill); outline-offset: 1px; }
+@media (max-width: 560px) {
+  .cn-tablero { gap: .25rem; padding: .6rem .5rem; }
+  .cn-carta { min-height: 3rem; font-size: .6rem; letter-spacing: 0; padding: .8rem .1rem .35rem; }
+  .cn-tipo { font-size: .44rem; left: .2rem; }
+}
+/* el tablero ordenado por parecido con la pista */
+.cn-ranking { list-style: none; margin: 0 auto; padding: .5rem .9rem .8rem; display: grid; gap: .22rem; max-width: 46rem; }
+.cn-fila { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr) 3rem 4.4rem; align-items: center; gap: .5rem; font: .72rem/1.2 var(--f-mono); color: var(--ink-2); }
+.cn-fila .w { font-weight: 700; color: var(--ink); letter-spacing: .03em; }
+.cn-fila .barra { height: .75rem; background: var(--line-soft); border-radius: 2px; position: relative; overflow: hidden; }
+.cn-fila .barra i { position: absolute; inset: 0 auto 0 0; background: var(--ink-3); border-radius: 2px; }
+.cn-fila.cn-R .barra i { background: var(--cn-r); }
+.cn-fila.cn-A .barra i { background: var(--cn-a); }
+.cn-fila.cn-N .barra i { background: var(--cn-n); }
+.cn-fila.cn-X .barra i { background: var(--cn-x); }
+.cn-fila .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+.cn-fila .tipo { font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.cn-fila.cn-corte { border-top: 2px dashed var(--pill-ink); padding-top: .3rem; margin-top: .15rem; }
+@media (max-width: 560px) { .cn-fila { grid-template-columns: 5.6rem minmax(0, 1fr) 2.6rem; } .cn-fila .tipo { display: none; } }
+/* el coseno entre dos palabras */
+.cn-coseno { padding: .9rem; max-width: 46rem; margin: 0 auto; }
+.cn-cifra { margin: 0 0 .4rem; font: .85rem var(--f-mono); color: var(--ink-2); max-width: none; }
+.cn-cifra b { font-size: 1.15rem; color: var(--ink); }
+.cn-medidor { height: .8rem; border-radius: 2px; background: var(--line-soft); position: relative; overflow: hidden; }
+.cn-medidor i { position: absolute; inset: 0 auto 0 0; background: var(--maze); }
+.cn-vecinas { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .6rem 1.4rem; margin-top: .9rem; }
+.cn-vecinas h5 { margin: 0 0 .25rem; font: 500 .66rem var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.cn-vecinas ol { margin: 0; padding-left: 1.4rem; font: .76rem/1.55 var(--f-mono); color: var(--ink-2); columns: 2; }
+.cn-texto { font: .85rem var(--f-mono); padding: .3rem .45rem; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); color: var(--ink); }
+.cn-texto:focus-visible, .cn-select:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.cn-select { font: .78rem var(--f-display); padding: .28rem .35rem; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); color: var(--ink); max-width: 100%; }
+.cn-aviso { margin: 0; padding: 0 .9rem .5rem; font: .76rem var(--f-mono); color: var(--bad); max-width: none; }
+.cn-aviso:empty, .cn-sugerencia:empty { display: none; }
+.cn-sugerencia { margin: 0; padding: 0 .9rem .6rem; font: .76rem var(--f-mono); color: var(--pill-ink); max-width: none; }
+.cn-opciones { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; padding: .2rem .9rem 0; max-width: 46rem; margin: 0 auto; }
+.cn-tabla { margin: 0; font-variant-numeric: tabular-nums; }
+.cn-liga { padding: .6rem .9rem; }
+.cn-liga:empty { display: none; }
+.cn-eq { font-weight: 700; }
+.cn-eq.cn-R { color: var(--cn-r); }
+.cn-eq.cn-A { color: var(--cn-a); }
+/* el simulador */
+.cn-config { border-bottom: 1px solid var(--line); background: var(--surface); }
+.cn-puestos { margin: 0; border-collapse: collapse; font-size: .78rem; width: auto; min-width: 0; }
+.cn-puestos th, .cn-puestos td { padding: .2rem .5rem .2rem 0; border: 0; text-align: left; }
+.cn-puestos thead th { font: 500 .62rem var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.cn-estado { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .9rem; padding: .6rem .9rem; font: .8rem var(--f-display); color: var(--ink-2); }
+.cn-marcador { padding: .2rem .55rem; border-radius: 3px; border: 1px solid var(--line); background: var(--surface); }
+.cn-marcador.cn-R b { color: var(--cn-r); }
+.cn-marcador.cn-A b { color: var(--cn-a); }
+.cn-marcador.turno.cn-R { border-color: var(--cn-r); box-shadow: inset 0 -3px 0 var(--cn-r); }
+.cn-marcador.turno.cn-A { border-color: var(--cn-a); box-shadow: inset 0 -3px 0 var(--cn-a); }
+.cn-quien { color: var(--ink); }
+.cn-pista-actual { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .7rem; margin: 0 auto; padding: .4rem .9rem 0; max-width: 46rem; }
+.cn-pista-actual b { font: 800 1.25rem var(--f-display); letter-spacing: .04em; }
+.cn-pista-actual.cn-R b { color: var(--cn-r); }
+.cn-pista-actual.cn-A b { color: var(--cn-a); }
+.cn-quedan { font: .74rem var(--f-mono); color: var(--ink-3); }
+.cn-ojo { margin: 0 auto; padding: 0 .9rem .5rem; max-width: 46rem; font: .72rem var(--f-mono); color: var(--pill-ink); }
+.cn-form, .cn-acciones { max-width: 46rem; margin: 0 auto; }
+.cn-cortina { padding: 2.4rem 1rem 2.6rem; text-align: center; background: var(--surface-2); }
+.cn-cortina p { margin: 0 auto .8rem; max-width: 34rem; }
+.cn-cortina-t { font: 800 1.3rem var(--f-display); color: var(--ink); }
+.cn-historial { border-top: 1px solid var(--line-soft); padding: .6rem .9rem .8rem; background: var(--surface); }
+.cn-historial:empty { display: none; }
+.cn-historial h5 { margin: 0 0 .35rem; font: 500 .66rem var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.cn-historial ol { margin: 0; padding: 0; list-style: none; display: grid; gap: .45rem; }
+.cn-historial li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .4rem; font: .76rem/1.4 var(--f-mono); color: var(--ink-2); padding-left: .55rem; border-left: 3px solid var(--line); }
+.cn-historial li.cn-R { border-left-color: var(--cn-r); }
+.cn-historial li.cn-A { border-left-color: var(--cn-a); }
+.cn-historial li > b { color: var(--ink); margin-right: .2rem; }
+.cn-intento { padding: .05rem .35rem; border-radius: 2px; color: var(--cn-sobre); font-size: .68rem; }
+.cn-intento.cn-R { background: var(--cn-r); }
+.cn-intento.cn-A { background: var(--cn-a); }
+.cn-intento.cn-N { background: var(--cn-n); }
+.cn-intento.cn-X { background: var(--cn-x); color: #fff; }
+.cn-secreto { flex-basis: 100%; font-size: .68rem; color: var(--ink-3); }
+/* el tablero dibujado a mano en los apuntes (figuras estáticas) */
+.cn-fig .cn-tablero { padding: 0; margin: 0; }
+.cn-resultado { margin: 0; padding-left: 1.5rem; columns: 2; font: .8rem/1.7 var(--f-mono); color: var(--ink-2); }
+.cn-resultado b { color: var(--ink); font-weight: 500; margin-right: .5rem; }
+.cn-resultado .primera b { font-weight: 700; color: var(--maze); }
+.cn-dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); gap: 1rem 1.25rem; margin: 0 0 1.6rem; }
+.cn-dos figure { margin: 0; }
+.cn-dos .cn-tablero { gap: .25rem; }
+.cn-dos .cn-carta { min-height: 2.9rem; font-size: .6rem; letter-spacing: 0; padding: .75rem .1rem .3rem; }
+.cn-dos .cn-tipo { font-size: .44rem; }
+figure.cn-fig { max-width: 46rem; }
+.narrow-tab .cn-tablero { max-width: 30rem; }
+/* los dibujos de vectores y el mapa de palabras */
+.cn-eje { stroke: var(--ink-3); stroke-width: 1.2; }
+.cn-vec { stroke: var(--maze); stroke-width: 2.4; }
+.cn-vec.b { stroke: var(--inky); }
+.cn-vec.c { stroke: var(--cn-r); }
+.cn-punta { fill: var(--ink-2); }
+.cn-arco { fill: none; stroke: var(--pill-ink); stroke-width: 1.4; }
+.cn-arco.largo { stroke-dasharray: 3 2; }
+.cn-t-arco { fill: var(--pill-ink); }
+.cn-t-vec { fill: var(--ink); font-weight: 500; }
+.cn-mapa-fondo { fill: var(--surface); stroke: var(--line); }
+.cn-mapa-p { stroke: var(--surface); stroke-width: 1.2; }
+.cn-mapa-p.g0 { fill: var(--inky); }
+.cn-mapa-p.g1 { fill: var(--pill-ink); }
+.cn-mapa-p.g2 { fill: var(--cn-r); }
+.cn-mapa-p.g3 { fill: var(--maze); }
+.cn-mapa-t { fill: var(--ink); }
+/* la recta del margen en la página de estrategias */
+.cn-recta { stroke: var(--ink-3); stroke-width: 1.2; }
+.cn-banda { fill: var(--pill-soft); stroke: var(--pill-ink); stroke-width: 1; stroke-dasharray: 3 2; }
+.cn-punto { stroke: var(--surface); stroke-width: 1.2; }
+.cn-punto.cn-R { fill: var(--cn-r); } .cn-punto.cn-A { fill: var(--cn-a); } .cn-punto.cn-N { fill: var(--cn-n); } .cn-punto.cn-X { fill: var(--cn-x); stroke: var(--ink-3); }
+.cn-th.cn-R { color: var(--cn-r); } .cn-th.cn-A { color: var(--cn-a); } .cn-th.cn-N { color: var(--ink-3); } .cn-th.cn-X { color: var(--ink); text-decoration: underline; }
+.demo-controls:empty { display: none; }
+.cn-arco.grueso { stroke-width: 3; }
+@media (max-width: 560px) {
+  .cn-puestos .demo-grupo { flex-direction: column; align-items: stretch; gap: .2rem; }
+  .cn-puestos th, .cn-puestos td { padding-right: .35rem; vertical-align: top; }
+  .cn-bar-puestos { overflow-x: auto; }
+}
+
+/* ============================================================
+   Tabla de récords: los dos rankings de cada concurso (resultados de las
+   prácticas 1 a 4, generados por tools/resultados-pN.py) como la tabla de
+   puntuaciones de una recreativa. Sin letra de píxeles: cifras en columna,
+   filetes punteados y el primero en píldora.
+   ============================================================ */
+.records tbody th, .records tbody td { border-bottom: 1px dotted var(--line); vertical-align: baseline; }
+.records tbody tr:last-child > * { border-bottom: none; }
+.records td.num-col { font-family: var(--f-mono); font-size: .82rem; }
+.records tbody td:first-child { color: var(--ink-3); width: 3.6rem; padding-right: 1.2rem; }
+.records tbody th { letter-spacing: .06em; }
+.records tbody td:nth-child(3) { font-weight: 700; color: var(--ink); }
+.records tbody td:nth-child(4) { color: var(--ink-3); }
+.records tbody tr:first-child > * { background: var(--pill-soft); }
+.records tbody tr:first-child td:first-child,
+.records tbody tr:first-child td:last-child { color: var(--pill-ink); font-weight: 700; }
+.records tbody tr:first-child th { font-weight: 700; color: var(--ink); }
+.records tbody tr.fuera > * { color: var(--ink-3); font-weight: 400; }
+/* la píldora de poder del primero, con el filo de la del calendario */
+.records tbody tr:first-child td:first-child::before {
+  content: ""; display: inline-block; width: .6rem; height: .6rem; margin-right: .5rem; vertical-align: .02em;
+  border-radius: 50%; background: var(--pill); box-shadow: 0 0 0 1px var(--pill-ink);
+}
+
+/* ============================================================
+   Marcador en el raíl y la cuña que muerde (guía de la Práctica 5)
+   ============================================================ */
+.marcador-fila { display: flex; align-items: center; gap: .45rem; margin: .45rem 0 .5rem; }
+.marcador-fila .marcador-barra { flex: 1; margin: 0; }
+.marcador-pac { width: 1rem; height: 1rem; flex: none; overflow: visible; }
+.marcador-pac .pac { fill: var(--pill); stroke: var(--pill-ink); stroke-width: 1.2; }
+.marcador-pac .pac-b { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .marcador.muerde .marcador-pac .pac-a { animation: chomp-a .34s steps(1) 1; }
+  .marcador.muerde .marcador-pac .pac-b { animation: chomp-b .34s steps(1) 1; }
+}
+.rail .marcador-rail { margin: 0; padding: .75rem .8rem .55rem; max-width: none; }
+.rail .marcador-rail h2 { margin: 0; }
+.marcador-rail .marcador-total { white-space: nowrap; }
+.marcador-rail .marcador-total b { font-size: 1.35rem; }
+.marcador-rail .marcador-fila { margin: .3rem 0 .55rem; }
+.rail .marcador-bonus li { display: flex; align-items: baseline; gap: .35rem; }
+.rail .marcador-bonus li:last-child { border-bottom: none; }
+.rail .marcador-bonus a { flex: 1 1 auto; display: flex; align-items: baseline; padding: .2rem 0; font-size: .8rem; }
+/* puntos guía entre el nombre y lo que vale */
+.rail .marcador-bonus a::after { content: ""; flex: 1 0 .6rem; margin-left: .35rem; border-bottom: 1px dotted var(--line); }
+.marcador-retos .pts { font-family: var(--f-mono); font-size: .74rem; font-variant-numeric: tabular-nums; color: var(--ink-3); white-space: nowrap; }
+.marcador-bonus .pts { font-family: var(--f-mono); font-size: .74rem; font-variant-numeric: tabular-nums; color: var(--ink-2); min-width: 2.6rem; text-align: right; }
+.marcador-bonus li.hecho a { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+.marcador-bonus li.hecho .pts { color: var(--ok); font-weight: 700; }
+.marcador-bonus-t { font-family: var(--f-mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin: .7rem 0 .25rem; }
+@media print { .marcador-rail { display: none; } }
+
+/* la guía paso a paso enlazada desde el dato "Para empezar" de un enunciado */
+.fact dd a .arrow { display: inline-block; margin-left: .3rem; transition: transform .18s cubic-bezier(.16,1,.3,1); }
+.fact dd a:hover .arrow { transform: translateX(.2rem); }
+
+/* ============================================================
+   404: un callejón sin salida con un fantasma dentro
+   ============================================================ */
+@media (min-width: 900px) {
+  .nf { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
+}
+.nf-mapa { display: block; width: 100%; max-width: 34rem; height: auto; margin: 0 0 1.5rem; }
+.nf-suelo { fill: var(--surface); }
+.nf-muro { fill: var(--maze); fill-opacity: .16; stroke: var(--maze); stroke-opacity: .45; stroke-width: .5; }
+.nf-pi { fill: var(--pill-ink); }
+.nf-pac { fill: var(--pill); stroke: var(--pill-ink); stroke-width: .8; }
+.nf-gh { fill: var(--blinky); }
+.nf-ojo { fill: #fff; }
+.nf-pupilas { fill: var(--mx-ground); }
+.nf-salida rect { fill: transparent; }
+.nf-salida text { font-family: var(--f-mono); font-size: 10px; font-weight: 500; letter-spacing: .8px; text-anchor: middle; fill: var(--ink-2); }
+.nf-salida:hover text { fill: var(--maze); text-decoration: underline; }
+/* el fantasma busca la salida con la mirada de vez en cuando; nada más se mueve */
+@media (prefers-reduced-motion: no-preference) {
+  .nf-pupilas { animation: nf-mira 7s ease-in-out infinite; }
+  @keyframes nf-mira {
+    0%, 70%, 100% { transform: translate(0, 0); }
+    76%, 84% { transform: translate(1.1px, -1.3px); }
+    90%, 96% { transform: translate(1.1px, 1.1px); }
+  }
+}

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>El simulador · Tema bonus · ICI</title>
+<meta name="description" content="Simulador de Código Secreto en la página: partidas con semilla, cada uno de los cuatro puestos (jefe de espías y agente de cada equipo) para una persona o para la máquina, las estrategias de la página 03 y una cortina para pasaros el ordenador sin ver la tarjeta.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema bonus</a>
+    <span aria-hidden="true">/</span>
+    <span>El simulador</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema bonus · 05 · Juegos de lenguaje</p>
+    <h1>
+      El simulador
+      <span class="thin">Jugad contra la máquina, con ella o entre vosotros.</span>
+    </h1>
+    <p class="standfirst">
+      Una partida entera de Código Secreto con las 239 palabras y los vectores de las páginas anteriores. Elegís quién juega en cada puesto, persona o máquina, y con qué estrategia piensa la máquina. Si sois varios en el mismo ordenador, la tarjeta sólo se enseña detrás de una cortina.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="jugar" data-corto="La partida">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">La partida</h2>
+        </div>
+        <div class="demo cn-sim" data-cn="simulador">
+          <div class="demo-head">
+            <span class="demo-label">Simulador</span>
+            <h3>Código Secreto</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">El simulador necesita JavaScript.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section id="como" data-corto="Cómo se usa">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Cómo se usa</h2>
+        </div>
+        <ul>
+          <li><strong>La semilla</strong> decide las 25 palabras, quién empieza y de quién es cada carta. Con la misma semilla sale la misma partida en cualquier ordenador, y se queda en la dirección de la página (<code>simulador.html#semilla=25</code>), así que podéis pasaros una partida concreta.</li>
+          <li><strong>Quién juega.</strong> Cada uno de los cuatro puestos (dar pistas y adivinar, en cada equipo) lo lleva una persona o la máquina. Para jugar solos, poned una persona en un puesto y la máquina en los otros tres; para jugar en grupo, varias personas.</li>
+          <li><strong>La cortina.</strong> Si hay más de una persona, la tarjeta de colores sólo se enseña cuando le toca a un jefe de espías que es persona, y antes sale una pantalla para pasarle el ordenador. En cuanto da su pista, la tarjeta se vuelve a esconder.</li>
+          <li><strong>Las pistas</strong> tienen que ser una palabra que la máquina conozca (unas 8&nbsp;800, en minúscula y casi todas en singular; la tilde da igual). Si la máquina adivina, debajo veréis cómo ha ordenado el tablero con vuestra pista. Y si os atascáis, el botón "¿Qué diría la máquina?" os enseña la pista que daría su estrategia.</li>
+          <li><strong>Adivinar</strong> es tocar cartas. Podéis probar el número de la pista más una, y plantaros cuando queráis a partir de la primera.</li>
+          <li><strong>Al acabar</strong> se enseña la tarjeta entera y, en las pistas de la máquina, en qué cartas pensaba y con qué margen.</li>
+        </ul>
+      </section>
+
+      <section id="probar" data-corto="Qué probar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Qué probar</h2>
+        </div>
+        <ol>
+          <li>De agente, con la máquina dando pistas en "Simular al compañero, sin umbral". Luego la misma semilla con "Con margen". ¿Cuántas acertáis con cada una? Es el ruido de la página&nbsp;03, pero el ruido sois vosotros.</li>
+          <li>De jefe de espías, con la máquina adivinando. ¿Conseguís una pista de 3 que la máquina entienda? Mirad cómo ordena el tablero y comparad con la que daría ella.</li>
+          <li>Cuatro personas, rojo contra azul, con la cortina. Y después una persona y la máquina en cada equipo, a ver qué pareja se entiende mejor.</li>
+          <li>Sólo máquinas, con una estrategia distinta en cada equipo: se ve la tarjeta, y en el historial por qué da cada pista.</li>
+        </ol>
+        <p class="fine">
+          Los vectores son una parte de los de fastText en castellano <!--cite grave-fasttext--><span class="cita">[<a href="#ref-grave-fasttext" id="cita-grave-fasttext">1</a>]</span><!--/cite--> (Facebook AI Research, licencia
+          CC&nbsp;BY-SA&nbsp;3.0), reducidos
+ a 64 números por palabra. La lista de palabras del tablero es propia.
+        </p>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-grave-fasttext">E. Grave, P. Bojanowski, P. Gupta, A. Joulin y T. Mikolov. "Learning Word Vectors for 157 Languages". <em>Proceedings of LREC 2018</em>, 2018. <a href="https://fasttext.cc/docs/en/crawl-vectors.html">fasttext.cc/docs/en/crawl-vectors.html</a> <a class="volver" href="#cita-grave-fasttext" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema bonus">
+        <a class="pager-prev" href="modelos-lenguaje.html"><span class="pager-l">Anterior</span><span class="pager-t">Con un modelo de lenguaje</span></a>
+        <a class="pager-next" href="index.html#resumen"><span class="pager-l">Siguiente</span><span class="pager-t">Lo que hay que llevarse</span></a>
+      </nav>
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#jugar">La partida</a></li>
+            <li><a href="#como">Cómo se usa</a></li>
+            <li><a href="#probar">Qué probar</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema bonus</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Código Secreto como problema</a></li>
+            <li><a href="vectores.html"><span>02</span>Palabras como vectores</a></li>
+            <li><a href="estrategias.html"><span>03</span>Estrategias</a></li>
+            <li><a href="modelos-lenguaje.html"><span>04</span>Con un modelo de lenguaje</a></li>
+            <li><a href="simulador.html" aria-current="page"><span>05</span>El simulador</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/codenames-datos.js" defer></script>
+<script src="../../assets/js/codenames.js" defer></script>
+</body>
+</html>

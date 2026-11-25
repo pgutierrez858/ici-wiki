@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -57,7 +57,7 @@
 
   <header class="masthead">
     <h1>
-      Máquinas de estados
+      Práctica 2 · Máquinas de estados
       <span class="thin">Diseñar primero, programar después, y medir cada versión.</span>
     </h1>
     <p class="standfirst">
@@ -136,17 +136,17 @@
           La parte más importante de la práctica es la <strong>abstracción</strong>: decidir qué
           <em>acciones</em> sabe hacer cada personaje, qué <em>condiciones</em> hacen que cambie de una a otra
           y qué información del juego hace falta de verdad para calcularlas, que es lo que acaba en el
-          <code>Input</code>. Programar la máquina, una vez decidido eso, es casi mecánico.
+          <code>Input</code>. Una vez decidido eso, programar la máquina es casi mecánico.
         </p>
         <div class="note tip">
           <span class="note-label">Antes de empezar</span>
           <p>
-            Leed <a href="../guias/tema1/maquinas-estados.html"><strong>Máquinas de estados</strong></a>, en
-            los apuntes del tema. Está escrita para esta práctica: el paquete <code>fsm</code> clase a clase,
+            Leed <a href="../guias/tema2/maquinas-estados.html"><strong>Máquinas de estados</strong></a>, en
+            los apuntes del tema. Está escrita para esta práctica y tiene el paquete <code>fsm</code> clase a clase,
             dos ejemplos completos, cómo ver la máquina mientras juega, cuatro diseños de cursos anteriores
             comentados y los errores típicos. Y lo que ya hicisteis en la
-            <a href="practica-1.html">Práctica&nbsp;1</a> no se tira: la mitad de aquellos métodos auxiliares
-            son acciones y transiciones que ya están escritas.
+            <a href="practica-1.html">Práctica&nbsp;1</a> no se tira, porque la mitad de aquellos métodos auxiliares
+            son acciones y transiciones que ya tenéis escritas.
           </p>
         </div>
 
@@ -154,7 +154,7 @@
         <p>
           Las de la Práctica&nbsp;1: <strong>sin visibilidad parcial</strong> y con el
           <strong>tiempo de razonamiento por defecto (40&nbsp;ms)</strong>. Qué significa exactamente ese
-          presupuesto, y por qué en la corrección no os va a cortar nadie, está explicado en
+          presupuesto, y por qué en la corrección no os va a cortar nadie, lo tenéis explicado en
           <a href="practica-1.html#reglas-simulacion">su enunciado</a>.
         </p>
       </section>
@@ -170,7 +170,7 @@
             <tbody>
               <tr>
                 <td><strong>El proceso</strong></td>
-                <td>Que el diseño exista antes que el código, que haya varias versiones, que cada una esté medida contra la anterior y que la decisión de quedarse con una salga de esas medidas. Es lo que más pesa.</td>
+                <td>Que el diseño exista antes que el código, que haya varias versiones, que cada una esté medida contra la anterior y que la decisión de quedarse con una salga de esas medidas. Esto es lo que más pesa.</td>
               </tr>
               <tr>
                 <td><strong>Las máquinas</strong></td>
@@ -178,7 +178,7 @@
               </tr>
               <tr>
                 <td><strong>La jerarquía</strong></td>
-                <td>Usar estados compuestos sube la nota. Los compuestos <strong>no cuentan</strong> para los 10: cuentan los simples que llevan dentro.</td>
+                <td>Usar estados compuestos sube la nota. Los compuestos <strong>no cuentan</strong> para los 10, cuentan los simples que llevan dentro.</td>
               </tr>
               <tr>
                 <td><strong>El rendimiento</strong></td>
@@ -190,7 +190,7 @@
         <div class="note mine">
           <span class="note-label">Por qué el proceso pesa más que el resultado</span>
           <p>
-            Porque es lo que se aprende aquí. En la Práctica&nbsp;1 el fallo que más nota costó fue
+            Porque es lo que se aprende aquí. En la Práctica&nbsp;1, el fallo que más nota costó fue
             <a href="practica-1-resultados.html#errores">un controlador y ningún rastro</a>: entregas con un
             solo controlador, a veces bueno, sin una versión anterior ni una medida que explicara por qué es
             así. <strong>Un controlador flojo con su historia saca mejor nota que uno bueno sin
@@ -200,8 +200,8 @@
         <div class="note tip">
           <span class="note-label">Los cuatro fantasmas cuentan una vez</span>
           <p>
-            Si los cuatro fantasmas usan la misma máquina, cada uno con su copia, esa máquina cuenta una vez:
-            sus estados son los del diseño, no el diseño multiplicado por cuatro. Si les dais máquinas
+            Si los cuatro fantasmas usan la misma máquina, cada uno con su copia, esa máquina cuenta una vez
+            (sus estados son los del diseño, sin multiplicar por cuatro). Si les dais máquinas
             distintas, cuenta cada una.
           </p>
         </div>
@@ -222,8 +222,8 @@
             <p>
               Todo lo que queréis que sepa hacer cada personaje, con una frase por acción: "ir a la píldora
               más cercana por un camino seguro", "ir al cruce al que va a llegar Ms.&nbsp;Pac-Man". Todavía
-              sin pensar cuándo. Las acciones son los verbos de la máquina, y si falta una, ningún diagrama
-              lo arregla.
+              sin pensar cuándo. Las acciones son los verbos de la máquina, y si falta una no hay diagrama
+              que lo arregle.
             </p>
           </div>
         </div>
@@ -233,10 +233,10 @@
             <h3 class="label">Las transiciones</h3>
             <p>
               Las condiciones que hacen cambiar de acción, cada una como algo que se pueda
-              <strong>calcular</strong>: no "hay un fantasma cerca", sino "algún fantasma no comestible está a
-              menos de 25 nodos por camino". Cada palabra vaga, un número. Y si una condición tiene ida y
-              vuelta, dos números, uno para entrar y otro para salir: es la
-              <a href="../guias/tema1/maquinas-estados.html#prioridades">histéresis</a> de los apuntes.
+              <strong>calcular</strong>: en vez de "hay un fantasma cerca", algo como "algún fantasma no comestible está a
+              menos de 25 nodos por camino". Por cada palabra vaga, un número. Y si una condición tiene ida y
+              vuelta, dos números, uno para entrar y otro para salir (es la
+              <a href="../guias/tema2/maquinas-estados.html#prioridades">histéresis</a> de los apuntes).
             </p>
           </div>
         </div>
@@ -248,7 +248,7 @@
               Ahora sí, el diagrama: los estados, las flechas con su transición, el estado inicial de cada
               máquina, en qué orden se miran las flechas que salen de un mismo estado, y qué estados se
               agrupan en un compuesto porque comparten salidas. Antes de darlo por bueno, pasadle la lista
-              <a href="../guias/tema1/maquinas-estados.html#disenar">"Antes de programar, comprobad el
+              <a href="../guias/tema2/maquinas-estados.html#disenar">"Antes de programar, comprobad el
               diagrama"</a> de los apuntes.
             </p>
           </div>
@@ -266,11 +266,11 @@
         <div class="note tip">
           <span class="note-label">No tiene que ser bonito</span>
           <p>
-            A mano en un papel y una foto, en un editor de grafos, en una pizarra: lo que os resulte más
-            rápido. Lo único que se pide es que se lea. Podéis mandar <strong>más de un diseño</strong> si
-            dudáis entre dos ideas, y es buena idea; pero <strong>al menos uno</strong>, porque sin diseño no
-            hay sobre qué daros <em>feedback</em>. En los apuntes tenéis
-            <a href="../guias/tema1/maquinas-estados.html#disenar">cuatro diseños de otros cursos</a> tal como
+            A mano en un papel y una foto, en un editor de grafos, en una pizarra... lo que os resulte más
+            rápido, que lo único que se pide es que se lea. Podéis mandar <strong>más de un diseño</strong> si
+            dudáis entre dos ideas (de hecho os lo recomiendo), pero <strong>al menos uno</strong>, porque sin diseño no
+            tengo sobre qué daros <em>feedback</em>. En los apuntes tenéis
+            <a href="../guias/tema2/maquinas-estados.html#disenar">cuatro diseños de otros cursos</a> tal como
             se entregaron, con lo que tenía bien y mal cada uno.
           </p>
         </div>
@@ -282,8 +282,8 @@
           <h2 class="sec">Segunda entrega: los controladores</h2>
         </div>
         <p>
-          La semana del 12 al 18 es un bucle, y cada vuelta deja una versión nueva. No se trata de llegar a la
-          máquina perfecta a la primera: se trata de que cada cambio tenga un motivo y una medida.
+          La semana del 12 al 18 es un bucle, y cada vuelta deja una versión nueva. Nadie espera que lleguéis a la
+          máquina perfecta a la primera, lo que se pide es que cada cambio tenga un motivo y una medida.
         </p>
         <div class="step">
           <span class="step-num">0</span>
@@ -291,7 +291,7 @@
             <h3 class="label">v0: el diseño, tal cual</h3>
             <p>
               La primera versión implementa el diseño que enviasteis, con el <em>feedback</em> aplicado y
-              sin "mejoras" de por medio. Es vuestra línea base: todo lo que venga después se compara con
+              sin "mejoras" de por medio. Es vuestra línea base, y todo lo que venga después se compara con
               ella.
             </p>
           </div>
@@ -302,11 +302,11 @@
             <h3 class="label">Probar contra varios rivales</h3>
             <p>
               Al menos tres, y <strong>siempre los mismos</strong> de aquí al final, con las mismas partidas
-              por rival: si cambiáis de rival a mitad, las versiones dejan de poder compararse. Buenos
-              candidatos: los fantasmas o la Ms.&nbsp;Pac-Man de la <a href="practica-0.html">Práctica&nbsp;0</a>,
+              por rival, porque si cambiáis de rival a mitad las versiones ya no se pueden comparar. Como
+              candidatos os recomiendo los fantasmas o la Ms.&nbsp;Pac-Man de la <a href="practica-0.html">Práctica&nbsp;0</a>,
               <strong>vuestros propios controladores de la Práctica&nbsp;1</strong> (¿juega mejor la máquina
-              que el código a mano?), los de cursos anteriores y los de otros grupos, compilados. Todos
-              están en <a href="../guias/competicion.html#rivales">Contra quién probar</a>.
+              que el código a mano?), los de cursos anteriores y los de otros grupos, compilados. Los tenéis todos
+              en <a href="../guias/competicion.html#rivales">Contra quién probar</a>.
             </p>
           </div>
         </div>
@@ -315,7 +315,7 @@
           <div class="step-body">
             <h3 class="label">Sacar las métricas que interesan</h3>
             <p>
-              La puntuación media, con su error típico, siempre. Pero la puntuación dice <em>cuánto</em>, no
+              La puntuación media, con su error típico, siempre. Pero la puntuación os dice <em>cuánto</em> y no
               <em>por qué</em>, y para decidir el siguiente cambio hace falta el porqué. Estas son las que
               suelen decir algo:
             </p>
@@ -331,7 +331,7 @@
               </tr>
               <tr>
                 <td><strong>Fantasmas comidos por píldora de poder</strong></td>
-                <td>Si la píldora se usa o se gasta al pasar. Del lado de los fantasmas, si huyen a tiempo. Cómo se cuenta, en <a href="practica-1-resultados.html#medir-mas">Cómo medir algo que no es la puntuación</a>.</td>
+                <td>Si la píldora se usa o se gasta al pasar. Del lado de los fantasmas, si huyen a tiempo. Cómo se cuenta lo tenéis en <a href="practica-1-resultados.html#medir-mas">Cómo medir algo que no es la puntuación</a>.</td>
               </tr>
               <tr>
                 <td><strong>Nivel alcanzado, vidas perdidas</strong></td>
@@ -339,11 +339,11 @@
               </tr>
               <tr>
                 <td><strong>Cambios de estado por partida</strong></td>
-                <td>Rebotes: una pareja de transiciones sin histéresis que entra y sale cada pocos turnos. Se cuentan con el <a href="../guias/tema1/maquinas-estados.html#depurar">observador propio</a> de los apuntes.</td>
+                <td>Rebotes: una pareja de transiciones sin histéresis que entra y sale cada pocos turnos. Se cuentan con el <a href="../guias/tema2/maquinas-estados.html#depurar">observador propio</a> de los apuntes.</td>
               </tr>
               <tr>
                 <td><strong>Veces que se ejecuta cada estado</strong></td>
-                <td>Un estado que no se ejecuta nunca no existe, aunque esté en el diagrama. Un contador por acción, en <code>execute</code>; nunca en el <code>evaluate</code> de una transición.</td>
+                <td>Un estado que no se ejecuta nunca no existe, aunque esté en el diagrama. Un contador por acción, en <code>execute</code> (nunca en el <code>evaluate</code> de una transición).</td>
               </tr>
             </tbody>
           </table>
@@ -354,9 +354,9 @@
             <h3 class="label">Mirar las métricas y buscar el porqué</h3>
             <p>
               Qué métrica está mal, contra qué rival, y qué pasa en esas partidas. Esto último no se adivina
-              leyendo el código: se mira, con <code>runGame</code> despacio y el
-              <a href="../guias/tema1/maquinas-estados.html#depurar"><code>GraphFSMObserver</code></a> abierto
-              para ver en qué estado está la máquina cuando la cosa sale mal. Se apunta en una o dos líneas:
+              leyendo el código, hay que mirarlo con <code>runGame</code> despacio y el
+              <a href="../guias/tema2/maquinas-estados.html#depurar"><code>GraphFSMObserver</code></a> abierto
+              para ver en qué estado está la máquina cuando la cosa sale mal. Luego lo apuntáis en una o dos líneas:
               el problema, y por qué creéis que pasa.
             </p>
           </div>
@@ -366,9 +366,9 @@
           <div class="step-body">
             <h3 class="label">Una versión nueva, con un solo cambio</h3>
             <p>
-              El que ataca ese porqué: un umbral, una transición nueva, un estado que se parte en dos. Una
+              El que ataca ese porqué, ya sea un umbral, una transición nueva o un estado que se parte en dos. Una
               cosa cada vez, porque con dos cambios a la vez no hay forma de saber cuál ha servido. La versión
-              anterior <strong>no se borra</strong>: se entrega todo, <code>v0</code>, <code>v1</code>,
+              anterior <strong>no se borra</strong>, se entrega todo: <code>v0</code>, <code>v1</code>,
               <code>v2</code>… Y vuelta al paso 1, comparando con la anterior como se explica
               <a href="#significativa">en la sección siguiente</a>.
             </p>
@@ -380,16 +380,16 @@
             <h3 class="label">Elegir una para el concurso</h3>
             <p>
               Al final, en un par de líneas: con qué versión os quedáis, de Ms.&nbsp;Pac-Man y de fantasmas, y
-              por qué. Que no tiene por qué ser la última: si <code>v3</code> no mejora de forma medible a
-              <code>v2</code> y es más complicada, la buena es <code>v2</code>, y decirlo así es una decisión
-              de las que cuentan.
+              por qué. No tiene por qué ser la última: si <code>v3</code> no mejora de forma medible a
+              <code>v2</code> y es más complicada, la buena es <code>v2</code>, y decirlo así también es una decisión
+              (y de las que cuentan).
             </p>
           </div>
         </div>
 
         <h3 class="label">Cómo organizar las versiones</h3>
         <p>
-          Las acciones y las transiciones se comparten entre versiones; lo que cambia de una a otra es cómo
+          Las acciones y las transiciones se comparten entre versiones, y lo que cambia de una a otra es cómo
           se monta la máquina y con qué umbrales. Así que cada versión es una clase controlador, y los dos
           nombres obligatorios apuntan a la que elegís:
         </p>
@@ -404,8 +404,8 @@
 ├── mspacman/  actions/  transitions/  MsPacManInput.java
 └── ghosts/    actions/  transitions/  GhostsInput.java</code></pre>
         <p>
-          Si una versión necesita que una acción haga otra cosa, que lo reciba por el constructor, o una
-          clase nueva al lado: lo que no vale es cambiar la acción que usan las versiones anteriores, porque
+          Si una versión necesita que una acción haga otra cosa, que lo reciba por el constructor, o haced una
+          clase nueva al lado. Lo que no vale es cambiar la acción que usan las versiones anteriores, porque
           entonces sus medidas dejan de ser suyas.
         </p>
       </section>
@@ -455,16 +455,16 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
         <p>
           Y la regla de bolsillo, para hacerla de cabeza: <strong>creedla sólo si la diferencia pasa de
           3 veces el mayor de los dos errores típicos</strong>. Es un poco más exigente que la cuenta de
-          arriba, así que por ahí no os vais a creer una mejora que no existe.
+          arriba, así que por ese lado no os vais a creer una mejora que no existe.
         </p>
         <p>
-          Tomad las dos cuentas como orientación: no se exigen en la entrega. La forma recomendada de comparar
+          Tomad las dos cuentas como orientación, que no se exigen en la entrega. La forma que os recomiendo para comparar
           dos versiones es jugarlas contra el mismo grupo fijo de rivales y con las mismas partidas, es decir,
-          con las mismas semillas. Eso lo hace el banco <code>Comparar</code>, que además saca la cuenta solo:
-          está en <a href="../guias/comparar-versiones.html">Comparar versiones</a>.
+          con las mismas semillas. Eso lo hace el banco <code>Comparar</code>, que además saca la cuenta solo, y lo tenéis
+          en <a href="../guias/comparar-versiones.html">Comparar versiones</a>.
         </p>
         <p>
-          Un ejemplo con números. La <code>v0</code> hace 1&#8239;830&nbsp;±&nbsp;39 puntos contra un rival y
+          Veamos un ejemplo con números. La <code>v0</code> hace 1&#8239;830&nbsp;±&nbsp;39 puntos contra un rival y
           la <code>v1</code>, 2&#8239;340&nbsp;±&nbsp;45:
         </p>
 <!--TEX \begin{aligned}
@@ -508,11 +508,11 @@ s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
 M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.0839em;"><span></span></span></span></span></span></span></span><span style="top:-2.6531em;"><span class="pstrut" style="height:3.0623em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">60</span></span></span><span style="top:-0.1531em;"><span class="pstrut" style="height:3.0623em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">60</span></span></span><span style="top:1.3469em;"><span class="pstrut" style="height:3.0623em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">120</span></span></span><span style="top:3.8469em;"><span class="pstrut" style="height:3.0623em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">120</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">la mejora es real</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:7.2692em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
         <p>
-          Si en cambio sale <code>D</code>&nbsp;=&nbsp;80 con el mismo margen, no habéis mejorado nada:
-          habéis cambiado de ruido. Entonces hay dos salidas honestas, jugar más partidas con las dos
+          Si en cambio sale <code>D</code>&nbsp;=&nbsp;80 con el mismo margen, en realidad no habéis mejorado nada,
+          sólo habéis cambiado de ruido. Entonces hay dos salidas honestas, jugar más partidas con las dos
           versiones o descartar el cambio, y las dos se apuntan en el diario. De dónde sale cada línea, por
           qué los errores no se suman tal cual y cuántas partidas hacen falta para ver una mejora pequeña
-          está en <a href="../guias/competicion.html#medir">Medir: la media y el error típico</a>.
+          lo tenéis en <a href="../guias/competicion.html#medir">Medir: la media y el error típico</a>.
         </p>
         <div class="note trap">
           <span class="note-label">Con 20 partidas no se ve nada</span>
@@ -531,17 +531,17 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
         </div>
         <p>
           Un solo archivo, <code>diario.md</code> (o <code>.txt</code>, o <code>.pdf</code>), que se escribe
-          <strong>mientras</strong> se trabaja, no la víspera. Entradas con fecha y cortas: qué hicisteis, qué
-          medisteis, qué decidisteis. Si una entrada pasa de diez líneas, sobra algo.
+          <strong>mientras</strong> se trabaja (y no la víspera). Entradas con fecha y cortas: qué hicisteis, qué
+          medisteis y qué decidisteis. Si una entrada pasa de diez líneas, diría que sobra algo.
         </p>
         <ul>
           <li>
             <strong>Si usáis IA, el <em>prompt</em> va en el diario</strong>, tal cual, con una línea sobre qué
-            cambiasteis vosotros de lo que os dio. Usarla no resta; no saber qué es vuestro, sí.
+            cambiasteis vosotros de lo que os dio. Usarla no resta, lo que resta es no saber qué es vuestro.
           </li>
           <li>
             Las métricas y el análisis de cada versión pueden ir en el diario o como comentario al principio
-            de su clase, <code>MsPacManV1</code>, <code>GhostsV2</code>. Donde os resulte más cómodo, pero
+            de su clase (<code>MsPacManV1</code>, <code>GhostsV2</code>), donde os resulte más cómodo, pero
             breve.
           </li>
           <li>
@@ -552,7 +552,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
         <h3 class="label">El <em>prompt</em>, con el diseño ya hecho</h3>
         <p>
           Lo que interesa de vuestro uso de la IA es que, cuando le pedís algo, <strong>el diseño ya esté en
-          vuestra cabeza</strong>: la IA escribe lo que vosotros habéis decidido, no decide por vosotros. La
+          vuestra cabeza</strong>, o sea, que la IA escriba lo que vosotros habéis decidido en vez de decidir por vosotros. La
           diferencia se ve en el propio <em>prompt</em>:
         </p>
         <figure>
@@ -578,13 +578,13 @@ con 35 para salir. No toques nada más.</code></pre>
         </figure>
         <p>
           El segundo <em>prompt</em> sólo se puede escribir si ya se sabe qué transición hace falta, con qué
-          umbral, de dónde sale cada dato y dónde va en la máquina. Ese conocimiento es la práctica, y el
+          umbral, de dónde sale cada dato y dónde va en la máquina. Saber eso es lo que se aprende en la práctica, y en el
           diario es donde se ve.
         </p>
 
         <h3 class="label">Un diario de ejemplo</h3>
         <p>
-          De un grupo inventado, con cifras inventadas. Fijaos en la longitud: así de corto.
+          De un grupo inventado, con cifras inventadas. Fijaos en la longitud, que con así de corto basta.
         </p>
 <pre><code># Diario · Práctica 2 · grupo ZZ
 Integrantes: …
@@ -641,7 +641,7 @@ rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre
         <p>
           Todo lo que se pide está ahí: el orden del diseño, el <em>prompt</em> y lo que se corrigió a mano,
           una tabla por versión, el problema y su porqué en una línea, la comparación con la anterior y una
-          elección razonada. Y una versión descartada, que también es un resultado.
+          elección razonada. Y hay una versión descartada, que también es un resultado.
         </p>
         <p>
           Si preferís llevar las medidas en el código, la cabecera de cada versión basta:
@@ -660,7 +660,7 @@ rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre
           <h2 class="sec">La lista del proceso</h2>
         </div>
         <p>
-          Para ir tachando. Las casillas se quedan guardadas en este navegador, y la del bucle se puede
+          Para ir tachando. Las casillas se quedan guardadas en este navegador, y la lista del bucle se puede
           desmarcar entera cada vez que empezáis una versión nueva.
         </p>
 
@@ -737,7 +737,7 @@ rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre
           </p>
         </div>
         <p>
-          Todas las prácticas serán comprobadas para la detección de plagios.
+          Todas las prácticas se pasan por un detector de plagios.
         </p>
 
         <h3 class="label">Antes de subir el zip</h3>
@@ -775,7 +775,7 @@ rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre
         <div class="note mine rail-nota">
           <span class="note-label">El tema</span>
           <p style="margin:0">
-            <a href="../guias/tema1/maquinas-estados.html">Máquinas de estados</a>: el paquete
+            <a href="../guias/tema2/maquinas-estados.html">Máquinas de estados</a>: el paquete
             <code>fsm</code>, ejemplos completos y diseños de otros cursos.
           </p>
         </div>
@@ -809,7 +809,7 @@ rivales frente a GhostsV0 (sus entradas, omitidas aquí, van igual).</code></pre
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

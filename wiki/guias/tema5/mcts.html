@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../../index.html">Inicio</a></li>
-        <li><a href="../../presentacion.html">Presentación</a></li>
         <li><a href="../../calendario.html">Calendario</a></li>
         <li><a href="../../practicas/index.html">Prácticas</a></li>
-        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="../index.html">Guías</a>
+    <a href="../index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <a href="index.html">Tema 5</a>
     <span aria-hidden="true">/</span>
@@ -64,7 +64,7 @@
       <span class="thin">Valorar una jugada jugando, muchas veces y sin pensar, y dejar que el árbol crezca hacia donde merece la pena.</span>
     </h1>
     <p class="standfirst">
-      La idea de Monte Carlo, el problema de repartir intentos entre opciones que no conocéis (el bandido multibrazo) y su solución, UCB1; cómo se convierte eso en un árbol con las cuatro fases de MCTS, el error típico al contar quién gana, qué jugada se elige al final, y por qué el árbol crece torcido a propósito.
+      Veamos la idea de Monte Carlo, el problema de repartir intentos entre opciones que no conocéis (el bandido multibrazo) y su solución, UCB1. Después, cómo se convierte eso en un árbol con las cuatro fases de MCTS, el error típico al contar quién gana, qué jugada se elige al final y por qué el árbol crece torcido a propósito.
     </p>
   </header>
 
@@ -96,7 +96,7 @@ jugar la <span class="var">j</span> de mayor valor</pre>
           No necesita ninguna función de evaluación: sólo las reglas. Y funciona mejor de lo que parece, porque una jugada
           que deja una posición fuerte gana más partidas al azar que una que deja una posición débil. En la posición del
           ejemplo interactivo de más abajo (mueve O y X amenaza la diagonal), con 20&#8239;000 partidas al azar por jugada,
-          tapar la diagonal sale con un 0,49 y la mejor de las otras con un 0,34. Acierta.
+          tapar la diagonal sale con un 0,49 y la mejor de las otras con un 0,34, así que acierta.
         </p>
         <p>
           Pero tiene dos fallos de fondo:
@@ -111,7 +111,7 @@ jugar la <span class="var">j</span> de mayor valor</pre>
         <p>
           MCTS arregla las dos cosas con la misma idea: <strong>repartir las partidas con cabeza</strong>, dando más a las
           jugadas que prometen, y <strong>guardar un árbol</strong> para que, en las posiciones que se repiten, el rival
-          también aprenda a elegir. Lo primero es un problema con nombre propio.
+          también aprenda a elegir. Lo primero es un problema que tiene hasta nombre propio.
         </p>
       </section>
 
@@ -130,7 +130,7 @@ jugar la <span class="var">j</span> de mayor valor</pre>
         <div class="demo" data-mcts="bandido">
           <div class="demo-head">
             <span class="demo-label">Ejemplo interactivo</span>
-            <h4>Cuatro tragaperras: tirad vosotros, y después que tire UCB1</h4>
+            <h3>Cuatro tragaperras: tirad vosotros, y después que tire UCB1</h3>
           </div>
           <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Son cuatro máquinas con probabilidades de premio de 0,35, 0,6, 0,5 y 0,25, y la fórmula de UCB1 está justo debajo.</p></div>
           <div class="demo-controls"></div>
@@ -151,7 +151,7 @@ jugar la <span class="var">j</span> de mayor valor</pre>
         </div>
         <p>
           Hay una forma de repartir las tiradas que se sabe que funciona bien: <strong>UCB1</strong> (<em lang="en">Upper
-          Confidence Bound</em>, publicada por Auer, Cesa-Bianchi y Fischer en 2002). Para cada máquina <!--tex i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span><!--/tex-->, llamamos
+          Confidence Bound</em>) <!--cite auer-ucb1--><span class="cita">[<a href="#ref-auer-ucb1" id="cita-auer-ucb1">1</a>]</span><!--/cite-->. Para cada máquina <!--tex i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span><!--/tex-->, llamamos
           <strong><!--tex n_i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">n_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--></strong> a cuántas veces habéis tirado de ella, <strong><!--tex \bar{x}_i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\bar{x}_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7178em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex--></strong> a su
           premio medio hasta ahora, y <!--tex n --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span><!--/tex--> al total de tiradas entre todas. UCB1 tira de la máquina con más
         </p>
@@ -260,12 +260,12 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
           <h2 class="sec">Del bandido al árbol: las cuatro fases</h2>
         </div>
         <p>
-          La idea de MCTS (Rémi Coulom le puso el nombre en 2006, y ese mismo año Kocsis y Szepesvári publicaron UCT, la
+          La idea de MCTS (Rémi Coulom le puso el nombre en 2006 <!--cite coulom-mcts--><span class="cita">[<a href="#ref-coulom-mcts" id="cita-coulom-mcts">2</a>]</span><!--/cite-->, y ese mismo año Kocsis y Szepesvári publicaron UCT <!--cite kocsis-uct--><span class="cita">[<a href="#ref-kocsis-uct" id="cita-kocsis-uct">3</a>]</span><!--/cite-->, la
           versión con UCB1 que vais a programar) es tratar <strong>cada nodo del árbol como un bandido</strong>: sus
           jugadas son las máquinas, y tirar de una es bajar por ella y jugar una partida. Cada nodo guarda dos números:
           <strong>N</strong>, cuántas partidas han pasado por él (sus <em>visitas</em>), y <strong>W</strong>, la suma de
           lo que han dado esas partidas. Su valor medio es <strong>W/N</strong>. El árbol empieza con la raíz sola y, en
-          cada <strong>iteración</strong>, crece un nodo y se juega una partida, en cuatro fases:
+          cada <strong>iteración</strong>, crece un nodo y se juega una partida, en cuatro fases <!--cite browne-mcts--><span class="cita">[<a href="#ref-browne-mcts" id="cita-browne-mcts">4</a>]</span><!--/cite-->:
         </p>
         <figure class="wide">
           <figcaption>Una iteración de MCTS. En amarillo, el camino de esta iteración</figcaption>
@@ -342,13 +342,17 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
       <span class="fn">retropropagar</span>(<span class="var">nodo</span>, <span class="var">r</span>)       <span class="var">sumar N y W hasta la raíz</span>
   <b>return</b> la jugada del hijo de <span class="var">raíz</span> con más visitas</pre>
         <p>
+          Este bucle es el que montáis en la <a href="../../practicas/practica-5.html">Práctica&nbsp;5</a>, en Python, y la
+          <a href="../mcts-paso-a-paso.html">guía paso a paso</a> lo construye en seis pasos, cada uno con su comprobación.
+        </p>
+        <p>
           Probadlo fase a fase en la posición de antes: mueve O, y X amenaza la diagonal 1-5-9. La única jugada que no
           pierde es tapar en la 9.
         </p>
         <div class="demo" data-mcts="fases">
           <div class="demo-head">
             <span class="demo-label">Ejemplo interactivo</span>
-            <h4>MCTS en tres en raya, una fase cada vez</h4>
+            <h3>MCTS en tres en raya, una fase cada vez</h3>
           </div>
           <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Las cuatro fases están explicadas justo encima; tras unas cien iteraciones, la jugada más visitada es tapar en la casilla 9.</p></div>
           <div class="demo-controls"></div>
@@ -373,7 +377,7 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
           <h2 class="sec">Quién gana en cada nodo</h2>
         </div>
         <p>
-          Hay un detalle que decide si vuestro MCTS juega bien o regala la partida. En la selección, cada nodo elige al hijo
+          Hay un detalle que, si se hace mal, hace que vuestro MCTS regale la partida. En la selección, cada nodo elige al hijo
           con más W/N. Pero en un nivel elige un jugador y en el siguiente, el otro, y lo que es bueno para uno es malo para
           el otro. La forma más limpia de no liarse: <strong>el W de cada nodo se cuenta desde el jugador que hizo la
           jugada que lleva a él</strong>. Así, cuando un padre elige entre sus hijos, todos esos hijos los creó el jugador
@@ -426,8 +430,8 @@ hijo B    N = 300    W/N = 0,62     se juega B</pre>
         <p>
           Minimax con profundidad fija mira todas las jugadas a la misma profundidad, las buenas y las absurdas. MCTS no:
           como la selección va a lo que promete, el árbol crece <strong>torcido</strong>, muy hondo por las líneas buenas y
-          casi nada por las malas. Es como piensa un jugador humano, que no analiza las jugadas que ve perdedoras a primera
-          vista.
+          casi nada por las malas. Se parece bastante a cómo piensa un jugador humano, que no se pone a analizar las jugadas que ve
+          perdedoras a primera vista.
         </p>
         <div class="table-scroll">
           <table class="ancha">
@@ -437,7 +441,7 @@ hijo B    N = 300    W/N = 0,62     se juega B</pre>
               <tr><td><strong>Forma del árbol</strong></td><td>Todo hasta la misma profundidad.</td><td>Hondo donde promete, poco donde no.</td></tr>
               <tr><td><strong>Si se le corta antes</strong></td><td>Una búsqueda a medias puede no servir.</td><td>Tiene una respuesta en cualquier momento (<em lang="en">anytime</em>), mejor cuanto más tiempo.</td></tr>
               <tr><td><strong>Qué devuelve</strong></td><td>El valor exacto, hasta donde mira.</td><td>Una estimación, que mejora con las iteraciones.</td></tr>
-              <tr><td><strong>Dónde brilla</strong></td><td>Juegos tácticos con buena evaluación: ajedrez, damas.</td><td>Mucha ramificación y sin buena evaluación: go, juegos de cartas, juegos nuevos.</td></tr>
+              <tr><td><strong>Dónde va mejor</strong></td><td>Juegos tácticos con buena evaluación: ajedrez, damas.</td><td>Mucha ramificación y sin buena evaluación: go, juegos de cartas, juegos nuevos.</td></tr>
               <tr><td><strong>Su punto débil</strong></td><td>El efecto horizonte, y escribir la evaluación.</td><td>Las trampas tácticas: una sola respuesta del rival lo cambia todo.</td></tr>
             </tbody>
           </table>
@@ -451,7 +455,7 @@ hijo B    N = 300    W/N = 0,62     se juega B</pre>
         <div class="demo" data-mcts="conecta4">
           <div class="demo-head">
             <span class="demo-label">Ejemplo interactivo</span>
-            <h4>Conecta 4 contra MCTS</h4>
+            <h3>Conecta 4 contra MCTS</h3>
           </div>
           <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Es un Conecta 4 contra un MCTS con simulaciones al azar, en el que se puede elegir el número de iteraciones por jugada.</p></div>
           <div class="demo-controls"></div>
@@ -479,6 +483,18 @@ hijo B    N = 300    W/N = 0,62     se juega B</pre>
         </div>
       </section>
 
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-auer-ucb1">P. Auer, N. Cesa-Bianchi y P. Fischer. "Finite-time Analysis of the Multiarmed Bandit Problem". <em>Machine Learning 47(2–3), 235–256</em>, 2002. <a class="volver" href="#cita-auer-ucb1" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-coulom-mcts">R. Coulom. "Efficient Selectivity and Backup Operators in Monte-Carlo Tree Search". <em>Computers and Games 2006, LNCS 4630, Springer</em>, 2007. <a class="volver" href="#cita-coulom-mcts" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-kocsis-uct">L. Kocsis y C. Szepesvári. "Bandit Based Monte-Carlo Planning". <em>ECML 2006, LNCS 4212, Springer</em>, 2006. <a class="volver" href="#cita-kocsis-uct" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-browne-mcts">C. Browne, E. Powley, D. Whitehouse, S. Lucas, P. Cowling y otros. "A Survey of Monte Carlo Tree Search Methods". <em>IEEE Transactions on Computational Intelligence and AI in Games 4(1), 1–43</em>, 2012. <a class="volver" href="#cita-browne-mcts" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
       <nav class="pager" aria-label="Páginas del tema 5">
         <a class="pager-prev" href="juegos.html"><span class="pager-l">Anterior</span><span class="pager-t">Juegos por turnos</span></a>
         <a class="pager-next" href="mejoras.html"><span class="pager-l">Siguiente</span><span class="pager-t">MCTS en la práctica</span></a>
@@ -497,6 +513,7 @@ hijo B    N = 300    W/N = 0,62     se juega B</pre>
             <li><a href="#punto-de-vista">Quién gana en cada nodo</a></li>
             <li><a href="#elegir">Qué jugada se elige</a></li>
             <li><a href="#asimetrico">Un árbol torcido</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
@@ -527,7 +544,7 @@ hijo B    N = 300    W/N = 0,62     se juega B</pre>
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

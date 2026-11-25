@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Ms. Pac-Man con siete reglas borrosas</span>
   </nav>
@@ -61,9 +61,9 @@
       <span class="thin">El ejemplo guiado de la Práctica&nbsp;4: de dos reglas a siete, midiendo cada paso.</span>
     </h1>
     <p class="standfirst">
-      Un controlador borroso completo y pequeño, montado poco a poco: las tres distancias que mide, las cuatro
+      Veamos un controlador borroso pequeño pero completo, montado poco a poco: las tres distancias que mide, las cuatro
       acciones que sabe hacer y siete reglas que se añaden por pasos, cada uno con lo que cambió en 300 partidas
-      contra cinco rivales. Al final, lo que le falta a esta Ms.&nbsp;Pac-Man, y el esqueleto de los fantasmas
+      contra cinco rivales. Al final tenéis lo que le falta a esta Ms.&nbsp;Pac-Man, y el esqueleto de los fantasmas
       para que empecéis los vuestros.
     </p>
   </header>
@@ -72,9 +72,9 @@
     <main>
 
       <p>
-        Antes de esta guía, leed dos páginas de los apuntes: <a href="tema2/inferencia-borrosa.html">Inferencia
+        Antes de esta guía, leed dos páginas de los apuntes: <a href="tema4/inferencia-borrosa.html">Inferencia
         borrosa</a>, para entender qué hace el motor con las reglas, y
-        <a href="tema2/borroso-mspacman.html">Lógica borrosa en Ms.&nbsp;Pac-Man</a>, para el formato FCL y el
+        <a href="tema4/borroso-mspacman.html">Lógica borrosa en Ms.&nbsp;Pac-Man</a>, para el formato FCL y el
         paquete <code>fuzzy</code> del motor. Aquí se usan <code>FuzzyInput</code>, <code>FuzzyEngine</code> y
         <code>ActionSelector</code> sin volver a explicar qué son.
       </p>
@@ -248,7 +248,7 @@
         <ul>
           <li>
             <strong>"No hay" es <code>LEJOS</code>, y todo se recorta a 150.</strong> Con Jess daba igual que fuera
-            1000. Aquí no: un término por puntos <a href="tema2/borroso-mspacman.html#visibilidad">se queda con el valor
+            1000. Aquí no: un término por puntos <a href="tema4/borroso-mspacman.html#visibilidad">se queda con el valor
             del extremo</a> fuera de su rango, así que un <code>-1</code> valdría "cerca" con un 1. Y los términos se
             dibujan entre 0 y 150, así que lo que sobra no aporta nada.
           </li>
@@ -360,7 +360,7 @@ END_DEFUZZIFY</code></pre>
           <h2 class="sec">Siete reglas, paso a paso</h2>
         </div>
         <p>
-          Las reglas se escribieron en este orden, y después de cada paso se midió la versión nueva contra la
+          Escribí las reglas en este orden, y después de cada paso medí la versión nueva contra la
           anterior con <a href="comparar-versiones.html"><code>Comparar</code></a>, 300 partidas contra cada uno de
           los cinco fantasmas de referencia. Al final de cada paso va qué cambió.
         </p>
@@ -386,7 +386,7 @@ RULE 2 : IF peligro IS NOT cerca THEN comer IS mucho;</code></pre>
               con 0,5.
             </p>
             <p>
-              Y aquí aparece la <a href="tema2/borroso-mspacman.html#acciones">trampa del término solo</a>. Cada
+              Y aquí aparece la <a href="tema4/borroso-mspacman.html#acciones">trampa del término solo</a>. Cada
               salida tiene un único término activo, <code>mucho</code>, y su centro de gravedad casi no se mueve con el
               grado: entre 8 y 8,7. Así que gana la regla que se active con más grado, que es como decir "huir si el
               fantasma está a menos de 25". <strong>Dos reglas borrosas con un término cada una son un umbral
@@ -441,8 +441,8 @@ RULE 5 : IF peligro IS lejos THEN comer IS mucho;</code></pre>
               el array. <code>ProbarBorroso</code> lo pilló con el caso "peligroso a 45: todavía come".
             </p>
             <p>
-              <strong>Al medirlo:</strong> 107 puntos más de media, con un umbral de 75. Pasa por poco, así que se
-              repitió con otras 300 semillas: 132 más, con un umbral de 75. Se queda. Contra cada rival por separado
+              <strong>Al medirlo:</strong> 107 puntos más de media, con un umbral de 75. Pasa por poco, así que lo
+              repetí con otras 300 semillas: 132 más, con un umbral de 75, y se queda. Contra cada rival por separado
               casi no se nota; sólo la media, con sus cinco rivales, tiene precisión para verlo.
             </p>
           </div>
@@ -512,8 +512,8 @@ RULE 7 : IF peligro IS NOT lejos AND ppill IS cerca THEN irAPPill IS mucho, huir
         </div>
 
         <p>
-          De cuatro pasos, uno subió mucho, otro poco, y el último no se sostiene. Lo que más se nota no es lo más
-          borroso: es una regla que añade una acción nueva. Las curvas suaves del paso&nbsp;2 ayudan, pero poco.
+          De cuatro pasos, uno subió mucho, otro poco, y el último no se sostiene. Curiosamente, lo que más se nota es
+          una regla que añade una acción nueva, que es lo menos borroso de todo. Las curvas suaves del paso&nbsp;2 ayudan, pero poco.
         </p>
         <div class="table-scroll">
           <table class="ancha">
@@ -536,7 +536,7 @@ RULE 7 : IF peligro IS NOT lejos AND ppill IS cerca THEN irAPPill IS mucho, huir
         <div class="demo" data-borroso="banco" data-presets="mspacman">
           <div class="demo-head">
             <span class="demo-label">Ejemplo interactivo</span>
-            <h4>Un turno de Ms.&nbsp;Pac-Man, salida a salida</h4>
+            <h3>Un turno de Ms.&nbsp;Pac-Man, salida a salida</h3>
           </div>
           <div class="demo-stage"><p class="demo-nojs">Este banco necesita JavaScript. Las mismas situaciones se prueban con <code>ProbarBorroso</code>, en <a href="depurar-borroso.html#probar">Depurar reglas borrosas</a>.</p></div>
           <div class="demo-controls"></div>
@@ -653,7 +653,7 @@ RULE 7 : IF peligro IS NOT lejos AND ppill IS cerca THEN irAPPill IS mucho, huir
               <tr>
                 <td>Huye hacia otro fantasma, o hacia un callejón.</td>
                 <td><code>HuirAction</code> sólo mira el fantasma más cercano.</td>
-                <td>Más inteligencia en la acción, como en la <a href="tema1/estrategias.html">Práctica&nbsp;1</a>, o una entrada con el segundo fantasma más cercano.</td>
+                <td>Más inteligencia en la acción, como en la <a href="tema2/estrategias.html">Práctica&nbsp;1</a>, o una entrada con el segundo fantasma más cercano.</td>
               </tr>
               <tr>
                 <td>Persigue a un comestible que se está acabando.</td>
@@ -668,7 +668,7 @@ RULE 7 : IF peligro IS NOT lejos AND ppill IS cerca THEN irAPPill IS mucho, huir
               <tr>
                 <td>Come hacia un fantasma que viene de frente.</td>
                 <td><code>comer</code> va a la píldora más cercana, esté donde esté.</td>
-                <td>La salida como parámetro: en vez de elegir acción, que lo borroso decida <em>cuánto</em> alejarse al comer, como en <a href="tema2/borroso-mspacman.html#acciones">los apuntes</a>.</td>
+                <td>La salida como parámetro: en vez de elegir acción, que lo borroso decida <em>cuánto</em> alejarse al comer, como en <a href="tema4/borroso-mspacman.html#acciones">los apuntes</a>.</td>
               </tr>
             </tbody>
           </table>
@@ -691,7 +691,7 @@ RULE 7 : IF peligro IS NOT lejos AND ppill IS cerca THEN irAPPill IS mucho, huir
           </li>
           <li>
             <strong>Paréntesis siempre que mezcléis <code>AND</code> y <code>OR</code>.</strong> jFuzzyLogic lee de
-            izquierda a derecha, <a href="tema2/borroso-mspacman.html#fcl">sin precedencia</a>.
+            izquierda a derecha, <a href="tema4/borroso-mspacman.html#fcl">sin precedencia</a>.
           </li>
           <li>
             <strong>Cada regla nueva, con su caso.</strong> Una línea en
@@ -706,7 +706,7 @@ RULE 7 : IF peligro IS NOT lejos AND ppill IS cerca THEN irAPPill IS mucho, huir
         <div class="note mine">
           <span class="note-label">Qué hace que una base borrosa sea más rica</span>
           <p>
-            No el número de reglas: cuatro reglas casi iguales, una por fantasma, valen lo que una. Lo que aprovecha la
+            El número de reglas importa poco: cuatro reglas casi iguales, una por fantasma, valen lo que una. Lo que aprovecha la
             lógica borrosa, y lo que más se nota al leer el FCL, es lo que ha ido apareciendo en esta página: términos
             pensados para lo que significan, salidas que recorren su escala, reglas que combinan varias entradas, una
             regla que da valor a dos salidas para ordenar prioridades, y curvas de control sin huecos ni empates.
@@ -784,7 +784,7 @@ RULE 3 : IF comestible IS no AND pacman IS cerca AND ppill IS cerca THEN huir IS
           <strong>peor</strong>: 305 puntos más concedidos de media, con un umbral de 286, y repitiendo, 530 con un
           umbral de 288. Pero los rivales no dicen lo mismo. Contra Basico y Avanzado, la v1 concede menos puntos y le
           comen menos fantasmas. Contra Intermedio, le comen 5,5 fantasmas por partida en vez de 1,7, y concede
-          3&#8239;076 puntos más. Por qué le pasa justo con ese rival, no lo sabemos todavía: es lo que se mira con la
+          3&#8239;076 puntos más. Por qué le pasa justo con ese rival todavía no lo sé, y es lo que se mira con la
           traza, con <code>VerPartida</code> contra él. Mientras tanto, al concurso iría la <code>v0</code>, que es la
           que carga <code>Ghosts()</code>.
         </p>
@@ -858,7 +858,7 @@ RULE 3 : IF comestible IS no AND pacman IS cerca AND ppill IS cerca THEN huir IS
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

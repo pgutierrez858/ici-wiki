@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/css/ici.css">
@@ -33,10 +34,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -49,7 +49,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Pathfinding en diapositivas</span>
   </nav>
@@ -61,7 +61,7 @@
     </h1>
     <p class="standfirst">
       Lo mismo que cuentan
-      <a href="tema1/index.html">los apuntes del tema 2</a>, de la página 01 a la 07, con los
+      <a href="tema2/index.html">los apuntes del tema 2</a>, de la página 01 a la 07, con los
       dibujos y el pseudocódigo delante: representar el mapa, buscar en él, A*, y qué de todo eso viene ya
       hecho en el simulador. Se pasa con las flechas del teclado y el botón de abajo la pone a pantalla
       completa.
@@ -118,9 +118,9 @@
 
       <section class="slide" id="d5">
         <span class="slide-num">Parte 1 · 5</span>
-        <h2>Son dos problemas, no uno</h2>
+        <h2>En realidad, son dos problemas</h2>
         <ol>
-          <li><strong>Representar el espacio:</strong> convertir el mundo continuo en un <strong>grafo</strong> finito: dónde se puede estar y qué está conectado con qué.</li>
+          <li><strong>Representar el espacio:</strong> convertir el mundo continuo en un <strong>grafo</strong> finito (dónde se puede estar y qué está conectado con qué).</li>
           <li><strong>Buscar en el grafo:</strong> encontrar una secuencia de pasos de la salida al destino.</li>
         </ol>
         <p class="lede">
@@ -228,7 +228,7 @@
             <li>Un <strong>cruce</strong> es un nodo con tres vecinos o más. En el primer laberinto hay 38.</li>
             <li>La representación no estorba, así que se ve clarísimo lo que hace el algoritmo.</li>
           </ul>
-          <p class="lede">Por eso, aquí el mérito no está en encontrar el camino: está en decidir hacia dónde.</p>
+          <p class="lede">Por eso, aquí el mérito está en decidir hacia dónde ir, más que en encontrar el camino.</p>
         </div>
         <figure>
           <figcaption>Los 38 cruces, en amarillo</figcaption>
@@ -765,7 +765,7 @@ open.add(start);
             <text x="235" y="164" class="t">llega él antes: el tramo no es seguro</text>
           </svg>
         </figure>
-        <p class="foot">No es "¿a qué distancia está el fantasma?". Es "¿quién llega antes <strong>ahí</strong>?".</p>
+        <p class="foot">Lo que hay que preguntarse es "¿quién llega antes <strong>ahí</strong>?", más que "¿a qué distancia está el fantasma?".</p>
       </section>
 
       <section class="slide s-code" id="d42">
@@ -1057,7 +1057,7 @@ open.add(start);
           <li><strong>El abanico de cruces.</strong> Desde ahí no hay un destino, hay un conjunto. Si no sabes por cuál sale, cúbrelos todos: para eso sois cuatro.</li>
           <li><strong>Coincidir en el tiempo.</strong> Dos anchuras a la vez, anotando en qué turno llega cada uno a cada nodo.</li>
         </ol>
-        <p class="lede">Más de dos cruces por delante ya no es predecir: es inventar.</p>
+        <p class="lede">Más allá de dos cruces por delante, ya es más inventar que predecir.</p>
       </section>
 
       <section class="slide s-figure" id="d53">
@@ -1166,7 +1166,7 @@ open.add(start);
 }</code></pre>
         <p class="lede">
           Cuando veas en pantalla los tramos que tu controlador da por cerrados, los errores de "¿llego yo
-          antes?" se hacen obvios en dos partidas. Sin eso, no. <strong>Y el interruptor es
+          antes?" se ven en un par de partidas (y sin eso, no hay manera). <strong>Y el interruptor es
           obligatorio</strong>: sin ventana, lo que se pinta se acumula en dos listas estáticas que no vacía
           nadie, y en una corrección de miles de partidas eso se come la memoria.
         </p>
@@ -1217,7 +1217,7 @@ open.add(start);
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

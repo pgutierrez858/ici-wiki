@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Revisar, retener y olvidar · Tema 6 · ICI</title>
+<meta name="description" content="La mitad del ciclo que hace aprender: revisar cómo salió una decisión cuando el resultado llega tarde (la ventana de cruces y a quién se le da el mérito), qué casos guardar, cuáles olvidar, cómo empezar con la base vacía y por qué una base por rival. Con dos ejemplos interactivos.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 6</a>
+    <span aria-hidden="true">/</span>
+    <span>Revisar, retener y olvidar</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 6 · 04 · Razonamiento basado en casos</p>
+    <h1>
+      Revisar, retener y olvidar
+      <span class="thin">Una buena base de casos tiene los casos que hacen falta, con su resultado bien apuntado (y no necesariamente muchos).</span>
+    </h1>
+    <p class="standfirst">
+      Cómo se le pone nota a una decisión cuando sus consecuencias llegan unos cruces más tarde, qué casos merece la pena
+      guardar, cuándo conviene olvidar, cómo se arranca sin ningún caso y por qué la plantilla guarda una base por rival.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        Recuperar y reutilizar deciden qué hacer, y revisar y retener deciden qué se aprende de lo que se hizo. Si esta
+        mitad está mal, la otra recupera casos con resultados que mienten, y Ms. Pac-Man repite errores tan tranquila.
+      </p>
+
+      <section id="revisar" data-corto="Revisar">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Revisar: el resultado llega tarde</h2>
+        </div>
+        <p>
+          En un problema de diagnóstico, revisar es preguntar si el diagnóstico acertó <!--cite recio-cbr-intro | transp. 27--><span class="cita">[<a href="#ref-recio-cbr-intro" id="cita-recio-cbr-intro">1</a>, transp. 27]</span><!--/cite-->. En un juego no hay a quién
+          preguntar, y además las consecuencias de una decisión no se ven al momento (girar a la izquierda en un cruce puede
+          acabar en que te cacen tres cruces después). La plantilla lo resuelve con una <strong>ventana</strong>: guarda las
+          decisiones en una cola, y cuando una lleva <var>V</var> cruces esperando le pone como resultado los puntos que se
+          han ganado desde entonces.
+        </p>
+        <pre class="pseudo"><span class="fn">al llegar a un cruce</span>:
+    meter el caso de este cruce en la cola
+    <b>si</b> la cola tiene <span class="var">V</span> casos:
+        <span class="var">viejo</span> = sacar el primero de la cola
+        resultado de <span class="var">viejo</span> = puntos de ahora − puntos que había cuando se decidió <span class="var">viejo</span>
+        guardar <span class="var">viejo</span>
+<span class="fn">al acabar la partida</span>:
+    revisar y guardar los que queden en la cola, con los puntos finales</pre>
+        <p>
+          En la plantilla <var>V</var> es <code>TIME_WINDOW</code>, que vale 3. Podéis probarlo con una partida contada cruce
+          a cruce:
+        </p>
+        <div class="demo" data-cbr="ventana">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h3>Doce cruces de una partida: qué resultado se lleva cada caso</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Muestra doce cruces de una partida, lo que pasa entre uno y otro (pastillas, una píldora, un fantasma comido y una muerte), y el resultado que se guarda con cada caso según el tamaño de la ventana.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p>
+          El ejemplo deja ver dos problemas. El primero es que morir no cuesta puntos: el caso del cruce 8 lleva a la muerte
+          en el tramo 10 y aun así sale con un resultado positivo, porque por el camino comió pastillas, así que para la base
+          aquella decisión fue buena. Hay que medir algo más que los puntos (las vidas perdidas, con un castigo grande, los
+          fantasmas comidos, si se acabó el nivel...).
+        </p>
+        <p>
+          El segundo es de quién es el mérito. Con una ventana de 3, los cruces 2, 3 y 4 se llevan los 200 puntos del
+          fantasma comido en el tramo 5, cuando a lo mejor la decisión buena fue la del cruce 3 (que fue hacia la píldora) y
+          las otras dos sólo pasaban por allí. Con una ventana corta las consecuencias lejanas no llegan, y con una larga se
+          reparten entre decisiones que no tuvieron nada que ver. Es el problema de la <strong>asignación del mérito</strong>
+          (credit assignment), el mismo que tiene el aprendizaje por refuerzo.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Ideas para revisar mejor</span>
+          <ul>
+            <li>Un resultado con varias partes: los puntos, menos un castigo por vida perdida, más algo por fantasma comido.</li>
+            <li>Que lo cercano pese más que lo lejano (los puntos del primer tramo cuentan enteros, los del segundo la
+              mitad, y así).</li>
+            <li>Guardar en el resultado más de un número (los puntos y si murió, por separado) y decidir al reutilizar cómo
+              se combinan.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="retener" data-corto="Retener">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Retener: qué se guarda</h2>
+        </div>
+        <p>
+          La plantilla guarda todos los casos, uno por cruce (que son entre 30 y 100 por partida). Tras unos cientos de
+          partidas la base tiene decenas de miles de casos, la mayoría casi iguales, y cada decisión los compara con todos.
+          Hay políticas más selectivas, y las dos clásicas son de David Aha (1991), que las llamó IB1 e IB2 <!--cite aha-ibl--><span class="cita">[<a href="#ref-aha-ibl" id="cita-aha-ibl">2</a>]</span><!--/cite-->. IB1 guarda todo,
+          e IB2 sólo guarda lo que falla: si la base ya habría decidido bien, el caso no aporta nada nuevo, y si se equivocó,
+          se guarda para que no vuelva a pasar. Una tercera opción es guardar sólo lo nuevo, es decir, no guardar el caso si
+          el más parecido de la base se le parece más que un umbral.
+        </p>
+        <div class="demo" data-cbr="retener">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h3>Tres políticas de retención, con las mismas situaciones</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Va presentando situaciones al azar a una base que decide con el caso más parecido, y guarda casos según la política elegida. Muestra cuántos casos guarda y cuántas decisiones acierta.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Con "Guardar todo", pulsad 100 y luego 1000 más, y apuntadlo en la tabla. Cambiad a "Sólo si se equivoca" y
+              repetid, y comparad cuántos casos guarda cada una y cuánto aciertan.</li>
+            <li>Mirad dónde quedan los casos con "Sólo si se equivoca": casi todos en las fronteras entre acciones, que es
+              donde se decide, porque en el centro de cada zona basta con unos pocos.</li>
+            <li>Quitad el ruido y repetid. Con ruido, guardar lo que falla también guarda las decisiones que salieron mal por
+              mala suerte (porque con ellas "falla"), y eso nos lleva a la sección siguiente.</li>
+          </ul>
+        </div>
+        <p>
+          En un juego "fallar" no está tan claro como en el ejemplo, porque no hay una respuesta correcta conocida. Una
+          traducción razonable sería guardar el caso si su resultado fue muy distinto del que predecían sus vecinos, o si no
+          tenía vecinos parecidos. Y hay una alternativa que no hace crecer la base: si el caso nuevo es casi igual a uno que
+          ya está y con la misma solución, en vez de guardarlo se <strong>actualiza el resultado</strong> del viejo con la
+          media de los dos.
+        </p>
+      </section>
+
+      <section id="olvidar" data-corto="Olvidar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Olvidar: el mantenimiento de la base</h2>
+        </div>
+        <p>
+          Con el tiempo, una base acumula dos tipos de casos que sobran (Barry Smyth y Mark Keane lo plantearon en 1995, en un
+          artículo con un título muy majo, <cite>Remembering to forget</cite> <!--cite smyth-keane--><span class="cita">[<a href="#ref-smyth-keane" id="cita-smyth-keane">3</a>]</span><!--/cite-->). Por un lado están los
+          <strong>redundantes</strong>, rodeados de vecinos que deciden lo mismo, que si se borran no cambian ninguna
+          decisión y la búsqueda va más rápida. Por otro, los <strong>ruidosos</strong>, cuya solución contradice a todos sus
+          vecinos (normalmente porque salieron así por casualidad), que si se borran hacen que se decida mejor.
+        </p>
+        <p>
+          jCOLIBRI trae varios algoritmos de mantenimiento ya hechos en <code>method.maintenance.algorithms</code>: RENN y BBNR
+          quitan ruido, y RC, CRR e ICF quitan redundancia <!--cite recio-cbr-jcolibri | transp. 35--><span class="cita">[<a href="#ref-recio-cbr-jcolibri" id="cita-recio-cbr-jcolibri">4</a>, transp. 35]</span><!--/cite-->. Están pensados para clasificación (cada caso tiene una clase, que
+          aquí sería su acción), así que para usarlos con resultados hay que pensar qué significa "acertar". Diría que lo más
+          práctico es hacer el mantenimiento entre partidas y no durante ellas, al cargar la base o con un programa aparte que
+          la limpia.
+        </p>
+      </section>
+
+      <section id="frio" data-corto="La base vacía">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Arrancar con la base vacía</h2>
+        </div>
+        <p>
+          La primera partida empieza sin ningún caso, así que la plantilla elige un movimiento al azar y lo guarda, y en las
+          partidas siguientes, mientras nada se parezca lo bastante o lo parecido saliera mal, sigue eligiendo al azar.
+          Llenar la base así funciona, pero despacio, porque hacen falta muchas partidas de Ms. Pac-Man dando tumbos para tener
+          casos buenos. Hay atajos:
+        </p>
+        <ul>
+          <li>Jugar mucho sin pantalla, con un programa que juegue cientos de partidas contra los fantasmas lo más deprisa
+            posible sólo para llenar la base (en CBR, entrenar es esto).</li>
+          <li>Aprender de un controlador que ya juega: que vuestro Ms. Pac-Man de reglas o borroso juegue y se guarde como
+            casos lo que hace, con su resultado. Es aprender por imitación, como jLOAF <!--cite floyd-jloaf--><span class="cita">[<a href="#ref-floyd-jloaf" id="cita-floyd-jloaf">5</a>]</span><!--/cite-->.</li>
+
+          <li>Aprender de vosotros mismos, porque el motor trae un <code>HumanController</code> que lee el teclado, así que
+            jugáis unas partidas y se guardan vuestras decisiones. Eso sí, cuidado, que seguramente juguéis peor de lo que
+            creéis, y vuestros errores también se guardan.</li>
+        </ul>
+      </section>
+
+      <section id="por-rival" data-corto="Una base por rival">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Una base por rival</h2>
+        </div>
+        <p>
+          La plantilla guarda una base de casos por cada controlador de fantasmas contra el que juega, en un fichero CSV con
+          el nombre del rival. Huir de unos fantasmas que persiguen siempre no es lo mismo que huir de unos que se mueven al
+          azar, y el mismo cruce con las mismas distancias puede pedir cosas distintas, así que mezclar sus casos sería mezclar
+          experiencias que no se parecen (aunque la descripción diga que sí).
+        </p>
+        <p>
+          A cambio, cada rival nuevo empieza con su base vacía. En el concurso eso no os pone en desventaja, porque todos
+          empezáis de cero contra todos los rivales. Allí <code>preCompute</code> no recibe el nombre de la clase de los
+          fantasmas sino uno anónimo (<code>rival1</code>, <code>rival2</code>...), así que la base por rival sigue
+          funcionando, pero no se puede preparar nada para unos fantasmas concretos (lo cuenta <a
+          href="../../practicas/practica-6.html#concurso">el enunciado</a>).
+        </p>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-recio-cbr-intro">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: introducción</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-intro" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-aha-ibl">D. W. Aha, D. Kibler y M. K. Albert. "Instance-Based Learning Algorithms". <em>Machine Learning 6(1), 37–66</em>, 1991. <a class="volver" href="#cita-aha-ibl" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-smyth-keane">B. Smyth y M. T. Keane. "Remembering to Forget: A Competence-Preserving Case Deletion Policy for Case-Based Reasoning Systems". <em>Proceedings of IJCAI-95, 377–382</em>, 1995. <a class="volver" href="#cita-smyth-keane" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-cbr-jcolibri">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: jCOLIBRI</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-jcolibri" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-floyd-jloaf">M. W. Floyd y B. Esfandiari. "A Case-Based Reasoning Framework for Developing Agents Using Learning by Observation". <em>IEEE 23rd International Conference on Tools with Artificial Intelligence (ICTAI), 531–538</em>, 2011. <a class="volver" href="#cita-floyd-jloaf" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema 6">
+        <a class="pager-prev" href="reutilizar.html"><span class="pager-l">Anterior</span><span class="pager-t">Reutilizar y adaptar</span></a>
+        <a class="pager-next" href="jcolibri.html"><span class="pager-l">Siguiente</span><span class="pager-t">CBR en Ms. Pac-Man</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#revisar">Revisar</a></li>
+            <li><a href="#retener">Retener</a></li>
+            <li><a href="#olvidar">Olvidar</a></li>
+            <li><a href="#frio">La base vacía</a></li>
+            <li><a href="#por-rival">Una base por rival</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 6</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Recordar en vez de razonar</a></li>
+            <li><a href="similitud.html"><span>02</span>Recuperar: la similitud</a></li>
+            <li><a href="reutilizar.html"><span>03</span>Reutilizar y adaptar</a></li>
+            <li><a href="revisar-retener.html" aria-current="page"><span>04</span>Revisar, retener y olvidar</a></li>
+            <li><a href="jcolibri.html"><span>05</span>CBR en Ms. Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/cbr.js" defer></script>
+</body>
+</html>

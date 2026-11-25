@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Práctica 6 · Razonamiento basado en casos · ICI</title>
+<meta name="description" content="Enunciado de la Práctica 6: implementar el comportamiento de Ms. Pac-Man con razonamiento basado en casos (jCOLIBRI), con un documento de diseño a mitad de bloque, curvas de aprendizaje que miden si aprende partida a partida, y concurso.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/css/ici.css">
+<script src="../assets/js/tema.js"></script>
+</head>
+<body data-page="practicas">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="../calendario.html">Calendario</a></li>
+        <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Prácticas</a>
+    <span aria-hidden="true">/</span>
+    <span>Práctica 6</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Práctica 6 · Razonamiento basado en casos
+      <span class="thin">Una Ms.&nbsp;Pac-Man que empieza sin saber jugar y aprende de cada partida.</span>
+    </h1>
+    <p class="standfirst">
+      El objetivo de esta práctica es implementar el comportamiento de Ms.&nbsp;Pac-Man con <strong>razonamiento basado en
+      casos</strong>, usando jCOLIBRI. Hasta ahora escribíais cómo se juega, y esta vez lo que diseñáis es qué se recuerda de
+      cada decisión, qué quiere decir que dos situaciones se parezcan y cómo se aprende del resultado. Lo que se mide es si vuestra Ms.&nbsp;Pac-Man
+      juega mejor cuantas más partidas lleva.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Documento de diseño</dt>
+      <dd>6 de diciembre<small>Domingo, a las 23:59, por el Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Entrega final</dt>
+      <dd>13 de diciembre<small>Domingo, a las 23:59, por el Campus Virtual</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Modalidad</dt>
+      <dd>Grupos de 3 o 4<small>Sólo Ms.&nbsp;Pac-Man, los fantasmas no</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Para empezar</dt>
+      <dd><a href="../guias/tema6/jcolibri.html">La plantilla<span class="arrow" aria-hidden="true">&#8594;</span></a><small>Un CBR que ya aprende, de la forma más simple</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+
+      <section id="que-se-pide">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué se pide</h2>
+        </div>
+        <p>
+          Un controlador <code>MsPacMan</code> que decida en cada cruce con un ciclo CBR completo, es decir, que recupere
+          los casos parecidos, reutilice su solución, revise cómo salió y retenga lo aprendido. Los fantasmas esta vez no se
+          hacen. Las decisiones de diseño son estas, y son vuestras:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Decisión</th><th scope="col">Qué hay que pensar</th><th scope="col">En los apuntes</th></tr></thead>
+            <tbody>
+              <tr><td>El caso</td><td>Qué atributos describen la situación, qué se guarda como solución (un movimiento, una acción de las prácticas anteriores...) y qué como resultado.</td><td><a href="../guias/tema6/que-es.html#caso">01</a>, <a href="../guias/tema6/similitud.html#atributos">02</a></td></tr>
+              <tr><td>La base</td><td>Una sola o partida (por rival, por si hay fantasmas comestibles...), y cuándo se consulta.</td><td><a href="../guias/tema6/similitud.html#coste">02</a>, <a href="../guias/tema6/revisar-retener.html#por-rival">04</a></td></tr>
+              <tr><td>Recuperar</td><td>La similitud de cada atributo con su rango, los pesos, cuántos vecinos y el umbral por debajo del cual no hay caso parecido.</td><td><a href="../guias/tema6/similitud.html">02</a></td></tr>
+              <tr><td>Reutilizar</td><td>Cómo se saca una decisión de los vecinos (copiar, votar, por resultado), cómo se adapta y cuándo se explora.</td><td><a href="../guias/tema6/reutilizar.html">03</a></td></tr>
+              <tr><td>Revisar</td><td>Cómo se calcula el resultado de una decisión y cuándo (la ventana, y qué cuenta: puntos, vidas, fantasmas).</td><td><a href="../guias/tema6/revisar-retener.html#revisar">04</a></td></tr>
+              <tr><td>Retener</td><td>Qué casos se guardan y cuáles se olvidan, para que la base mejore sin crecer sin control.</td><td><a href="../guias/tema6/revisar-retener.html#retener">04</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Antes de empezar</span>
+          <p>
+            Leed los <a href="../guias/tema6/index.html"><strong>apuntes del tema&nbsp;6</strong></a>. El último,
+            <a href="../guias/tema6/jcolibri.html"><strong>CBR en Ms.&nbsp;Pac-Man</strong></a>, es la plantilla clase a
+            clase (dónde está cada fase, cómo es el CSV de la base y los cuatro sitios que hay que tocar para añadir un
+            atributo), y su última sección cuenta lo que la plantilla hace de la forma más simple, que es por donde os
+            recomiendo empezar.
+          </p>
+        </div>
+        <h3 class="label">Reglas de simulación</h3>
+        <p>
+          Las de las prácticas anteriores: <strong>sin visibilidad parcial</strong> y con el <strong>tiempo de
+          razonamiento por defecto (40&nbsp;ms)</strong>. Con CBR esto tiene una consecuencia nueva, y es que cada decisión
+          compara la consulta con toda la base, así que una base que crece sin control acaba pasándose de tiempo. La
+          <a href="#curvas">curva de aprendizaje</a> lo mide en cada partida.
+        </p>
+      </section>
+
+      <section id="evaluacion">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Cómo se evalúa</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Se mira</th><th scope="col">En concreto</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>El diseño</td>
+                <td>El documento del 6 de diciembre y cómo ha cambiado hasta la entrega: que cada decisión de la tabla de arriba esté tomada y justificada, y que lo que cambiéis después esté explicado con lo que medisteis.</td>
+              </tr>
+              <tr>
+                <td>El aprendizaje</td>
+                <td>Las <a href="#curvas">curvas de aprendizaje</a>, es decir, que vuestra Ms.&nbsp;Pac-Man, empezando con la base vacía, juegue mejor al final que al principio y que el tiempo por decisión aguante. Es lo propio de esta práctica y lo que más pesa.</td>
+              </tr>
+              <tr>
+                <td>El proceso</td>
+                <td>Como en las prácticas 3 y 4: varias versiones, cada una medida contra la anterior con los mismos rivales, y la elegida saliendo de las medidas. Todo en el <a href="#diario">diario</a>.</td>
+              </tr>
+              <tr>
+                <td>El rendimiento</td>
+                <td>Cómo juega la versión elegida, con la base que entreguéis, contra los fantasmas de referencia y en el <a href="#concurso">concurso</a>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mine">
+          <span class="note-label">Con jugar bien no basta</span>
+          <p>
+            Una Ms.&nbsp;Pac-Man que juega bien desde la primera partida porque en realidad decide con reglas, y en la que los
+            casos no cambian nada, no es lo que se pide. Se puede usar un controlador anterior para decidir cuando no hay caso
+            parecido o para llenar la base (está en los <a href="../guias/tema6/reutilizar.html#sin-caso">apuntes</a>), pero
+            tiene que verse que los casos aprenden algo que ese controlador no sabía.
+          </p>
+        </div>
+      </section>
+
+      <section id="diseno">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El documento de diseño</h2>
+        </div>
+        <p>
+          A mitad de bloque, el <strong>domingo 6 de diciembre</strong>, cada grupo entrega un documento corto (dos o tres
+          páginas, en PDF) con su diseño. No hace falta tenerlo programado todavía, es lo que pensáis hacer y por qué, y os
+          lo devuelvo comentado para que lo tengáis antes de la entrega final. Tiene estas partes:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Parte</th><th scope="col">Qué contar</th></tr></thead>
+            <tbody>
+              <tr><td>Estructura del caso</td><td>Los atributos de la descripción con su tipo y su rango, qué es la solución y cómo se representa el resultado (puntos, positivo o negativo, un valor entre −100 y 100...).</td></tr>
+              <tr><td>Persistencia</td><td>Una base o varias, partida por rival, por si hay fantasmas comestibles, por nivel...</td></tr>
+              <tr><td>Organización en memoria</td><td>Lineal, como en la plantilla, o con alguna división o índice para buscar menos.</td></tr>
+              <tr><td>Recuperación</td><td>Qué atributos se comparan (todos o los más relevantes), la similitud local de cada uno y la global, los pesos, cuántos vecinos (<var>k</var>), si hay umbral, y cuándo se recupera (en cada cruce, en cada cambio de posición...).</td></tr>
+              <tr><td>Reutilización</td><td>Cómo se combinan las soluciones de los vecinos (copia, votación, votación por similitud, por resultado), cómo se adapta, y cuándo y cómo se explora.</td></tr>
+              <tr><td>Revisión</td><td>La función que da el resultado de un caso y cuándo se calcula (por ejemplo, la diferencia de puntos a los cinco cruces, menos un castigo si muere).</td></tr>
+              <tr><td>Retención</td><td>Qué casos se guardan (todos, los que no tienen un vecino muy parecido, los que no contradicen a los que ya hay...) y si se olvida alguno.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Medid la plantilla antes de escribirlo</span>
+          <p>
+            Os recomiendo pasar <code>Curva</code> con la plantilla tal cual antes de diseñar nada. Así sabéis de dónde
+            partís, y algunas decisiones (el umbral, los rangos) se toman mucho mejor viendo números que en abstracto.
+          </p>
+        </div>
+      </section>
+
+      <section id="como-trabajar">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Cómo trabajar</h2>
+        </div>
+        <div class="step">
+          <span class="step-num">0</span>
+          <div class="step-body">
+            <h3 class="label">Arrancad con la plantilla</h3>
+            <p>
+              Descargad <a href="../recursos/ICI-Practica6.zip" download><code>ICI-Practica6.zip</code></a>, que trae el
+              simulador (<code>MsPacManEngine</code>) y el proyecto <code>Practica6</code> con la plantilla y los rivales de
+              referencia. Se importa igual que el de las prácticas 3 y 4, y hace falta el
+              <span class="path">Maven &gt; Update Project</span> del motor, que es el que trae jCOLIBRI. Ejecutad
+              <code>VerPartida</code>, <code>Entrenar</code>, <code>Curva</code> y <code>Comparar</code>, y si los cuatro
+              funcionan el entorno está listo. Poned vuestra letra en el paquete, en <code>TEAM</code> y en
+              <code>plaintextconfig.xml</code>.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">Medid la plantilla</h3>
+            <p>
+              Su curva contra los rivales que elijáis, apuntada en el diario. Es vuestra <code>v0</code> (ojo, que en <code>Comparar</code> la v0 es otra cosa, Ms.&nbsp;Pac-Man con la base vacía, que sirve de suelo para comparar).
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">El diseño</h3>
+            <p>
+              Las decisiones de la tabla de <a href="#que-se-pide">Qué se pide</a>, escritas en el
+              <a href="#diseno">documento</a>, para el 6 de diciembre.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Una versión nueva, con un solo cambio y su propia base</h3>
+            <p>
+              Cada versión aprende en su propia carpeta de <code>cbrdata/grupoYY/</code> (el primer argumento del
+              constructor de <code>MsPacMan</code>), para no mezclar casos de versiones distintas. Si el cambio toca la
+              descripción o el resultado, la base vieja ya no sirve y la versión nueva empieza vacía.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Medidla de dos formas</h3>
+            <p>
+              Con <code>Curva</code>, para ver si aprende y a qué ritmo, y con <code>Entrenar</code> y luego
+              <code>Comparar</code>, para ver si con la base ya llena juega mejor que la versión anterior con la suya, contra
+              los mismos rivales. Si se queda o se descarta, y por qué, va al diario.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Mirad los casos</h3>
+            <p>
+              Cuando Ms.&nbsp;Pac-Man hace algo raro, el CSV os dice por qué (qué caso recuperó, con qué similitud y qué
+              resultado tenía). Imprimid el caso recuperado en <code>VerPartida</code> y buscadlo en el fichero. Y de vuelta al
+              paso 3.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">6</span>
+          <div class="step-body">
+            <h3 class="label">Elegir para el concurso</h3>
+            <p>
+              Con qué versión os quedáis, con qué base entrenada y por qué.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="curvas">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Las curvas de aprendizaje</h2>
+        </div>
+        <p>
+          <code>Curva</code> vacía la base de una carpeta, juega 50 partidas seguidas contra un rival aprendiendo, y por cada
+          partida apunta en un CSV los puntos, cuántos casos tiene la base, cuánto tarda de media cada decisión y cuántos tics
+          duró. Al final compara la media de las diez primeras partidas con la de las diez últimas. El CSV se abre con una hoja
+          de cálculo, y ahí podéis dibujar las cuatro columnas frente al número de partida.
+        </p>
+        <p>
+          Se lanza como <code>Curva Basico 50</code>, con el rival (los nombres de <code>Rivales</code>), el número de
+          partidas y, si queréis, la carpeta, y nunca toca la base de <code>Entrenar</code>. El CSV lleva punto y coma y coma
+          decimal, para que la hoja de cálculo lo abra tal cual.
+        </p>
+        <p>
+          Por defecto juega como en el concurso, con el plan B apagado. Con <code>Curva Basico 50 curva planB</code> lo
+          enciende. Merece la pena sacar las dos: si la curva sólo sube con el plan B, lo que juega mejor son vuestras reglas,
+          no la base.
+        </p>
+        <p>
+          En las partidas que he lanzado con la plantilla tal cual, la curva sale plana: de las diez primeras partidas a las
+          diez últimas la diferencia es ruido, tanto contra <code>Basico</code> como contra <code>GhostsAggressive</code>. Al
+          final hay unos 2&#8239;000 casos y cada decisión tarda unos 0,2&nbsp;ms. Las cifras cambian de una ejecución a otra
+          (la plantilla explora al azar), así que si diez partidas no bastan para distinguir el principio del final, jugad
+          más.
+        </p>
+        <p>En la entrega final va la curva de la versión elegida contra tres rivales como mínimo, y en cada una mirad:</p>
+        <ul>
+          <li>Los puntos, que deberían subir. De una partida a otra hay mucho ruido, así que fijaos en la tendencia o en la
+            media de cada diez.</li>
+          <li>Los casos, cuánto crece la base y si deja de crecer cuando ya no aprende nada nuevo.</li>
+          <li>El tiempo por decisión, que tiene que quedar lejos de los 40&nbsp;ms al final de las 50 partidas.</li>
+        </ul>
+      </section>
+
+      <section id="diario">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">El diario de desarrollo</h2>
+        </div>
+        <p>
+          Como el de la <a href="practica-4.html#diario">Práctica&nbsp;4</a>: un solo <code>diario.md</code>, escrito
+          <strong>mientras</strong> trabajáis, con entradas cortas y con fecha. Arriba van los integrantes, los rivales y qué
+          versión y qué base van al concurso, y en cada versión:
+        </p>
+        <ul>
+          <li>Qué cambia y por qué, en una o dos líneas (lo que visteis y el cambio que lo ataca).</li>
+          <li>Las diez primeras y las diez últimas de su curva, y la fila de la media de <code>Comparar</code> contra la
+            versión anterior.</li>
+          <li>Un caso que explique algo, cuando lo haya: el que se recuperaba mal, el que tenía un resultado que mentía...</li>
+          <li>Si usáis IA, el prompt tal cual, y qué cambiasteis vosotros.</li>
+        </ul>
+      </section>
+
+      <section id="concurso">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">El concurso</h2>
+        </div>
+        <p>
+          El concurso mide lo propio de esta práctica: quién consigue que la curva suba más. Todos empezáis igual, con la
+          base vacía, y contra cada rival se juega en dos tiempos:
+        </p>
+        <ol>
+          <li><strong>Entrenamiento.</strong> 50 partidas seguidas aprendiendo, como en <code>Curva</code>. La base que
+            entreguéis no se usa: antes de empezar se borra.</li>
+          <li><strong>Evaluación.</strong> 20 partidas más con la base congelada, que ya no aprende. De ellas sale vuestra
+            media de puntos contra ese rival.</li>
+        </ol>
+        <p>
+          Los rivales son los de referencia, los que trae <code>Rivales</code> y con los que podéis probar todo lo que
+          queráis, y unos cuantos de prueba que no tenéis (fantasmas de grupos de la Práctica&nbsp;4), para que haya algo de
+          emoción. Las semillas de las partidas son las mismas para todos los grupos.
+        </p>
+        <p>
+          En cada rival se ordena a los grupos por su media de puntos, y gana el que tenga el mejor <strong>puesto
+          medio</strong> entre todos los rivales. Va por puestos y no por puntos porque contra unos fantasmas al azar se sacan
+          muchos más puntos que contra unos agresivos, y con una media de puntos mandarían los rivales fáciles.
+        </p>
+        <h3 class="label">Dos reglas para que cuente la base</h3>
+        <ul>
+          <li><strong>El plan B va apagado.</strong> Lo que hace vuestra Ms.&nbsp;Pac-Man cuando ningún caso le sirve (unas
+            reglas, el controlador borroso...) va en el método <code>planB</code> del motor y sólo ahí. En el concurso la
+            construyo con <code>planB</code> a <code>false</code>, y entonces, cuando ningún caso sirve, juega al azar. Así
+            cada movimiento sale de los casos que recupera (copiado o adaptado) o es al azar, y los puntos miden lo que ha
+            aprendido la base y no lo bien escritas que estén unas reglas.</li>
+          <li><strong>Los rivales no tienen nombre.</strong> <code>preCompute</code> no recibe el nombre de la clase de los
+            fantasmas sino uno anónimo (<code>rival1</code>, <code>rival2</code>...). La base por rival sigue funcionando,
+            con un CSV para cada uno, pero no podéis preparar nada para unos fantasmas concretos.</li>
+        </ul>
+        <div class="note trap">
+          <span class="note-label">Lo de siempre</span>
+          <p>
+            Un controlador que lanza excepciones en el concurso queda descalificado. Y aquí hay formas nuevas de que pase,
+            como un CSV que no se puede leer o una base que, al final del entrenamiento, es tan grande que cada decisión se
+            pasa de tiempo.
+          </p>
+        </div>
+      </section>
+
+      <section id="entrega">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Reglas de entrega</h2>
+        </div>
+        <p>
+          Esta práctica se desarrolla en <strong>grupos de 3 o 4 estudiantes</strong> y tiene dos entregas en el Campus
+          Virtual: el documento de diseño antes del <strong>domingo 6 de diciembre a las 23:59</strong>, y la práctica antes
+          del <strong>domingo 13 de diciembre a las 23:59</strong>.
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Qué</th><th scope="col">Cómo exactamente</th></tr></thead>
+            <tbody>
+              <tr><td>Documento de diseño</td><td><code>diseno-grupoYY.pdf</code>, con las partes de <a href="#diseno">arriba</a>.</td></tr>
+              <tr><td>Archivo de la práctica</td><td><code>practica6-grupoYY.zip</code>, donde <code>YY</code> es la letra de vuestro grupo.</td></tr>
+              <tr><td>Paquete</td><td><code>es.ucm.fdi.ici.c2627.practica6.grupoYY</code></td></tr>
+              <tr><td>Controlador a concurso</td><td><code>MsPacMan</code>, con el constructor <code>MsPacMan(String base, boolean aprender, boolean planB)</code> de la plantilla funcionando con la versión elegida: el concurso entrena con <code>("concurso", true, false)</code> y evalúa con <code>("concurso", false, false)</code>.</td></tr>
+              <tr><td>Nombres</td><td>Es requisito imprescindible dar nombre al equipo y al comportamiento con <code>setName</code> y <code>setTeam</code>.</td></tr>
+              <tr><td>La base</td><td>La carpeta <code>cbrdata/grupoYY/</code> con la base de la versión elegida, ya entrenada. El concurso empieza de cero y no la usa, pero a mí me sirve para ver cómo juega.</td></tr>
+              <tr><td>Raíz del zip</td><td>La carpeta <code>es</code> (comprimiendo desde la raíz del código fuente), la carpeta <code>cbrdata</code>, el <code>diario.md</code> y las curvas (los CSV de <code>Curva</code> y sus gráficas).</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note trap">
+          <span class="note-label">No se modifica el simulador</span>
+          <p>
+            Ni el simulador ni jCOLIBRI. La entrega <strong>no debe contener el código del simulador</strong> (paquete
+            <code>pacman.*</code>), y cumpliendo esto podéis crear los paquetes y clases que queráis.
+          </p>
+        </div>
+        <p>
+          Todas las prácticas serán comprobadas para la detección de plagios.
+        </p>
+
+        <h3 class="label">Antes de subir el zip</h3>
+        <ul class="check" data-guardar="p6-zip">
+          <li>El paquete es <code>es.ucm.fdi.ici.c2627.practica6.grupoYY</code>, con vuestra letra, y también <code>TEAM</code> y las clases de <code>plaintextconfig.xml</code>.</li>
+          <li><code>setName</code> y <code>setTeam</code> llevan el nombre de vuestro grupo.</li>
+          <li>La base que va en el zip se lee bien: una partida de <code>VerPartida</code> con ella no da errores, y la primera decisión ya recupera casos.</li>
+          <li>Las columnas de los CSV coinciden con las de <code>plaintextconfig.xml</code> (si cambiasteis la descripción, la base es nueva).</li>
+          <li>No hay estado en atributos <code>static</code>.</li>
+          <li>Al final de las 50 partidas de <code>Curva</code>, la decisión media está lejos de los 40&nbsp;ms.</li>
+          <li>Con el plan B apagado, como juega <code>Curva</code> por defecto, la versión elegida juega sin errores.</li>
+          <li>Todo compila en un proyecto limpio que sólo referencia a <code>MsPacManEngine</code>.</li>
+          <li>Al abrir el zip aparecen <code>es/</code>, <code>cbrdata/</code>, <code>diario.md</code> y las curvas en la raíz, y ni un archivo de <code>pacman.*</code>.</li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">Contenido</h2>
+          <ol>
+            <li><a href="#que-se-pide">Qué se pide</a></li>
+            <li><a href="#evaluacion">Cómo se evalúa</a></li>
+            <li><a href="#diseno">El documento de diseño</a></li>
+            <li><a href="#como-trabajar">Cómo trabajar</a></li>
+            <li><a href="#curvas">Las curvas de aprendizaje</a></li>
+            <li><a href="#diario">El diario</a></li>
+            <li><a href="#concurso">El concurso</a></li>
+            <li><a href="#entrega">Reglas de entrega</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="de-la-practica">
+          <h2 id="de-la-practica">Los apuntes</h2>
+          <ol>
+            <li><a href="../guias/tema6/similitud.html"><span>02</span>La similitud</a></li>
+            <li><a href="../guias/tema6/reutilizar.html"><span>03</span>Reutilizar y adaptar</a></li>
+            <li><a href="../guias/tema6/revisar-retener.html"><span>04</span>Revisar y retener</a></li>
+            <li><a href="../guias/tema6/jcolibri.html"><span>05</span>CBR en Ms. Pac-Man</a></li>
+          </ol>
+        </nav>
+        <div class="note mine rail-nota">
+          <span class="note-label">El tema</span>
+          <p style="margin:0">
+            <a href="../guias/tema6/index.html">Razonamiento basado en casos</a>: el ciclo de las cuatro R, con ejemplos
+            para mover la consulta entre casos y ver crecer la base.
+          </p>
+        </div>
+        <div class="note mine rail-nota">
+          <span class="note-label">Dudas</span>
+          <p style="margin:0">
+            <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a>. Mejor preguntar con el caso recuperado en la mano que
+            con "no aprende".
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../assets/js/ici.js" defer></script>
+</body>
+</html>

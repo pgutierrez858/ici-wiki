@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Con un modelo de lenguaje · Tema bonus · ICI</title>
+<meta name="description" content="Agentes de Código Secreto con modelos de lenguaje: qué aportan frente a los vectores, un jefe de espías y un agente escritos como prompts, cómo se comparte la estrategia en el texto, cómo comprobar lo que devuelve el modelo, generar con el modelo y verificar con vectores, y una comparación con todas las técnicas del curso.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema bonus</a>
+    <span aria-hidden="true">/</span>
+    <span>Con un modelo de lenguaje</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema bonus · 04 · Juegos de lenguaje</p>
+    <h1>
+      Con un modelo de lenguaje
+      <span class="thin">Más asociaciones, menos control.</span>
+    </h1>
+    <p class="standfirst">
+      Un modelo de lenguaje se sabe muchas más asociaciones que los vectores (Drácula, refranes, películas) y puede explicar sus pistas. A cambio es caro, lento, no siempre contesta igual y hay que comprobar todo lo que dice. Veamos cómo se monta un agente con uno y cómo se combina con lo de la página anterior.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="aporta" data-corto="Qué aporta">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué aporta y qué cuesta</h2>
+        </div>
+        <p>
+          Un modelo de lenguaje es, en el fondo, un programa que dado un texto reparte probabilidad entre las palabras que
+          pueden venir después. Por dentro también trabaja con vectores, pero con una diferencia importante: el vector de una
+          palabra depende de la frase en la que está, así que BANCO en "me senté en el banco del parque" y en "el banco me ha
+          cobrado" ya no son lo mismo <!--cite vaswani-transformer--><span class="cita">[<a href="#ref-vaswani-transformer" id="cita-vaswani-transformer">1</a>]</span><!--/cite-->. Además ha leído tanto que conoce asociaciones que los vectores de palabras sueltas no
+          tienen: VAMPIRO y MURCIÉLAGO van con DRÁCULA, PIRATA y LORO con un parche, y GATO con "siete vidas".
+        </p>
+        <p>
+          Por un lado, eso hace que sus pistas se parezcan más a las de una persona, y que se entienda mejor con personas. Por
+          otro, cada pista cuesta una llamada (dinero y uno o varios segundos), no siempre devuelve lo mismo ante la misma
+          pregunta, y a veces devuelve cosas que no valen: una palabra del tablero, dos palabras, o un número que no cuadra. Lo
+          que se ha medido en un estudio con bots y modelos de lenguaje <!--cite stephenson-codenames--><span class="cita">[<a href="#ref-stephenson-codenames" id="cita-stephenson-codenames">2</a>]</span><!--/cite--> va en esa línea: emparejados con un compañero idéntico,
+          los modelos de lenguaje no llegan a los bots de vectores (que, como vimos, no fallan nunca entre ellos), pero se
+          estropean mucho menos cuando el compañero es distinto. También vieron que los modelos que daban pistas con números
+          más altos perdían más partidas, que es el equilibrio entre aciertos y riesgo de la página anterior otra vez.
+        </p>
+      </section>
+
+      <section id="jefe" data-corto="El jefe en un prompt">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Un jefe de espías escrito como prompt</h2>
+        </div>
+        <p>
+          Lo que antes era código ahora es texto: el contexto que se le da al modelo, lo que se suele llamar
+          <strong>prompt</strong>. Normalmente va en dos partes, unas instrucciones fijas (el contexto de sistema) y los datos
+          de cada turno (el de usuario). Un ejemplo para el jefe de espías:
+        </p>
+        <pre class="pseudo"><b>Sistema</b>
+Eres el jefe de espías del equipo rojo en Código Secreto.
+Das una pista de UNA palabra en castellano y un número.
+Reglas: la pista no puede ser una palabra del tablero ni empezar igual que una.
+Tu agente ordenará las cartas por lo mucho que se parecen a tu pista y tocará
+las N primeras. Elige la pista para que tus cartas salgan antes que cualquier otra,
+y sobre todo lejos del asesino: si dudas, da un número más bajo.
+Responde sólo con JSON: {"pista": "...", "numero": N, "para": ["...", "..."]}
+
+<b>Usuario</b>
+Tus cartas: PLAYA, ISLA, PIRATA
+Del rival: BARCO, BANCO
+Neutrales: LUNA, GATO
+Asesino: TIBURÓN
+Pistas que ya has dado: ninguna</pre>
+        <p>
+          Fijaos en dos cosas. La primera, que en el prompt va escrito cómo adivina el agente: es la misma suposición de todo el
+          tema (los dos conocen la estrategia del otro), sólo que aquí la estrategia se pacta en castellano en vez de en
+          código. La segunda, que pedimos también "para" (las cartas en las que piensa), que no es parte del juego pero nos
+          sirve para comprobar la pista y para depurar.
+        </p>
+      </section>
+
+      <section id="agente" data-corto="El agente en un prompt">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">El agente, y la convención en el texto</h2>
+        </div>
+        <pre class="pseudo"><b>Sistema</b>
+Eres el agente del equipo rojo en Código Secreto. Tu jefe de espías te da una pista
+y un número N. Tu jefe elige pistas que se parecen a sus cartas más que a ninguna otra
+y da números prudentes cuando el asesino está cerca.
+Ordena las cartas que quedan de más a menos relacionadas con la pista y devuelve
+como mucho N, en orden. Si no ves clara una, no la pongas.
+Responde sólo con JSON: {"cartas": ["...", "..."]}
+
+<b>Usuario</b>
+Cartas que quedan: PLAYA, BARCO, LUNA, ISLA, TIBURÓN, PIRATA, GATO, BANCO
+Pista: COSTA 2
+Pistas anteriores (con lo que salió): ninguna</pre>
+        <p>
+          Esto significa que la convención entre los dos vive ahora en dos trozos de texto que tienen que decir lo mismo. Si
+          cambiáis uno y no el otro, os pasa como a los bots con vectores distintos: cada uno piensa de una forma y se dejan de
+          entender. Y como el modelo no sigue las instrucciones al pie de la letra, el jefe de espías nunca puede simular al
+          agente del todo (es lo que en la página anterior llamábamos ruido).
+        </p>
+      </section>
+
+      <section id="comprobar" data-corto="Comprobar">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Comprobar todo lo que devuelve</h2>
+        </div>
+        <p>
+          Lo que sale de un modelo de lenguaje es texto, y se trata como cualquier entrada que viene de fuera: no os fiéis
+          hasta haberlo comprobado. Para el jefe de espías, como mínimo:
+        </p>
+        <pre class="pseudo">respuesta = llamar al modelo
+si no es JSON válido, o le falta "pista" o "numero":             reintentar
+si la pista tiene espacios, o está en el tablero, o empieza igual: reintentar, diciéndole por qué
+si el número no está entre 1 y 9:                                 reintentar
+si "para" nombra cartas que no son vuestras:                     reintentar
+tras 2 reintentos: usar la estrategia con margen de la página 03</pre>
+        <p>
+          Lo de reintentar "diciéndole por qué" importa: se añade al prompt algo como "ISLETA no vale porque empieza igual que
+          ISLA", y suele arreglarlo a la segunda. Y lo de tener una estrategia de reserva sin modelo de lenguaje también, porque
+          tarde o temprano la llamada falla o tarda demasiado (la competición de 2025, que ya es con modelos de lenguaje, da 60
+          segundos por respuesta <!--cite codenames-cog2025--><span class="cita">[<a href="#ref-codenames-cog2025" id="cita-codenames-cog2025">3</a>]</span><!--/cite-->).
+
+        </p>
+      </section>
+
+      <section id="hibrido" data-corto="Generar y verificar">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Generar con uno y verificar con otro</h2>
+        </div>
+        <p>
+          La gracia es que no hace falta elegir. Los vectores son baratos, exactos y no entienden nada; el modelo entiende
+          mucho y no es de fiar. Juntos se tapan los huecos, y hay dos formas típicas de hacerlo:
+        </p>
+        <ul>
+          <li><strong>El modelo propone y los vectores comprueban.</strong> Se le piden diez pistas candidatas con sus cartas, y a cada una se le pasa la cuenta de la página anterior (el orden del tablero, el margen, o el valor esperado). Se dice la mejor que la pasa. Así el modelo aporta ideas "humanas" y los vectores quitan las que llevarían al agente al asesino.</li>
+          <li><strong>Los vectores proponen y el modelo filtra.</strong> La estrategia con margen saca sus veinte mejores (ZONA, NUDISTA, BAHÍA, COSTA...) y el modelo elige la que entendería una persona. Es más barato, porque es una sola llamada y nunca inventa una pista que no valga.</li>
+        </ul>
+        <p>
+          Lo de generar con el modelo y comprobar con algo exacto se usa mucho fuera de los juegos también, por ejemplo para
+          que el código que escribe un modelo pase los tests antes de darlo por bueno.
+        </p>
+      </section>
+
+      <section id="comparar" data-corto="Frente al curso">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Todo el curso en una tabla</h2>
+        </div>
+        <p>
+          Para cerrar, lo que se gana y lo que se pierde con cada forma de meter conocimiento en un agente, de lo que hemos
+          visto este cuatrimestre:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Técnica</th><th scope="col">Dónde está el conocimiento</th><th scope="col">Coste por decisión</th><th scope="col">¿Se puede explicar?</th><th scope="col">¿Hace siempre lo mismo?</th></tr></thead>
+            <tbody>
+              <tr><td>Máquinas de estados, árboles, reglas, lógica borrosa</td><td>Escrito a mano por vosotros</td><td>Casi nada</td><td>Sí, regla a regla</td><td>Sí</td></tr>
+              <tr><td>Búsqueda (minimax, MCTS)</td><td>En el modelo del juego y la función de evaluación</td><td>El que le deis de tiempo</td><td>Sí, con el árbol</td><td>Con semilla, sí</td></tr>
+              <tr><td>Razonamiento basado en casos</td><td>En los casos guardados y la similitud</td><td>Buscar en la base</td><td>Sí: "como aquella vez"</td><td>Sí, salvo que cambie la base</td></tr>
+              <tr><td>Vectores de palabras</td><td>Aprendido de texto, en números sin nombre</td><td>Multiplicar y sumar</td><td>A medias: dice "se parece", no por qué</td><td>Sí</td></tr>
+              <tr><td>Modelos de lenguaje</td><td>Aprendido de muchísimo texto, y en el prompt</td><td>Una llamada: dinero y segundos</td><td>Explica, pero la explicación también la genera</td><td>No necesariamente</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Por lo que se ve en la industria, diría que los modelos de lenguaje entran en los juegos sobre todo donde hace falta lenguaje
+          de verdad (personajes con los que hablar, juegos de palabras como Infinite Craft) o durante el desarrollo, y casi
+          nunca para decidir lo que hace un enemigo en cada fotograma, que sigue siendo cosa de lo que hemos visto en el curso.
+          En Código Secreto las dos cosas se juntan, y por eso es un buen sitio para probarlas.
+        </p>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-vaswani-transformer">A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser e I. Polosukhin. "Attention Is All You Need". <em>Advances in Neural Information Processing Systems 30 (NeurIPS 2017)</em>, 2017. <a class="volver" href="#cita-vaswani-transformer" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-stephenson-codenames">M. Stephenson, M. Sidji y B. Ronval. "Codenames as a Benchmark for Large Language Models". <em>IEEE Transactions on Games</em>, 2025. <a href="https://arxiv.org/abs/2412.11373">arxiv.org/abs/2412.11373</a> <a class="volver" href="#cita-stephenson-codenames" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-codenames-cog2025">M. Stephenson, M. Sidji y G. Paolini. <em>Codenames AI Competition</em>. IEEE Conference on Games (CoG 2025), 2025. <a href="https://cog2025.inesc-id.pt/codenames/">cog2025.inesc-id.pt/codenames</a> <a class="volver" href="#cita-codenames-cog2025" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema bonus">
+        <a class="pager-prev" href="estrategias.html"><span class="pager-l">Anterior</span><span class="pager-t">Estrategias</span></a>
+        <a class="pager-next" href="simulador.html"><span class="pager-l">Siguiente</span><span class="pager-t">El simulador</span></a>
+      </nav>
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#aporta">Qué aporta</a></li>
+            <li><a href="#jefe">El jefe en un prompt</a></li>
+            <li><a href="#agente">El agente en un prompt</a></li>
+            <li><a href="#comprobar">Comprobar</a></li>
+            <li><a href="#hibrido">Generar y verificar</a></li>
+            <li><a href="#comparar">Frente al curso</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema bonus</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Código Secreto como problema</a></li>
+            <li><a href="vectores.html"><span>02</span>Palabras como vectores</a></li>
+            <li><a href="estrategias.html"><span>03</span>Estrategias</a></li>
+            <li><a href="modelos-lenguaje.html" aria-current="page"><span>04</span>Con un modelo de lenguaje</a></li>
+            <li><a href="simulador.html"><span>05</span>El simulador</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

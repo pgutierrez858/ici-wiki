@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/css/ici.css">
@@ -33,10 +34,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -49,7 +49,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Depurar reglas</span>
   </nav>
@@ -61,9 +61,9 @@
     </h1>
     <p class="standfirst">
       En una máquina de estados se ve en qué estado está el personaje. En un sistema de reglas no hay nada que
-      mirar: en cada turno se disparan unas cuantas reglas, gana un <code>ACTION</code> y el resto desaparece. Esta
-      guía da dos herramientas para verlo, una para probar reglas sin jugar y otra para seguirlas mientras se
-      juega, con el código entero y lo que sacan de verdad con el ejemplo de las siete reglas.
+      mirar: en cada turno se disparan unas cuantas reglas, gana un <code>ACTION</code> y el resto desaparece. En
+      esta guía tenéis dos herramientas para verlo (una para probar reglas sin jugar y otra para seguirlas mientras se
+      juega), con el código entero y lo que sacan de verdad con el ejemplo de las siete reglas.
     </p>
   </header>
 
@@ -95,7 +95,7 @@
               </tr>
               <tr>
                 <td><strong>3 · ¿La acción hace lo que debe?</strong></td>
-                <td>El problema ya no es de reglas: es Java, como en la Práctica&nbsp;1.</td>
+                <td>Aquí el problema ya es de Java, como en la Práctica&nbsp;1.</td>
                 <td><code>VerPartida</code> despacio, con la traza diciendo qué acción se está ejecutando.</td>
               </tr>
             </tbody>
@@ -192,8 +192,8 @@ BIEN  gana perseguir, esperaba perseguir</code></pre>
           </p>
         </div>
         <p>
-          Los casos sirven también para el diario: "este caso fallaba, cambié esto y ya no" es exactamente el tipo
-          de entrada que se pide, y se puede comprobar.
+          Los casos sirven también para el diario: "este caso fallaba, cambié esto y ya no" es justo el tipo
+          de entrada que busco, y además se puede comprobar.
         </p>
       </section>
 
@@ -340,8 +340,8 @@ executor.runGame(pacman, <span class="k">new</span> GhostsAggressive(), <span cl
 traza.resumen();</code></pre></div>
         <p>
           Para un fantasma, lo mismo con su motor: <code>new TrazaReglas("PINKY", ghosts.getMotor(GHOST.PINKY),
-          true)</code>. Con <code>false</code> escribe todos los turnos; sirve para mirar un momento concreto, no
-          una partida entera.
+          true)</code>. Con <code>false</code> escribe todos los turnos, lo que viene bien para mirar un momento
+          concreto, pero para una partida entera es demasiado.
         </p>
 
         <h3 class="label">Leerla</h3>
@@ -461,14 +461,14 @@ traza.resumen();</code></pre></div>
           <li>
             <strong><code>(watch rules)</code> en la primera línea del <code>.clp</code>.</strong> El
             <code>RuleEngine</code> lo ejecuta al cargar el fichero, y desde entonces Jess escribe una línea
-            <code>FIRE</code> por cada regla disparada, en todos los turnos, hasta que lo quitéis. Está comprobado
-            con el motor de la asignatura: sobrevive a los <code>reset</code> de cada turno. Con
-            <code>(watch facts)</code> salen también los hechos que entran y salen. Escribe muchísimo: para una
-            partida corta, o para un fantasma solo.
+            <code>FIRE</code> por cada regla disparada, en todos los turnos, hasta que lo quitéis. Lo he comprobado
+            con el motor de la asignatura, y sobrevive a los <code>reset</code> de cada turno. Con
+            <code>(watch facts)</code> salen también los hechos que entran y salen. Eso sí, escribe muchísimo, así que
+            mejor para una partida corta o para un fantasma solo.
           </li>
           <li>
             <strong>La consola de Jess</strong>, con el <code>.clp</code> cargado y unos hechos de prueba, como se
-            cuenta en <a href="tema2/clips.html#probar-jess">CLIPS y Jess</a>. Es <code>ProbarReglas</code> a mano.
+            cuenta en <a href="tema3/clips.html#probar-jess">CLIPS y Jess</a>. Es <code>ProbarReglas</code> a mano.
           </li>
         </ul>
         <p>
@@ -485,7 +485,7 @@ traza.resumen();</code></pre></div>
         <p>
           Los de Jess con el paquete <code>rules</code> (plantillas que no coinciden, ids que no están en el mapa,
           <code>TRUE</code> en mayúsculas, empates de <code>priority</code>) están en
-          <a href="tema2/reglas-mspacman.html#errores">los apuntes</a>. Estos son los que salieron montando el
+          <a href="tema3/reglas-mspacman.html#errores">los apuntes</a>. Estos son los que me salieron a mí montando el
           ejemplo:
         </p>
         <div class="table-scroll">
@@ -510,7 +510,7 @@ traza.resumen();</code></pre></div>
               </tr>
               <tr>
                 <td>Una regla se dispara dos veces y su <code>ACTION</code> aparece sólo una.</td>
-                <td>No es un error: Jess no aserta dos hechos idénticos. Pasa con <code>PELIGRO</code> en el ejemplo, que lo concluyen dos reglas. Si necesitáis distinguirlos, que el <code>info</code> sea distinto.</td>
+                <td>En realidad no es un error, Jess no aserta dos hechos idénticos. Pasa con <code>PELIGRO</code> en el ejemplo, que lo concluyen dos reglas. Si necesitáis distinguirlos, que el <code>info</code> sea distinto.</td>
               </tr>
               <tr>
                 <td>Se dispara una regla con un <code>not</code> que no debería cumplirse.</td>
@@ -575,7 +575,7 @@ traza.resumen();</code></pre></div>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -57,11 +57,11 @@
 
   <header class="masthead">
     <h1>
-      Sistemas de reglas
+      Práctica 3 · Sistemas de reglas
       <span class="thin">Reglas que se ven disparar, y versiones que se miden contra los mismos rivales.</span>
     </h1>
     <p class="standfirst">
-      El objetivo de esta práctica es implementar los comportamientos de Ms.&nbsp;Pac-Man y de los fantasmas
+      En esta práctica vais a implementar los comportamientos de Ms.&nbsp;Pac-Man y de los fantasmas
       mediante un <strong>sistema de reglas en CLIPS</strong>, ejecutado por Jess. Como en la Práctica&nbsp;2, lo
       que más pesa es <strong>cómo llegáis</strong> al controlador final: saber qué reglas se disparan y por
       qué, y saber si cada versión es mejor que la anterior, con números.
@@ -87,8 +87,8 @@
       <dd>15 reglas<small>Por comportamiento, y que se disparen</small></dd>
     </div>
     <div class="fact">
-      <dt>Para empezar</dt>
-      <dd>Siete reglas<small>Un ejemplo guiado, con su proyecto</small></dd>
+      <dt>Guía paso a paso</dt>
+      <dd><a href="../guias/reglas-paso-a-paso.html">Siete reglas<span class="arrow" aria-hidden="true">&#8594;</span></a><small>Un ejemplo guiado, con su proyecto</small></dd>
     </div>
   </dl>
 
@@ -127,7 +127,7 @@
         <div class="note tip">
           <span class="note-label">Antes de empezar</span>
           <p>
-            Leed <a href="../guias/tema2/reglas-mspacman.html"><strong>Reglas en Ms.&nbsp;Pac-Man</strong></a>, en
+            Leed <a href="../guias/tema3/reglas-mspacman.html"><strong>Reglas en Ms.&nbsp;Pac-Man</strong></a>, en
             los apuntes del tema 3: el paquete <code>rules</code> pieza a pieza. Y después haced entera la guía
             <a href="../guias/reglas-paso-a-paso.html"><strong>Ms.&nbsp;Pac-Man con siete reglas</strong></a>, con
             su proyecto descargado y abierto: es el punto de partida de la práctica. Lo que hicisteis en la
@@ -212,7 +212,7 @@
         <div class="note mine">
           <span class="note-label">Quince reglas que hagan algo</span>
           <p>
-            No sirve copiar una regla cambiando un número. La complejidad que se valora es la que aprovecha lo que
+            Copiar una regla cambiando un número no cuenta como regla nueva. La complejidad que se valora es la que aprovecha lo que
             tiene un sistema de reglas: hechos intermedios que encadenan reglas, memoria entre turnos,
             <code>not</code>, variables que relacionan varios hechos, acciones con parámetros. Todo eso aparece en
             el ejemplo guiado, con su porqué.
@@ -419,8 +419,8 @@ antes que peligro. salience 10 en las reglas de PELIGRO. BIEN.
 ## mié 21 oct · + rematar (7 reglas) → v1
 Ruido, también repitiendo con otras semillas. Al concurso va v0.</code></pre>
         <p>
-          Están el porqué de cada regla, un caso que falló y cómo se arregló, la traza explicando un "no se nota",
-          una falsa alarma deshecha repitiendo y una versión descartada. Eso es lo que se pide.
+          Ahí tenéis el porqué de cada regla, un caso que falló y cómo se arregló, la traza explicando un "no se nota",
+          una falsa alarma deshecha repitiendo y una versión descartada, y algo así es lo que se pide.
         </p>
       </section>
 
@@ -542,7 +542,7 @@ Ruido, también repitiendo con otras semillas. Al concurso va v0.</code></pre>
         <div class="note mine rail-nota">
           <span class="note-label">El tema</span>
           <p style="margin:0">
-            <a href="../guias/tema2/index.html">Sistemas de reglas</a>: hechos, encadenamiento, conflictos, Rete y
+            <a href="../guias/tema3/index.html">Sistemas de reglas</a>: hechos, encadenamiento, conflictos, Rete y
             Jess, con bancos de pruebas en la página.
           </p>
         </div>
@@ -569,7 +569,7 @@ Ruido, también repitiendo con otras semillas. Al concurso va v0.</code></pre>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

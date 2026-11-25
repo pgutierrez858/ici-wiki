@@ -9,7 +9,8 @@ y, si quiere, los atributos
     usa_reloj = False           para los rivales de profundidad fija, que no miran el reloj
 
 `tablero` es una copia: el jugador puede hacer push/pop en él sin miedo.
-`tiempo` son los segundos que tiene para pensar esa jugada.
+`tiempo` son los segundos que tiene para pensar esa jugada. Con reloj de partida, nunca
+más de lo que le queda en su reloj (y nunca menos de MINIMO).
 """
 import time
 
@@ -19,6 +20,8 @@ VALOR = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3, chess.ROOK: 5, chess.Q
 
 # Por encima de esto (veces el tiempo por jugada), una jugada va fuera de tiempo.
 MARGEN = 1.5
+# Con el reloj de partida agotado, cada jugada recibe esto.
+MINIMO = 0.05
 
 
 def material(tablero, color=chess.WHITE):
@@ -30,7 +33,7 @@ def material(tablero, color=chess.WHITE):
 
 
 def jugar(blancas, negras, tiempo=1.0, max_medias=200, fen=chess.STARTING_FEN,
-          estricto=False, al_mover=None):
+          estricto=False, al_mover=None, reloj=None):
     """Juega una partida y devuelve (resultado, motivo, tablero).
 
     resultado   "1-0", "0-1" o "1/2-1/2"
@@ -41,9 +44,12 @@ def jugar(blancas, negras, tiempo=1.0, max_medias=200, fen=chess.STARTING_FEN,
                 MARGEN veces el tiempo pierde la partida. Con False, las excepciones
                 saltan (para que veáis dónde) y el tiempo sólo avisa.
     al_mover    función (tablero, jugada, jugador, segundos) que se llama tras cada jugada
+    reloj       segundos de reloj para toda la partida, para cada jugador (None: sin reloj).
+                Cada jugada recibe min(tiempo, lo que le queda), y como poco MINIMO.
     """
     tablero = chess.Board(fen)
     jugadores = {chess.WHITE: blancas, chess.BLACK: negras}
+    gastado = {chess.WHITE: 0.0, chess.BLACK: 0.0}
     while True:
         fin = tablero.outcome(claim_draw=True)
         if fin is not None:
@@ -59,23 +65,25 @@ def jugar(blancas, negras, tiempo=1.0, max_medias=200, fen=chess.STARTING_FEN,
         turno = tablero.turn
         jugador = jugadores[turno]
         pierde = "0-1" if turno == chess.WHITE else "1-0"
+        t = tiempo if reloj is None else max(MINIMO, min(tiempo, reloj - gastado[turno]))
         t0 = time.perf_counter()
         try:
-            jugada = jugador.elegir(tablero.copy(), tiempo)
+            jugada = jugador.elegir(tablero.copy(), t)
         except Exception as e:
             if not estricto:
                 raise
             return pierde, f"{jugador.nombre} lanza {type(e).__name__}: {e}", tablero
         segundos = time.perf_counter() - t0
+        gastado[turno] += segundos
 
         if jugada not in tablero.legal_moves:
             if not estricto:
                 raise ValueError(f"{jugador.nombre} devuelve {jugada!r}, que no es legal en\n{tablero.fen()}")
             return pierde, f"{jugador.nombre} hace una jugada ilegal: {jugada}", tablero
-        if segundos > tiempo * MARGEN + 0.05 and getattr(jugador, "usa_reloj", True):
+        if segundos > t * MARGEN + 0.05 and getattr(jugador, "usa_reloj", True):
             if estricto:
-                return pierde, f"{jugador.nombre} tarda {segundos:.2f} s con {tiempo} s", tablero
-            print(f"OJO: {jugador.nombre} ha tardado {segundos:.2f} s y tenía {tiempo} s")
+                return pierde, f"{jugador.nombre} tarda {segundos:.2f} s con {t:.2f} s", tablero
+            print(f"OJO: {jugador.nombre} ha tardado {segundos:.2f} s y tenía {t:.2f} s")
 
         tablero.push(jugada)
         if al_mover:

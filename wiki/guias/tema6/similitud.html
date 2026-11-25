@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Recuperar: la similitud · Tema 6 · ICI</title>
+<meta name="description" content="Cómo decide un sistema de casos qué caso se parece más a la situación de ahora: elegir los atributos, la similitud local de cada uno (intervalo, igualdad, umbral, tabla), la similitud global como media pesada, los k vecinos más cercanos, los errores típicos con los rangos y cuánto cuesta buscar. Con las cuentas paso a paso y un ejemplo interactivo.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 6</a>
+    <span aria-hidden="true">/</span>
+    <span>Recuperar: la similitud</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 6 · 02 · Razonamiento basado en casos</p>
+    <h1>
+      Recuperar: la similitud
+      <span class="thin">Lo que antes iba en las reglas ahora va en una sola pregunta: qué se parece a qué.</span>
+    </h1>
+    <p class="standfirst">
+      Qué atributos describen una situación, cómo se compara cada uno (la similitud local), cómo se juntan en un único
+      número (la similitud global), qué cambia al mirar varios vecinos en vez de uno, y los dos errores con los rangos que
+      más se repiten.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <p>
+        Recuperar es comparar la consulta con cada caso de la base y quedarse con los que más se le parecen. Para eso nos
+        hace falta una función que, dados un caso y una consulta, devuelva un número entre 0 (no se parecen nada) y 1 (son
+        iguales), y a ese número lo llamamos <strong>similitud</strong>. Se construye en dos pisos: primero se compara cada
+        atributo por separado y luego se juntan las comparaciones <!--cite recio-cbr-recuperar | transp. 5–8--><span class="cita">[<a href="#ref-recio-cbr-recuperar" id="cita-recio-cbr-recuperar">1</a>, transp. 5–8]</span><!--/cite-->.
+      </p>
+
+      <section id="atributos" data-corto="Los atributos">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Qué atributos describen una situación</h2>
+        </div>
+        <p>
+          La descripción de un caso es lo que Ms. Pac-Man "ve" al llegar a un cruce, y es la misma pregunta que os hacíais
+          en la Práctica&nbsp;3 al escribir las clases <code>Input</code>: qué hace falta saber para decidir. La diferencia es
+          que aquí cada atributo que pongáis se va a comparar, y un atributo que no importa estorba (hace que dos situaciones
+          que piden lo mismo parezcan distintas).
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Atributo</th><th scope="col">Tipo</th><th scope="col">¿Ayuda a decidir?</th></tr></thead>
+            <tbody>
+              <tr><td>Distancia al fantasma más cercano</td><td>Número</td><td>Sí, es lo primero que mira cualquiera.</td></tr>
+              <tr><td>¿Ese fantasma es comestible?</td><td>Sí o no</td><td>Sí, porque cambia huir por perseguir.</td></tr>
+              <tr><td>Distancia a la píldora de poder más cercana</td><td>Número</td><td>Sí.</td></tr>
+              <tr><td>Tiempo que le queda al fantasma comestible</td><td>Número</td><td>Sí, para saber si da tiempo a cazarlo.</td></tr>
+              <tr><td>Dirección por la que viene el fantasma</td><td>Una de cuatro</td><td>Sí, si la solución es un movimiento (está en la <a href="reutilizar.html#adaptar">página 03</a>).</td></tr>
+              <tr><td>Puntos que lleva</td><td>Número</td><td>¿Decidiríais distinto con 2000 puntos que con 8000?</td></tr>
+              <tr><td>Tics de partida</td><td>Número</td><td>Lo mismo que con los puntos: mirad si de verdad cambia algo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Las dos últimas filas no son una errata, que la plantilla de la práctica trae los puntos y el tiempo en la
+          descripción. Os toca a vosotros decidir si se quedan.
+        </p>
+      </section>
+
+      <section id="local" data-corto="Similitud local">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">La similitud local, atributo a atributo</h2>
+        </div>
+        <p>
+          Para cada atributo se elige una función que compare su valor en el caso con su valor en la consulta, según su tipo <!--cite recio-cbr-recuperar | transp. 11–16--><span class="cita">[<a href="#ref-recio-cbr-recuperar">1</a>, transp. 11–16]</span><!--/cite-->. Llamemos
+          <var>a</var> al valor en el caso y <var>b</var> al de la consulta.
+        </p>
+        <h3 class="label">Números: el intervalo</h3>
+        <p>
+          Es la más usada. Se elige un número <var>r</var>, el <strong>rango</strong>, que es la diferencia a partir de la
+          cual dos valores ya no se parecen nada, y la similitud baja en línea recta desde 1 (cuando son iguales) hasta 0
+          (cuando se diferencian en <var>r</var>):
+        </p>
+        <!--TEX \mathrm{sim}(a, b) = 1 - \frac{|a - b|}{r} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mi mathvariant="normal">∣</mi><mi>a</mi><mo>−</mo><mi>b</mi><mi mathvariant="normal">∣</mi></mrow><mi>r</mi></mfrac></mrow><annotation encoding="application/x-tex">\mathrm{sim}(a, b) = 1 - \frac{|a - b|}{r}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm">sim</span></span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.113em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">b</span><span class="mord">∣</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Por ejemplo, con <var>r</var>&nbsp;=&nbsp;100, un fantasma a 12 pasos y otro a 10:
+        </p>
+        <pre class="pseudo">sim = 1 − |12 − 10| / 100
+    = 1 − 2 / 100
+    = 0,98</pre>
+        <p>
+          En jCOLIBRI es <code>new Interval(r)</code>.
+        </p>
+        <h3 class="label">Sí o no, o nombres: la igualdad</h3>
+        <p>
+          Vale 1 si los dos valores son iguales y 0 si no. Sirve para "¿es comestible?" y para cualquier atributo que no
+          tenga orden. En jCOLIBRI, <code>new Equal()</code>.
+        </p>
+        <h3 class="label">El umbral</h3>
+        <p>
+          Vale 1 si la diferencia no pasa de un número <var>u</var> y 0 si lo pasa ("a menos de 5 pasos de diferencia, me da
+          igual"), o sea, es el intervalo en versión todo o nada. En jCOLIBRI, <code>new Threshold(u)</code>, y ojo, que
+          sólo funciona con enteros.
+        </p>
+        <h3 class="label">Valores con nombre que se parecen entre sí: la tabla</h3>
+        <p>
+          Si un atributo puede valer <code>LEJOS</code>, <code>MEDIO</code> o <code>CERCA</code>, con la igualdad
+          <code>LEJOS</code> y <code>MEDIO</code> no se parecen nada, igual que <code>LEJOS</code> y <code>CERCA</code>. Con
+          una tabla podéis escribir a mano cuánto se parece cada par:
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col"></th><th scope="col">LEJOS</th><th scope="col">MEDIO</th><th scope="col">CERCA</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">LEJOS</th><td>1</td><td>0,6</td><td>0</td></tr>
+              <tr><th scope="row">MEDIO</th><td>0,6</td><td>1</td><td>0,5</td></tr>
+              <tr><th scope="row">CERCA</th><td>0</td><td>0,5</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          En jCOLIBRI es <code>new Table("fichero.csv")</code>, con la tabla en un CSV. También está
+          <code>EnumDistance</code>, que usa el orden en que se declaran los valores del <code>enum</code>, pero cuidado con
+          usarla con <code>MOVE</code>, porque el orden de <code>UP</code>, <code>RIGHT</code>, <code>DOWN</code> y
+          <code>LEFT</code> no significa nada.
+        </p>
+        <div class="note trap">
+          <span class="note-label">El intervalo no se para en 0</span>
+          <p>
+            jCOLIBRI calcula <code>1 - |a - b| / r</code> tal cual, sin recortar, así que si dos valores se diferencian en
+            más de <var>r</var> la similitud sale negativa. La plantilla del año pasado ponía la distancia al fantasma a
+            <code>Integer.MAX_VALUE</code> cuando estaban todos en la casa, y con <code>Interval(650)</code> y un caso con el
+            fantasma a 20 pasos pasaba esto:
+          </p>
+          <pre class="pseudo">sim = 1 − |2 147 483 647 − 20| / 650
+    = 1 − 3 303 820,96
+    = −3 303 819,96</pre>
+          <p>
+            Un solo atributo así se come la media de todos los demás. Por eso la plantilla de este año pone un tope
+            (<code>DISTANCIA_MAX</code>, que vale 650, en <code>MsPacManInput</code>), y si añadís atributos os toca ponerles
+            el suyo. Mirad también los puntos, porque con <code>Interval(15000)</code> dos partidas que se lleven más de
+            15&#8239;000 puntos también dan negativo.
+          </p>
+        </div>
+      </section>
+
+      <section id="global" data-corto="Similitud global">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">La similitud global: la media pesada</h2>
+        </div>
+        <p>
+          Con una similitud por atributo, falta juntarlas, y lo normal es hacer la media dando a cada atributo un
+          <strong>peso</strong> según lo que importe <!--cite recio-cbr-recuperar | transp. 17--><span class="cita">[<a href="#ref-recio-cbr-recuperar">1</a>, transp. 17]</span><!--/cite-->. Llamemos <var>C</var> al caso, <var>Q</var> a la consulta y
+          <var>n</var> al número de atributos, y para cada atributo <var>i</var>, <var>c<sub>i</sub></var> a su valor en el
+          caso, <var>q<sub>i</sub></var> a su valor en la consulta, <var>sim<sub>i</sub></var> a su similitud local y
+          <var>w<sub>i</sub></var> a su peso. Entonces:
+        </p>
+        <!--TEX \mathrm{sim}(C, Q) = \frac{\sum_{i=1}^{n} w_i \cdot \mathrm{sim}_i(c_i, q_i)}{\sum_{i=1}^{n} w_i} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mo stretchy="false">(</mo><mi>C</mi><mo separator="true">,</mo><mi>Q</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>w</mi><mi>i</mi></msub><mo>⋅</mo><msub><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mi>i</mi></msub><mo stretchy="false">(</mo><msub><mi>c</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>q</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\mathrm{sim}(C, Q) = \frac{\sum_{i=1}^{n} w_i \cdot \mathrm{sim}_i(c_i, q_i)}{\sum_{i=1}^{n} w_i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm">sim</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">Q</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.488em;vertical-align:-0.994em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.494em;"><span style="top:-2.3057em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.6897em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">sim</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.994em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          Es decir, cada similitud local multiplicada por su peso, todo sumado, y dividido por la suma de los pesos para
+          que el resultado siga entre 0 y 1. En jCOLIBRI es <code>Average</code> (la plantilla trae su propia versión, que
+          es más rápida) y los pesos se ponen con <code>simConfig.setWeight(atributo, peso)</code>. Si no ponéis ninguno,
+          todos valen 1.
+        </p>
+
+        <h3 class="label">El ejemplo de la página anterior, con números</h3>
+        <p>
+          La consulta era el fantasma a 12 y la píldora a 40. Con <var>r</var>&nbsp;=&nbsp;100 en los dos atributos y los
+          dos pesos a 1:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Caso</th><th scope="col">Fantasma</th><th scope="col">Píldora</th><th scope="col">Solución</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>70</td><td>60</td><td>comer pastillas</td></tr>
+              <tr><td>2</td><td>10</td><td>55</td><td>huir</td></tr>
+              <tr><td>3</td><td>15</td><td>8</td><td>ir a la píldora</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <pre class="pseudo"><b>Caso 1</b>
+sim fantasma = 1 − |12 − 70| / 100 = 1 − 0,58 = 0,42
+sim píldora  = 1 − |40 − 60| / 100 = 1 − 0,20 = 0,80
+sim global   = (0,42 + 0,80) / 2
+             = 1,22 / 2
+             = 0,61
+
+<b>Caso 2</b>
+sim fantasma = 1 − |12 − 10| / 100 = 1 − 0,02 = 0,98
+sim píldora  = 1 − |40 − 55| / 100 = 1 − 0,15 = 0,85
+sim global   = (0,98 + 0,85) / 2
+             = 1,83 / 2
+             = 0,915
+
+<b>Caso 3</b>
+sim fantasma = 1 − |12 − 15| / 100 = 1 − 0,03 = 0,97
+sim píldora  = 1 − |40 − 8| / 100  = 1 − 0,32 = 0,68
+sim global   = (0,97 + 0,68) / 2
+             = 1,65 / 2
+             = 0,825</pre>
+        <p>
+          Gana el caso&nbsp;2, con 0,915, así que Ms. Pac-Man huye (como habíamos dicho a ojo).
+        </p>
+
+        <h3 class="label">Lo que se le pide a una similitud</h3>
+        <p>
+          Dos cosas: que todo se parezca del todo a sí mismo (sim(A,&nbsp;A)&nbsp;=&nbsp;1) y que dé igual el orden
+          (sim(A,&nbsp;B)&nbsp;=&nbsp;sim(B,&nbsp;A)). Lo que no tiene por qué cumplir es la transitividad: que A se parezca
+          a B y B se parezca a C no quiere decir que A se parezca a C. Pensad en tres figuras que comparamos por su color y
+          por su forma. Cada atributo vale 1 si coincide y 0 si no, y la similitud global es la media de los dos
+          <!--cite recio-cbr-recuperar | transp. 4--><span class="cita">[<a href="#ref-recio-cbr-recuperar">1</a>, transp. 4]</span><!--/cite-->.
+        </p>
+        <figure class="wide">
+          <figcaption>El cuadrado rojo se parece a los otros dos, pero los otros dos no se parecen entre sí</figcaption>
+          <svg class="explica" viewBox="0 0 640 236" role="img" aria-label="Un círculo rojo, un cuadrado rojo y un cuadrado azul. El círculo rojo y el cuadrado rojo comparten el color: similitud 0,5. El cuadrado rojo y el cuadrado azul comparten la forma: similitud 0,5. El círculo rojo y el cuadrado azul no comparten nada: similitud 0.">
+            <path d="M120 62 Q220 4 320 62" class="sim-si"/>
+            <text x="220" y="26" class="mc-t sim-si-t mc-centro">mismo color · 0,5</text>
+            <path d="M320 62 Q420 4 520 62" class="sim-si"/>
+            <text x="420" y="26" class="mc-t sim-si-t mc-centro">misma forma · 0,5</text>
+            <circle cx="120" cy="110" r="36" class="sim-rojo"/>
+            <rect x="284" y="74" width="72" height="72" rx="4" class="sim-rojo"/>
+            <rect x="484" y="74" width="72" height="72" rx="4" class="sim-azul"/>
+            <text x="120" y="172" class="mc-t mc-centro">círculo rojo</text>
+            <text x="320" y="172" class="mc-t mc-centro">cuadrado rojo</text>
+            <text x="520" y="172" class="mc-t mc-centro">cuadrado azul</text>
+            <path d="M120 186 Q320 266 520 186" class="sim-no"/>
+            <text x="320" y="216" class="mc-t sim-no-t mc-centro">nada en común · 0</text>
+          </svg>
+        </figure>
+        <pre class="pseudo"><b>círculo rojo y cuadrado rojo</b>
+sim color  = 1   (los dos son rojos)
+sim forma  = 0
+sim global = (1 + 0) / 2
+           = 0,5
+
+<b>cuadrado rojo y cuadrado azul</b>
+sim color  = 0
+sim forma  = 1   (los dos son cuadrados)
+sim global = (0 + 1) / 2
+           = 0,5
+
+<b>círculo rojo y cuadrado azul</b>
+sim color  = 0
+sim forma  = 0
+sim global = (0 + 0) / 2
+           = 0</pre>
+        <p>
+          El cuadrado rojo hace de puente: se parece a medias a cada uno, pero lo que comparte con el círculo (el color) no
+          es lo que comparte con el otro cuadrado (la forma). Por eso, que dos casos se parezcan a un tercero no os dice
+          nada de cómo se parecen entre ellos.
+        </p>
+        <p>
+          Tampoco es obligatorio juntarlas con la media pesada. Otras formas habituales son quedarse con la peor de todas
+          (el mínimo, que es muy exigente) o tratar los atributos como un vector, calcular la distancia euclídea y convertirla
+          en similitud, por ejemplo con 1 / (1 + distancia). La media es la más fácil de entender y de ajustar, y es la que
+          trae la plantilla.
+        </p>
+
+        <h3 class="label">El rango también es un peso</h3>
+        <p>
+          La plantilla usa <code>Interval(650)</code> para las distancias. Si repetimos la cuenta del caso&nbsp;3 con
+          <var>r</var>&nbsp;=&nbsp;650 en la píldora:
+        </p>
+        <pre class="pseudo">sim píldora = 1 − |40 − 8| / 650
+            = 1 − 0,049
+            = 0,951</pre>
+        <p>
+          Con un rango tan grande, 32 pasos de diferencia casi no cuentan, y la píldora a 8 pasos y a 40 parecen lo mismo.
+          En las partidas que he lanzado con la plantilla ninguna distancia real pasó de 165 pasos, así que la similitud más
+          baja posible entre dos distancias reales es
+        </p>
+        <pre class="pseudo">1 − 165 / 650 = 1 − 0,25 = 0,75</pre>
+        <p>
+          y casi todos los casos salen por encima de 0,7, que es justo el umbral que usa la plantilla para decidir que "no
+          hay nada parecido". Con ese rango, el umbral casi nunca salta. En general, un rango pequeño hace que el atributo sea
+          exigente y uno grande que sea tolerante, de modo que elegir los rangos es otra forma (un pelín escondida) de elegir
+          los pesos.
+        </p>
+      </section>
+
+      <section id="vecinos" data-corto="Los k vecinos">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Uno o varios: los k vecinos más cercanos</h2>
+        </div>
+        <p>
+          Quedarse sólo con el caso más parecido (1-NN, el vecino más cercano) es frágil: si ese caso es malo, porque aquella
+          vez huir salió mal por mala suerte, se repite el error. Lo habitual es recuperar los <var>k</var> más parecidos <!--cite cover-hart-knn--><span class="cita">[<a href="#ref-cover-hart-knn" id="cita-cover-hart-knn">2</a>]</span><!--/cite--> y que
+          <strong>voten</strong>, cada uno por su solución, de forma que gana la que más votos tenga. Con
+          <strong>votación pesada</strong> cada voto vale su similitud, y un caso de 0,95 cuenta más que uno de 0,70.
+        </p>
+        <div class="demo" data-cbr="vecinos">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h3>Mover la consulta entre 26 casos guardados</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Muestra 26 casos en un plano (distancia al fantasma, distancia a la píldora), coloreados por su acción, y los k más parecidos a un punto que movéis vosotros.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <div class="note tip">
+          <span class="note-label">Qué probar</span>
+          <ul>
+            <li>Pulsad "Pintar qué se decide en cada punto" con k&nbsp;=&nbsp;1, y cada caso se queda con una zona alrededor.
+              El caso&nbsp;14 (fantasma a 36, píldora a 43) huyó donde un buen jugador habría seguido comiendo, como pasa a
+              veces en cualquier partida, y hace una isla roja. Subid a k&nbsp;=&nbsp;5 y mirad qué le pasa a la isla.</li>
+            <li>Con las zonas pintadas, poned el peso de la píldora a 0. Las fronteras se vuelven verticales, porque sólo
+              cuenta el fantasma. Después probad a poner a 0 el del fantasma.</li>
+            <li>Con k&nbsp;=&nbsp;5, buscad un punto donde "un voto cada uno" y "pesada por similitud" decidan cosas distintas
+              (los hay cerca de las fronteras). Con k&nbsp;=&nbsp;3 no vais a encontrar ninguno, ¿por qué?</li>
+          </ul>
+        </div>
+        <p>
+          Un <var>k</var> pequeño se cree cualquier caso suelto, y uno grande junta casos que ya no se parecen tanto. Por lo
+          general se prueba con 3, 5 o 7 (impares, para que haya menos empates). En la <a href="reutilizar.html">página
+          siguiente</a> hay una tercera forma de votar, según cómo salió cada caso.
+        </p>
+      </section>
+
+      <section id="coste" data-corto="Lo que cuesta">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Lo que cuesta buscar</h2>
+        </div>
+        <p>
+          La recuperación de la plantilla (<code>NNScoringMethod.evaluateSimilarity</code>) compara la consulta con todos los
+          casos de la base, uno a uno, y luego los ordena. Si la base tiene <var>N</var> casos y la descripción <var>n</var>
+          atributos, cada decisión hace del orden de <var>N</var>&nbsp;·&nbsp;<var>n</var> comparaciones. Con 10&#8239;000
+          casos y 5 atributos son 50&#8239;000 cuentas por cruce, que caben de sobra en los 40&nbsp;ms de un tic, pero con
+          millones de casos ya no.
+        </p>
+        <p>
+          Antes de complicar la búsqueda hay cosas sencillas que ayudan. La plantilla ya decide sólo en los cruces (entre un
+          cruce y otro Ms. Pac-Man sigue por el pasillo y no hay nada que elegir). También se puede partir la base, una por
+          rival (la plantilla ya lo hace) o una para cuando hay fantasmas comestibles y otra para cuando no, y así cada
+          búsqueda mira menos casos y además no se mezclan situaciones que no se parecen. Y, por último, guardar menos, porque
+          muchos casos casi iguales no aportan nada (está en la <a href="revisar-retener.html#retener">página 04</a>).
+        </p>
+        <p>
+          Más allá de eso hay índices pensados para buscar vecinos (árboles k-d, o agrupar los casos y buscar sólo en el
+          grupo más cercano) <!--cite recio-cbr-recuperar | transp. 3--><span class="cita">[<a href="#ref-recio-cbr-recuperar">1</a>, transp. 3]</span><!--/cite-->, pero con las bases de esta práctica no os van a hacer falta.
+
+        </p>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-recio-cbr-recuperar">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: recuperación y adaptación</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-recuperar" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-cover-hart-knn">T. M. Cover y P. E. Hart. "Nearest Neighbor Pattern Classification". <em>IEEE Transactions on Information Theory 13(1), 21–27</em>, 1967. <a class="volver" href="#cita-cover-hart-knn" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema 6">
+        <a class="pager-prev" href="que-es.html"><span class="pager-l">Anterior</span><span class="pager-t">Recordar en vez de razonar</span></a>
+        <a class="pager-next" href="reutilizar.html"><span class="pager-l">Siguiente</span><span class="pager-t">Reutilizar y adaptar</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#atributos">Los atributos</a></li>
+            <li><a href="#local">Similitud local</a></li>
+            <li><a href="#global">Similitud global</a></li>
+            <li><a href="#vecinos">Los k vecinos</a></li>
+            <li><a href="#coste">Lo que cuesta</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 6</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Recordar en vez de razonar</a></li>
+            <li><a href="similitud.html" aria-current="page"><span>02</span>Recuperar: la similitud</a></li>
+            <li><a href="reutilizar.html"><span>03</span>Reutilizar y adaptar</a></li>
+            <li><a href="revisar-retener.html"><span>04</span>Revisar, retener y olvidar</a></li>
+            <li><a href="jcolibri.html"><span>05</span>CBR en Ms. Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/cbr.js" defer></script>
+</body>
+</html>

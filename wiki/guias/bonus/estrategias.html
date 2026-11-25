@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Estrategias: aciertos contra riesgo · Tema bonus · ICI</title>
+<meta name="description" content="Estrategias para dar pistas en Código Secreto con vectores de palabras: dos ingenuas (una a una y la media), la del bot base de la competición de Código Secreto, el margen frente al ruido, la puntuación blanda de Koyyalagunta y otros y el valor esperado con simulaciones, con las cuentas en un tablero de ocho cartas, pseudocódigo, una liguilla para compararlas y una lista de ideas para probar.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema bonus</a>
+    <span aria-hidden="true">/</span>
+    <span>Estrategias: aciertos contra riesgo</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema bonus · 03 · Juegos de lenguaje</p>
+    <h1>
+      Estrategias: aciertos contra riesgo
+      <span class="thin">Muchas palabras posibles, pocas buenas y una que hace perder.</span>
+    </h1>
+    <p class="standfirst">
+      Dar una pista es elegir una acción, la palabra y el número, que descubra cuantas más cartas mejor sin arriesgarse a tocar las del rival o el asesino. No hay una forma única de equilibrar las dos cosas: veamos dos estrategias ingenuas, la del bot base de la competición y tres formas distintas de manejar el riesgo, todas con las cuentas en el mismo tablero.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="problema" data-corto="El problema">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El problema: aciertos contra riesgo</h2>
+        </div>
+        <p>
+          Para el jefe de espías, cada jugada posible es una pareja (pista, número). Llamamos <var>c</var> a la pista,
+          <var>n</var> al número, y <var>s</var>(<var>c</var>,&nbsp;<var>x</var>) al coseno entre la pista y la carta
+          <var>x</var> (el parecido de la página anterior). A las cartas que no son vuestras, sean del rival, neutrales o el
+          asesino, las llamamos las <strong>malas</strong>.
+        </p>
+        <p>
+          Una pista con un <var>n</var> grande acaba antes la partida, y es lo que se mide en la competición de bots de
+          Código Secreto: juega un solo equipo, se cuentan los turnos que tarda en descubrir todas sus cartas, y si toca el
+          asesino (o todas las del rival) se le apuntan 25 <!--cite codenames-competicion--><span class="cita">[<a href="#ref-codenames-competicion" id="cita-codenames-competicion">1</a>]</span><!--/cite-->. Pero cuanto más grande es <var>n</var>, más fácil es que alguna
+          mala se cuele por delante. Todas las estrategias de esta página son formas distintas de equilibrar esas dos cosas,
+          y hay tres filosofías:
+        </p>
+        <ul>
+          <li><strong>Condiciones que no se negocian.</strong> Una pista sólo vale si cumple ciertas reglas ("ninguna mala por delante", "parecido de al menos tal"), y entre las que valen se coge la de más <var>n</var>. Es lo que hacen el bot base de la competición y la estrategia con margen.</li>
+          <li><strong>Una puntuación que compensa.</strong> Se suma lo bueno y se resta lo malo con un peso, y gana la de más puntos, aunque tenga alguna pega. Es la puntuación blanda.</li>
+          <li><strong>Contar lo que puede pasar.</strong> Se modela cómo se puede equivocar el compañero, se simulan muchas veces sus elecciones y se coge la pista que da más de media. Es el valor esperado, y es primo directo de las simulaciones del tema&nbsp;5.</li>
+        </ul>
+        <p>
+          Vamos a hacer todas las cuentas en el tablero pequeño de la página anterior. Sois el rojo, vuestras son PLAYA, ISLA
+          y PIRATA, y de las miles de pistas posibles nos quedamos con cinco para poder seguirlas a mano:
+        </p>
+        <figure class="cn-fig narrow-tab">
+          <figcaption>El tablero de toda la página</figcaption>
+          <div class="cn-tablero" style="--cols:4"><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">PLAYA</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">BARCO</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">LUNA</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">ISLA</span></div><div class="cn-carta cn-X clave"><span class="cn-tipo">asesino</span><span class="cn-w">TIBURÓN</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">PIRATA</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">GATO</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">BANCO</span></div></div>
+        </figure>
+        <div class="table-scroll">
+          <table class="ancha cn-tabla">
+            <caption class="sr-only">Coseno de cinco pistas con cada una de las ocho cartas</caption>
+            <thead><tr><th scope="col">Pista</th><th scope="col" class="cn-th cn-R">PLAYA</th><th scope="col" class="cn-th cn-A">BARCO</th><th scope="col" class="cn-th cn-N">LUNA</th><th scope="col" class="cn-th cn-R">ISLA</th><th scope="col" class="cn-th cn-X">TIBURÓN</th><th scope="col" class="cn-th cn-R">PIRATA</th><th scope="col" class="cn-th cn-N">GATO</th><th scope="col" class="cn-th cn-A">BANCO</th></tr></thead><tbody><tr><th scope="row">MAR</th><td>0,54</td><td>0,54</td><td>0,29</td><td>0,50</td><td>0,37</td><td>0,29</td><td>−0,03</td><td>0,09</td></tr><tr><th scope="row">COSTA</th><td>0,64</td><td>0,27</td><td>0,22</td><td>0,78</td><td>0,18</td><td>0,29</td><td>−0,25</td><td>0,01</td></tr><tr><th scope="row">ARENA</th><td>0,51</td><td>0,09</td><td>0,30</td><td>0,34</td><td>0,11</td><td>0,02</td><td>−0,08</td><td>0,09</td></tr><tr><th scope="row">TESORO</th><td>−0,04</td><td>0,31</td><td>0,05</td><td>0,20</td><td>0,20</td><td>0,35</td><td>0,10</td><td>0,25</td></tr><tr><th scope="row">PEZ</th><td>0,04</td><td>0,30</td><td>0,16</td><td>0,15</td><td>0,82</td><td>0,35</td><td>0,54</td><td>0,04</td></tr></tbody>
+          </table>
+        </div>
+        <p>
+          (En rojo las vuestras, en azul las del rival, en gris las neutrales y subrayado el asesino.) Una vez tenemos esta
+          tabla, cada estrategia es sólo una forma distinta de leerla.
+        </p>
+      </section>
+
+      <section id="ingenuas" data-corto="Dos ingenuas">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Dos estrategias ingenuas</h2>
+        </div>
+        <p>
+          Empezamos por los dos extremos, una que no arriesga nada y otra que no mira el riesgo.
+        </p>
+        <h3>Una a una</h3>
+        <p>
+          La pista siempre lleva el número 1, y se elige la que más destaca para una de vuestras cartas sobre la mala que más
+          se le parece. Llamamos <strong>margen</strong> a esa diferencia:
+        </p>
+        <pre class="pseudo">para cada pista <span class="var">c</span>:
+    <span class="var">p</span> = la vuestra más parecida a <span class="var">c</span>
+    <span class="var">m</span> = la mala más parecida a <span class="var">c</span>
+    margen(<span class="var">c</span>) = s(<span class="var">c</span>, <span class="var">p</span>) − s(<span class="var">c</span>, <span class="var">m</span>)
+decir la <span class="var">c</span> de más margen, con el número 1</pre>
+        <p>Con las cinco pistas de la tabla:</p>
+<pre class="cuenta">MAR     PLAYA 0,54 − BARCO   0,54 =  0,00
+COSTA   ISLA  0,78 − BARCO   0,27 =  0,51   ← la mejor
+ARENA   PLAYA 0,51 − LUNA    0,30 =  0,21
+TESORO  PIRATA 0,35 − BARCO  0,31 =  0,05
+PEZ     PIRATA 0,35 − TIBURÓN 0,82 = −0,47</pre>
+        <p>
+          Así que COSTA&nbsp;1 (y buscando entre todas las palabras, PISCINA&nbsp;1 para PLAYA, con 0,52). Es muy difícil que
+          salga mal, pero necesita un turno por carta: 9 turnos siempre, que en la competición es una puntuación malísima.
+        </p>
+        <h3>La media</h3>
+        <p>
+          La otra punta. Como vimos en la página anterior, la palabra más cercana a la media de dos vectores es una buena pista
+          para las dos. Así que se cogen las <var>m</var> cartas vuestras que más se parecen entre sí, se hace su media y se
+          dice la palabra más cercana, con el número <var>m</var>. Con <var>m</var>&nbsp;=&nbsp;2, de vuestras tres cartas las
+          más parecidas son PLAYA e ISLA (0,63, frente a 0,31 de ISLA y PIRATA y 0,18 de PLAYA y PIRATA), y sale BAHÍA&nbsp;2.
+          Con <var>m</var>&nbsp;=&nbsp;3 sale COSTA&nbsp;3, que como vimos depende de 0,02 de diferencia entre PIRATA y BARCO.
+        </p>
+        <p>
+          El problema es que la media no mira las malas para nada. Aquí ha salido bien de casualidad, pero en la semilla&nbsp;4
+          del simulador las dos rojas más parecidas son ROSA y SOMBRA, y la palabra más cercana a su media es VIOLETA:
+        </p>
+        <figure class="cn-fig">
+          <figcaption>Semilla 4: el tablero ordenado con VIOLETA. El agente toca ROSA y luego el asesino</figcaption>
+          <ol class="cn-ranking"><li class="cn-fila cn-R"><span class="w">ROSA</span><span class="barra"><i style="width:100.0%"></i></span><span class="num">0,80</span><span class="tipo">rojo</span></li><li class="cn-fila cn-X"><span class="w">DIAMANTE</span><span class="barra"><i style="width:49.7%"></i></span><span class="num">0,40</span><span class="tipo">asesino</span></li><li class="cn-fila cn-R cn-corte"><span class="w">SOMBRA</span><span class="barra"><i style="width:36.7%"></i></span><span class="num">0,29</span><span class="tipo">rojo</span></li><li class="cn-fila cn-N"><span class="w">AZÚCAR</span><span class="barra"><i style="width:31.4%"></i></span><span class="num">0,25</span><span class="tipo">neutral</span></li><li class="cn-fila cn-N"><span class="w">ARAÑA</span><span class="barra"><i style="width:30.4%"></i></span><span class="num">0,24</span><span class="tipo">neutral</span></li><li class="cn-fila cn-R"><span class="w">NARIZ</span><span class="barra"><i style="width:24.6%"></i></span><span class="num">0,20</span><span class="tipo">rojo</span></li></ol>
+        </figure>
+        <p>
+          "VIOLETA&nbsp;2" lleva al agente a ROSA y después al DIAMANTE, que es el asesino. Jugando las semillas 1 a 60 en
+          solitario, la media tarda 8,9 turnos y pierde 8 partidas por el asesino, y eso con un compañero que piensa
+          exactamente igual. Es más ambiciosa que una a una y le sale casi igual de mal.
+        </p>
+      </section>
+
+      <section id="competicion" data-corto="La de la competición">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">La de la competición: simular al compañero</h2>
+        </div>
+        <p>
+          Aquí entra la suposición del tema: los dos agentes conocen la estrategia del otro. El agente de la competición (y el
+          nuestro) hace siempre lo mismo, que es ordenar las cartas por coseno con la pista y tocar las <var>n</var>
+          primeras:
+        </p>
+        <pre class="pseudo"><b>Agente</b>
+ordenar las cartas que quedan por s(<span class="var">c</span>, carta), de mayor a menor
+tocar las <span class="var">n</span> primeras, en orden, mientras salgan vuestras</pre>
+        <p>
+          Si el jefe de espías sabe eso, puede <strong>hacer él mismo esa ordenación</strong> para cada pista y ver cuántas de
+          vuestras salen antes de la primera mala. Ese es el <var>n</var> de la pista. El bot base de la competición <!--cite kim-codenames codenames-competicion--><span class="cita">[<a href="#ref-kim-codenames" id="cita-kim-codenames">2</a>, <a href="#ref-codenames-competicion">1</a>]</span><!--/cite-->
+          lo escribe de otra forma, probando grupos de 1, 2 y 3
+          cartas vuestras y exigiendo que la peor del grupo esté más cerca de la pista que la mejor mala, pero es la misma
+          cuenta. Además pide que el parecido pase de un mínimo, que llamamos umbral <var>τ</var> (en su código, una distancia
+          de 0,5 o 0,7, que en coseno es 0,5 o 0,3):
+        </p>
+        <pre class="pseudo"><b>Jefe de espías</b>
+para cada pista <span class="var">c</span>:
+    ordenar las cartas que quedan por s(<span class="var">c</span>, carta)
+    <span class="var">n</span>(<span class="var">c</span>) = cuántas vuestras salen seguidas al principio
+             y con s(<span class="var">c</span>, carta) ≥ <span class="var">τ</span>
+decir la <span class="var">c</span> de más <span class="var">n</span>(<span class="var">c</span>); si empatan, la de más margen sobre la primera mala</pre>
+        <p>Con <var>τ</var>&nbsp;=&nbsp;0,30, mirando el orden de cada fila de la tabla:</p>
+<pre class="cuenta">MAR     BARCO 0,538 va antes que PLAYA 0,535          → n = 0, no vale
+COSTA   ISLA 0,78, PLAYA 0,64, PIRATA 0,29 < 0,30     → n = 2, margen 0,64 − 0,27 = 0,37
+ARENA   PLAYA 0,51, ISLA 0,34, LUNA 0,30 es mala      → n = 2, margen 0,34 − 0,30 = 0,04
+TESORO  PIRATA 0,35, BARCO 0,31 es mala               → n = 1
+PEZ     TIBURÓN 0,82 va el primero                    → n = 0, no vale</pre>
+        <p>
+          Empatan COSTA y ARENA con 2, y gana COSTA&nbsp;2 por margen. Sin umbral (<var>τ</var> muy bajo) PIRATA también
+          entra, porque 0,289 es más que 0,269, y sale COSTA&nbsp;3.
+        </p>
+        <p>
+          Ahora bien, buscando entre las 8&nbsp;500 palabras pasa algo curioso: con <var>τ</var>&nbsp;=&nbsp;0,30 la máquina
+          dice JUNGLA&nbsp;3, y sin umbral... NUDISTA&nbsp;3 (para PLAYA, PIRATA e ISLA). Y lo peor es que funciona: con un
+          compañero que usa exactamente los mismos vectores, en solitario acaba en 3,7 turnos con umbral y en 2,3 sin él, sin
+          tocar nunca el asesino. En partidas enteras dice cosas como TOMAN&nbsp;8. Es la simulación perfecta de la
+          página&nbsp;01: si los dos piensan igual, vale cualquier palabra que dé la cuenta, tenga sentido o no.
+        </p>
+        <div class="note mine">
+          <span class="note-label">Lo que se ha medido</span>
+          <p>
+            En un estudio con los bots de la competición <!--cite stephenson-codenames--><span class="cita">[<a href="#ref-stephenson-codenames" id="cita-stephenson-codenames">3</a>]</span><!--/cite-->, el bot de word2vec jugando con otro
+            igual acababa en 6,8 turnos y no perdía ninguna partida. Emparejado con un agente que usaba otros vectores (GloVe)
+            pasaba a 12,4 turnos y perdía un 22&nbsp;% de las partidas, que es lo mismo que vamos a ver con el ruido.
+          </p>
+        </div>
+      </section>
+
+      <section id="ruido" data-corto="El ruido">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Cuando el compañero no piensa igual</h2>
+        </div>
+        <p>
+          Una persona, otro modelo u otros vectores no van a ordenar el tablero exactamente como vosotros. Para simularlo
+          añadimos <strong>ruido</strong>: el agente suma a cada coseno un número al azar, a veces positivo y a veces
+          negativo, de tamaño típico <var>σ</var> (una normal de media 0 y desviación <var>σ</var>). Con
+          <var>σ</var>&nbsp;=&nbsp;0 es nuestro agente de siempre; con <var>σ</var>&nbsp;=&nbsp;0,10, dos cartas que se
+          diferencian en menos de 0,1 pueden cambiar de orden con bastante facilidad. Mirad COSTA en una recta:
+        </p>
+        <figure class="wide">
+          <figcaption>El coseno de COSTA con cada carta. En amarillo, la franja de 0,10 por encima de BARCO, la primera mala</figcaption>
+          <svg class="explica" viewBox="0 0 640 160" role="img" aria-label="Recta de −0,3 a 0,8 con las ocho cartas según su coseno con COSTA. Muy a la derecha ISLA, 0,78, y PLAYA, 0,64, las dos rojas. En el centro, muy juntas, PIRATA (roja) 0,29, BARCO (azul) 0,27, LUNA (neutral) 0,22 y TIBURÓN (asesino) 0,18. Más a la izquierda BANCO, 0,01, y GATO, −0,25. Una franja amarilla va de 0,27 a 0,37, y PIRATA queda dentro.">
+            <rect x="330" y="66" width="51" height="28" class="cn-banda"/>
+            <line x1="40" y1="80" x2="612" y2="80" class="cn-recta"/>
+            <g class="mc-t">
+              <line x1="91" y1="76" x2="91" y2="84" class="cn-recta"/><text x="91" y="152" class="mc-centro">−0,2</text>
+              <line x1="193" y1="76" x2="193" y2="84" class="cn-recta"/><text x="193" y="152" class="mc-centro">0</text>
+              <line x1="295" y1="76" x2="295" y2="84" class="cn-recta"/><text x="295" y="152" class="mc-centro">0,2</text>
+              <line x1="396" y1="76" x2="396" y2="84" class="cn-recta"/><text x="396" y="152" class="mc-centro">0,4</text>
+              <line x1="498" y1="76" x2="498" y2="84" class="cn-recta"/><text x="498" y="152" class="mc-centro">0,6</text>
+              <line x1="600" y1="76" x2="600" y2="84" class="cn-recta"/><text x="600" y="152" class="mc-centro">0,8</text>
+            </g>
+            <circle cx="590" cy="80" r="6" class="cn-punto cn-R"/><text x="590" y="60" class="mc-t mc-centro cn-t-vec">ISLA 0,78</text>
+            <circle cx="518" cy="80" r="6" class="cn-punto cn-R"/><text x="518" y="60" class="mc-t mc-centro cn-t-vec">PLAYA 0,64</text>
+            <circle cx="340" cy="80" r="6" class="cn-punto cn-R"/><text x="352" y="60" class="mc-t mc-centro cn-t-vec">PIRATA 0,29</text>
+            <circle cx="330" cy="80" r="6" class="cn-punto cn-A"/><text x="340" y="110" class="mc-t mc-centro">BARCO 0,27</text>
+            <circle cx="305" cy="80" r="6" class="cn-punto cn-N"/><text x="285" y="42" class="mc-t mc-centro">LUNA 0,22</text>
+            <circle cx="284" cy="80" r="6" class="cn-punto cn-X"/><text x="262" y="126" class="mc-t mc-centro">TIBURÓN (asesino) 0,18</text>
+            <circle cx="198" cy="80" r="6" class="cn-punto cn-A"/><text x="190" y="110" class="mc-t mc-centro">BANCO 0,01</text>
+            <circle cx="65" cy="80" r="6" class="cn-punto cn-N"/><text x="65" y="110" class="mc-t mc-centro">GATO −0,25</text>
+          </svg>
+        </figure>
+        <p>
+          Con "COSTA&nbsp;3", la tercera carta que toque el agente tiene que ser PIRATA, que saca a BARCO sólo 0,02 y a LUNA y
+          al TIBURÓN muy poco más. Lo he simulado: con <var>σ</var>&nbsp;=&nbsp;0,05, BARCO se cuela por delante de PIRATA en
+          39 de cada 100 tiradas. ISLA y PLAYA, en cambio, están tan lejos de las malas que no se mueven.
+        </p>
+        <p>
+          Y en partidas enteras se nota muchísimo. Las semillas 1 a 60 en solitario, ahora con <var>σ</var>&nbsp;=&nbsp;0,10:
+        </p>
+        <div class="table-scroll">
+          <table class="cn-tabla">
+            <thead><tr><th scope="col">Estrategia</th><th scope="col">Sin ruido</th><th scope="col">Con ruido 0,10</th></tr></thead>
+            <tbody>
+              <tr><td>La de la competición (<var>τ</var> = 0,30)</td><td>3,7 turnos, 0 asesinos</td><td>6,8 turnos, 6 asesinos</td></tr>
+              <tr><td>Simular al compañero sin umbral</td><td>2,3 turnos, 0 asesinos</td><td>7,4 turnos, 9 asesinos</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          La que mejor iba sin ruido es ahora la peor de las dos: sus pistas eran de máquina, y en cuanto el compañero no es
+          exactamente igual, se rompen. Las tres estrategias que quedan son tres formas distintas de manejar este riesgo.
+        </p>
+      </section>
+
+      <section id="margen" data-corto="Con margen">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Con margen: dejar sitio al error</h2>
+        </div>
+        <p>
+          La idea más directa: si el compañero puede mover los cosenos un poco, exigid que cada carta vuestra le saque a la
+          primera mala por lo menos un <strong>margen</strong> <var>δ</var>, y el doble, 2<var>δ</var>, al asesino (porque
+          tocarlo es perder, y tocar una rival sólo cuesta el turno). Es la estrategia de la competición con una condición
+          más:
+        </p>
+        <pre class="pseudo"><span class="var">n</span>(<span class="var">c</span>) = cuántas vuestras salen seguidas al principio con
+             s(<span class="var">c</span>, carta) ≥ <span class="var">τ</span>
+             s(<span class="var">c</span>, carta) − s(<span class="var">c</span>, primera mala) ≥ <span class="var">δ</span>
+             s(<span class="var">c</span>, carta) − s(<span class="var">c</span>, asesino) ≥ 2<span class="var">δ</span></pre>
+        <p>Con <var>τ</var>&nbsp;=&nbsp;0,30 y <var>δ</var>&nbsp;=&nbsp;0,10:</p>
+<pre class="cuenta">COSTA   ISLA   0,78 − 0,27 = 0,51 ≥ 0,10 ✓   0,78 − 0,18 = 0,60 ≥ 0,20 ✓
+        PLAYA  0,64 − 0,27 = 0,37 ≥ 0,10 ✓   0,64 − 0,18 = 0,46 ≥ 0,20 ✓
+        PIRATA 0,29 − 0,27 = 0,02 < 0,10 ✗                                  → n = 2
+ARENA   PLAYA  0,51 − 0,30 = 0,21 ≥ 0,10 ✓   0,51 − 0,11 = 0,40 ≥ 0,20 ✓
+        ISLA   0,34 − 0,30 = 0,04 < 0,10 ✗                                  → n = 1</pre>
+        <p>
+          Sale COSTA&nbsp;2, y entre todas las palabras ZONA&nbsp;2 (correcta, aunque sosa). Lo que se pierde es velocidad
+          cuando todo va bien: sin ruido tarda 4,4 turnos en vez de 3,7. A cambio, con ruido 0,10 se queda en 5,9 turnos y 2
+          asesinos, la mejor de las que llevamos. Es la que usa el simulador por defecto cuando la máquina os da pistas, porque
+          vosotros sois el "ruido".
+        </p>
+      </section>
+
+      <section id="blanda" data-corto="Puntuación blanda">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2 class="sec">Puntuación blanda</h2>
+        </div>
+        <p>
+          Hasta aquí todo eran condiciones de "sí o no". Koyyalagunta y otros <!--cite koyyalagunta-codenames--><span class="cita">[<a href="#ref-koyyalagunta-codenames" id="cita-koyyalagunta-codenames">4</a>]</span><!--/cite--> propusieron en su lugar una puntuación
+          que compensa: para unas cartas objetivo <var>I</var> (las <var>m</var> vuestras más parecidas a la pista), se suma
+          su parecido y se resta, con un peso <var>λ</var>, el de la mala más parecida:
+        </p>
+<!--TEX g(c) = \sum_{x \in I} s(c, x) \; - \; \lambda \cdot \max_{y \text{ mala}} s(c, y) --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><mi>I</mi></mrow></munder><mi>s</mi><mo stretchy="false">(</mo><mi>c</mi><mo separator="true">,</mo><mi>x</mi><mo stretchy="false">)</mo><mtext>  </mtext><mo>−</mo><mtext>  </mtext><mi>λ</mi><mo>⋅</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mi>y</mi><mtext> mala</mtext></mrow></munder><mi>s</mi><mo stretchy="false">(</mo><mi>c</mi><mo separator="true">,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">g(c) = \sum_{x \in I} s(c, x) \; - \; \lambda \cdot \max_{y \text{ mala}} s(c, y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mopen">(</span><span class="mord mathnormal">c</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3717em;vertical-align:-1.3217em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8557em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mrel mtight">∈</span><span class="mord mathnormal mtight" style="margin-right:0.0785em;">I</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.3217em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mopen">(</span><span class="mord mathnormal">c</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.6382em;vertical-align:-0.8882em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.4306em;"><span style="top:-2.3479em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">y</span><span class="mord text mtight"><span class="mord mtight"> mala</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop">max</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8882em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mopen">(</span><span class="mord mathnormal">c</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span></span></div><!--/TEX-->
+        <p>
+          En su artículo, <var>m</var>&nbsp;=&nbsp;2 y <var>λ</var>&nbsp;=&nbsp;0,5. Con nuestras cinco pistas:
+        </p>
+<pre class="cuenta">COSTA   ISLA 0,78 + PLAYA 0,64 − 0,5 · BARCO 0,27   = 1,42 − 0,14 = 1,29   ← la mejor
+MAR     PLAYA 0,54 + ISLA 0,50 − 0,5 · BARCO 0,54   = 1,04 − 0,27 = 0,77
+ARENA   PLAYA 0,51 + ISLA 0,34 − 0,5 · LUNA 0,30    = 0,85 − 0,15 = 0,70
+TESORO  PIRATA 0,35 + ISLA 0,20 − 0,5 · BARCO 0,31  = 0,55 − 0,15 = 0,40
+PEZ     PIRATA 0,35 + ISLA 0,15 − 0,5 · TIBURÓN 0,82 = 0,50 − 0,41 = 0,09</pre>
+        <p>
+          Gana COSTA&nbsp;2, como las demás, pero fijaos en MAR: queda por delante de ARENA aunque manda al agente a BARCO
+          lo primero. Con una puntuación que compensa, una pista con una mala por delante puede ganar si sus objetivos son
+          muy buenos. Eso tiene sentido si quien adivina es una persona (ellos la evaluaron con personas, pidiéndoles que
+          ordenaran qué cartas tocarían con cada pista), pero con nuestro agente sale caro: en solitario y sin ruido tarda 8,2 turnos y toca 8 veces el
+          asesino. Subiendo <var>λ</var> a 2, baja a 5,8 turnos y 2 asesinos.
+        </p>
+        <p>
+          El mismo artículo tiene otra idea que se puede copiar tal cual: filtrar las pistas demasiado raras o demasiado
+          comunes según su frecuencia en el texto (lo llamaron DETECT), que es justo lo que quitaría a NUDISTA y TOMAN del
+          medio.
+        </p>
+      </section>
+
+      <section id="esperado" data-corto="Valor esperado">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2 class="sec">Valor esperado: simular muchas veces</h2>
+        </div>
+        <p>
+          La última se olvida de las condiciones y de los pesos a ojo: dice cuánto vale cada cosa y deja que la cuenta decida.
+          Si el agente tiene ruido <var>σ</var>, la misma pista puede salir de muchas formas, así que la simulamos
+          <var>R</var> veces (como las partidas al azar del MCTS) y nos quedamos con la media. Lo que vale cada carta que toca
+          el agente:
+        </p>
+<pre class="cuenta">vuestra   +1   (y sigue)
+neutral    0   (y se acaba el turno)
+rival     −1   (y se acaba el turno)
+asesino   −A   (y se acaba la partida; probamos con A = 10)</pre>
+        <pre class="pseudo">candidatas = las 30 mejores de simular al compañero (sin umbral)
+para cada candidata <span class="var">c</span> y cada <span class="var">n</span> posible:
+    repetir <span class="var">R</span> = 100 veces:
+        ordenar las cartas por s(<span class="var">c</span>, carta) + ruido de tamaño <span class="var">σ</span>
+        tocar las <span class="var">n</span> primeras como el agente y sumar lo que valen
+    valor(<span class="var">c</span>, <span class="var">n</span>) = la media de esas <span class="var">R</span> sumas
+decir la (<span class="var">c</span>, <span class="var">n</span>) de más valor</pre>
+        <p>
+          Volvamos a la duda de COSTA. Con 20&nbsp;000 simulaciones, suponiendo un compañero con <var>σ</var>&nbsp;=&nbsp;0,05,
+          COSTA&nbsp;2 vale 2,00 y COSTA&nbsp;3 vale 1,98: casi lo mismo, porque lo que se gana con PIRATA se pierde cuando
+          se cuela BARCO (−1) o, alguna vez, el TIBURÓN (−10). Con <var>σ</var>&nbsp;=&nbsp;0,10, COSTA&nbsp;2 sigue en 1,98
+          y COSTA&nbsp;3 se hunde a 1,16. Es decir, que la respuesta a "¿arriesgo con la tercera?" depende de lo bien que os
+          conozca vuestro compañero, y esta estrategia lo tiene en cuenta en vez de fijar un margen a ojo.
+        </p>
+        <p>
+          En solitario, suponiendo <var>σ</var>&nbsp;=&nbsp;0,05, tarda 2,9 turnos sin ruido y 5,8 con ruido 0,10. Y si el
+          <var>σ</var> que supone es el de verdad (0,10 con ruido 0,10), baja a 5,1 turnos y 2 asesinos, la mejor de todas.
+          El precio es que hace unas 3&nbsp;000 simulaciones por pista (30 candidatas por 100), que en la página son unos
+          milisegundos pero con un modelo más caro no lo serían.
+        </p>
+      </section>
+
+      <section id="comparar" data-corto="Comparar y jugar">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2 class="sec">Compararlas vosotros</h2>
+        </div>
+        <p>
+          Todas las cifras de la página salen de estos dos ejemplos. En el primero podéis elegir estrategia, tocar sus
+          parámetros y ver qué pista propone, en el tablero pequeño o en una partida entera:
+        </p>
+        <div class="demo" data-cn="pistas">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h3>Qué pista da cada estrategia</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. En el tablero pequeño, una a una da PISCINA 1, la media BAHÍA 2, la de la competición JUNGLA 3, con margen ZONA 2 y la blanda BAHÍA 2.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p>
+          En el segundo se juegan muchas partidas seguidas, en solitario (como en la competición) o un equipo contra otro, con
+          el ruido que queráis:
+        </p>
+        <div class="demo" data-cn="liguilla">
+          <div class="demo-head">
+            <span class="demo-label">Ejemplo interactivo</span>
+            <h3>Una liguilla entre estrategias</h3>
+          </div>
+          <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Los resultados de 60 partidas están en la tabla de debajo.</p></div>
+          <div class="demo-controls"></div>
+          <p class="demo-read" role="status" aria-live="polite"></p>
+        </div>
+        <p>Y el resumen, con las semillas 1 a 60 en solitario:</p>
+        <div class="table-scroll">
+          <table class="ancha cn-tabla">
+            <thead><tr><th scope="col">Estrategia</th><th scope="col">Filosofía</th><th scope="col">Sin ruido</th><th scope="col">Con ruido 0,10</th></tr></thead>
+            <tbody>
+              <tr><td>Una a una</td><td>Ingenua: no arriesga</td><td>9,0 turnos · 0 asesinos</td><td>9,6 · 2</td></tr>
+              <tr><td>La media (<var>m</var> = 2)</td><td>Ingenua: no mira las malas</td><td>8,9 · 8</td><td>10,4 · 12</td></tr>
+              <tr><td>La de la competición (<var>τ</var> = 0,30)</td><td>Condiciones</td><td>3,7 · 0</td><td>6,8 · 6</td></tr>
+              <tr><td>Simular al compañero sin umbral</td><td>Condiciones</td><td>2,3 · 0</td><td>7,4 · 9</td></tr>
+              <tr><td>Con margen (<var>τ</var> = 0,30, <var>δ</var> = 0,10)</td><td>Condiciones con holgura</td><td>4,4 · 0</td><td>5,9 · 2</td></tr>
+              <tr><td>Blanda (<var>m</var> = 2, <var>λ</var> = 0,5)</td><td>Puntuación que compensa</td><td>8,2 · 8</td><td>9,3 · 10</td></tr>
+              <tr><td>Valor esperado (<var>σ</var> = 0,05, <var>A</var> = 10)</td><td>Simular el error</td><td>2,9 · 0</td><td>5,8 · 5</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          En general, ninguna es la mejor en todo: las que más rinden con un compañero idéntico son las que peor aguantan uno
+          distinto, y el valor esperado es el que mejor se adapta, siempre que acierte cuánto se equivoca el compañero.
+        </p>
+      </section>
+
+      <section id="adivinar" data-corto="El que adivina">
+        <div class="sec-head">
+          <span class="num">09</span>
+          <h2 class="sec">Y el que adivina</h2>
+        </div>
+        <p>
+          Hemos dejado al agente en lo más simple (ordenar y tocar <var>n</var>) a propósito, porque es la convención que
+          comparten los dos y lo que permite simularlo. Pero también se puede mejorar, siempre que el jefe de espías lo sepa:
+        </p>
+        <ul>
+          <li><strong>Plantarse.</strong> Si la siguiente carta se parece a la pista mucho menos que las anteriores (o no pasa de un mínimo), mejor no tocarla aunque el número diga que sí. Con un jefe de espías humano, que a veces se pasa, ayuda.</li>
+          <li><strong>Usar la carta de más.</strong> Las reglas dejan probar <var>n</var>&nbsp;+&nbsp;1. Si el agente apunta las pistas viejas y cuántas cartas le quedan a cada una, puede gastar esa carta extra en la mejor de una pista anterior.</li>
+          <li><strong>Simular al jefe de espías.</strong> Igual que el jefe simula al agente, el agente puede preguntarse "si mi jefe hubiera querido decir ISLA y PLAYA, ¿qué pista habría dado?" y comprobar qué grupo de cartas explica mejor la pista que ha oído. Es razonar hacia atrás, y es lo que hacéis las personas cuando decís "si quisiera decir BARCO no habría dicho COSTA".</li>
+        </ul>
+      </section>
+
+      <section id="probar" data-corto="Ideas para probar">
+        <div class="sec-head">
+          <span class="num">10</span>
+          <h2 class="sec">Ideas para probar</h2>
+        </div>
+        <p>
+          Lo de esta página es un punto de partida. Con lo que hay aquí se pueden probar muchas cosas, y os recomiendo
+          medirlas con la liguilla en vez de a ojo:
+        </p>
+        <ul>
+          <li>Mezclar filosofías: margen como condición y valor esperado para elegir entre las que la cumplen, o la puntuación blanda con un castigo aparte para el asesino.</li>
+          <li>Elegir <var>σ</var> según con quién jugáis: pequeño con vuestro propio agente y grande con una persona. ¿Se puede estimar el <var>σ</var> de una persona viendo qué toca en el simulador?</li>
+          <li>Cambiar lo que vale cada carta (<var>A</var>, o lo que cuesta regalarle una al rival cuando va ganando), o tener en cuenta en qué punto de la partida estáis: cuando el rival está a punto de ganar, merece la pena arriesgar más.</li>
+          <li>Filtrar las pistas raras por frecuencia, como DETECT, o pasarlas por un modelo de lenguaje para quitar las que una persona no entendería (página&nbsp;04).</li>
+          <li>Usar otros vectores, o dos a la vez, y ver qué pasa cuando el jefe y el agente no usan los mismos.</li>
+          <li>Mejorar el agente con lo de la sección anterior y comprobar si el jefe, sabiéndolo, puede arriesgar más.</li>
+        </ul>
+        <div class="note tip">
+          <span class="note-label">Para leer más</span>
+          <p>
+            El artículo que presenta la competición <!--cite kim-codenames--><span class="cita">[<a href="#ref-kim-codenames">2</a>]</span><!--/cite-->, el de la puntuación blanda y DETECT
+            <!--cite koyyalagunta-codenames--><span class="cita">[<a href="#ref-koyyalagunta-codenames">4</a>]</span><!--/cite-->, y uno que compara bots de vectores y modelos de lenguaje
+            <!--cite stephenson-codenames--><span class="cita">[<a href="#ref-stephenson-codenames">3</a>]</span><!--/cite-->. El código de la competición, con sus bots base, está en
+            <a href="https://github.com/CodenamesAICompetition/Game">github.com/CodenamesAICompetition/Game</a>.
+
+          </p>
+        </div>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-codenames-competicion">A. Summerville, A. Kim, M. Ruzmaykin y A. Truong. <em>The Codenames AI Competition (código y bots base)</em>. FDG 2019, 2019. <a href="https://github.com/CodenamesAICompetition/Game">github.com/CodenamesAICompetition/Game</a> <a class="volver" href="#cita-codenames-competicion" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-kim-codenames">A. Kim, M. Ruzmaykin, A. Truong y A. Summerville. "Cooperation and Codenames: Understanding Natural Language Processing via Codenames". <em>Proceedings of AIIDE 2019</em>, 2019. <a class="volver" href="#cita-kim-codenames" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-stephenson-codenames">M. Stephenson, M. Sidji y B. Ronval. "Codenames as a Benchmark for Large Language Models". <em>IEEE Transactions on Games</em>, 2025. <a href="https://arxiv.org/abs/2412.11373">arxiv.org/abs/2412.11373</a> <a class="volver" href="#cita-stephenson-codenames" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-koyyalagunta-codenames">D. Koyyalagunta, A. Sun, R. L. Draelos y C. Rudin. "Playing Codenames with Language Graphs and Word Embeddings". <em>Journal of Artificial Intelligence Research 71, 319–346</em>, 2021. <a class="volver" href="#cita-koyyalagunta-codenames" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema bonus">
+        <a class="pager-prev" href="vectores.html"><span class="pager-l">Anterior</span><span class="pager-t">Palabras como vectores</span></a>
+        <a class="pager-next" href="modelos-lenguaje.html"><span class="pager-l">Siguiente</span><span class="pager-t">Con un modelo de lenguaje</span></a>
+      </nav>
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#problema">El problema</a></li>
+            <li><a href="#ingenuas">Dos ingenuas</a></li>
+            <li><a href="#competicion">La de la competición</a></li>
+            <li><a href="#ruido">El ruido</a></li>
+            <li><a href="#margen">Con margen</a></li>
+            <li><a href="#blanda">Puntuación blanda</a></li>
+            <li><a href="#esperado">Valor esperado</a></li>
+            <li><a href="#comparar">Comparar y jugar</a></li>
+            <li><a href="#adivinar">El que adivina</a></li>
+            <li><a href="#probar">Ideas para probar</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema bonus</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Código Secreto como problema</a></li>
+            <li><a href="vectores.html"><span>02</span>Palabras como vectores</a></li>
+            <li><a href="estrategias.html" aria-current="page"><span>03</span>Estrategias</a></li>
+            <li><a href="modelos-lenguaje.html"><span>04</span>Con un modelo de lenguaje</a></li>
+            <li><a href="simulador.html"><span>05</span>El simulador</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+<script src="../../assets/js/codenames-datos.js" defer></script>
+<script src="../../assets/js/codenames.js" defer></script>
+</body>
+</html>

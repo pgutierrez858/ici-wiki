@@ -29,7 +29,8 @@
   if (btn) {
     var paint = function (mode) {
       btn.innerHTML = 'Tema · <b>' + NAMES[mode] + '</b>';
-      btn.setAttribute('aria-label', 'Tema de la página: ' + NAMES[mode] + '. Pulsa para cambiar.');
+      // empieza por lo que se ve, para que funcione también por voz (WCAG 2.5.3)
+      btn.setAttribute('aria-label', 'Tema · ' + NAMES[mode] + '. Pulsa para cambiar.');
     };
     paint(current());
     btn.addEventListener('click', function () {
@@ -68,18 +69,77 @@
 
     var slot = el.querySelector('[data-state]');
     if (!slot) return;
-    if (today > due) {
-      slot.className = 'chip done';
-      slot.textContent = 'Entregada';
-    } else if (today >= start) {
-      slot.className = 'chip now';
-      slot.textContent = 'En curso';
-      el.setAttribute('aria-current', 'true');
-    } else {
-      slot.className = 'chip soon';
-      slot.textContent = 'Por abrir';
-    }
+    var st = estado(el);
+    slot.className = 'chip ' + st[0];
+    slot.textContent = st[1];
+    if (st[0] === 'now') el.setAttribute('aria-current', 'true');
   });
+
+  // [clase, texto] de un bloque a fecha de hoy; build.mjs hace lo mismo al publicar
+  function estado(el) {
+    var start = parse(el.getAttribute('data-start'));
+    if (today > parse(el.getAttribute('data-due'))) return ['done', 'Cerrada'];
+    if (today >= start) return ['now', 'En curso'];
+    return ['soon', el.hasAttribute('data-enun')
+      ? 'Abre el ' + start.getDate() + ' ' + MES[start.getMonth()].slice(0, 3) : 'Por abrir'];
+  }
+
+  /* ---------- franja Ahora ----------
+     Recoloca la cuña de Ms. Pac-Man, come las píldoras de los bloques
+     cerrados y rehace la línea de "qué toca" con la fecha de hoy. */
+  var franja = document.querySelector('.ahora');
+  if (franja) {
+    var pills = [].slice.call(franja.querySelectorAll('.ap'));
+    var vivo = null, obj = null;
+    pills.forEach(function (li) {
+      var st = estado(li);
+      li.setAttribute('data-ap', st[0]);
+      li.removeAttribute('data-objetivo');
+      var a = li.querySelector('a');
+      if (a) a.removeAttribute('aria-current');
+      var sr = li.querySelector('.sr-only');
+      if (sr) sr.textContent = li.getAttribute('data-name') + ' · ' + li.getAttribute('data-tema') + ', ' + st[1].toLowerCase();
+      if (st[0] === 'now' && !vivo) vivo = li;
+      if (st[0] === 'soon' && !obj) obj = li;
+    });
+    obj = vivo || obj;
+    var pac = franja.querySelector('.ap-pac');
+    var dias = function (x) { var n = Math.round((x - today) / 86400000); return n === 0 ? 'es hoy' : n === 1 ? 'queda 1 día' : 'quedan ' + n + ' días'; };
+    var cuando = 'Todas las prácticas cerradas', rel = '', nombre = 'Curso terminado';
+    if (obj) {
+      obj.setAttribute('data-objetivo', '');
+      var oa = obj.querySelector('a');
+      if (oa) oa.setAttribute('aria-current', 'step');
+      if (pac) obj.querySelector('.ap-dot').insertBefore(pac, obj.querySelector('.ap-pill'));
+      nombre = obj.getAttribute('data-name') + ' · ' + obj.getAttribute('data-tema');
+      var hito = obj.getAttribute('data-hito'), dueTxt = obj.getAttribute('data-due-txt');
+      if (!vivo) {
+        var abre = parse(obj.getAttribute('data-start'));
+        cuando = 'Abre el ' + fmt(abre); rel = dias(abre);
+      } else if (hito && today <= parse(hito)) {
+        cuando = 'Entrega del ' + obj.getAttribute('data-hito-txt') + ' el ' + fmt(parse(hito)); rel = dias(parse(hito));
+      } else if (dueTxt) {
+        cuando = 'Entrega: ' + dueTxt.toLowerCase();
+      } else {
+        var vence = parse(obj.getAttribute('data-due'));
+        cuando = 'Entrega el ' + fmt(vence); rel = dias(vence);
+      }
+    } else if (pac) {
+      pac.parentNode.removeChild(pac);
+    }
+    var pon = function (sel, txt) { var x = franja.querySelector(sel); if (x) x.textContent = txt; };
+    pon('[data-ahora-name]', nombre);
+    pon('[data-ahora-when]', cuando);
+    pon('[data-ahora-rel]', rel);
+    [['enun', 'data-enun'], ['guia', 'data-guia'], ['apuntes', 'data-apuntes']].forEach(function (k) {
+      var a = franja.querySelector('[data-ahora-' + k[0] + ']');
+      if (!a) return;
+      var href = obj && obj.getAttribute(k[1]);
+      a.parentNode.hidden = !href;
+      if (href) a.setAttribute('href', href);
+      if (k[0] === 'guia' && href) a.firstChild.nodeValue = obj.getAttribute('data-guia-txt') + ' ';
+    });
+  }
 
   if (next) {
     var days = Math.round((next.due - today) / 86400000);
@@ -287,8 +347,11 @@
      todas como mucho la mitad del total: son las misiones de la práctica. */
   [].slice.call(document.querySelectorAll('[data-marcador]')).forEach(function (m) {
     var maximo = Number(m.getAttribute('data-marcador')) || 10;
-    var total = m.querySelector('[data-total]'), barra = m.querySelector('[data-barra]'), msg = m.querySelector('[data-mensaje]');
+    var msg = m.querySelector('[data-mensaje]');
     var inicial = msg ? msg.textContent : '';
+    // copias del marcador (la del raíl): repiten total, barra y lo tachado, sin casillas propias
+    var espejos = m.id ? [].slice.call(document.querySelectorAll('[data-espejo="' + m.id + '"]')) : [];
+    var estaba = null;   // lleno en la cuenta anterior; null en la primera, que no anima
     function num(x) { return String(Math.round(x * 100) / 100).replace('.', ','); }
     function cuenta() {
       var base = 0, retos = [];
@@ -300,10 +363,26 @@
       });
       retos.sort(function (a, b) { return b - a; });
       var deRetos = Math.min(maximo / 2, retos.slice(0, 3).reduce(function (a, b) { return a + b; }, 0));
-      var t = Math.min(maximo, base + deRetos);
-      total.textContent = num(t);
-      barra.style.width = (100 * t / maximo) + '%';
-      m.classList.toggle('lleno', t >= maximo);
+      var t = Math.min(maximo, base + deRetos), lleno = t >= maximo;
+      [m].concat(espejos).forEach(function (el) {
+        el.querySelector('[data-total]').textContent = num(t);
+        el.querySelector('[data-barra]').style.transform = 'scaleX(' + (t / maximo) + ')';
+        el.classList.toggle('lleno', lleno);
+        if (lleno && estaba === false) {   // la cuña muerde una vez al llegar al máximo
+          el.classList.remove('muerde'); void el.offsetWidth; el.classList.add('muerde');
+        }
+      });
+      estaba = lleno;
+      espejos.forEach(function (el) {
+        [].slice.call(el.querySelectorAll('li > a[href^="#"]')).forEach(function (a) {
+          var o = m.querySelector('li a[href="' + a.getAttribute('href') + '"]');
+          var c = o && o.closest('li').querySelector('input[type=checkbox]');
+          var li = a.parentNode, hecho = !!(c && c.checked), sr = li.querySelector('.sr-only');
+          li.classList.toggle('hecho', hecho);
+          if (!sr) { sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = ' (hecho)'; li.appendChild(sr); }
+          sr.hidden = !hecho;
+        });
+      });
       if (msg) msg.textContent = t >= maximo ? '¡Práctica completa!'
         : retos.length > 3 ? 'Ya tenéis más de tres retos: cuentan los tres que más valen.' : inicial;
     }
@@ -324,7 +403,7 @@
     caja.type = 'checkbox';
     label.appendChild(caja);
     label.appendChild(document.createTextNode('Hecha'));
-    (mision.querySelector('h4') || mision).appendChild(label);
+    (mision.querySelector('h3, h4') || mision).appendChild(label);
     function pinta() { caja.checked = origen.checked; mision.classList.toggle('mision-hecha', origen.checked); }
     caja.addEventListener('change', function () {
       origen.checked = caja.checked;
@@ -333,4 +412,126 @@
     origen.addEventListener('change', pinta);
     pinta();
   });
+
+  /* ---------- apuntes: guía en curso, índice en móvil y píldoras ----------
+     Las tres cosas son ayudas de navegación: sin JavaScript la página ya
+     tiene su raíl (en escritorio), su pager y el índice del tema. */
+
+  // en el índice de apuntes, la guía del bloque en curso sube arriba
+  var enCurso = document.getElementById('en-curso');
+  if (enCurso) {
+    var arriba = enCurso.querySelector('.guia-p');
+    var viva = document.querySelector('.guia-p[aria-current="true"]');
+    var primera = document.querySelector('#anteriores .guia-p');
+    if (viva && arriba && viva !== arriba && primera) {
+      primera.parentNode.insertBefore(arriba, primera);
+      enCurso.appendChild(viva);
+    } else if (!viva) {
+      var hEnCurso = enCurso.querySelector('[data-en-curso]');
+      if (hEnCurso) hEnCurso.textContent = 'La última práctica';
+    }
+  }
+
+  // por debajo de 1020 px el raíl no se ve: su índice se copia en un
+  // desplegable al principio de main
+  var railDentro = document.querySelector('.rail .rail-inner');
+  var principal = document.querySelector('.cols > main');
+  var navsRail = railDentro ? [].slice.call(railDentro.querySelectorAll('nav')) : [];
+  if (principal && navsRail.length) {
+    var det = document.createElement('details');
+    det.className = 'indice-movil';
+    var resumen = document.createElement('summary');
+    var nPag = navsRail[0].querySelectorAll('a').length;
+    var esTema = navsRail[0].getAttribute('aria-labelledby') === 'del-tema';
+    resumen.textContent = (esTema ? 'Índice del tema · ' : 'Índice de la página · ') + nPag +
+      (esTema ? ' páginas' : nPag === 1 ? ' sección' : ' secciones');
+    det.appendChild(resumen);
+    navsRail.forEach(function (nav) {
+      var copia = nav.cloneNode(true);
+      var tit = copia.querySelector('h2');
+      copia.removeAttribute('aria-labelledby');
+      if (tit) {
+        copia.setAttribute('aria-label', tit.textContent);
+        var p = document.createElement('p');
+        p.className = 'indice-movil-h';
+        p.textContent = tit.textContent;
+        tit.parentNode.replaceChild(p, tit);
+      }
+      [].slice.call(copia.querySelectorAll('[id]')).forEach(function (e) { e.removeAttribute('id'); });
+      det.appendChild(copia);
+    });
+    det.addEventListener('click', function (e) { if (e.target.closest('a')) det.open = false; });
+    principal.insertBefore(det, principal.firstChild);
+  }
+
+  // al pie de cada página de apuntes, una píldora por página del tema: las
+  // leídas en este navegador, comidas; la actual, con Ms. Pac-Man
+  var enTema = location.pathname.match(/\/guias\/(tema\d|bonus)\/[^\/]*$/);
+  if (enTema && principal) {
+    var COLOR = { tema2: 'p1', tema3: 'p3', tema4: 'p4', tema5: 'p5', tema6: 'cb', bonus: 'bn' };
+    var carpeta = location.pathname.replace(/[^\/]*$/, '');
+    var aqui = /\/$/.test(location.pathname) ? location.pathname + 'index.html' : location.pathname;
+    var fuente = document.querySelectorAll('nav[aria-labelledby="del-tema"] a');
+    if (!fuente.length) fuente = principal.querySelectorAll('.links a');
+    var paginas = [];
+    [].forEach.call(fuente, function (a) {
+      var ruta = new URL(a.getAttribute('href'), location.href).pathname;
+      if (ruta.replace(/[^\/]*$/, '') !== carpeta || /\/index\.html$/.test(ruta)) return;
+      if (paginas.some(function (x) { return x.ruta === ruta; })) return;
+      var lt = a.querySelector('.lt');
+      var nombre = (lt ? lt.textContent : a.textContent).replace(/^\s*\d+\s*/, '').trim();
+      paginas.push({ ruta: ruta, href: a.getAttribute('href'), nombre: nombre });
+    });
+
+    var LEIDAS = 'ici-leidas';
+    var leidas = [];
+    try { leidas = JSON.parse(localStorage.getItem(LEIDAS) || '[]'); } catch (e) { leidas = []; }
+    if (!Array.isArray(leidas)) leidas = [];
+    if (paginas.some(function (x) { return x.ruta === aqui; }) && leidas.indexOf(aqui) < 0) {
+      leidas.push(aqui);
+      try { localStorage.setItem(LEIDAS, JSON.stringify(leidas)); } catch (e) {}
+    }
+
+    if (paginas.length > 1) {
+      var nombreTema = enTema[1] === 'bonus' ? 'Tema bonus' : 'Tema ' + enTema[1].slice(4);
+      var hechas = paginas.filter(function (x) { return leidas.indexOf(x.ruta) > -1; }).length;
+      var todas = hechas === paginas.length;
+      var fila = document.createElement('nav');
+      fila.className = 'pildoras' + (todas ? ' completo' : '');
+      fila.setAttribute('data-b', COLOR[enTema[1]]);
+      fila.setAttribute('aria-label', 'Páginas del ' + nombreTema.toLowerCase() + ' que habéis leído');
+      var rotulo = document.createElement('p');
+      rotulo.className = 'pildoras-txt';
+      rotulo.textContent = nombreTema + ' · ' + (todas ? 'completado, las ' + paginas.length + ' páginas leídas'
+        : hechas + ' de ' + paginas.length + ' páginas leídas');
+      fila.appendChild(rotulo);
+      var ol = document.createElement('ol');
+      paginas.forEach(function (x) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = x.href;
+        a.title = x.nombre;
+        if (x.ruta === aqui) {
+          a.setAttribute('aria-current', 'page');
+          a.setAttribute('aria-label', x.nombre + ', la estáis leyendo');
+          a.innerHTML = '<svg class="pildora-pac" viewBox="0 0 26 26" aria-hidden="true" focusable="false">' +
+            '<path d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/></svg>';
+        } else {
+          var comida = leidas.indexOf(x.ruta) > -1;
+          a.setAttribute('aria-label', x.nombre + (comida ? ', leída' : ', sin leer'));
+          a.innerHTML = '<span class="pildora' + (comida ? ' comida' : '') + '" aria-hidden="true"></span>';
+        }
+        li.appendChild(a);
+        ol.appendChild(li);
+      });
+      var poder = document.createElement('li');
+      poder.className = 'pildora-poder';
+      poder.setAttribute('aria-hidden', 'true');
+      poder.innerHTML = '<span></span>';
+      ol.appendChild(poder);
+      fila.appendChild(ol);
+      var pager = principal.querySelector('.pager');
+      principal.insertBefore(fila, pager || null);
+    }
+  }
 })();

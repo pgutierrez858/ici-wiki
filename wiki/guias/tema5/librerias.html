@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../../assets/css/ici.css">
@@ -33,10 +34,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../../index.html">Inicio</a></li>
-        <li><a href="../../presentacion.html">Presentación</a></li>
         <li><a href="../../calendario.html">Calendario</a></li>
         <li><a href="../../practicas/index.html">Prácticas</a></li>
-        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -49,7 +49,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="../index.html">Guías</a>
+    <a href="../index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <a href="index.html">Tema 5</a>
     <span aria-hidden="true">/</span>
@@ -63,7 +63,7 @@
       <span class="thin">Lo que ya está hecho, para qué sirve, y por qué en la práctica el MCTS lo escribís vosotros.</span>
     </h1>
     <p class="standfirst">
-      Las reglas del ajedrez son largas y llenas de casos raros, así que nadie las programa de cero: para eso está python-chess, que es lo que usa la práctica. Además, unas cuantas librerías y programas que conviene conocer para seguir con juegos por turnos, con un fragmento de código de cada una que se pueda usar desde Python.
+      Las reglas del ajedrez son largas y están llenas de casos raros, así que nadie las programa de cero (para eso está python-chess, que es lo que usa la práctica). Aparte de esa, veamos unas cuantas librerías y programas que conviene conocer si queréis seguir con juegos por turnos, cada una con un fragmento de código que se puede usar desde Python.
     </p>
   </header>
 
@@ -75,10 +75,10 @@
           <h2 class="sec">python-chess</h2>
         </div>
         <p>
-          La librería de ajedrez de referencia en Python (se instala con <code>pip install chess</code>). Sabe todas las
-          reglas, enroque, captura al paso, coronación, tablas por repetición y por la regla de las 50 jugadas, y lo hace
-          bastante rápido para ser Python puro. Es lo único que el entorno de la práctica usa para jugar. Lo que más vais a
-          tocar:
+          La librería de ajedrez de referencia en Python <!--cite python-chess--><span class="cita">[<a href="#ref-python-chess" id="cita-python-chess">1</a>]</span><!--/cite--> (se instala con <code>pip install chess</code>). Se sabe todas las
+          reglas (enroque, captura al paso, coronación, tablas por repetición y por la regla de las 50 jugadas) y va
+          bastante rápido para ser Python puro. Es lo único que usa el entorno de la práctica para jugar, y lo que más vais a
+          tocar es esto:
         </p>
 <pre><code>import chess
 
@@ -94,9 +94,9 @@ print(tablero)                          # el tablero en texto</code></pre>
         <div class="note trap">
           <span class="note-label">Lo que cuesta cada cosa</span>
           <p>
-            <code>push</code> y <code>pop</code> son baratos. Generar las jugadas legales y preguntar si la partida ha
-            terminado son lo caro, porque comprueban jaques y, en el caso de las tablas, repeticiones. En una simulación se
-            hacen miles de veces por jugada, así que importa no llamarlos más de lo necesario.
+            <code>push</code> y <code>pop</code> son baratos. Lo caro es generar las jugadas legales y preguntar si la partida ha
+            terminado, porque comprueban jaques (y, en el caso de las tablas, repeticiones). En una simulación se
+            hacen miles de veces por jugada, así que conviene no llamarlos más de lo necesario.
           </p>
         </div>
         <h3 class="label">Ver y guardar partidas</h3>
@@ -112,7 +112,7 @@ print(chess.pgn.Game.from_board(tablero))   # la partida jugada hasta aquí, en 
         <h3 class="label">Hablar con un motor: Stockfish</h3>
         <p>
           <code>chess.engine</code> lanza un programa de ajedrez externo que hable UCI (el protocolo estándar de los motores)
-          y le pide un análisis. Con Stockfish descargado, podéis preguntar qué jugada fue un error en una partida que perdió
+          y le pide un análisis. Si os descargáis Stockfish, podéis preguntarle qué jugada fue un error en una partida que perdió
           vuestro MCTS:
         </p>
 <pre><code>import chess.engine
@@ -124,8 +124,8 @@ motor.quit()</code></pre>
         <div class="note trap">
           <span class="note-label">Para analizar, no para jugar</span>
           <p>
-            Stockfish os sirve para entender vuestras partidas, nunca dentro de vuestro jugador: eso no sería vuestro
-            MCTS sino el de otros. Lo que se puede usar está en el <a href="../../practicas/practica-5.html">enunciado</a>.
+            Stockfish os sirve para entender vuestras partidas, nunca dentro de vuestro jugador (ahí el que jugaría de
+            verdad es Stockfish, no vuestro MCTS). Lo que se puede usar está en el <a href="../../practicas/practica-5.html">enunciado</a>.
           </p>
         </div>
       </section>
@@ -136,11 +136,11 @@ motor.quit()</code></pre>
           <h2 class="sec">OpenSpiel</h2>
         </div>
         <p>
-          La colección de juegos y algoritmos de DeepMind para investigación: decenas de juegos (Conecta&nbsp;4, go, póker,
+          La colección de juegos y algoritmos de DeepMind para investigación <!--cite lanctot-openspiel--><span class="cita">[<a href="#ref-lanctot-openspiel" id="cita-lanctot-openspiel">2</a>]</span><!--/cite-->: decenas de juegos (Conecta&nbsp;4, go, póker,
           Hanabi, backgammon…) con una misma interfaz, y muchos algoritmos ya hechos, entre ellos MCTS, ISMCTS, minimax,
           CFR y los de AlphaZero. El núcleo está en C++ y se usa desde Python con <code>pyspiel</code> (se instala con
           <code>pip install open_spiel</code>; en Windows, mejor dentro de WSL). Es la opción si queréis comparar vuestro
-          algoritmo con los de referencia en muchos juegos sin programar ninguno.
+          algoritmo con los de referencia en muchos juegos sin tener que programar ninguno.
         </p>
 <pre><code>import pyspiel
 from open_spiel.python.algorithms import mcts
@@ -161,11 +161,11 @@ print(estado.returns())                       # [1, -1], [-1, 1] o [0, 0]</code>
           <h2 class="sec">PettingZoo</h2>
         </div>
         <p>
-          La versión multijugador de Gymnasium, la interfaz estándar de entornos de aprendizaje por refuerzo. Trae juegos de
+          La versión multijugador de Gymnasium, la interfaz estándar de entornos de aprendizaje por refuerzo <!--cite terry-pettingzoo--><span class="cita">[<a href="#ref-terry-pettingzoo" id="cita-terry-pettingzoo">3</a>]</span><!--/cite-->. Trae juegos de
           mesa clásicos (ajedrez, Conecta&nbsp;4, go, tres en raya, varios de cartas) con un bucle en el que cada agente
-          observa, recibe su recompensa y actúa por turnos. Sirve sobre todo si después queréis entrenar redes; para
-          buscar, le falta algo importante: no está pensada para copiar el estado y simular desde él, que es lo que MCTS
-          necesita a cada iteración.
+          observa, recibe su recompensa y actúa por turnos. Sirve sobre todo si después queréis entrenar redes, pero para
+          buscar se queda corta, porque no está pensada para copiar el estado y simular desde él (y eso es justo lo que MCTS
+          necesita en cada iteración).
         </p>
 <pre><code>from pettingzoo.classic import connect_four_v3
 
@@ -188,19 +188,19 @@ env.close()</code></pre>
         </div>
         <ul>
           <li>
-            <strong>Ludii</strong> es un sistema general de juegos en Java, de la Universidad de Maastricht: más de mil juegos
+            <strong>Ludii</strong> es un sistema general de juegos en Java, de la Universidad de Maastricht <!--cite piette-ludii--><span class="cita">[<a href="#ref-piette-ludii" id="cita-piette-ludii">4</a>]</span><!--/cite-->: más de mil juegos
             de tablero, antiguos y modernos, escritos en un lenguaje de descripción propio, con interfaz gráfica y agentes
             ya hechos, entre ellos varias versiones de MCTS. Si queréis ver cómo juega MCTS a un juego que no conocéis, o
-            escribir un juego nuevo describiendo sólo sus reglas, es el sitio.
+            escribir un juego nuevo describiendo sólo sus reglas, es el sitio al que ir.
           </li>
           <li>
-            <strong>Leela Chess Zero (Lc0)</strong> es un motor de ajedrez libre que sigue la receta de AlphaZero: MCTS con
+            <strong>Leela Chess Zero (Lc0)</strong> <!--cite lczero--><span class="cita">[<a href="#ref-lczero" id="cita-lczero">5</a>]</span><!--/cite--> es un motor de ajedrez libre que sigue la receta de AlphaZero <!--cite silver-alphazero--><span class="cita">[<a href="#ref-silver-alphazero" id="cita-silver-alphazero">6</a>]</span><!--/cite-->: MCTS con
             una red neuronal en vez de simulaciones. Habla UCI, así que se usa desde python-chess exactamente igual que
-            Stockfish. Con una buena tarjeta gráfica juega al nivel de los mejores motores, y es la prueba de que MCTS sí
+            Stockfish. Con una buena tarjeta gráfica juega al nivel de los mejores motores, así que demuestra que MCTS sí
             puede con el ajedrez cuando la evaluación es buena.
           </li>
           <li>
-            <strong>KataGo</strong> es lo mismo para el go: MCTS más red, libre, y más fuerte que cualquier humano. Muchos
+            <strong>KataGo</strong> <!--cite wu-katago--><span class="cita">[<a href="#ref-wu-katago" id="cita-wu-katago">7</a>]</span><!--/cite--> es lo mismo para el go: MCTS más red, libre, y más fuerte que cualquier humano. Muchos
             jugadores de go lo usan para analizar sus partidas.
           </li>
         </ul>
@@ -239,7 +239,7 @@ env.close()</code></pre>
               <tr><td><strong>Stockfish</strong></td><td>Motor alfa-beta, el más fuerte que hay</td><td>Analizar vuestras partidas. Nunca dentro del jugador.</td></tr>
               <tr><td><strong>OpenSpiel</strong></td><td>Muchos juegos y algoritmos de referencia</td><td>Comparar algoritmos en juegos distintos, o probar ISMCTS y CFR.</td></tr>
               <tr><td><strong>PettingZoo</strong></td><td>Entornos multijugador estilo Gymnasium</td><td>Aprendizaje por refuerzo; para buscar se queda corto.</td></tr>
-              <tr><td><strong>Ludii</strong></td><td>Sistema general de juegos, en Java</td><td>Ver MCTS en cientos de juegos, o describir uno nuevo.</td></tr>
+              <tr><td><strong>Ludii</strong></td><td>Sistema general de juegos, en Java</td><td>Ver MCTS en más de mil juegos, o describir uno nuevo.</td></tr>
               <tr><td><strong>Lc0, KataGo</strong></td><td>MCTS con red neuronal, al máximo nivel</td><td>Ver adónde llega MCTS con una buena evaluación.</td></tr>
               <tr><td><strong>Paquetes de MCTS</strong></td><td>MCTS genérico, para enchufar un juego</td><td>Prototipos; no para la práctica.</td></tr>
             </tbody>
@@ -255,8 +255,24 @@ env.close()</code></pre>
         </div>
       </section>
 
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-python-chess">N. Fiekas. <em>python-chess: a chess library for Python</em>. documentación, 2026. <a href="https://python-chess.readthedocs.io/">python-chess.readthedocs.io</a> <a class="volver" href="#cita-python-chess" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-lanctot-openspiel">M. Lanctot y otros. "OpenSpiel: A Framework for Reinforcement Learning in Games". <em>arXiv:1908.09453</em>, 2019. <a href="https://arxiv.org/abs/1908.09453">arxiv.org/abs/1908.09453</a> <a class="volver" href="#cita-lanctot-openspiel" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-terry-pettingzoo">J. K. Terry y otros. "PettingZoo: Gym for Multi-Agent Reinforcement Learning". <em>Advances in Neural Information Processing Systems 34 (NeurIPS 2021)</em>, 2021. <a class="volver" href="#cita-terry-pettingzoo" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-piette-ludii">É. Piette, D. J. N. J. Soemers, M. Stephenson, C. F. Sironi, M. H. M. Winands y C. Browne. "Ludii – The Ludemic General Game System". <em>ECAI 2020, Frontiers in Artificial Intelligence and Applications 325, 411–418, IOS Press</em>, 2020. <a class="volver" href="#cita-piette-ludii" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-lczero">Proyecto Leela Chess Zero. <em>Leela Chess Zero (Lc0)</em>. web del proyecto, 2026. <a href="https://lczero.org/">lczero.org</a> <a class="volver" href="#cita-lczero" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-silver-alphazero">D. Silver y otros. "A General Reinforcement Learning Algorithm that Masters Chess, Shogi, and Go through Self-Play". <em>Science 362(6419), 1140–1144</em>, 2018. <a class="volver" href="#cita-silver-alphazero" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-wu-katago">D. J. Wu. "Accelerating Self-Play Learning in Go". <em>arXiv:1902.10565</em>, 2019. <a href="https://arxiv.org/abs/1902.10565">arxiv.org/abs/1902.10565</a> <a class="volver" href="#cita-wu-katago" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
       <nav class="pager" aria-label="Páginas del tema 5">
         <a class="pager-prev" href="informacion-imperfecta.html"><span class="pager-l">Anterior</span><span class="pager-t">Azar e información oculta</span></a>
+        <a class="pager-next" href="index.html#resumen"><span class="pager-l">Siguiente</span><span class="pager-t">Lo que hay que llevarse</span></a>
       </nav>
 
     </main>
@@ -272,6 +288,7 @@ env.close()</code></pre>
             <li><a href="#otros">Ludii, Lc0 y KataGo</a></li>
             <li><a href="#pequenas">Paquetes de MCTS</a></li>
             <li><a href="#cuando">Cuándo usar cada una</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
@@ -302,7 +319,7 @@ env.close()</code></pre>
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

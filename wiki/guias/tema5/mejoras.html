@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../../index.html">Inicio</a></li>
-        <li><a href="../../presentacion.html">Presentación</a></li>
         <li><a href="../../calendario.html">Calendario</a></li>
         <li><a href="../../practicas/index.html">Prácticas</a></li>
-        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="../index.html">Guías</a>
+    <a href="../index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <a href="index.html">Tema 5</a>
     <span aria-hidden="true">/</span>
@@ -78,34 +78,34 @@
         <ul>
           <li>
             <strong>Go.</strong> Es donde nació. Minimax no funcionaba porque nadie sabía escribir una función de
-            evaluación para el go. Hacia 2006 los primeros programas con MCTS, como Crazy Stone y MoGo, dieron un salto
-            enorme, y en pocos años ganaban partidas a profesionales en el tablero pequeño de 9×9.
+            evaluación para el go. Hacia 2006 los primeros programas con MCTS, como Crazy Stone <!--cite coulom-mcts--><span class="cita">[<a href="#ref-coulom-mcts" id="cita-coulom-mcts">1</a>]</span><!--/cite--> y MoGo <!--cite gelly-mogo--><span class="cita">[<a href="#ref-gelly-mogo" id="cita-gelly-mogo">2</a>]</span><!--/cite-->, dieron un salto
+            enorme, y en pocos años ganaban partidas a profesionales en el tablero pequeño de 9×9 <!--cite browne-mcts--><span class="cita">[<a href="#ref-browne-mcts" id="cita-browne-mcts">3</a>]</span><!--/cite-->.
           </li>
           <li>
             <strong>AlphaGo y AlphaZero.</strong> En 2016 AlphaGo, de DeepMind, ganó 4 a 1 a Lee Sedol, uno de los mejores
             jugadores del mundo. Era MCTS con dos redes neuronales: una que decía qué jugadas merecía la pena probar y otra
-            que estimaba quién iba ganando. En 2017, AlphaZero quitó del todo las simulaciones al azar: la red evalúa la
-            hoja y ese valor se retropropaga. Aprendió solo, jugando contra sí mismo, a jugar al go, al ajedrez y al shogi.
-            Leela Chess Zero (Lc0) y KataGo son programas libres que siguen esa receta. AlphaGo sólo perdió la cuarta
+            que estimaba quién iba ganando <!--cite silver-alphago--><span class="cita">[<a href="#ref-silver-alphago" id="cita-silver-alphago">4</a>]</span><!--/cite-->. En 2017, AlphaZero quitó del todo las simulaciones al azar: la red evalúa la
+            hoja y ese valor se retropropaga. Aprendió solo, jugando contra sí mismo, a jugar al go, al ajedrez y al shogi <!--cite silver-alphazero--><span class="cita">[<a href="#ref-silver-alphazero" id="cita-silver-alphazero">5</a>]</span><!--/cite-->.
+            Leela Chess Zero (Lc0) <!--cite lczero--><span class="cita">[<a href="#ref-lczero" id="cita-lczero">6</a>]</span><!--/cite--> y KataGo <!--cite wu-katago--><span class="cita">[<a href="#ref-wu-katago" id="cita-wu-katago">7</a>]</span><!--/cite--> son programas libres que siguen esa receta. AlphaGo sólo perdió la cuarta
             partida, por la jugada 78 de Lee Sedol (la primera imagen de abajo): según DeepMind, era una jugada con una
-            posibilidad entre 10&nbsp;000 de jugarse. Es el precio de explorar sobre todo lo que parece prometedor.
+            posibilidad entre 10&nbsp;000 de jugarse <!--cite deepmind-alphago--><span class="cita">[<a href="#ref-deepmind-alphago" id="cita-deepmind-alphago">8</a>]</span><!--/cite-->, que es el precio de explorar sobre todo lo que parece prometedor.
           </li>
           <li>
             <strong>Total War: Rome II</strong> (Creative Assembly, 2013). La IA del mapa de campaña usa MCTS para
             planificar parte de sus decisiones, un caso conocido de MCTS en un juego comercial que no es de tablero. Lo
             contaron sus desarrolladores en la Game/AI Conference de 2014, y fue la primera vez que MCTS llegaba a un
-            juego de gran presupuesto.
+            juego de gran presupuesto <!--cite champandard-rome2--><span class="cita">[<a href="#ref-champandard-rome2" id="cita-champandard-rome2">9</a>]</span><!--/cite-->.
           </li>
           <li>
             <strong>Juegos de cartas.</strong> El <em>Spades</em> para móviles de AI Factory usa una variante de MCTS
             para información oculta (ISMCTS, en la <a href="informacion-imperfecta.html">página 04</a>) desarrollada con
-            la Universidad de York, y se publicó cómo la ajustaron para que jugara de forma creíble y no sólo fuerte.
+            la Universidad de York, y se publicó cómo la ajustaron para que jugara de forma creíble y no sólo fuerte <!--cite whitehouse-spades--><span class="cita">[<a href="#ref-whitehouse-spades" id="cita-whitehouse-spades">10</a>]</span><!--/cite-->.
             Magic: The Gathering y Hearthstone son bancos de pruebas habituales en la investigación.
           </li>
           <li>
             <strong>Juego general.</strong> En las competiciones de <em lang="en">General Game Playing</em> el programa
             recibe las reglas de un juego que no ha visto nunca y tiene que jugarlo bien. Como no hay tiempo de escribir
-            una evaluación para cada juego, MCTS, que sólo necesita las reglas, se convirtió en la técnica dominante.
+            una evaluación para cada juego, MCTS, que sólo necesita las reglas, acabó siendo la técnica más usada <!--cite bjornsson-cadia--><span class="cita">[<a href="#ref-bjornsson-cadia" id="cita-bjornsson-cadia">11</a>]</span><!--/cite-->.
           </li>
         </ul>
         <div class="capturas">
@@ -131,7 +131,7 @@
           </figure>
         </div>
         <p>
-          El patrón es siempre el mismo: MCTS gana cuando hay muchas jugadas posibles, cuando no se sabe escribir una buena
+          Por lo general, MCTS gana cuando hay muchas jugadas posibles, cuando no se sabe escribir una buena
           evaluación, o cuando el juego cambia y no hay tiempo de afinar una. Donde ya hay una buena evaluación y mucha
           táctica, como en ajedrez, la cosa es más complicada.
         </p>
@@ -181,7 +181,7 @@
           <p>
             El MCTS básico os va a salir en una tarde con la guía. Lo que queda es atacar este problema, y no hay una sola
             respuesta: cada mejora de esta página es una idea que podéis probar, medir y quedaros o descartar. Las dos de abajo
-            de la tabla mezclan MCTS con minimax, y es lo que más ha funcionado; no son las únicas.
+            de la tabla mezclan MCTS con minimax, y diría que es lo que mejor ha funcionado, aunque no son las únicas.
           </p>
         </div>
       </section>
@@ -230,18 +230,19 @@
           </table>
         </div>
         <p>
-          Lo último no es un detalle. A unas 5&#8239;000 iteraciones por segundo, el árbol crece unos 5&#8239;000 nodos por
+          Cuidado con lo último: a unas 5&#8239;000 iteraciones por segundo, el árbol crece unos 5&#8239;000 nodos por
           segundo, y a 3 o 4&nbsp;KB cada uno son de 15 a 20&nbsp;MB por cada segundo que se piensa. En un ordenador no importa
           en un segundo, pero sí en un videojuego que piensa durante toda la partida, en una consola con la memoria contada o
           en un móvil. Ahí se limita el número de nodos y, cuando se llega al límite, se dejan de crear o se borran los menos
           visitados. El Spades de la sección 01 lleva desde 2013 una versión de MCTS con la memoria acotada, pensada justo
-          para un móvil.
+          para un móvil <!--cite powley-memoria--><span class="cita">[<a href="#ref-powley-memoria" id="cita-powley-memoria">12</a>]</span><!--/cite-->.
         </p>
         <h3 class="label">La profundidad de la simulación, medida</h3>
         <p>
           La plantilla corta la simulación a 10 medias jugadas y evalúa con el material. Con otras profundidades, a
-          0,3&nbsp;segundos por jugada, contra Voraz, desde 8 aperturas y con los dos colores. Las iteraciones son las de
-          los 0,9&nbsp;s que busca, en la posición inicial; los puntos, en porcentaje, con ganadas-tablas-perdidas:
+          0,3&nbsp;segundos por jugada, contra Voraz, desde 8 aperturas y con los dos colores. La columna de iteraciones la
+          medí aparte, dándole 0,9&nbsp;s en la posición inicial (en una jugada de 0,3&nbsp;s caben más o menos la tercera
+          parte); los puntos, en porcentaje, con ganadas-tablas-perdidas:
         </p>
         <div class="table-scroll">
           <table>
@@ -293,14 +294,14 @@
         <p>
           Otra forma de gastar el tiempo: desde cada hoja nueva, 4 simulaciones en vez de una, y su media. Cada hoja da un
           resultado menos ruidoso, pero el árbol crece cuatro veces más despacio. Contra Voraz, a 0,3&nbsp;s: con una
-          simulación por hoja, 91&nbsp;% (14-1-1); con cuatro, 94&nbsp;% (14-2-0). La diferencia cabe de sobra en el ruido. Es lo habitual: una simulación por hoja suele bastar, porque
+          simulación por hoja, 91&nbsp;% (14-1-1); con cuatro, 94&nbsp;% (14-2-0). La diferencia cabe de sobra en el ruido, y es lo habitual: una simulación por hoja suele bastar, porque
           el árbol ya hace la media al volver muchas veces a los nodos que importan.
         </p>
         <h3 class="label">Y en minimax</h3>
         <p>
           Minimax tiene menos mandos: la <strong>profundidad</strong>, el <strong>orden</strong> de las jugadas y la
           <strong>evaluación</strong>. El problema es el reloj, porque el tiempo de una búsqueda a profundidad fija no se
-          sabe de antemano. Con el AlfaBeta de la práctica, en Python, en un medio juego con 37 jugadas legales:
+          sabe de antemano. Con el AlfaBeta de los rivales (el de <code>ajedrez/rivales.py</code>), en Python, en un medio juego con 37 jugadas legales:
         </p>
 <!--TEX \begin{array}{lr}
 \text{AlfaBeta(1)} & 0,003\ \text{s} \\
@@ -315,10 +316,12 @@
 \end{array}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:4.8em;vertical-align:-2.15em;"></span><span class="mord"><span class="mtable"><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(1)</span></span></span></span><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(2)</span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(3)</span></span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">AlfaBeta(4)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">003</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">013</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">25</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">57</span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span></span></span></span></span></span></span></div><!--/TEX-->
         <p>
           Cada media jugada más multiplica el tiempo, aquí entre 4 y 20 veces. Con 1 segundo por jugada, <code>AlfaBeta(4)</code>
-          se pasaría en el medio juego, aunque en la posición inicial tarde 0,66&nbsp;s. Por eso los
+          se pasaría en el medio juego, aunque en la posición inicial tarde 0,66&nbsp;s. (El alfa-beta que escribís
+          siguiendo la guía sale bastante más rápido, y en la <a href="../mcts-paso-a-paso.html">guía de la práctica</a> tenéis
+          sus tiempos, pero el salto de un nivel al siguiente es parecido.) Por eso los
           programas de verdad no buscan a profundidad fija, sino con <strong>profundización iterativa</strong>: buscan a
           profundidad 1, luego a 2, luego a 3, hasta que se acaba el reloj, y juegan lo que dijo la última búsqueda
-          completa. Parece un desperdicio repetir los niveles de arriba, pero cuestan poco al lado del último, y cada
+          completa <!--cite russell-norvig--><span class="cita">[<a href="#ref-russell-norvig" id="cita-russell-norvig">13</a>]</span><!--/cite-->. Parece un desperdicio repetir los niveles de arriba, pero cuestan poco al lado del último, y cada
           búsqueda deja ordenadas las jugadas para la siguiente, que así poda más. Es la forma de que minimax también tenga
           una respuesta en cualquier momento, algo que MCTS trae de serie.
         </p>
@@ -361,7 +364,7 @@
           <span class="note-label">Para vuestro diario</span>
           <p>
             Cada heurística cuesta tiempo en cada iteración, y el tiempo se paga en iteraciones. Una heurística que acierta
-            pero hace la simulación tres veces más lenta puede salir a cuenta o no: eso no se razona, se mide. Meted cada
+            pero hace la simulación tres veces más lenta puede salir a cuenta o no, y la única forma de saberlo es medirlo. Meted cada
             idea por separado en <code>comparar.py</code>, como una versión más, y apuntad lo que da.
           </p>
         </div>
@@ -390,7 +393,7 @@
           attacker</em>). Así, una pieza colgada se come en la simulación, que era el problema.
         </p>
         <p>
-          El precio: cada jugada de la simulación cuesta más, así que salen menos iteraciones. Y no hay que pasarse: una
+          El precio es que cada jugada de la simulación cuesta más, así que salen menos iteraciones. Y tampoco hay que pasarse: una
           simulación que juega siempre igual (la misma jugada en la misma posición) da siempre el mismo resultado y deja de
           ser Monte Carlo. Lo normal es mezclar: con cierta probabilidad la jugada con criterio, y si no, al azar.
         </p>
@@ -423,8 +426,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
           Un hijo recién creado no sabe nada, y hasta que acumula visitas UCB1 lo trata igual que a los demás. Si tenéis una
           idea previa de qué jugadas son prometedoras (capturas, jaques, desarrollar piezas), se le puede dar ventaja desde
           el principio, de dos formas: sumando un término que pesa mucho con pocas visitas y se desvanece con muchas
-          (<em lang="en">progressive bias</em>), o empezando el nodo con visitas y victorias ficticias, como si ya se hubiera
-          probado unas cuantas veces. AlphaZero hace lo primero con lo que dice su red, en una variante de UCB1 llamada PUCT.
+          (<em lang="en">progressive bias</em>) <!--cite chaslot-progresivo--><span class="cita">[<a href="#ref-chaslot-progresivo" id="cita-chaslot-progresivo">14</a>]</span><!--/cite-->, o empezando el nodo con visitas y victorias ficticias, como si ya se hubiera
+          probado unas cuantas veces. AlphaZero hace lo primero con lo que dice su red, en una variante de UCB1 llamada PUCT <!--cite silver-alphazero--><span class="cita">[<a href="#ref-silver-alphazero">5</a>]</span><!--/cite-->.
         </p>
       </section>
 
@@ -435,8 +438,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
         </div>
         <h3 class="label">Ver los mates: MCTS-Solver</h3>
         <p>
-          Si un hijo da mate, ese hijo vale 1 seguro, no "más o menos 1 después de muchas simulaciones". MCTS-Solver (Winands,
-          Björnsson y Saito, 2008) marca los nodos con resultado demostrado y lo sube por el árbol con reglas de minimax: un
+          Si un hijo da mate, ese hijo vale 1 seguro, no "más o menos 1 después de muchas simulaciones". MCTS-Solver <!--cite winands-solver--><span class="cita">[<a href="#ref-winands-solver" id="cita-winands-solver">15</a>]</span><!--/cite--> marca los nodos con resultado demostrado y lo sube por el árbol con reglas de minimax: un
           nodo es ganado si algún hijo gana, y perdido si todos sus hijos pierden. Así, un mate en una o en dos se encuentra
           enseguida y no se pierde por culpa de una media. La versión mínima ya ayuda: antes de buscar, mirar si alguna jugada
           da mate.
@@ -461,8 +463,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
         </div>
         <p>
           En la sección 02 visteis el problema: dejáis la dama colgando, de las treinta respuestas del rival sólo una se la
-          come, y la media de las simulaciones no se entera. Esta mejora va a por eso. Es de Lanctot, Winands, Pepels y
-          Sturtevant (2014), y es la que más subió contra AlfaBeta2 en las medidas de esa sección.
+          come, y la media de las simulaciones no se entera. Esta mejora va a por eso <!--cite lanctot-implicito--><span class="cita">[<a href="#ref-lanctot-implicito" id="cita-lanctot-implicito">16</a>]</span><!--/cite-->, y es la que más subió contra AlfaBeta2 en las medidas de esa sección.
         </p>
         <h3 class="label">Un ejemplo: la dama por un peón</h3>
         <p>
@@ -526,7 +527,7 @@ al retropropagar: para cada <span class="var">nodo</span> del camino, de abajo a
         <h3 class="label">La mezcla, en la selección</h3>
         <p>
           La selección no usa <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> a secas, sino una mezcla con la media. Llamamos <!--tex \lambda --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span><!--/tex--> (lambda) al peso
-          de <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> en la mezcla, entre 0 y 1. En el artículo original se llama <!--tex \alpha --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span></span></span></span><!--/tex-->, pero aquí
+          de <!--tex M --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><!--/tex--> en la mezcla, entre 0 y 1. En el artículo original <!--cite lanctot-implicito--><span class="cita">[<a href="#ref-lanctot-implicito">16</a>]</span><!--/cite--> se llama <!--tex \alpha --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span></span></span></span><!--/tex-->, pero aquí
           <!--tex \alpha --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span></span></span></span><!--/tex--> ya es la cota de <a href="juegos.html#alfabeta">alfa-beta</a>. La parte de explorar de UCB1 no
           cambia:
         </p>
@@ -564,7 +565,7 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
         <div class="demo" data-mcts="minimax">
           <div class="demo-head">
             <span class="demo-label">Ejemplo interactivo</span>
-            <h4>La media, el peor caso y el peso que los mezcla</h4>
+            <h3>La media, el peor caso y el peso que los mezcla</h3>
           </div>
           <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Es el árbol de arriba con un deslizador para el peso λ: con λ = 0 la selección baja por Dxb7, y a partir de λ = 0,15 baja por Cf3.</p></div>
           <div class="demo-controls"></div>
@@ -611,7 +612,7 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
         </p>
         <p>
           La otra vía es <strong>paralelizar</strong>. Lo más sencillo es la paralelización en la raíz: varios procesos
-          construyen cada uno su árbol desde la misma posición, y al final se suman las visitas de cada jugada. En Python
+          construyen cada uno su árbol desde la misma posición, y al final se suman las visitas de cada jugada <!--cite chaslot-paralelo--><span class="cita">[<a href="#ref-chaslot-paralelo" id="cita-chaslot-paralelo">17</a>]</span><!--/cite-->. En Python
           tienen que ser procesos (<code>multiprocessing</code>) y no hilos, porque los hilos no ejecutan código Python a la
           vez. En la práctica no se usa: el <a href="../../practicas/practica-5.html">enunciado</a> pide un jugador sin hilos
           ni procesos.
@@ -643,10 +644,35 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
           <p>
             La <a href="../mcts-paso-a-paso.html">guía paso a paso</a> os lleva hasta el MCTS básico, y propone retos para
             seguir. Cada mejora es una versión nueva que se mide contra la anterior con los mismos rivales, como en las prácticas de antes.
-            Una mejora que en teoría ayuda y en vuestras medidas no, se descarta, y eso también se cuenta en el diario.
+            Si una mejora en teoría ayuda pero en vuestras medidas no, se descarta, y eso también se cuenta en el diario.
           </p>
         </div>
       </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-coulom-mcts">R. Coulom. "Efficient Selectivity and Backup Operators in Monte-Carlo Tree Search". <em>Computers and Games 2006, LNCS 4630, Springer</em>, 2007. <a class="volver" href="#cita-coulom-mcts" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-gelly-mogo">S. Gelly, Y. Wang, R. Munos y O. Teytaud. "Modification of UCT with Patterns in Monte-Carlo Go". <em>Informe técnico RR-6062, INRIA</em>, 2006. <a class="volver" href="#cita-gelly-mogo" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-browne-mcts">C. Browne, E. Powley, D. Whitehouse, S. Lucas, P. Cowling y otros. "A Survey of Monte Carlo Tree Search Methods". <em>IEEE Transactions on Computational Intelligence and AI in Games 4(1), 1–43</em>, 2012. <a class="volver" href="#cita-browne-mcts" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-silver-alphago">D. Silver y otros. "Mastering the Game of Go with Deep Neural Networks and Tree Search". <em>Nature 529, 484–489</em>, 2016. <a class="volver" href="#cita-silver-alphago" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-silver-alphazero">D. Silver y otros. "A General Reinforcement Learning Algorithm that Masters Chess, Shogi, and Go through Self-Play". <em>Science 362(6419), 1140–1144</em>, 2018. <a class="volver" href="#cita-silver-alphazero" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-lczero">Proyecto Leela Chess Zero. <em>Leela Chess Zero (Lc0)</em>. web del proyecto, 2026. <a href="https://lczero.org/">lczero.org</a> <a class="volver" href="#cita-lczero" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-wu-katago">D. J. Wu. "Accelerating Self-Play Learning in Go". <em>arXiv:1902.10565</em>, 2019. <a href="https://arxiv.org/abs/1902.10565">arxiv.org/abs/1902.10565</a> <a class="volver" href="#cita-wu-katago" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-deepmind-alphago">Google DeepMind. <em>AlphaGo</em>. web de DeepMind, 2026. <a href="https://deepmind.google/research/alphago/">deepmind.google/research/alphago</a> <a class="volver" href="#cita-deepmind-alphago" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-champandard-rome2">A. J. Champandard. "Monte-Carlo Tree Search in TOTAL WAR: ROME II's Campaign AI". <em>AiGameDev.com</em>, 2014. <a class="volver" href="#cita-champandard-rome2" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-whitehouse-spades">D. Whitehouse, P. I. Cowling, E. J. Powley y J. Rollason. "Integrating Monte Carlo Tree Search with Knowledge-Based Methods to Create Engaging Play in a Commercial Mobile Game". <em>Proceedings of AIIDE 2013</em>, 2013. <a class="volver" href="#cita-whitehouse-spades" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-bjornsson-cadia">Y. Björnsson y H. Finnsson. "CadiaPlayer: A Simulation-Based General Game Player". <em>IEEE Transactions on Computational Intelligence and AI in Games 1(1), 4–15</em>, 2009. <a class="volver" href="#cita-bjornsson-cadia" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-powley-memoria">E. J. Powley, P. I. Cowling y D. Whitehouse. "Memory Bounded Monte Carlo Tree Search". <em>Proceedings of AIIDE 2017, 94–100</em>, 2017. <a class="volver" href="#cita-powley-memoria" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-russell-norvig">S. Russell y P. Norvig. <em>Artificial Intelligence: A Modern Approach</em>. 4.ª ed., Pearson, 2020. <a class="volver" href="#cita-russell-norvig" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-chaslot-progresivo">G. M. J.-B. Chaslot, M. H. M. Winands, H. J. van den Herik, J. W. H. M. Uiterwijk y B. Bouzy. "Progressive Strategies for Monte-Carlo Tree Search". <em>New Mathematics and Natural Computation 4(3), 343–357</em>, 2008. <a class="volver" href="#cita-chaslot-progresivo" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-winands-solver">M. H. M. Winands, Y. Björnsson y J.-T. Saito. "Monte-Carlo Tree Search Solver". <em>Computers and Games 2008, LNCS 5131, 25–36, Springer</em>, 2008. <a class="volver" href="#cita-winands-solver" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-lanctot-implicito">M. Lanctot, M. H. M. Winands, T. Pepels y N. R. Sturtevant. "Monte Carlo Tree Search with Heuristic Evaluations using Implicit Minimax Backups". <em>IEEE Conference on Computational Intelligence and Games (CIG 2014), 1–8</em>, 2014. <a class="volver" href="#cita-lanctot-implicito" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-chaslot-paralelo">G. M. J.-B. Chaslot, M. H. M. Winands y H. J. van den Herik. "Parallel Monte-Carlo Tree Search". <em>Computers and Games 2008, LNCS 5131, 60–71, Springer</em>, 2008. <a class="volver" href="#cita-chaslot-paralelo" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
 
       <nav class="pager" aria-label="Páginas del tema 5">
         <a class="pager-prev" href="mcts.html"><span class="pager-l">Anterior</span><span class="pager-t">Monte Carlo Tree Search</span></a>
@@ -662,11 +688,15 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
           <ol>
             <li><a href="#donde">Dónde se usa</a></li>
             <li><a href="#ajedrez">MCTS y el ajedrez</a></li>
+            <li><a href="#mandos">Los mandos</a></li>
+            <li><a href="#conocimiento">Dónde entra el conocimiento</a></li>
             <li><a href="#simulacion">Mejorar la simulación</a></li>
             <li><a href="#seleccion">Mejorar la selección</a></li>
             <li><a href="#arbol">Mejorar el árbol</a></li>
+            <li><a href="#minimax">Minimax implícito</a></li>
             <li><a href="#iteraciones">Más iteraciones</a></li>
             <li><a href="#resumen">Resumen</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
@@ -697,7 +727,7 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

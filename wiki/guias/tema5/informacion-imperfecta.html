@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../../index.html">Inicio</a></li>
-        <li><a href="../../presentacion.html">Presentación</a></li>
         <li><a href="../../calendario.html">Calendario</a></li>
         <li><a href="../../practicas/index.html">Prácticas</a></li>
-        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="../index.html">Guías</a>
+    <a href="../index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <a href="index.html">Tema 5</a>
     <span aria-hidden="true">/</span>
@@ -64,7 +64,7 @@
       <span class="thin">Cuando hay dados, o cuando no veis las cartas del rival.</span>
     </h1>
     <p class="standfirst">
-      Hasta aquí los dos jugadores lo veían todo y nada dependía de la suerte. Qué cambia con los dados (nodos de azar), qué cambia con las cartas escondidas (determinizar), por qué determinizar engaña, cómo lo arregla ISMCTS, y por qué en el póker hace falta otra cosa.
+      Hasta aquí los dos jugadores lo veían todo y nada dependía de la suerte. Veamos qué cambia con los dados (nodos de azar) y con las cartas escondidas (determinizar), por qué determinizar engaña y cómo lo arregla ISMCTS, y por qué en el póker hace falta otra cosa.
     </p>
   </header>
 
@@ -101,7 +101,7 @@
           Con dados, el árbol tiene un tercer tipo de nodo: además de los de MAX y los de MIN, los <strong>nodos de
           azar</strong>, en los que no elige nadie y cada rama tiene una probabilidad. Un nodo de azar vale la
           <strong>media de sus hijos, pesada por su probabilidad</strong>, lo que en estadística se llama valor esperado. A
-          minimax con nodos de azar se le llama <strong>expectimax</strong>.
+          minimax con nodos de azar se le llama <strong>expectimax</strong> <!--cite russell-norvig--><span class="cita">[<a href="#ref-russell-norvig" id="cita-russell-norvig">1</a>]</span><!--/cite-->.
         </p>
         <figure class="wide">
           <figcaption>MAX elige entre dos jugadas que dependen de la suerte. Los círculos amarillos son nodos de azar</figcaption>
@@ -162,8 +162,8 @@ B &amp;= \tfrac{1}{6} \cdot 0 + \tfrac{5}{6} \cdot 8 \\
           ya es de información perfecta, así que se busca como siempre. A eso se le llama <strong>determinizar</strong>, y a
           cada reparto inventado, una determinización. Se repite con muchos repartos distintos y se elige la jugada que mejor
           sale de media, o la que más repartos votan. El método completo se conoce como <strong>Perfect Information Monte
-          Carlo</strong> (PIMC). Es sencillo y funciona sorprendentemente bien en muchos juegos de cartas: el programa de
-          bridge GIB, de Matthew Ginsberg, uno de los más fuertes de finales de los noventa, jugaba así.
+          Carlo</strong> (PIMC). Es sencillo y, aunque no lo parezca, funciona bastante bien en muchos juegos de cartas (el programa de
+          bridge GIB, de Matthew Ginsberg, uno de los más fuertes de finales de los noventa, jugaba así <!--cite ginsberg-gib--><span class="cita">[<a href="#ref-ginsberg-gib" id="cita-ginsberg-gib">2</a>]</span><!--/cite-->).
         </p>
         <pre class="pseudo"><b>repetir</b> muchas veces:
     repartir al azar lo que no veis, de forma compatible con lo que sabéis
@@ -180,15 +180,43 @@ jugar la jugada con mejor media entre todos los mundos</pre>
         <h3 class="label">La fusión de estrategias</h3>
         <p>
           En cada mundo inventado la búsqueda ve las cartas del rival. Así que cualquier plan que dependa de
-          <strong>adivinar</strong> algo le sale siempre bien, porque en cada mundo "adivina" con las cartas a la vista. Un
-          ejemplo pequeño: al final de una mano podéis plantaros y llevaros 6 puntos seguros (jugada B), o jugar el as
-          (jugada A) y, en la última baza, adivinar el palo de la única carta que le queda al rival, corazones o picas, mitad y
-          mitad. Si acertáis, 10 puntos; si falláis, 0.
+          <strong>adivinar</strong> algo le sale siempre bien, porque en cada mundo "adivina" con las cartas a la vista. Para
+          verlo, un juego de juguete que se acaba en una sola jugada:
+        </p>
+        <ul>
+          <li>El rival tiene una carta boca abajo. Puede ser de corazones (♥) o de picas (♠), mitad y mitad.</li>
+          <li><strong>Jugada A, adivinar:</strong> decís un palo y se da la vuelta la carta. Si habéis acertado, os lleváis
+            10 puntos; si no, 0.</li>
+          <li><strong>Jugada B, cobrar:</strong> os lleváis 6 puntos sin mirar la carta.</li>
+        </ul>
+        <figure class="wide">
+          <figcaption>Las reglas del juego: una carta tapada y dos jugadas</figcaption>
+          <svg class="explica det-svg" viewBox="0 0 640 186" role="img" aria-label="La carta del rival, boca abajo, que es de corazones o de picas, mitad y mitad. Jugada A, adivinar: decís un palo, se da la vuelta la carta; si acertáis, 10 puntos, y si falláis, 0. Jugada B, cobrar: 6 puntos siempre, sin mirar la carta.">
+            <rect x="58" y="34" width="64" height="90" rx="7" class="det-dorso"/>
+            <text x="90" y="91" class="det-q">?</text>
+            <text x="90" y="150" class="mc-t mc-centro">la carta del rival</text>
+            <text x="90" y="168" class="mc-t mc-centro mc-tenue">♥ o ♠, mitad y mitad</text>
+            <rect x="186" y="22" width="232" height="128" rx="8" class="det-fondo"/>
+            <text x="202" y="48" class="det-titulo det-izq">A · Adivinar</text>
+            <text x="202" y="74" class="mc-t det-izq">decís un palo en voz alta</text>
+            <text x="202" y="94" class="mc-t det-izq">y se da la vuelta la carta</text>
+            <text x="202" y="120" class="mc-t det-izq det-ok">acertáis → 10 puntos</text>
+            <text x="202" y="138" class="mc-t det-izq det-mal">falláis → 0 puntos</text>
+            <rect x="432" y="22" width="196" height="128" rx="8" class="det-fondo"/>
+            <text x="448" y="48" class="det-titulo det-izq">B · Cobrar</text>
+            <text x="448" y="74" class="mc-t det-izq">no se mira la carta</text>
+            <text x="448" y="120" class="mc-t det-izq det-num">siempre → 6 puntos</text>
+          </svg>
+        </figure>
+        <p>
+          Jugadlo en el ejemplo. A la izquierda, lo que hace la búsqueda en uno de sus mundos inventados, con la carta del
+          rival boca arriba. A la derecha, la partida de verdad, con la carta boca abajo. Las barras de abajo van llevando
+          la cuenta.
         </p>
         <div class="demo" data-mcts="determinizar">
           <div class="demo-head">
             <span class="demo-label">Ejemplo interactivo</span>
-            <h4>Plantarse o adivinar: determinizar contra un árbol de lo que sabéis</h4>
+            <h3>Adivinar o cobrar: lo que ve la búsqueda y lo que veis vosotros</h3>
           </div>
           <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Determinizando, A vale 10 en cada mundo y se elige A; de verdad vale 5, y B, con 6, era mejor.</p></div>
           <div class="demo-controls"></div>
@@ -208,7 +236,7 @@ A \text{ de verdad} &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
         <p>
           El error viene de tomar en cada mundo una decisión distinta (decir corazones en unos y picas en otros) donde de
           verdad tenéis que tomar una sola, porque no distinguís esos mundos. Se dice que se "funden" estrategias que en
-          realidad no podéis seguir.
+          realidad no podéis seguir <!--cite frank-basin--><span class="cita">[<a href="#ref-frank-basin" id="cita-frank-basin">3</a>]</span><!--/cite-->.
         </p>
         <h3 class="label">La no localidad</h3>
         <p>
@@ -226,7 +254,7 @@ A \text{ de verdad} &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
           <h2 class="sec">ISMCTS: un árbol de lo que sabéis</h2>
         </div>
         <p>
-          <strong>ISMCTS</strong> (<em lang="en">Information Set MCTS</em>, de Cowling, Powley y Whitehouse, 2012) ataca la
+          <strong>ISMCTS</strong> (<em lang="en">Information Set MCTS</em>) <!--cite cowling-ismcts--><span class="cita">[<a href="#ref-cowling-ismcts" id="cita-cowling-ismcts">4</a>]</span><!--/cite--> ataca la
           fusión de estrategias así: en vez de un árbol por cada mundo inventado, construye <strong>un solo árbol cuyos nodos
           son conjuntos de información</strong>, es decir, lo que sabe el jugador que decide, no la posición exacta.
         </p>
@@ -271,7 +299,7 @@ A \text{ de verdad} &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
         </ol>
         <p>
           En el ejemplo de arriba, el botón <strong>Lo que sé (ISMCTS)</strong> cuenta así: el palo que diréis tiene que ser
-          el mismo en todos los mundos. Es la versión que usa el <em>Spades</em> de AI Factory que aparecía en la
+          el mismo en todos los mundos. Es la versión que usa el <em>Spades</em> de AI Factory <!--cite whitehouse-spades--><span class="cita">[<a href="#ref-whitehouse-spades" id="cita-whitehouse-spades">5</a>]</span><!--/cite--> que aparecía en la
           <a href="mejoras.html#donde">página anterior</a>. La no localidad, en cambio, no la arregla: el mundo de cada
           iteración se sigue inventando como se pueda.
         </p>
@@ -287,9 +315,9 @@ A \text{ de verdad} &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
           las mismas cartas es fácil de leer, así que hay que mezclar: farolear a veces, y con una frecuencia bien pensada.
           Eso es una <strong>estrategia mixta</strong>, y MCTS, que busca una jugada buena, no la da. Para estos juegos se usan
           métodos de teoría de juegos que buscan una estrategia de equilibrio jugando millones de manos contra sí mismos; el
-          más conocido es <strong>CFR</strong> (<em lang="en">counterfactual regret minimization</em>, 2007). Con
-          descendientes suyos, Libratus ganó en 2017 a profesionales de póker sin límite mano a mano, y Pluribus, en 2019, en
-          mesas de seis jugadores.
+          más conocido es <strong>CFR</strong> (<em lang="en">counterfactual regret minimization</em>, 2007) <!--cite zinkevich-cfr--><span class="cita">[<a href="#ref-zinkevich-cfr" id="cita-zinkevich-cfr">6</a>]</span><!--/cite-->. Con
+          descendientes suyos, Libratus ganó en 2017 a profesionales de póker sin límite mano a mano <!--cite brown-libratus--><span class="cita">[<a href="#ref-brown-libratus" id="cita-brown-libratus">7</a>]</span><!--/cite-->, y Pluribus, en 2019, en
+          mesas de seis jugadores <!--cite brown-pluribus--><span class="cita">[<a href="#ref-brown-pluribus" id="cita-brown-pluribus">8</a>]</span><!--/cite-->.
         </p>
         <p>
           Y en los videojuegos queda la salida menos elegante: que la IA <strong>haga trampa</strong> y vea lo que el
@@ -306,6 +334,22 @@ A \text{ de verdad} &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
           </ul>
         </div>
       </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-russell-norvig">S. Russell y P. Norvig. <em>Artificial Intelligence: A Modern Approach</em>. 4.ª ed., Pearson, 2020. <a class="volver" href="#cita-russell-norvig" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-ginsberg-gib">M. L. Ginsberg. "GIB: Imperfect Information in a Computationally Challenging Game". <em>Journal of Artificial Intelligence Research 14, 303–358</em>, 2001. <a class="volver" href="#cita-ginsberg-gib" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-frank-basin">I. Frank y D. Basin. "Search in Games with Incomplete Information: A Case Study Using Bridge Card Play". <em>Artificial Intelligence 100(1–2), 87–123</em>, 1998. <a class="volver" href="#cita-frank-basin" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-cowling-ismcts">P. I. Cowling, E. J. Powley y D. Whitehouse. "Information Set Monte Carlo Tree Search". <em>IEEE Transactions on Computational Intelligence and AI in Games 4(2), 120–143</em>, 2012. <a class="volver" href="#cita-cowling-ismcts" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-whitehouse-spades">D. Whitehouse, P. I. Cowling, E. J. Powley y J. Rollason. "Integrating Monte Carlo Tree Search with Knowledge-Based Methods to Create Engaging Play in a Commercial Mobile Game". <em>Proceedings of AIIDE 2013</em>, 2013. <a class="volver" href="#cita-whitehouse-spades" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-zinkevich-cfr">M. Zinkevich, M. Johanson, M. Bowling y C. Piccione. "Regret Minimization in Games with Incomplete Information". <em>Advances in Neural Information Processing Systems 20 (NIPS 2007)</em>, 2007. <a class="volver" href="#cita-zinkevich-cfr" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-brown-libratus">N. Brown y T. Sandholm. "Superhuman AI for Heads-up No-limit Poker: Libratus Beats Top Professionals". <em>Science 359(6374), 418–424</em>, 2018. <a class="volver" href="#cita-brown-libratus" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-brown-pluribus">N. Brown y T. Sandholm. "Superhuman AI for Multiplayer Poker". <em>Science 365(6456), 885–890</em>, 2019. <a class="volver" href="#cita-brown-pluribus" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
 
       <nav class="pager" aria-label="Páginas del tema 5">
         <a class="pager-prev" href="mejoras.html"><span class="pager-l">Anterior</span><span class="pager-t">MCTS en la práctica</span></a>
@@ -325,6 +369,7 @@ A \text{ de verdad} &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
             <li><a href="#trampas">Sus dos trampas</a></li>
             <li><a href="#ismcts">ISMCTS</a></li>
             <li><a href="#otra-cosa">Cuándo no basta</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
@@ -355,7 +400,7 @@ A \text{ de verdad} &amp;= \tfrac{1}{2} \cdot 10 + \tfrac{1}{2} \cdot 0 \\
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

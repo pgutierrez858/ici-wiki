@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Depurar reglas borrosas</span>
   </nav>
@@ -62,9 +62,9 @@
     </h1>
     <p class="standfirst">
       Con Jess, en cada turno se disparaban unas reglas y otras no. Aquí casi todas se activan un poco, se mezclan,
-      y lo que sale es un número por acción. Eso es lo bueno de la lógica borrosa y también lo que la hace difícil
-      de seguir. Esta guía da dos herramientas para verlo, una para probar el FCL sin jugar y otra para seguirlo
-      mientras se juega, con el código entero y lo que sacan de verdad con el ejemplo de las siete reglas.
+      y lo que sale es un número por acción. Eso es lo bueno de la lógica borrosa, y también lo que la hace difícil
+      de seguir. En esta guía tenéis dos herramientas para verlo (una para probar el FCL sin jugar y otra para seguirlo
+      mientras se juega), con el código entero y lo que sacan de verdad con el ejemplo de las siete reglas.
     </p>
   </header>
 
@@ -96,7 +96,7 @@
               </tr>
               <tr>
                 <td><strong>3 · ¿La acción hace lo que debe?</strong></td>
-                <td>El problema ya no es borroso: es Java, como en la Práctica&nbsp;1.</td>
+                <td>Aquí el problema ya es de Java, como en la Práctica&nbsp;1.</td>
                 <td><code>VerPartida</code> despacio, con la traza diciendo qué acción se está ejecutando.</td>
               </tr>
             </tbody>
@@ -186,8 +186,8 @@ Todos los casos bien.</code></pre>
         <div class="note tip">
           <span class="note-label">Un caso por regla, desde el principio</span>
           <p>
-            Cada regla nueva, con la situación para la que la escribís y la acción que debería ganar. Si una regla
-            posterior la rompe, os enteráis en un segundo. En el ejemplo, el caso "peligroso a 45: todavía come" fue
+            Os recomiendo acompañar cada regla nueva de un caso, con la situación para la que la escribís y la acción
+            que debería ganar, y así, si una regla posterior la rompe, os enteráis en un segundo. En el ejemplo, el caso "peligroso a 45: todavía come" fue
             el que destapó un empate a 5,0 en la primera versión del <a href="borroso-paso-a-paso.html#paso2">paso&nbsp;2</a>.
           </p>
         </div>
@@ -199,7 +199,7 @@ Todos los casos bien.</code></pre>
           <h2 class="sec">Ver las reglas mientras se juega</h2>
         </div>
         <p>
-          El motor trae un observador, <code>ConsoleFuzzyEngineObserver</code>, que <a href="tema2/borroso-mspacman.html#ver">escribe
+          El motor trae un observador, <code>ConsoleFuzzyEngineObserver</code>, que <a href="tema4/borroso-mspacman.html#ver">escribe
           en cada turno</a> todas las entradas, todas las salidas y todas las reglas. Son unas veinte líneas por turno,
           y una partida tiene miles. <code>TrazaBorrosa</code> hace lo mismo en una línea, sólo cuando cambia la acción
           ganadora, y al final un resumen:
@@ -302,8 +302,8 @@ traza.resumen();</code></pre></div>
         </p>
         <p>
           La otra mitad del resumen también dice mucho. Contra los agresivos, esta Ms.&nbsp;Pac-Man huye en 3&#8239;268
-          de 4&#8239;001 turnos: casi todo el tiempo. Si queréis que puntúe más, ahí está el margen, y no en afinar la
-          regla 7, que gana 110 veces.
+          de 4&#8239;001 turnos: casi todo el tiempo. Si queréis que puntúe más, diría que el margen está ahí, mucho más
+          que en afinar la regla 7, que gana 110 veces.
         </p>
         <div class="note mine">
           <span class="note-label">Activarse no es ganar</span>
@@ -355,7 +355,7 @@ traza.resumen();</code></pre></div>
         </div>
         <p>
           Para probar una idea rápida hay dos atajos. El primero, el banco de los apuntes, en
-          <a href="tema2/inferencia-borrosa.html">Inferencia borrosa</a>, o el de la
+          <a href="tema4/inferencia-borrosa.html">Inferencia borrosa</a>, o el de la
           <a href="borroso-paso-a-paso.html#reglas">guía del ejemplo</a>, que ya tiene cargado el FCL de las siete
           reglas: pegáis vuestro FCL, movéis las entradas y veis los recortes, las salidas y la curva. Da las mismas
           cifras que jFuzzyLogic.
@@ -401,7 +401,7 @@ traza.resumen();</code></pre></div>
               <tr><td>Un fantasma que no existe hace huir a Ms.&nbsp;Pac-Man.</td><td>Un <code>-1</code> como distancia, fuera de los términos: vale "cerca" con un 1. "No hay" tiene que ser un número dentro del rango, como <code>LEJOS</code>.</td></tr>
               <tr><td>Las entradas valen siempre lo mismo, o lo del turno anterior.</td><td>Atributos del <code>Input</code> inicializados en la declaración, que pisan lo que calcula <code>parseInput</code>; o una variable que no se manda en algún turno. Ved <a href="borroso-paso-a-paso.html#entradas">las entradas</a>.</td></tr>
               <tr><td>Una regla con <code>NOT</code> se activa mucho más de lo que esperabais.</td><td><code>NOT lejos</code> no es <code>cerca</code>: es <!--tex 1 - \mu --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">1 - \mu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span><!--/tex-->, y vale algo en todo el tramo en que <code>lejos</code> no es 1. El <a href="borroso-paso-a-paso.html#paso4">paso&nbsp;4</a> del ejemplo.</td></tr>
-              <tr><td>Una regla con <code>OR</code> y <code>AND</code> se activa cuando no debería.</td><td>jFuzzyLogic lee de izquierda a derecha, sin precedencia. Paréntesis.</td></tr>
+              <tr><td>Una regla con <code>OR</code> y <code>AND</code> se activa cuando no debería.</td><td>jFuzzyLogic lee de izquierda a derecha, sin precedencia. Usad paréntesis.</td></tr>
               <tr><td>Con <code>METHOD : MM</code> salen valores absurdos, cerca de 0.</td><td>Un error de jFuzzyLogic 3.2 con la media de los máximos. Usad <code>COG</code>.</td></tr>
               <tr><td><code>TrazaBorrosa</code> o un <code>ConsoleFuzzyEngineObserver</code> enganchados en la entrega.</td><td>Escriben en cada turno y ralentizan el concurso. Fuera antes de subir el zip.</td></tr>
             </tbody>
@@ -455,7 +455,7 @@ traza.resumen();</code></pre></div>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

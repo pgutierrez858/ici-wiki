@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Tema bonus · Agentes para juegos de lenguaje · ICI</title>
+<meta name="description" content="Tema bonus de ICI: agentes que juegan a Código Secreto. Las palabras como vectores y el coseno, cinco estrategias para dar y adivinar pistas cuando los dos agentes conocen la estrategia del otro, el riesgo del asesino, los modelos de lenguaje y un simulador para jugar en la página contra la máquina o entre varias personas.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <span>Tema bonus</span>
+  </nav>
+
+  <header class="masthead">
+    <h1>
+      Agentes para juegos de lenguaje
+      <span class="thin">Cuando el tablero son palabras.</span>
+    </h1>
+    <p class="standfirst">
+      Los apuntes del bloque extra, pensados para una clase. Construimos agentes que juegan a Código Secreto, el juego en el
+      que hay que dar una pista de una sola palabra para que tu compañero acierte varias del tablero. Por una vez la técnica
+      no es simbólica: el significado de las palabras sale de vectores aprendidos sobre muchísimo texto, y encima de ellos
+      ponemos estrategias sencillas, de las de escribir en una tarde.
+    </p>
+    <div class="byline">
+      <span><strong>Pablo Gutiérrez Sánchez</strong></span>
+      <span><a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a></span>
+      <span>Facultad de Informática · UCM</span>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Tema</dt>
+      <dd>Bonus<small>Juegos de lenguaje</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Para jugar</dt>
+      <dd><a href="simulador.html">Simulador</a><small>Contra la máquina o entre varias personas</small></dd>
+    </div>
+    <div class="fact">
+      <dt>Antes de leer</dt>
+      <dd>Temas 5 y 6<small>Vuelven la información oculta y la similitud</small></dd>
+    </div>
+  </dl>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="paginas" data-corto="Las páginas">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Las páginas</h2>
+        </div>
+        <p>
+          La primera cuenta el juego y por qué es un problema raro para lo que hemos visto en el curso, la segunda cómo se
+          mide el parecido entre dos palabras, la tercera es el centro del tema (las estrategias), la cuarta qué cambia con un
+          modelo de lenguaje, y la última es el simulador para jugar.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="que-es.html">
+              <span class="lt">01 · Código Secreto como problema de IA<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 5 secciones</span>
+              <span class="ld">Las reglas, los dos agentes de cada equipo, qué pasa si los dos conocen la estrategia del otro, por qué no sirven las técnicas de los otros temas tal cual, y dónde se usan estas ideas (de Scribblenauts a Contexto y la competición de bots de Código Secreto).</span>
+            </a>
+          </li>
+          <li>
+            <a href="vectores.html">
+              <span class="lt">02 · Palabras como vectores<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplos interactivos</span>
+              <span class="ld">Dime con quién andas: de contar vecinas a los vectores de palabras, el coseno con sus cuentas, un mapa de palabras, sumar y restar significados (rey − hombre + mujer), cómo ordena el tablero el que adivina, y las pegas (banco, frío y calor, y los sesgos del texto).</span>
+            </a>
+          </li>
+          <li>
+            <a href="estrategias.html">
+              <span class="lt">03 · Estrategias: aciertos contra riesgo<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con ejemplos interactivos</span>
+              <span class="ld">Dos ingenuas (una a una y la media), la del bot base de la competición, y tres formas de manejar el riesgo: con margen, con una puntuación blanda y con el valor esperado simulando al compañero. Con las cuentas en un tablero de ocho cartas, el ruido, una liguilla para compararlas e ideas para probar.</span>
+            </a>
+          </li>
+          <li>
+            <a href="modelos-lenguaje.html">
+              <span class="lt">04 · Con un modelo de lenguaje<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con prompts</span>
+              <span class="ld">Un jefe de espías y un agente hechos con prompts, cómo se comparte la estrategia en el texto, comprobar lo que devuelve el modelo, generar con uno y verificar con vectores, y la comparación con todo lo del curso.</span>
+            </a>
+          </li>
+          <li>
+            <a href="simulador.html">
+              <span class="lt">05 · El simulador<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Para jugar · en la página</span>
+              <span class="ld">Una partida entera con semilla: elegís qué puestos lleva una persona y cuáles la máquina, y con qué estrategia, y si sois varios en el mismo ordenador una cortina os deja pasároslo sin ver la tarjeta.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="resumen" data-corto="Lo que hay que llevarse">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Lo que hay que llevarse</h2>
+        </div>
+        <ol>
+          <li>En Código Secreto hay dos problemas distintos: dar una pista (el jefe de espías, que ve la tarjeta) y adivinarla (el agente, que no la ve). Las acciones son las palabras del idioma, así que no se pueden escribir a mano ni explorar como en un árbol.</li>
+          <li>Un embedding es un vector por palabra, aprendido del texto, en el que las palabras que salen en frases parecidas quedan cerca. El parecido se mide con el coseno del ángulo entre los dos vectores.</li>
+          <li>El agente más sencillo ordena el tablero por coseno con la pista y prueba las <var>n</var> primeras. Si el jefe de espías sabe que su agente hace eso, puede simularlo antes de hablar: es la estrategia de simular al compañero.</li>
+          <li>Dar una pista es buscar la acción que descubre más cartas con menos riesgo. Hay estrategias ingenuas (una a una no arriesga nada, la media no mira las malas) y tres filosofías para equilibrarlo: condiciones que no se negocian (la de la competición, con margen), una puntuación que compensa (la blanda) y simular muchas veces los errores del compañero (el valor esperado).</li>
+          <li>Si los dos agentes comparten la estrategia y los vectores, valen pistas que ninguna persona entendería (la máquina propone NUDISTA&nbsp;3 para PLAYA, PIRATA e ISLA) y no fallan nunca. En cuanto el que adivina tiene algo de ruido, esas pistas se rompen, y las que aguantan son las que dejan margen o cuentan con el error.</li>
+          <li>Un modelo de lenguaje sabe muchas más asociaciones que los vectores y puede explicarse, pero es caro, lento, no siempre responde igual y hay que comprobar todo lo que devuelve. Juntarlo con los vectores (uno propone, el otro comprueba) suele salir mejor que cada uno por separado.</li>
+        </ol>
+        <div class="note mine">
+          <span class="note-label">Y para practicar</span>
+          <p>
+            El <a href="simulador.html">simulador</a> lleva todas las estrategias de la página&nbsp;03, y la liguilla de esa
+            página sirve para medir las vuestras. Os recomiendo jugar primero de agente con la máquina dando pistas (en
+            "Simular al compañero, sin umbral" y luego en "Con margen") para notar la diferencia en vuestras carnes, y luego de
+            jefes de espías, a ver si conseguís que la máquina os entienda.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#paginas">Las páginas</a></li>
+            <li><a href="#resumen">Lo que hay que llevarse</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema bonus</h2>
+          <ol>
+            <li><a href="index.html" aria-current="page"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Código Secreto como problema</a></li>
+            <li><a href="vectores.html"><span>02</span>Palabras como vectores</a></li>
+            <li><a href="estrategias.html"><span>03</span>Estrategias</a></li>
+            <li><a href="modelos-lenguaje.html"><span>04</span>Con un modelo de lenguaje</a></li>
+            <li><a href="simulador.html"><span>05</span>El simulador</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

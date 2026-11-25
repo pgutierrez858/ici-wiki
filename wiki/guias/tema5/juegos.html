@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../../index.html">Inicio</a></li>
-        <li><a href="../../presentacion.html">Presentación</a></li>
         <li><a href="../../calendario.html">Calendario</a></li>
         <li><a href="../../practicas/index.html">Prácticas</a></li>
-        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="../index.html">Guías</a>
+    <a href="../index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <a href="index.html">Tema 5</a>
     <span aria-hidden="true">/</span>
@@ -86,8 +86,8 @@
         </div>
         <p>
           Pensad en cómo decidía vuestra Ms.&nbsp;Pac-Man: "si hay un fantasma cerca, huye". La regla resume lo que
-          vosotros sabéis del juego. Funciona mientras la situación se parezca a las que imaginasteis al escribirla, y
-          cuando no se parece, falla sin enterarse. Un jugador de ajedrez no decide así, o no sólo así: piensa "si muevo
+          vosotros sabéis del juego, y funciona mientras la situación se parezca a las que imaginasteis al escribirla, pero
+          cuando no se parece falla sin enterarse. Un jugador de ajedrez no decide así, o no sólo así: piensa "si muevo
           el caballo, me come el alfil; si muevo la torre, no". Eso es <strong>buscar</strong>.
         </p>
         <div class="table-scroll">
@@ -104,8 +104,8 @@
         </div>
         <p>
           Para buscar hacen falta tres cosas: saber qué jugadas son legales en cada posición, saber qué posición resulta
-          de cada jugada, y saber cuándo se ha acabado la partida y quién ha ganado. Con eso basta para jugar de forma
-          perfecta, en teoría. En la práctica no, por el tamaño del árbol, que es lo que viene ahora.
+          de cada jugada, y saber cuándo se ha acabado la partida y quién ha ganado. En teoría, con eso basta para jugar
+          de forma perfecta, pero en la práctica no, por el tamaño del árbol (que es lo que veremos ahora).
         </p>
         <div class="note tip">
           <span class="note-label">Qué juegos</span>
@@ -175,7 +175,7 @@
             <thead><tr><th scope="col">Juego</th><th scope="col">b (jugadas por turno)</th><th scope="col">d (medias jugadas)</th><th scope="col">Tamaño</th></tr></thead>
             <tbody>
               <tr><td>Tres&nbsp;en&nbsp;raya</td><td>de 9 a 1</td><td>9 como mucho</td><td>255&#8239;168 partidas distintas: un ordenador las recorre todas en un instante.</td></tr>
-              <tr><td>Conecta&nbsp;4</td><td>7 como mucho</td><td>42 como mucho</td><td>Unos 4,5 billones de posiciones. Está resuelto desde 1988: si el que empieza juega bien, gana.</td></tr>
+              <tr><td>Conecta&nbsp;4</td><td>7 como mucho</td><td>42 como mucho</td><td>Unos 4,5 billones de posiciones. Está resuelto desde 1988: si el que empieza juega bien, gana <!--cite allis-conecta4--><span class="cita">[<a href="#ref-allis-conecta4" id="cita-allis-conecta4">1</a>]</span><!--/cite-->.</td></tr>
               <tr><td>Ajedrez</td><td>unas 35</td><td>unas 80</td><td><!--tex 35^{80} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>35</mn><mn>80</mn></msup></mrow><annotation encoding="application/x-tex">35^{80}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">3</span><span class="mord"><span class="mord">5</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">80</span></span></span></span></span></span></span></span></span></span></span></span><!--/tex-->, del orden de <!--tex 10^{123} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>123</mn></msup></mrow><annotation encoding="application/x-tex">10^{123}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">123</span></span></span></span></span></span></span></span></span></span></span></span><!--/tex--> partidas.</td></tr>
               <tr><td>Go&nbsp;(19×19)</td><td>unas 250</td><td>unas 150</td><td><!--tex 250^{150} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>250</mn><mn>150</mn></msup></mrow><annotation encoding="application/x-tex">250^{150}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">25</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">150</span></span></span></span></span></span></span></span></span></span></span></span><!--/tex-->, del orden de <!--tex 10^{360} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>360</mn></msup></mrow><annotation encoding="application/x-tex">10^{360}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">360</span></span></span></span></span></span></span></span></span></span></span></span><!--/tex-->.</td></tr>
             </tbody>
@@ -210,7 +210,7 @@
           valen lo que vale el final para MAX: 1 si gana, 0 si son tablas, −1 si pierde (o cualquier escala de puntos).
           Minimax sube esos valores por el árbol con una idea muy sencilla: <strong>en sus niveles, MAX elige el hijo de
           valor más alto; en los suyos, MIN elige el más bajo</strong>, porque lo que es bueno para uno es malo para el
-          otro. El valor que llega a la raíz es lo que MAX puede asegurarse si los dos juegan perfecto.
+          otro. El valor que llega a la raíz es lo que MAX puede asegurarse si los dos juegan perfecto <!--cite russell-norvig--><span class="cita">[<a href="#ref-russell-norvig" id="cita-russell-norvig">2</a>]</span><!--/cite-->.
         </p>
         <figure class="wide">
           <figcaption>Minimax con dos medias jugadas. Los triángulos hacia arriba son nodos de MAX; hacia abajo, de MIN. Los números de abajo son las hojas</figcaption>
@@ -276,7 +276,7 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
           Volved al árbol de arriba y recorredlo de izquierda a derecha. Después de A ya sabéis que MAX tiene asegurado un
           3. Pasáis a B y su primera hoja es un 2. Como B es un nodo de MIN, B va a valer <strong>2 o menos</strong>,
           hagan lo que hagan las otras dos hojas. Y MAX ya tiene un 3. <strong>B no se va a elegir nunca</strong>, así que
-          el 4 y el 6 no hace falta mirarlos: se <strong>podan</strong>.
+          el 4 y el 6 no hace falta mirarlos: se <strong>podan</strong> <!--cite knuth-moore--><span class="cita">[<a href="#ref-knuth-moore" id="cita-knuth-moore">3</a>]</span><!--/cite-->.
         </p>
         <figure class="wide">
           <figcaption>El mismo árbol con poda alfa-beta: las dos hojas grises no se llegan a evaluar</figcaption>
@@ -359,7 +359,7 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
           </table>
         </div>
         <p>
-          Siete hojas de nueve. Fijaos en el paso 9: B devuelve 2, pero eso no es lo que vale B. Si el 4 o el 6 hubieran
+          Al final se han mirado siete hojas de nueve. Fijaos en el paso 9: B devuelve 2, pero eso no es lo que vale B. Si el 4 o el 6 hubieran
           sido un 1, B valdría 1. Lo que sí se sabe es que vale <strong>2 o menos</strong>, y eso basta, porque MAX no va a
           ir por B en ningún caso. Alfa-beta da el valor exacto de la raíz y de la jugada buena; de las ramas podadas sólo
           da una cota.
@@ -525,7 +525,7 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
         <div class="demo" data-mcts="alfabeta">
           <div class="demo-head">
             <span class="demo-label">Ejemplo interactivo</span>
-            <h4>Alfa-beta paso a paso, con la ventana de cada nodo</h4>
+            <h3>Alfa-beta paso a paso, con la ventana de cada nodo</h3>
           </div>
           <div class="demo-stage"><p class="demo-nojs">Este ejemplo necesita JavaScript. Recorre paso a paso los árboles de esta sección; la traza del primero está en la tabla de arriba.</p></div>
           <div class="demo-controls"></div>
@@ -576,7 +576,7 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
           se miran 5 hojas de 9 en vez de 7 (es el árbol <strong>C bien ordenado</strong> de la demo). La raíz vale lo mismo:
           el orden nunca cambia el resultado, sólo lo que cuesta llegar a él. Por eso los programas de ajedrez miran antes
           las jugadas que prometen más, como las capturas. Con el mejor orden posible, alfa-beta llega con el mismo trabajo
-          al doble de profundidad que minimax.
+          al doble de profundidad que minimax <!--cite knuth-moore--><span class="cita">[<a href="#ref-knuth-moore">3</a>]</span><!--/cite-->.
         </p>
 
         <h3 class="label">Probadlo a mano</h3>
@@ -685,7 +685,7 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
           </p>
         </div>
         <p>
-          Y ahí está el punto débil. Escribir una buena función de evaluación es volver a lo de siempre, poner a mano el
+          Y aquí está el punto débil: escribir una buena función de evaluación es volver a lo de siempre, poner a mano el
           conocimiento de un experto, igual que en una regla. En ajedrez se consiguió tras décadas de trabajo. En
           <strong>go</strong> no hubo manera: nadie sabía escribir una fórmula que dijera quién va ganando a mitad de
           partida, y con <!--tex b \approx 250 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>≈</mo><mn>250</mn></mrow><annotation encoding="application/x-tex">b \approx 250</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">250</span></span></span></span><!--/tex--> tampoco se llega lejos buscando. Durante años los programas de go jugaban como
@@ -702,14 +702,14 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
         <ul>
           <li>
             <strong>Ajedrez.</strong> En 1997, Deep Blue, de IBM, ganó un match a Kaspárov, el campeón del mundo, con
-            alfa-beta, hardware hecho a medida y una función de evaluación ajustada por grandes maestros. Stockfish, el
+            alfa-beta, hardware hecho a medida y una función de evaluación ajustada por grandes maestros <!--cite campbell-deepblue--><span class="cita">[<a href="#ref-campbell-deepblue" id="cita-campbell-deepblue">4</a>]</span><!--/cite-->. Stockfish, el
             motor libre más fuerte de hoy, sigue siendo alfa-beta con muchísimas mejoras; desde 2020 su evaluación es una
-            red neuronal pequeña (NNUE) en vez de una fórmula escrita a mano.
+            red neuronal pequeña (NNUE) en vez de una fórmula escrita a mano <!--cite stockfish-nnue--><span class="cita">[<a href="#ref-stockfish-nnue" id="cita-stockfish-nnue">5</a>]</span><!--/cite-->.
           </li>
           <li>
             <strong>Damas.</strong> Chinook, de la Universidad de Alberta, fue el primer programa que ganó un título
             mundial frente a humanos, y en 2007 su equipo demostró que las damas, jugadas perfectas por los dos lados, son
-            tablas.
+            tablas <!--cite schaeffer-damas--><span class="cita">[<a href="#ref-schaeffer-damas" id="cita-schaeffer-damas">6</a>]</span><!--/cite-->.
           </li>
           <li>
             <strong>Videojuegos por turnos y de tablero.</strong> Las versiones digitales de juegos de mesa y muchos juegos
@@ -723,10 +723,25 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
           <p>
             Buscar tiene una ventaja enorme sobre escribir la decisión a mano: encuentra jugadas que nadie previó. Pero el
             árbol es inmenso, así que hay que cortar, y lo que hay detrás del corte lo pone la función de evaluación. Cuando
-            esa función es buena, alfa-beta es imbatible; cuando no se sabe escribir, hace falta otra idea.
+            esa función es buena, alfa-beta es muy difícil de batir, pero cuando no se sabe escribir hace falta otra idea (y ahí
+            entra MCTS).
           </p>
         </div>
       </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-allis-conecta4">L. V. Allis. "A Knowledge-Based Approach of Connect-Four. The Game is Solved: White Wins". <em>Tesis de máster, Report IR-163, Vrije Universiteit Amsterdam</em>, 1988. <a class="volver" href="#cita-allis-conecta4" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-russell-norvig">S. Russell y P. Norvig. <em>Artificial Intelligence: A Modern Approach</em>. 4.ª ed., Pearson, 2020. <a class="volver" href="#cita-russell-norvig" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-knuth-moore">D. E. Knuth y R. W. Moore. "An Analysis of Alpha-Beta Pruning". <em>Artificial Intelligence 6(4), 293–326</em>, 1975. <a class="volver" href="#cita-knuth-moore" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-campbell-deepblue">M. Campbell, A. J. Hoane Jr. y F.-h. Hsu. "Deep Blue". <em>Artificial Intelligence 134(1–2), 57–83</em>, 2002. <a class="volver" href="#cita-campbell-deepblue" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-stockfish-nnue">The Stockfish developers. "Introducing NNUE Evaluation". <em>blog de Stockfish</em>, 2020. <a href="https://stockfishchess.org/blog/2020/introducing-nnue-evaluation/">stockfishchess.org/blog/2020/introducing-nnue-evaluation</a> <a class="volver" href="#cita-stockfish-nnue" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-schaeffer-damas">J. Schaeffer, N. Burch, Y. Björnsson, A. Kishimoto, M. Müller, R. Lake, P. Lu y S. Sutphen. "Checkers Is Solved". <em>Science 317(5844), 1518–1522</em>, 2007. <a class="volver" href="#cita-schaeffer-damas" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
 
       <nav class="pager" aria-label="Páginas del tema 5">
         <a class="pager-prev" href="index.html"><span class="pager-l">Anterior</span><span class="pager-t">Índice del tema</span></a>
@@ -747,6 +762,7 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
             <li><a href="#alfabeta">La poda alfa-beta</a></li>
             <li><a href="#evaluar">El límite: evaluar</a></li>
             <li><a href="#donde">Dónde se usa</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <nav aria-labelledby="del-tema">
@@ -777,7 +793,7 @@ C &amp;= \min(14, 5, 2) = 2 \\[10pt]
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

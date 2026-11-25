@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/css/ici.css">
@@ -33,10 +34,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -49,7 +49,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Ms. Pac-Man con siete reglas</span>
   </nav>
@@ -60,9 +60,9 @@
       <span class="thin">El ejemplo guiado de la Práctica&nbsp;3: de una regla a siete, midiendo cada paso.</span>
     </h1>
     <p class="standfirst">
-      Un controlador de reglas completo y pequeño, montado poco a poco: los hechos que ve, las acciones
+      Veamos un controlador de reglas pequeño pero completo, montado poco a poco: los hechos que ve, las acciones
       que sabe hacer y siete reglas que se añaden de una en una, cada una con lo que cambió en 300 partidas
-      contra cinco rivales. Al final, lo que le falta a esta Ms.&nbsp;Pac-Man, y el esqueleto de los fantasmas
+      contra cinco rivales. Al final tenéis lo que le falta a esta Ms.&nbsp;Pac-Man, y el esqueleto de los fantasmas
       para que empecéis los vuestros.
     </p>
   </header>
@@ -71,8 +71,8 @@
     <main>
 
       <p>
-        Antes de esta guía, leed dos páginas de los apuntes: <a href="tema2/clips.html">CLIPS y Jess</a>, para la
-        sintaxis, y <a href="tema2/reglas-mspacman.html">Reglas en Ms.&nbsp;Pac-Man</a>, para el paquete
+        Antes de esta guía, leed dos páginas de los apuntes: <a href="tema3/clips.html">CLIPS y Jess</a>, para la
+        sintaxis, y <a href="tema3/reglas-mspacman.html">Reglas en Ms.&nbsp;Pac-Man</a>, para el paquete
         <code>rules</code> del motor. Aquí se usa <code>RulesInput</code> sin volver a explicar qué es.
       </p>
 
@@ -248,10 +248,10 @@
             <strong>Las dos distancias no se miden igual.</strong> La de un fantasma peligroso se mide desde él y
             con su último movimiento, porque un fantasma no puede dar media vuelta: lo que importa es cuánto
             tarda él en llegar. La de uno comestible, desde Ms.&nbsp;Pac-Man, porque ahí la que se mueve hacia el
-            otro es ella. Es lo mismo que en la <a href="tema1/estrategias.html">Práctica&nbsp;1</a>.
+            otro es ella. Es lo mismo que en la <a href="tema2/estrategias.html">Práctica&nbsp;1</a>.
           </li>
           <li>
-            <strong>"No hay" es un número grande, no un hueco.</strong> Jess no tiene <code>null</code>. Con
+            <strong>"No hay" se escribe como un número grande.</strong> Jess no tiene <code>null</code>. Con
             <code>LEJOS = 1000</code>, una regla que pregunta <code>(&lt; ?d 20)</code> funciona igual haya o no
             fantasmas, sin un caso aparte.
           </li>
@@ -398,7 +398,7 @@ huirDelPeligro.setInput(input);</code></pre></div>
           <h2 class="sec">Siete reglas, de una en una</h2>
         </div>
         <p>
-          Las reglas se escribieron en este orden, y después de cada paso se midió la versión nueva contra la
+          Escribí las reglas en este orden, y después de cada paso medí la versión nueva contra la
           anterior con <a href="comparar-versiones.html"><code>Comparar</code></a>, contra los fantasmas de
           referencia que trae el proyecto. Al final de cada paso va, en una línea, qué cambió.
         </p>
@@ -467,7 +467,7 @@ huirDelPeligro.setInput(input);</code></pre></div>
               <strong>"estar en peligro" es una conclusión que van a usar varias reglas</strong>: <code>huir</code>
               ahora, y en los pasos siguientes <code>aLaPPill</code>, que también la necesita, y <code>cazar</code>,
               que necesita que <em>no</em> se cumpla. Y porque va a haber dos formas de llegar a ella (la del paso
-              3). Es el <a href="tema2/encadenamiento.html">encadenamiento hacia delante</a> de los apuntes: una regla
+              3). Es el <a href="tema3/encadenamiento.html">encadenamiento hacia delante</a> de los apuntes: una regla
               aserta un hecho que dispara otra.
             </p>
             <p>
@@ -490,9 +490,9 @@ huirDelPeligro.setInput(input);</code></pre></div>
    (assert (PELIGRO)))</code></pre>
             <p>
               Con un solo umbral, un fantasma que ronda los 20 nodos hace que Ms.&nbsp;Pac-Man cambie de idea cada
-              pocos turnos. La solución es la <a href="tema1/maquinas-estados.html#prioridades">histéresis</a> de la
+              pocos turnos. La solución es la <a href="tema2/maquinas-estados.html#prioridades">histéresis</a> de la
               Práctica&nbsp;2, entrar a 20 y salir a 30, pero una base de reglas no se acuerda del turno anterior: el
-              motor <a href="tema2/reglas-mspacman.html#memoria">vacía la memoria en cada turno</a>. Así que la
+              motor <a href="tema3/reglas-mspacman.html#memoria">vacía la memoria en cada turno</a>. Así que la
               memoria vive en Java y llega como un hecho más, el slot <code>ultima</code>.
             </p>
             <p>
@@ -520,8 +520,8 @@ huirDelPeligro.setInput(input);</code></pre></div>
 }</code></pre></div>
             <p>
               <strong>Al medirla:</strong> no se nota. Con esta forma de huir, cambiar de idea a los 20 nodos no le
-              costaba vidas. Se queda porque es el ejemplo de cómo recordar entre turnos; en vuestro diario, algo así
-              se apunta tal cual: "no se nota, y la dejo por esto".
+              costaba vidas. La dejo porque es el ejemplo de cómo recordar entre turnos (en vuestro diario, algo así
+              se apunta tal cual): "no se nota, y la dejo por esto".
             </p>
           </div>
         </div>
@@ -706,7 +706,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
         <div class="demo" data-reglas="banco" data-presets="mspacman">
           <div class="demo-head">
             <span class="demo-label">Ejemplo interactivo</span>
-            <h4>Un turno de Ms.&nbsp;Pac-Man, regla a regla</h4>
+            <h3>Un turno de Ms.&nbsp;Pac-Man, regla a regla</h3>
           </div>
           <div class="demo-stage"><p class="demo-nojs">Este banco de pruebas necesita JavaScript. Las mismas situaciones se prueban con <code>ProbarReglas</code>, en <a href="depurar-reglas.html#probar">Depurar reglas</a>.</p></div>
           <div class="demo-controls"></div>
@@ -835,12 +835,12 @@ FIRE 3 MAIN::comer f-1</code></pre>
               <tr>
                 <td>Huye hacia otro fantasma, o hacia un callejón.</td>
                 <td><code>HuirAction</code> sólo mira el fantasma más cercano.</td>
-                <td>Un hecho que diga por qué salidas del próximo cruce llega antes que todos, y reglas que elijan una. La <a href="tema1/estrategias.html">Práctica&nbsp;1</a> tiene medio trabajo hecho.</td>
+                <td>Un hecho que diga por qué salidas del próximo cruce llega antes que todos, y reglas que elijan una. La <a href="tema2/estrategias.html">Práctica&nbsp;1</a> tiene medio trabajo hecho.</td>
               </tr>
               <tr>
                 <td>Come hacia un fantasma que viene de frente.</td>
                 <td><code>comer</code> va a la píldora más cercana, esté donde esté.</td>
-                <td>Una acción <code>comer</code> con parámetro, por ejemplo la zona, y reglas que elijan zonas tranquilas. Un <a href="tema1/mapas-influencia.html">mapa de influencia</a> da ese hecho.</td>
+                <td>Una acción <code>comer</code> con parámetro, por ejemplo la zona, y reglas que elijan zonas tranquilas. Un <a href="tema2/mapas-influencia.html">mapa de influencia</a> da ese hecho.</td>
               </tr>
               <tr>
                 <td>Gasta las píldoras de poder al pasar.</td>
@@ -925,7 +925,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
             <tbody>
               <tr>
                 <td><strong>Un <code>.clp</code> por fantasma</strong></td>
-                <td>La de la plantilla y los <a href="tema2/reglas-mspacman.html#java">apuntes</a>: <code>blinkyrules.clp</code>, <code>inkyrules.clp</code>…, ids como <code>BLINKYchases</code> y un mapa compartido.</td>
+                <td>La de la plantilla y los <a href="tema3/reglas-mspacman.html#java">apuntes</a>: <code>blinkyrules.clp</code>, <code>inkyrules.clp</code>…, ids como <code>BLINKYchases</code> y un mapa compartido.</td>
                 <td>Si cada fantasma va a tener una personalidad distinta, con reglas que no comparten.</td>
               </tr>
               <tr>
@@ -969,7 +969,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
           Cada fantasma tiene sus propias instancias de <code>PerseguirAction</code> y <code>HuirAction</code>, que
           saben de qué fantasma son, así que el id puede ser el mismo para los cuatro: <code>perseguir</code> en el
           motor de Blinky ejecuta la acción de Blinky. Y como un fantasma sólo puede cambiar de dirección en los
-          cruces, fuera de ellos ni se llama a Jess: ahorra la mayor parte del tiempo.
+          cruces, fuera de ellos ni se llama a Jess, y con eso se ahorra la mayor parte del tiempo.
         </p>
         <p>
           Las reglas del esqueleto, en <code>ghosts-v1.clp</code>. La <code>v0</code> es lo mismo sin G3, para tener
@@ -1010,7 +1010,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
         <p>
           <strong>Al medirlas</strong>, con <code>Comparar</code> en modo fantasmas, la diferencia entre la
           <code>v0</code> y la <code>v1</code> es pequeña: G3 quizá conceda algo menos de puntos, pero harían falta
-          muchas más partidas para asegurarlo. Así son casi todas las mejoras de un controlador que ya funciona.
+          muchas más partidas para asegurarlo. Y diría que eso pasa con casi todas las mejoras de un controlador que ya funciona.
         </p>
         <h3 class="label">Ideas para llegar a 15</h3>
         <div class="table-scroll">
@@ -1083,7 +1083,7 @@ FIRE 3 MAIN::comer f-1</code></pre>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

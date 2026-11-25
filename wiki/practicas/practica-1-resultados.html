@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -64,8 +64,8 @@
     </h1>
     <p class="standfirst">
       Los diecisiete grupos han jugado todos contra todos: cada Ms.&nbsp;Pac-Man contra los fantasmas de
-      toda la clase, 300 partidas por emparejamiento. Aquí están los dos rankings, el punto extra que
-      reparten y la tabla completa. Después vienen los errores que más se repitieron al leer las entregas,
+      toda la clase, 300 partidas por emparejamiento. Aquí tenéis los dos rankings, el punto extra que
+      reparten y la tabla completa. Después vienen los errores que más he visto al leer las entregas,
       y las dos piezas de la reentrega: las <strong>misiones</strong> que suben la nota y los
       <strong>enemigos</strong>, las preguntas que pueden salir en la defensa.
     </p>
@@ -99,15 +99,15 @@
           <h2 class="sec">Los dos rankings</h2>
         </div>
         <p>
-          Se han jugado los controladores tal y como se entregaron, con las reglas de
+          He jugado los controladores tal y como se entregaron, con las reglas de
           <a href="../guias/competicion.html#ranking">la guía de la competición</a>: la puntuación de una
           Ms.&nbsp;Pac-Man es la media de su fila, lo que saca contra los fantasmas de toda la clase, y la de
           unos fantasmas es la media de su columna, lo que dejan sacar. Cada media sale de 5&#8239;100
-          partidas. No hay ningún grupo descalificado.
+          partidas, y no hay ningún grupo descalificado.
         </p>
         <!--P1:PAC-->
         <div class="table-scroll">
-          <table class="ranking">
+          <table class="ranking records">
             <caption>Ranking de Ms. Pac-Man · más es mejor</caption>
             <thead><tr><th scope="col">Puesto</th><th scope="col">Grupo</th><th scope="col" class="num-col">Media</th><th scope="col" class="num-col">Error típico</th><th scope="col" class="num-col">Medio punto</th></tr></thead>
             <tbody>
@@ -134,7 +134,7 @@
         <!--/P1:PAC-->
         <!--P1:GHO-->
         <div class="table-scroll">
-          <table class="ranking">
+          <table class="ranking records">
             <caption>Ranking de fantasmas · menos es mejor</caption>
             <thead><tr><th scope="col">Puesto</th><th scope="col">Grupo</th><th scope="col" class="num-col">Media</th><th scope="col" class="num-col">Error típico</th><th scope="col" class="num-col">Medio punto</th></tr></thead>
             <tbody>
@@ -163,7 +163,7 @@
         <h3 class="label">Lo que se lee en las dos tablas</h3>
         <p>
           <strong>Arriba, en Ms.&nbsp;Pac-Man, hay un empate.</strong> Las dos primeras se separan 57
-          puntos, y eso es lo que puede moverse una media de 5&#8239;100 partidas por puro azar. La cuenta
+          puntos, que es más o menos lo que puede moverse una media de 5&#8239;100 partidas por puro azar. La cuenta
           es la de <a href="../guias/competicion.html">la guía de la competición</a>: la diferencia se
           compara con el error típico de la resta.
         </p>
@@ -250,8 +250,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
         <p>
           <strong>Nadie gana los dos.</strong> La mejor Ms.&nbsp;Pac-Man queda decimotercera en fantasmas, y
           los mejores fantasmas tienen la sexta Ms.&nbsp;Pac-Man. El único grupo entre los cuatro primeros
-          de los dos rankings es CY_OGA. Es lo normal: los dos controladores se piensan por separado y casi
-          todo el mundo le dedica más horas a uno de los dos.
+          de los dos rankings es CY_OGA. Diría que es lo normal, porque los dos controladores se piensan por separado y casi
+          todo el mundo le acaba dedicando más horas a uno de los dos.
         </p>
         <p>
           <strong>Arriba hay más competencia que el curso pasado.</strong> Las cifras no se pueden comparar
@@ -262,7 +262,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 
         <h3 class="label">El punto extra</h3>
         <p>
-          Medio punto por cada ranking, con la fórmula de
+          Hay medio punto por cada ranking, con la fórmula de
           <a href="../guias/competicion.html#punto-extra">la guía</a>: el mejor se lleva el medio punto
           entero, el peor se queda a cero y los demás reciben la parte proporcional a lo cerca que quedaron
           del mejor. Por eso las dos Ms.&nbsp;Pac-Man empatadas se llevan 0,50 y 0,49. Cada medio punto se
@@ -341,15 +341,15 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
         </div>
         <!--/P1:MATRIZ-->
         <p>
-          Merece la pena buscar vuestra fila y vuestra columna. La media resume, pero las casillas dicen
-          contra quién se pierde: una Ms.&nbsp;Pac-Man que se hunde contra unos fantasmas concretos tiene
+          Merece la pena buscar vuestra fila y vuestra columna. La media resume, pero en las casillas se ve
+          contra quién se pierde: si una Ms.&nbsp;Pac-Man se hunde contra unos fantasmas concretos, tiene
           un hueco que esos fantasmas saben aprovechar. La casilla más baja de la tabla es de
-          1&#8239;296 puntos y la más alta, de 9&#8239;745: siete veces más con el mismo motor.
+          1&#8239;296 puntos y la más alta, de 9&#8239;745 (siete veces más, con el mismo motor).
         </p>
         <div class="note mine">
           <span class="note-label">Qué se ha tocado del código para jugar</span>
           <p>
-            Lo mínimo para que diecisiete entregas convivan en un mismo proyecto: el paquete raíz y lo que
+            Sólo lo mínimo para que diecisiete entregas convivan en un mismo proyecto: el paquete raíz y lo que
             devuelve <code>getName()</code>, porque el evaluador indexa la tabla por ese nombre y varios
             grupos devolvían <code>"MsPacMan"</code> o nada. En un grupo, además, se quitó un
             <code>static</code>: el evaluador juega partidas en paralelo, y unos arrays compartidos entre
@@ -366,22 +366,22 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
           <h2 class="sec">Los errores que más se repitieron</h2>
         </div>
         <p>
-          Salen de leer las diecisiete entregas, código y documento. Ninguno es de un grupo en concreto:
-          cada uno apareció en varias, y los ejemplos están escritos para esta página, no copiados de
+          Salen de leer las diecisiete entregas, código y documento. Ninguno es de un grupo en concreto
+          (cada uno apareció en varias), y los ejemplos los he escrito para esta página, sin copiarlos de
           ninguna. Si reconocéis el vuestro, la retroalimentación del campus os dice dónde está.
         </p>
 
         <h3 class="label">1 · Un controlador y ningún rastro</h3>
         <p>
-          El fallo que más nota ha costado no está en el código. Lo que se evalúa es <strong>cómo
+          El fallo que más nota ha costado está fuera del código. Lo que se evalúa es <strong>cómo
           llegáis</strong> a los controladores: qué probasteis, qué medisteis y qué decidisteis. Varias
           entregas traían un solo controlador, a veces bueno, sin ninguna versión anterior ni una medida
           que explicara por qué es así. Otras medían, pero sin decir cuántas partidas ni con qué error, y
           sacaban conclusiones de diferencias que caben en el ruido.
         </p>
         <p>
-          Usar IA no es el problema. El problema es que no quede rastro de qué es vuestro. Un diario de
-          desarrollo que se escribe mientras se trabaja es una tabla así, con 300 partidas por versión
+          Podéis usar IA, pero tiene que quedar rastro de qué es vuestro. Un diario de
+          desarrollo que se va escribiendo mientras se trabaja es una tabla así, con 300 partidas por versión
           contra los mismos tres fantasmas:
         </p>
         <div class="table-scroll">
@@ -390,7 +390,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
             <tbody>
               <tr><td>v0</td><td>Los controladores de la Práctica&nbsp;0, sin tocar: la línea base.</td><td class="num-col">2&#8239;410 ± 38</td><td>—</td></tr>
               <tr><td>v1</td><td>"¿Llego antes?" en el primer cruce de cada salida.</td><td class="num-col">3&#8239;120 ± 41</td><td>Se queda: 710 puntos, muy por encima del ruido.</td></tr>
-              <tr><td>v2</td><td>Lo mismo, también en el segundo cruce.</td><td class="num-col">3&#8239;180 ± 40</td><td>No se puede decidir: 60 puntos caben en el ruido. Más partidas.</td></tr>
+              <tr><td>v2</td><td>Lo mismo, también en el segundo cruce.</td><td class="num-col">3&#8239;180 ± 40</td><td>No se puede decidir, 60 puntos caben en el ruido. Hacen falta más partidas.</td></tr>
               <tr><td>v3</td><td>Ir a la píldora de poder sólo con dos fantasmas cerca.</td><td class="num-col">3&#8239;650 ± 45</td><td>Se queda. Siguiente: por qué muere tanto en el laberinto 3.</td></tr>
             </tbody>
           </table>
@@ -436,28 +436,28 @@ s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
 M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1266em;"><span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">60</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.93em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:0.9514em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">57</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">60</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:2.7774em;"><span class="pstrut" style="height:3.3214em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mspace"> </span><span class="mord text"><span class="mord">error t</span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord latin_fallback">ı</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">pico</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇒</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">no se sabe</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:6.4589em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
         <p>
-          A esa tabla le acompañan, por cada fila, la hipótesis antes de tocar nada, lo que visteis en
+          Esa tabla va acompañada, por cada fila, de la hipótesis antes de tocar nada, lo que visteis en
           partidas concretas y, si usasteis IA, qué le pedisteis, qué os dio y qué cambiasteis vosotros.
-          Con eso, un controlador flojo saca mejor nota que uno bueno sin historia.
+          Con eso, un controlador flojo saca mejor nota que uno bueno del que no se sabe cómo salió.
         </p>
         <p>
           Desde la Práctica&nbsp;2 esto tiene un formato fijo, el
           <a href="practica-2.html#diario"><strong>diario de desarrollo</strong></a>: un
           <code>diario.md</code> con entradas cortas, versiones <code>v0</code>, <code>v1</code>… medidas
-          contra los mismos rivales, y un ejemplo completo de cómo queda. Es el mismo que se pide en la
+          contra los mismos rivales, y un ejemplo completo de cómo queda. Es el mismo formato que se pide en la
           reentrega.
         </p>
         <p>
           Y la tabla no tiene por qué quedarse en los puntos. Contar fantasmas comidos o píldoras de poder
-          gastadas por partida explica por qué se mueve la media; cómo se hace, en
-          <a href="#medir-mas">la sección de las misiones</a>.
+          gastadas por partida explica por qué se mueve la media (cómo se hace lo tenéis en
+          <a href="#medir-mas">la sección de las misiones</a>).
         </p>
 
         <h3 class="label">2 · Una rama que se come a las demás</h3>
         <p>
           Muchas Ms.&nbsp;Pac-Man son una cascada de prioridades: huir, comer, ir a por píldoras. Si una
-          rama que casi siempre se cumple va antes de tiempo, las de después no se ejecutan nunca, y el
-          diseño que describe el documento no es el que juega.
+          rama que casi siempre se cumple va antes de tiempo, las de después no se ejecutan nunca, y lo que
+          juega acaba siendo otro diseño distinto del que describe el documento.
         </p>
         <div class="codigo"><pre><code><span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
     MOVE haciaPildora = pildoraMasCercana(game);
@@ -469,14 +469,14 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 }</code></pre></div>
         <p>
           La prioridad va de lo más urgente a lo menos: primero huir, luego comer, y la píldora al final.
-          Para cazar este error, un contador por rama que se imprime al acabar cien partidas: una rama a
+          Para cazar este error, os recomiendo un contador por rama que se imprima al acabar cien partidas, porque una rama a
           cero es una rama que no existe.
         </p>
 
         <h3 class="label">3 · "¿Llego yo antes?" a medias</h3>
         <p>
-          Casi todo el mundo usó la idea buena: un sitio es seguro si llego antes que cualquier fantasma.
-          Pero muchas veces se quedó a medias. Unas búsquedas sólo evitaban el nodo donde está ahora el
+          Casi todo el mundo usó la idea buena (un sitio es seguro si llego antes que cualquier fantasma),
+          pero muchas veces se quedó a medias. Unas búsquedas sólo evitaban el nodo donde está ahora el
           fantasma, y una píldora con un fantasma viniendo de frente contaba como segura. Otras miraban
           bien el primer cruce y no el resto del camino, o medían la distancia del fantasma sin su último
           movimiento, como si pudiera darse la vuelta.
@@ -495,8 +495,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
     <span class="k">return true</span>;
 }</code></pre></div>
         <p>
-          Y se aplica a cada nodo del camino que vais a recorrer, con los pasos que llevaréis al llegar a
-          él, no sólo al primero. En una búsqueda en anchura sale casi gratis: <code>misPasos</code> es la
+          Y se aplica a cada nodo del camino que vais a recorrer (no sólo al primero), con los pasos que llevaréis al llegar a
+          él. En una búsqueda en anchura sale casi gratis: <code>misPasos</code> es la
           distancia con la que el nodo entra en la cola, y si no es seguro, no se expande.
         </p>
 
@@ -529,8 +529,8 @@ MOVE d = dir;
         <h3 class="label">5 · Términos en escalas distintas</h3>
         <p>
           Las funciones de utilidad y los mapas de influencia suman términos con pesos. Si un término va
-          de 0 a 1 y otro de 0 a 100, decide el segundo, y los pesos que se ajustaron con tanto cuidado no
-          pintan nada:
+          de 0 a 1 y otro de 0 a 100, decide el segundo, y los pesos que se ajustaron con tanto cuidado acaban
+          sin pintar nada:
         </p>
         <div class="codigo"><pre><code><span class="c">// Así no: comida y peligro van de 0 a 1; el último término, de 0 a 100.</span>
 <span class="k">double</span> u = comida[n] - <span class="n">2</span> * peligro[n] + <span class="n">100.0</span> / (distanciaAlObjetivo + <span class="n">1</span>);
@@ -554,16 +554,16 @@ MOVE d = dir;
 
 <span class="k">double</span> extra = PESO_RACHA * rachaDeFantasmas;   <span class="c">// ...vale siempre 0</span></code></pre></div>
         <p>
-          Si una idea está apagada porque midiéndola salía peor, decidlo y quitadla: también es un
-          resultado, y de los que más cuentan. Si está apagada sin querer, es un error que nadie ha visto
+          Si una idea está apagada porque al medirla salía peor, decidlo y quitadla, que eso también es un
+          resultado (y de los que más cuentan). Si está apagada sin querer, es un error que nadie ha visto
           porque nadie lo ha medido.
         </p>
 
         <h3 class="label">7 · Coordinar sin mirar quién llega</h3>
         <p>
           En los fantasmas, la idea de repartirse los cruces de Ms.&nbsp;Pac-Man estuvo en muchas
-          entregas. Falló de dos formas: varios fantasmas iban al mismo sitio, o uno iba a un cruce al que
-          ella llegaba antes, y acababa persiguiéndola por detrás. Repartir es asignar cada cruce a un solo
+          entregas. Falló de dos formas: o varios fantasmas iban al mismo sitio, o uno iba a un cruce al que
+          ella llegaba antes y acababa persiguiéndola por detrás. Para repartir, cada cruce va a un solo
           fantasma, y sólo si llega a tiempo:
         </p>
         <div class="codigo"><pre><code>Set&lt;Integer&gt; tomados = <span class="k">new</span> HashSet&lt;&gt;();
@@ -580,8 +580,8 @@ MOVE d = dir;
     <span class="c">// si no llega a ninguno, que haga otra cosa: perseguir, o tapar la píldora de poder</span>
 }</code></pre></div>
         <p>
-          Lo mismo con la píldora de poder: basta con que la tape el fantasma que llega antes. Si van
-          todos, no queda nadie cazando.
+          Lo mismo con la píldora de poder: basta con que la tape el fantasma que llega antes, porque si van
+          todos no queda nadie cazando.
         </p>
 
         <h3 class="label">8 · ¿Me da tiempo a comérmelo?</h3>
@@ -595,12 +595,12 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
         <p>
           Para perseguirlo, la cota segura es la primera, <code>2 * d + MARGEN &lt;
           game.getGhostEdibleTime(g)</code>, porque no sabéis hacia dónde irá. La cuenta entera está en
-          <a href="../guias/tema1/estrategias.html#alcanzar-comestible">los apuntes del tema</a>.
+          <a href="../guias/tema2/estrategias.html#alcanzar-comestible">los apuntes del tema</a>.
         </p>
 
         <h3 class="label">9 · Un bucle que no guarda al mejor</h3>
         <p>
-          Un método auxiliar mal escrito no falla de forma visible: devuelve siempre lo mismo, y todo lo
+          Cuando un método auxiliar está mal escrito, muchas veces no se ve: devuelve siempre lo mismo, y todo lo
           que depende de él funciona un poco peor sin que se note por qué.
         </p>
         <div class="codigo"><pre><code><span class="c">// Así no: «mejor» no se actualiza nunca, y el bucle se salta la última.</span>
@@ -633,11 +633,11 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
               </tr>
               <tr>
                 <td><strong>Estado en atributos <code>static</code></strong></td>
-                <td>El concurso juega partidas en paralelo, y lo <code>static</code> lo comparten todas. Lo que en casa funciona, ahí se pisa.</td>
+                <td>El concurso juega partidas en paralelo, y lo <code>static</code> lo comparten todas. Lo que en casa funciona, ahí se pisa entre partidas.</td>
               </tr>
               <tr>
                 <td><strong>Sin el <code>txt</code></strong> con los integrantes y los controladores a concurso</td>
-                <td>Con varias versiones en el zip, hay que adivinar cuál juega. Puede que no sea la que queríais.</td>
+                <td>Con varias versiones en el zip, me toca adivinar cuál juega, y puede que no sea la que queríais.</td>
               </tr>
             </tbody>
           </table>
@@ -647,9 +647,9 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
           <p>
             El <code>primerMovimientoDe</code> del enunciado iba un nodo desfasado: el camino de
             <code>getShortestPath</code> no incluye el nodo de origen, así que <code>camino[0]</code> ya es
-            el primer paso. Y el aviso de que devuelve un solo elemento si ya estás en el destino era falso:
-            devuelve un array vacío. Ya está corregido en <a href="practica-1.html">el enunciado</a>, y a
-            quien lo copió no le ha contado en contra.
+            el primer paso. Y el aviso de que devuelve un solo elemento si ya estás en el destino estaba mal,
+            porque devuelve un array vacío. Ya está corregido en <a href="practica-1.html">el enunciado</a> y, como
+            la culpa era mía, a quien lo copió no le ha contado en contra.
           </p>
         </div>
       </section>
@@ -661,20 +661,20 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
         </div>
         <p>
           Todos los grupos pueden volver a entregar la Práctica&nbsp;1 hasta el <strong>domingo 18 de
-          octubre</strong>, el día de entrega de la Práctica&nbsp;2. Pero no sirve cualquier cambio: cada
+          octubre</strong>, el día de entrega de la Práctica&nbsp;2, pero no vale cualquier cambio: cada
           grupo tiene una <strong>ficha</strong> con entre dos y cuatro misiones, escritas a partir de su
           propia entrega, y <strong>sólo suben nota esas misiones</strong>.
         </p>
         <ul>
           <li>Las misiones de un grupo suman <strong>3 puntos</strong> entre todas, y no tienen por qué valer lo mismo.</li>
-          <li>Cada misión completada suma lo que vale. La nota no pasa de 10.</li>
+          <li>Cada misión completada suma lo que vale, y la nota no pasa de 10.</li>
           <li>Cada una dice qué hacer y qué entregar para demostrarlo: una versión nueva medida contra la anterior, una tabla, una prueba que faltaba.</li>
           <li>Cada misión se documenta como una entrada de un <code>diario.md</code>, en el <a href="practica-2.html#diario">formato de la Práctica&nbsp;2</a>: qué cambiáis y por qué, cómo lo medís y con qué os quedáis.</li>
-          <li>Todas parten de vuestra propia solución: arreglar lo que intentabais, medir lo que decíais haber medido, terminar una idea a medias, o probar variantes de lo que ya hacíais si apenas lo probasteis. Ninguna pide cambiar de técnica ni de diseño.</li>
-          <li>El concurso no se vuelve a jugar: el punto extra ya está cerrado y va aparte.</li>
+          <li>Todas parten de vuestra propia solución: arreglar lo que intentabais, medir lo que decíais haber medido, terminar una idea a medias, o probar variantes de lo que ya hacíais si apenas lo probasteis. Ninguna os pide cambiar de técnica ni de diseño.</li>
+          <li>El concurso no se vuelve a jugar, así que el punto extra ya está cerrado y va aparte.</li>
         </ul>
 
-        <h3 class="label">El color del cristal es lo que vale</h3>
+        <h3 class="label">El color del cristal dice lo que vale</h3>
         <p>
           Cada misión es un cristal, y cuanto más vale, más raro es el color:
         </p>
@@ -687,7 +687,7 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
 
         <h3 class="label">Una ficha de ejemplo</h3>
         <p>
-          Una ficha inventada, de un grupo que no existe, para que se vea la forma. La de cada grupo cita
+          Es una ficha inventada, de un grupo que no existe, para que veáis la forma. La de cada grupo cita
           sus propias clases y métodos.
         </p>
         <div class="misiones">
@@ -733,7 +733,7 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
           </article>
         </div>
         <p class="apunte">
-          1,25 + 1 + 0,75 = 3. Al grupo que ya tiene documentado el proceso no le sale el diario: sus tres
+          1,25 + 1 + 0,75 = 3. Al grupo que ya tiene documentado el proceso no le sale el diario, y sus tres
           puntos se reparten entre misiones de código y de medida.
         </p>
 
@@ -742,8 +742,8 @@ si viene hacia mí   me acerco  1 + ½ = 1½ nodos por turno  →  d / 1½ = 2d/
           Muchas misiones piden contar cosas del juego: cuántos fantasmas se come Ms.&nbsp;Pac-Man, cuántas
           píldoras de poder gasta, cuántas veces salta una rama. <code>runExperiment</code> sólo devuelve la
           puntuación y los turnos, pero llama a <code>preCompute</code> antes de cada partida y a
-          <code>postCompute</code> después. Así que basta con envolver vuestra Ms.&nbsp;Pac-Man en otro
-          controlador que mira cada turno y cuenta, sin tocar su código:
+          <code>postCompute</code> después, así que basta con envolver vuestra Ms.&nbsp;Pac-Man en otro
+          controlador que mira cada turno y va contando, sin tocar su código:
         </p>
         <div class="codigo"><pre><code><span class="k">import</span> pacman.controllers.PacmanController;
 <span class="k">import</span> pacman.game.Constants.MOVE;
@@ -806,9 +806,9 @@ fantasmas        2,31 ± 0,08
 p. de poder      3,62 ± 0,04
 fantasmas por píldora  0,64</code></pre>
         <p>
-          La última línea es la que dice algo que la puntuación esconde. Cada píldora de poder puede valer
-          hasta cuatro fantasmas, y esta Ms.&nbsp;Pac-Man se come 0,64 por píldora: la mayoría las gasta al pasar. Eso
-          es una misión con su medida de antes y de después.
+          La última línea es la que cuenta algo que la puntuación esconde. Cada píldora de poder puede valer
+          hasta cuatro fantasmas, y esta Ms.&nbsp;Pac-Man se come 0,64 por píldora, o sea, la mayoría las gasta al pasar. Ahí
+          ya tenéis una misión con su medida de antes y de después.
         </p>
         <p>
           Con el mismo esquema se cuenta cualquier cosa que se vea en <code>Game</code>: vidas perdidas con
@@ -838,11 +838,11 @@ fantasmas por píldora  0,64</code></pre>
         </div>
         <p>
           La ficha trae también tres <strong>enemigos</strong>: tres preguntas sobre vuestra entrega que os
-          puedo hacer en la defensa oral, una de cada dificultad. Se le pueden hacer a cualquier miembro del
+          puedo hacer en la defensa oral, una de cada dificultad. Os las puedo hacer a cualquiera del
           grupo, y cada una que no sepáis responder resta lo que indica.
         </p>
         <ul>
-          <li>Las tres vienen escritas en la ficha, tal cual os las haré, también la <strong>difícil</strong>: no hay nada escondido, lo que se mide es si la sabéis responder.</li>
+          <li>Las tres vienen escritas en la ficha, tal cual os las haré, también la <strong>difícil</strong>. No hay nada escondido, sólo se mide si la sabéis responder.</li>
           <li>La difícil suele ser algo que llama la atención en el código: un caso límite, una incoherencia entre el documento y el código, una parte que conviene entender aunque no la escribierais vosotros.</li>
           <li>Los enemigos cambian con cada práctica.</li>
         </ul>
@@ -893,8 +893,8 @@ fantasmas por píldora  0,64</code></pre>
           <p>
             Leed el código que entregasteis, no el que tenéis ahora, y que cada uno sepa explicar las partes
             que escribieron los demás. Para la difícil, buscad en el código lo que pregunta y lanzad una
-            partida con la depuración encendida hasta ver el caso. Si una parte la generó la IA, la defensa es el sitio
-            donde se nota si la entendéis.
+            partida con la depuración encendida hasta ver el caso. Si una parte la generó la IA, en la defensa
+            se nota si la entendéis.
           </p>
         </div>
       </section>
@@ -943,7 +943,7 @@ fantasmas por píldora  0,64</code></pre>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

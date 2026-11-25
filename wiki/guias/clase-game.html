@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/css/ici.css">
@@ -33,10 +34,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -49,7 +49,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>La clase Game</span>
   </nav>
@@ -95,7 +95,7 @@
           <h2 class="sec">Dos cambios respecto al juego original</h2>
         </div>
         <p>
-          El simulador no es exactamente el arcade original. Hay dos diferencias que condicionan cómo se
+          El simulador <!--cite gaia-mspacman--><span class="cita">[<a href="#ref-gaia-mspacman" id="cita-gaia-mspacman">1</a>]</span><!--/cite--> no es exactamente el arcade original <!--cite mspacman-arcade--><span class="cita">[<a href="#ref-mspacman-arcade" id="cita-mspacman-arcade">2</a>]</span><!--/cite-->. Hay dos diferencias que condicionan cómo se
           escribe un controlador:
         </p>
         <ol>
@@ -105,8 +105,8 @@
             único movimiento legal es seguir.
           </li>
           <li>
-            No se puede hacer el <strong>movimiento contrario</strong> al que te trajo a esa intersección.
-            No se vuelve atrás.
+            No se puede hacer el <strong>movimiento contrario</strong> al que te trajo a esa intersección,
+            o sea, no se puede volver atrás.
           </li>
         </ol>
         <div class="note tip">
@@ -142,7 +142,7 @@
                alt="El primer laberinto del simulador: pasillos rosas sobre fondo negro, las píldoras como puntos blancos repartidos por todos los pasillos, cuatro píldoras de poder más grandes en las esquinas, la caja de la cárcel en el centro y Ms. Pac-Man abajo, en el centro.">
         </figure>
         <p>
-          Esa imagen sale del propio simulador: es el laberinto con sus 220 píldoras, las cuatro de poder en
+          Esa imagen es una captura del propio simulador: el laberinto con sus 220 píldoras, las cuatro de poder en
           las esquinas y Ms.&nbsp;Pac-Man colocada en el nodo de salida del juego original.
         </p>
         <figure class="wide">
@@ -244,7 +244,7 @@
             las únicas aristas del grafo que unen dos nodos que en la pantalla están lejísimos.
           </p>
           <p>
-            La consecuencia para tu controlador es directa: un fantasma que está al otro lado de la
+            Para tu controlador, esto quiere decir que un fantasma que está al otro lado de la
             pantalla puede estar a <strong>un solo paso</strong>. Con <code>DM.PATH</code> te sale 1 y
             aciertas; con <code>EUCLID</code> o <code>MANHATTAN</code> te sale 108 y te confías.
           </p>
@@ -268,7 +268,7 @@
             segundo. Tampoco hay el mismo número de nodos: 1293, 1319, 1380 y 1309.
           </p>
           <p>
-            La consecuencia práctica es que un número de nodo escrito a mano en el código apunta a otro sitio
+            En la práctica, esto quiere decir que un número de nodo escrito a mano en el código apunta a otro sitio
             en cuanto se pasa de nivel. Los nodos que necesites, pídeselos al <code>game</code>:
             <code>getPillIndices()</code>, <code>getJunctionIndices()</code>,
             <code>getPacmanCurrentNodeIndex()</code>.
@@ -413,9 +413,9 @@
           </ul>
           <p>
             En ninguno de los dos casos se aborta tu método ni salta una excepción: nadie interrumpe un
-            <code>getMove</code> a medias. Que no te corten tampoco significa que el tiempo dé igual, porque
-            evaluar una entrega son decenas de partidas de 4000 turnos y eso se paga en horas de cálculo.
-            <code>getShortestPath</code> sobre listas grandes se cobra en cada llamada.
+            <code>getMove</code> a medias. Eso no quiere decir que el tiempo dé igual, porque evaluar una
+            entrega son decenas de partidas de 4000 turnos y eso se paga en horas de cálculo (y un
+            <code>getShortestPath</code> sobre listas grandes se cobra en cada llamada).
           </p>
         </div>
 
@@ -615,8 +615,8 @@
           <span class="note-label">En un mismo turno puedes comer y morir</span>
           <p>
             El motor recorre los cuatro fantasmas. Si uno comestible está a tiro te lo apunta, y si además hay
-            otro normal igual de cerca, pierdes la vida de todas formas. Estar rodeado con la píldora de poder
-            a medias no es seguro.
+            otro normal igual de cerca, pierdes la vida de todas formas, así que cuidado con dejarte rodear
+            con la píldora de poder a medias.
           </p>
         </div>
 
@@ -764,7 +764,7 @@
         <div class="note tip">
           <span class="note-label">Comestible sin preguntar por un booleano</span>
           <p>
-            Existe un <code>isGhostEdible(GHOST)</code>, pero lo que se usa es
+            Existe un <code>isGhostEdible(GHOST)</code>, pero suele ser más útil
             <code>getGhostEdibleTime(GHOST)&nbsp;&gt;&nbsp;0</code>: contesta a lo mismo y además te dice
             cuántos turnos te quedan, que es el dato con el que decides si merece la pena ir a por él.
           </p>
@@ -774,7 +774,10 @@
         <p>
           Estos dos son los que más se usan en las primeras prácticas. Les das el nodo en el que estás, el
           nodo al que quieres ir, el último movimiento que hiciste y una <strong>métrica de
-          distancia</strong>, y te devuelven la dirección que hay que tomar.
+          distancia</strong>, y te devuelven la dirección que hay que tomar. Hay también una versión
+          <code>getApproximateNextMoveTowardsTarget</code> con los mismos argumentos, que es la que pide la
+          Práctica&nbsp;0: el <code>getNextMove…</code> mide mal los vecinos de los lados y gira peor (está
+          contado en <a href="../practicas/practica-0.html#entregado">los resultados de la P0</a>).
         </p>
         <div class="table-scroll">
           <table>
@@ -809,8 +812,8 @@
           Es la regla con la que el motor <strong>compara los vecinos</strong> de tu nodo. Por dentro,
           <code>getNextMoveTowardsTarget</code> no hace nada más que esto: mira los nodos a los que puedes
           llegar con un movimiento, mide con la métrica que le has pasado cuánto dista cada uno del
-          destino, y te devuelve el movimiento que lleva al vecino con la medida más pequeña. Cambiar la
-          métrica cambia la respuesta.
+          destino, y te devuelve el movimiento que lleva al vecino con la medida más pequeña. Así que si
+          cambias la métrica, puede cambiar la respuesta.
         </p>
         <div class="table-scroll">
           <table>
@@ -903,8 +906,8 @@
 
         <h3 class="label">Qué hace el motor con un movimiento que no puede aplicar</h3>
         <p>
-          Devolver un movimiento imposible no rompe nada: no hay excepción, no hay aviso y no pierdes el
-          turno. El motor no rechaza lo que le das, lo <strong>sustituye</strong>. Antes de mover a
+          Devolver un movimiento imposible no rompe nada (no salta ninguna excepción ni aviso, y tampoco
+          pierdes el turno): el motor coge lo que le das y lo <strong>sustituye</strong>. Antes de mover a
           Ms.&nbsp;Pac-Man aplica estas tres reglas, en este orden:
         </p>
         <ol>
@@ -947,7 +950,7 @@
           </table>
         </div>
         <p>
-          Lo importante de esa tabla es que la salida por defecto es "seguir recto", no "pararse":
+          Con lo que hay que quedarse de esa tabla es con que la salida por defecto es "seguir recto", y
           Ms.&nbsp;Pac-Man no se queda quieta por una decisión tuya, ni siquiera devolviendo
           <code>MOVE.NEUTRAL</code>.
         </p>
@@ -968,7 +971,8 @@
         <p>
           Los fantasmas funcionan con la misma corrección, con dos diferencias: cuando llegan a la tercera
           regla eligen al azar entre los movimientos legales, y sí pueden darse la vuelta, pero sólo
-          cuando el motor se lo impone al comerse Ms.&nbsp;Pac-Man una píldora de poder. Pedirlo no sirve.
+          cuando el motor se lo impone al comerse Ms.&nbsp;Pac-Man una píldora de poder (pedirlo no sirve
+          de nada).
         </p>
 
         <h3 class="label">Cómo elige <code>getNextMoveAwayFromTarget</code></h3>
@@ -1019,7 +1023,7 @@
         <h3 class="label">Qué pasa cuando le pides algo imposible</h3>
         <p>
           Esto conviene saberlo de memoria, porque el motor no lanza una excepción que te pare: te
-          devuelve un valor y sigue. Y cada método falla de una manera distinta.
+          devuelve un valor y sigue, y además cada método falla a su manera.
         </p>
         <div class="table-scroll">
           <table>
@@ -1071,7 +1075,7 @@
             atrás.
           </p>
           <p>
-            La costumbre que ahorra horas: comprueba <code>!= -1</code> y <code>!= null</code> justo
+            Una costumbre que ahorra horas: comprueba <code>!= -1</code> y <code>!= null</code> justo
             donde lo recibes, y nunca uses el resultado de un método del <code>game</code> como índice sin
             mirarlo. Con visibilidad parcial esto pasa de recomendación a obligación, porque ahí lo que no
             se ve vale <code>-1</code> continuamente.
@@ -1103,7 +1107,7 @@
           <span class="note-label">Confundir activas con iniciales</span>
           <p>
             Los métodos sin <code>Active</code> devuelven la configuración inicial del mapa, no lo que queda
-            por comer. Si tu Ms.&nbsp;Pac-Man va a por píldoras que ya se comió, es esto.
+            por comer. Si tu Ms.&nbsp;Pac-Man va a por píldoras que ya se comió, casi seguro que es esto.
           </p>
         </div>
 
@@ -1277,8 +1281,8 @@
           </table>
         </div>
         <p>
-          En la clase hay alguna más, y vale la pena abrirla una vez. Lo importante es leer los valores de
-          ahí y no copiarlos a mano en tu controlador.
+          En la clase hay alguna más, y vale la pena abrirla una vez. Y lo dicho, mejor leer los valores
+          de ahí que copiarlos a mano en tu controlador.
         </p>
       </section>
 
@@ -1311,6 +1315,16 @@
         </ul>
       </section>
 
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-gaia-mspacman">Grupo GAIA, UCM. <em>Ms. Pac-Man vs Ghosts (versión de la asignatura)</em>. 2026. <a href="https://gaia.fdi.ucm.es/research/mspacman/">gaia.fdi.ucm.es/research/mspacman</a> <a class="volver" href="#cita-gaia-mspacman" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-mspacman-arcade">General Computer Corporation. <em>Ms. Pac-Man</em>. videojuego arcade, Midway, 1982. <a class="volver" href="#cita-mspacman-arcade" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
     </main>
 
     <aside class="rail">
@@ -1325,11 +1339,13 @@
             <li><a href="#metodos">Métodos</a></li>
             <li><a href="#parcial">Visibilidad parcial</a></li>
             <li><a href="#constants">La clase <code>Constants</code></a></li>
+            <li><a href="#siguiente">A dónde ir ahora</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <p class="rail-note">
           Este documento sale del material de apoyo de la asignatura. Si echas en falta un método, dímelo y
-          se añade.
+          lo añado.
         </p>
       </div>
     </aside>
@@ -1347,7 +1363,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

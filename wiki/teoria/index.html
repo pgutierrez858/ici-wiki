@@ -11,6 +11,7 @@
 <meta name="description" content="Temario de Ingeniería de Comportamientos Inteligentes: los conceptos de cada tema, en una línea cada uno, y a qué práctica sirven.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/css/ici.css">
@@ -33,10 +34,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -58,8 +58,8 @@
       <span class="thin">Los temas del curso y el vocabulario de cada uno.</span>
     </h1>
     <p class="standfirst">
-      Esta página es un mapa: por cada tema, para qué sirve, a qué práctica va asociado y los
-      conceptos que hay que tener claros, definidos en una línea. El desarrollo completo de cada concepto se
+      Esta página viene a ser un mapa del curso: por cada tema, para qué sirve, a qué práctica va asociado y los
+      conceptos que conviene tener claros, cada uno definido en una línea. El desarrollo completo de cada concepto se
       publica en esta sección junto con la práctica que lo usa.
     </p>
   </header>
@@ -78,14 +78,14 @@
         <p>
           Es el tema en el que se apoyan todos los demás. Un sistema basado en conocimiento separa lo que el sistema
           <em>sabe</em> de lo que el sistema <em>hace</em> con lo que sabe: la base de conocimiento por un
-          lado, el motor que razona sobre ella por otro. Toda la asignatura consiste en decidir qué va en la
+          lado, el motor que razona sobre ella por otro <!--cite gonzalez-dankel--><span class="cita">[<a href="#ref-gonzalez-dankel" id="cita-gonzalez-dankel">1</a>]</span><!--/cite-->. En el fondo, toda la asignatura va de decidir qué metemos en la
           base de conocimiento y en qué formato.
         </p>
         <dl class="gloss">
           <div><dt>Sistema basado en conocimiento</dt><dd>Programa donde el conocimiento del dominio está representado explícitamente y separado del mecanismo que lo utiliza.</dd></div>
           <div><dt>Base de conocimiento</dt><dd>El conjunto de hechos y relaciones que el sistema sabe sobre el dominio, en un formato que puede inspeccionarse y corregirse a mano.</dd></div>
           <div><dt>Motor de inferencia</dt><dd>El mecanismo que aplica el conocimiento a una situación concreta para obtener conclusiones o decisiones.</dd></div>
-          <div><dt>Adquisición del conocimiento</dt><dd>Sacar el conocimiento de donde esté, sea un experto, tus propias partidas o los datos del motor, y hacerlo explícito. Es el cuello de botella real.</dd></div>
+          <div><dt>Adquisición del conocimiento</dt><dd>Sacar el conocimiento de donde esté, sea un experto, vuestras propias partidas o los datos del motor, y hacerlo explícito. Suele ser el verdadero cuello de botella.</dd></div>
           <div><dt>Modelos lógicos</dt><dd>Representaciones basadas en verdad y deducción: lógica de predicados, reglas de producción.</dd></div>
           <div><dt>Modelos estructurados</dt><dd>Representaciones basadas en organización: marcos, redes semánticas, ontologías, máquinas de estados.</dd></div>
           <div><dt>Modelos imprecisos</dt><dd>Representaciones que admiten grados en vez de sí o no: lógica borrosa, probabilidad, similitud entre casos.</dd></div>
@@ -104,7 +104,7 @@
         <p>
           El repertorio clásico de un personaje: cómo se mueve y cómo decide. Primero la solución directa
           a base de condicionales anidados, para ver dónde se rompe; después la máquina de estados, que es
-          la primera representación de verdad del curso.
+          la primera representación de verdad del curso <!--cite recio-t2 millington-funge--><span class="cita">[<a href="#ref-recio-t2" id="cita-recio-t2">2</a>, <a href="#ref-millington-funge" id="cita-millington-funge">3</a>]</span><!--/cite-->.
         </p>
         <figure class="wide">
           <figcaption>La máquina de estados de cada personaje, corriendo junto a la partida</figcaption>
@@ -118,7 +118,7 @@
           <div><dt>Toma de decisiones</dt><dd>Elegir <em>qué</em> hacer, en un nivel por encima de <em>cómo</em> moverse: la decisión escoge el comportamiento, el comportamiento escoge la dirección.</dd></div>
           <div><dt>Máquina de estados finita (FSM)</dt><dd>Conjunto de estados, uno activo cada vez, y transiciones etiquetadas con la condición que las dispara. Cada estado encapsula un comportamiento.</dd></div>
           <div><dt>Transición</dt><dd>Condición sobre el estado del juego que hace pasar de un estado a otro: "fantasma cerca y no comestible", "se acabó el tiempo de píldora".</dd></div>
-          <div><dt>FSM jerárquica</dt><dd>Estados que contienen máquinas de estados. Evita la explosión de transiciones cuando el número de estados crece.</dd></div>
+          <div><dt>FSM jerárquica</dt><dd>Estados que contienen máquinas de estados. Evita la explosión de transiciones cuando el número de estados crece <!--cite recio-t2 | transp. 43–46--><span class="cita">[<a href="#ref-recio-t2">2</a>, transp. 43–46]</span><!--/cite-->.</dd></div>
           <div><dt>Histéresis</dt><dd>Margen deliberado entre la condición que entra a un estado y la que sale de él, para que el personaje no oscile entre dos estados en ticks consecutivos.</dd></div>
           <div><dt>Coordinación</dt><dd>Los cuatro fantasmas son cuatro agentes con un objetivo común: repartirse cuadrantes, cortar escapatorias, no perseguir todos lo mismo.</dd></div>
         </dl>
@@ -133,9 +133,9 @@
           <a href="../practicas/practica-3.html">Práctica 3 · Sistemas de reglas</a> · 19 oct&#8239;–&#8239;1 nov
         </p>
         <p>
-          Conocimiento declarativo: en vez de escribir el orden en que se comprueban las cosas, escribes
-          las reglas y el motor decide cuáles se aplican. Se gana legibilidad y se pierde el control del
-          flujo, y ese intercambio es lo que hay que entender.
+          Conocimiento declarativo: en vez de escribir el orden en que se comprueban las cosas, escribís
+          las reglas y el motor decide cuáles se aplican. Ganáis legibilidad y perdéis el control del
+          flujo, y la gracia del tema está en entender ese intercambio <!--cite recio-reglas--><span class="cita">[<a href="#ref-recio-reglas" id="cita-recio-reglas">4</a>]</span><!--/cite-->.
         </p>
         <figure class="wide">
           <figcaption>Jess disparando reglas mientras se juega la partida</figcaption>
@@ -145,12 +145,12 @@
         <dl class="gloss">
           <div><dt>Hecho</dt><dd>Afirmación sobre el estado actual del mundo, añadida a la memoria de trabajo: <code>(fantasma-cerca blinky 12)</code>.</dd></div>
           <div><dt>Regla de producción</dt><dd>Par antecedente–consecuente: si se cumplen estos patrones sobre los hechos, ejecuta estas acciones.</dd></div>
-          <div><dt>Memoria de trabajo</dt><dd>El conjunto de hechos vigentes en un instante. Tu controlador la reconstruye o la actualiza en cada tick.</dd></div>
+          <div><dt>Memoria de trabajo</dt><dd>El conjunto de hechos vigentes en un instante. Vuestro controlador la reconstruye o la actualiza en cada tick.</dd></div>
           <div><dt>Emparejamiento</dt><dd>Proceso de encontrar qué reglas tienen su antecedente satisfecho por los hechos actuales.</dd></div>
           <div><dt>Agenda y resolución de conflictos</dt><dd>Cuando varias reglas pueden dispararse a la vez, la estrategia de resolución decide el orden: prioridad explícita, especificidad, antigüedad del hecho.</dd></div>
           <div><dt>Encadenamiento hacia delante</dt><dd>Se parte de los hechos y se deducen conclusiones. Es el modo natural para decidir la acción de un personaje.</dd></div>
           <div><dt>Encadenamiento hacia atrás</dt><dd>Se parte de una hipótesis y se busca si los hechos la sostienen. Útil para diagnóstico más que para actuar.</dd></div>
-          <div><dt>Jess</dt><dd>Motor de reglas para Java que usaremos en la práctica. Las reglas se escriben en un fichero aparte del código Java, y eso es parte de la gracia.</dd></div>
+          <div><dt>Jess</dt><dd>Motor de reglas para Java que usaremos en la práctica <!--cite friedman-hill--><span class="cita">[<a href="#ref-friedman-hill" id="cita-friedman-hill">5</a>]</span><!--/cite-->. Las reglas se escriben en un fichero aparte del código Java, y eso es parte de la gracia.</dd></div>
         </dl>
       </section>
 
@@ -163,9 +163,9 @@
           <a href="../practicas/index.html#bloques">Práctica 4</a> · 2&#8239;–&#8239;15 nov
         </p>
         <p>
-          "El fantasma está cerca" no es verdadero ni falso: es verdadero en cierto grado. La lógica
-          borrosa permite escribir reglas con el vocabulario con el que de verdad piensa un jugador y
-          obtener decisiones suaves en vez de saltos bruscos en un umbral.
+          Una frase como "el fantasma está cerca" no tiene por qué ser verdadera o falsa del todo, puede serlo en
+          cierto grado. La lógica borrosa permite escribir reglas con el vocabulario con el que de verdad piensa un jugador y
+          obtener decisiones suaves en vez de saltos bruscos en un umbral <!--cite recio-borroso--><span class="cita">[<a href="#ref-recio-borroso" id="cita-recio-borroso">6</a>]</span><!--/cite-->.
         </p>
         <figure class="wide">
           <figcaption>Las reglas borrosas y su grado de cumplimiento, tick a tick</figcaption>
@@ -173,14 +173,14 @@
                alt="A la izquierda la salida del motor borroso: las distancias y confianzas de cada fantasma como entrada, el valor de runAway como salida, y doce reglas del tipo &quot;si la distancia de Blinky es cerca y la confianza es alta, entonces runAway es emergency&quot; con su grado de activación. A la derecha la partida en marcha.">
         </figure>
         <dl class="gloss">
-          <div><dt>Conjunto borroso</dt><dd>Conjunto en el que la pertenencia es un grado entre 0 y 1 en vez de un sí o un no.</dd></div>
+          <div><dt>Conjunto borroso</dt><dd>Conjunto en el que la pertenencia es un grado entre 0 y 1 en vez de un sí o un no <!--cite zadeh-fuzzy--><span class="cita">[<a href="#ref-zadeh-fuzzy" id="cita-zadeh-fuzzy">7</a>]</span><!--/cite-->.</dd></div>
           <div><dt>Función de pertenencia</dt><dd>La curva que asigna ese grado a cada valor de la variable: triangular, trapezoidal, gaussiana.</dd></div>
           <div><dt>Variable lingüística</dt><dd>Variable cuyos valores son palabras, como una distancia que puede ser <em>cerca</em>, <em>media</em> o <em>lejos</em>, cada una con su función de pertenencia.</dd></div>
           <div><dt>Regla borrosa</dt><dd>Regla escrita sobre variables lingüísticas: "si la distancia es <em>cerca</em> y el fantasma es <em>no comestible</em>, la amenaza es <em>alta</em>".</dd></div>
           <div><dt>Difuminación</dt><dd>Convertir las magnitudes numéricas del juego en grados de pertenencia. La entrada del sistema borroso.</dd></div>
-          <div><dt>Inferencia (Mamdani)</dt><dd>Combinar el grado de cumplimiento de cada regla para obtener un conjunto borroso de salida.</dd></div>
+          <div><dt>Inferencia (Mamdani)</dt><dd>Combinar el grado de cumplimiento de cada regla para obtener un conjunto borroso de salida <!--cite mamdani-assilian--><span class="cita">[<a href="#ref-mamdani-assilian" id="cita-mamdani-assilian">8</a>]</span><!--/cite-->.</dd></div>
           <div><dt>Desdifuminación</dt><dd>Reducir ese conjunto de salida a un número con el que actuar: centro de gravedad, media de máximos.</dd></div>
-          <div><dt>jFuzzyLogic</dt><dd>Biblioteca Java que usaremos; las reglas se escriben en FCL, un formato de texto independiente del código.</dd></div>
+          <div><dt>jFuzzyLogic</dt><dd>Biblioteca Java que usaremos; las reglas se escriben en FCL, un formato de texto independiente del código <!--cite jfuzzylogic--><span class="cita">[<a href="#ref-jfuzzylogic" id="cita-jfuzzylogic">9</a>]</span><!--/cite-->.</dd></div>
         </dl>
       </section>
 
@@ -194,17 +194,17 @@
         </p>
         <p>
           Cuando el juego va por turnos y hay un adversario, se puede <em>simular</em> el futuro en vez de
-          razonar sólo sobre el presente. El conocimiento del dominio no desaparece: se traslada a la
+          razonar sólo sobre el presente. El conocimiento del dominio sigue ahí, sólo que pasa a la
           función que evalúa lo buena que es una posición y a cómo se poda el árbol.
         </p>
         <dl class="gloss">
           <div><dt>Modelo <em>forward</em></dt><dd>Capacidad de preguntarle al juego "si hago esta jugada, ¿cómo queda el estado?" sin jugarla de verdad. Sin él no hay búsqueda.</dd></div>
           <div><dt>Árbol de juego</dt><dd>Nodos que son estados y aristas que son jugadas, alternando el turno de cada jugador.</dd></div>
-          <div><dt>Minimax</dt><dd>Elegir la jugada que maximiza tu resultado suponiendo que el adversario elige siempre la que te lo minimiza.</dd></div>
+          <div><dt>Minimax</dt><dd>Elegir la jugada que maximiza tu resultado suponiendo que el adversario elige siempre la que te lo minimiza <!--cite russell-norvig--><span class="cita">[<a href="#ref-russell-norvig" id="cita-russell-norvig">10</a>]</span><!--/cite-->.</dd></div>
           <div><dt>Poda alfa-beta</dt><dd>Descartar ramas que no pueden cambiar la decisión final. Mismo resultado que minimax explorando mucho menos.</dd></div>
           <div><dt>Función de evaluación</dt><dd>Estimación de lo buena que es una posición sin llegar al final de la partida. Aquí es donde va el conocimiento del dominio.</dd></div>
-          <div><dt>Monte Carlo Tree Search</dt><dd>Construir el árbol de forma incremental guiado por simulaciones aleatorias: seleccionar, expandir, simular, propagar el resultado.</dd></div>
-          <div><dt>UCT</dt><dd>La fórmula que equilibra explotar la jugada que va bien y explorar las poco visitadas durante la selección.</dd></div>
+          <div><dt>Monte Carlo Tree Search</dt><dd>Construir el árbol de forma incremental guiado por simulaciones aleatorias: seleccionar, expandir, simular, propagar el resultado <!--cite coulom-mcts browne-mcts--><span class="cita">[<a href="#ref-coulom-mcts" id="cita-coulom-mcts">11</a>, <a href="#ref-browne-mcts" id="cita-browne-mcts">12</a>]</span><!--/cite-->.</dd></div>
+          <div><dt>UCT</dt><dd>La fórmula que equilibra explotar la jugada que va bien y explorar las poco visitadas durante la selección <!--cite kocsis-uct--><span class="cita">[<a href="#ref-kocsis-uct" id="cita-kocsis-uct">13</a>]</span><!--/cite-->.</dd></div>
           <div><dt>Presupuesto y <em>anytime</em></dt><dd>El controlador tiene un tiempo límite por jugada; MCTS puede pararse en cualquier momento y devolver la mejor jugada encontrada hasta entonces.</dd></div>
         </dl>
         <div class="note mine">
@@ -228,16 +228,24 @@
         <p>
           La última vuelta de tuerca: en vez de escribir reglas, guardar experiencias. Un sistema basado en
           casos resuelve un problema nuevo recuperando el caso más parecido que ya resolvió y adaptando su
-          solución. Es la forma más directa de que un comportamiento aprenda sin entrenar un modelo.
+          solución <!--cite recio-cbr-intro--><span class="cita">[<a href="#ref-recio-cbr-intro" id="cita-recio-cbr-intro">14</a>]</span><!--/cite-->. Es la forma más directa de que un comportamiento aprenda sin entrenar un modelo.
         </p>
         <dl class="gloss">
           <div><dt>Caso</dt><dd>Par problema–solución tomado de una experiencia concreta, con el resultado que obtuvo.</dd></div>
           <div><dt>Base de casos</dt><dd>La memoria del sistema. Sustituye a la base de reglas: el conocimiento está en los ejemplos, no en las generalizaciones.</dd></div>
-          <div><dt>Ciclo de las cuatro R</dt><dd>Recuperar el caso similar, reutilizar su solución, revisar el resultado y retener el caso nuevo.</dd></div>
+          <div><dt>Ciclo de las cuatro R</dt><dd>Recuperar el caso similar, reutilizar su solución, revisar el resultado y retener el caso nuevo <!--cite aamodt-plaza--><span class="cita">[<a href="#ref-aamodt-plaza" id="cita-aamodt-plaza">15</a>]</span><!--/cite-->.</dd></div>
           <div><dt>Medida de similitud</dt><dd>Función que decide qué caso guardado se parece más a la situación actual. Ahí va el conocimiento del dominio.</dd></div>
           <div><dt>Adaptación</dt><dd>Ajustar la solución recuperada a las diferencias entre el caso viejo y el problema nuevo.</dd></div>
           <div><dt>Retención y mantenimiento</dt><dd>Decidir qué casos merecen guardarse para que la base crezca en calidad y no sólo en tamaño.</dd></div>
         </dl>
+        <div class="note mine">
+          <span class="note-label">Sobre este tema</span>
+          <p>
+            Se vuelve a Ms.&nbsp;Pac-Man, con jCOLIBRI, la librería de casos del grupo GAIA de esta facultad <!--cite recio-cbr-jcolibri--><span class="cita">[<a href="#ref-recio-cbr-jcolibri" id="cita-recio-cbr-jcolibri">16</a>]</span><!--/cite-->. Los
+            <a href="../guias/tema6/index.html">apuntes del tema</a> siguen el ciclo paso a paso, con las cuentas de la
+            similitud y ejemplos para mover la consulta entre casos y ver cómo crece la base.
+          </p>
+        </div>
       </section>
 
       <section id="bonus">
@@ -249,25 +257,33 @@
           Código Secreto · 14&#8239;–&#8239;20 dic
         </p>
         <p>
-          Este bloque rompe la regla del curso. Cuando el tablero son palabras, escribir el conocimiento a
-          mano no llega: hay que medir significado, y eso hoy sale de modelos entrenados sobre muchísimo
-          texto. Sirve para ver por dentro las técnicas del otro lado de la Inteligencia Artificial y para
+          Este bloque se salta un poco la regla del curso, porque cuando el tablero son palabras no llega con
+          escribir el conocimiento a mano: hay que medir significado, y eso hoy sale de modelos entrenados sobre muchísimo
+          texto. Sirve para ver por dentro las técnicas del otro lado de la Inteligencia Artificial y
           entender qué se gana y qué se pierde al cambiar de lado.
         </p>
         <dl class="gloss">
           <div><dt>Código Secreto</dt><dd>Veinticinco palabras en la mesa. El jefe de espías ve cuáles son de su equipo y sólo puede decir una palabra y un número para señalarlas.</dd></div>
-          <div><dt>Embedding</dt><dd>Vector que representa una palabra, colocado de forma que las palabras de significado parecido queden cerca unas de otras.</dd></div>
-          <div><dt>Similitud del coseno</dt><dd>La medida habitual de cercanía entre dos vectores: el ángulo que forman, no la distancia en línea recta.</dd></div>
-          <div><dt>Modelo de lenguaje</dt><dd>Modelo que, dado un contexto, reparte probabilidad entre las continuaciones posibles. No deduce la respuesta, la ordena.</dd></div>
+          <div><dt>Embedding</dt><dd>Vector que representa una palabra, colocado de forma que las palabras de significado parecido queden cerca unas de otras <!--cite mikolov-word2vec--><span class="cita">[<a href="#ref-mikolov-word2vec" id="cita-mikolov-word2vec">17</a>]</span><!--/cite-->.</dd></div>
+          <div><dt>Similitud del coseno</dt><dd>La medida habitual de cercanía entre dos vectores: el ángulo que forman (y no la distancia en línea recta).</dd></div>
+          <div><dt>Modelo de lenguaje</dt><dd>Modelo que, dado un contexto, reparte probabilidad entre las continuaciones posibles. No deduce nada, se limita a ordenar las continuaciones.</dd></div>
           <div><dt><em>Prompt</em></dt><dd>El contexto que se le da al modelo. Aquí es una decisión de diseño más, y se prueba y se mide como cualquier otra.</dd></div>
           <div><dt>Decisión con riesgo</dt><dd>Acertar de más regala el turno y tocar la casilla negra pierde la partida, así que la mejor pista no siempre es la más ambiciosa.</dd></div>
-          <div><dt>Sesgo del corpus</dt><dd>Los vectores heredan lo que había en el texto de entrenamiento, con sus asociaciones útiles y sus prejuicios.</dd></div>
+          <div><dt>Sesgo del corpus</dt><dd>Los vectores heredan lo que había en el texto de entrenamiento, con sus asociaciones útiles y sus prejuicios <!--cite bolukbasi-sesgo--><span class="cita">[<a href="#ref-bolukbasi-sesgo" id="cita-bolukbasi-sesgo">18</a>]</span><!--/cite-->.</dd></div>
         </dl>
+        <div class="note mine">
+          <span class="note-label">Sobre este tema</span>
+          <p>
+            Los <a href="../guias/bonus/index.html">apuntes del tema</a> van de los vectores de palabras a las estrategias de
+            la competición de bots de Código Secreto <!--cite kim-codenames--><span class="cita">[<a href="#ref-kim-codenames" id="cita-kim-codenames">19</a>]</span><!--/cite-->, con las cuentas en un tablero pequeño y un
+            <a href="../guias/bonus/simulador.html">simulador</a> para jugar en la página.
+          </p>
+        </div>
         <div class="note mine">
           <span class="note-label">Por qué está aquí</span>
           <p>
-            Después de cuatro meses escribiendo conocimiento a mano, este bloque enseña el contraste: lo que
-            se gana en cobertura, lo que se pierde en control y por qué la industria usa cada cosa donde la
+            Después de cuatro meses escribiendo conocimiento a mano, este bloque sirve para ver el contraste
+            (se gana cobertura y se pierde control) y entender por qué la industria usa cada cosa donde la
             usa.
           </p>
         </div>
@@ -279,10 +295,37 @@
         </div>
         <p>
           La bibliografía completa, tema por tema, está en
-          <a href="../index.html#recursos">la página de la asignatura</a>. Si sólo vas a leer un libro en
-          todo el curso, que sea el de Millington y Funge: es el que más se parece a lo que hacemos aquí.
+          <a href="../index.html#recursos">la página de la asignatura</a>. Si sólo vais a leer un libro en
+          todo el curso, que sea el de Millington y Funge, que diría que es el que más se parece a lo que hacemos aquí.
         </p>
       </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-gonzalez-dankel">A. J. González y D. D. Dankel. <em>The Engineering of Knowledge-Based Systems</em>. Prentice Hall, 1993. <a class="volver" href="#cita-gonzalez-dankel" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-t2">J. A. Recio-García. <em>Tema 02. Repaso de conceptos de IA para videojuegos</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-t2" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-millington-funge">I. Millington y J. Funge. <em>Artificial Intelligence for Games</em>. 3.ª ed., CRC Press, 2019. <a class="volver" href="#cita-millington-funge" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-reglas">J. A. Recio-García. <em>Tema 03(a). Sistemas de reglas</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-reglas" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-friedman-hill">E. Friedman-Hill. <em>Jess in Action: Rule-Based Systems in Java</em>. Manning, 2003. <a class="volver" href="#cita-friedman-hill" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-borroso">J. A. Recio-García. <em>Tema 03. Razonamiento borroso</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-borroso" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-zadeh-fuzzy">L. A. Zadeh. "Fuzzy Sets". <em>Information and Control 8(3), 338–353</em>, 1965. <a class="volver" href="#cita-zadeh-fuzzy" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-mamdani-assilian">E. H. Mamdani y S. Assilian. "An Experiment in Linguistic Synthesis with a Fuzzy Logic Controller". <em>International Journal of Man-Machine Studies 7(1), 1–13</em>, 1975. <a class="volver" href="#cita-mamdani-assilian" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-jfuzzylogic">P. Cingolani y J. Alcalá-Fdez. "jFuzzyLogic: a Java Library to Design Fuzzy Logic Controllers According to the Standard for Fuzzy Control Programming". <em>International Journal of Computational Intelligence Systems 6(sup1), 61–75</em>, 2013. <a class="volver" href="#cita-jfuzzylogic" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-russell-norvig">S. Russell y P. Norvig. <em>Artificial Intelligence: A Modern Approach</em>. 4.ª ed., Pearson, 2020. <a class="volver" href="#cita-russell-norvig" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-coulom-mcts">R. Coulom. "Efficient Selectivity and Backup Operators in Monte-Carlo Tree Search". <em>Computers and Games 2006, LNCS 4630, Springer</em>, 2007. <a class="volver" href="#cita-coulom-mcts" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-browne-mcts">C. Browne, E. Powley, D. Whitehouse, S. Lucas, P. Cowling y otros. "A Survey of Monte Carlo Tree Search Methods". <em>IEEE Transactions on Computational Intelligence and AI in Games 4(1), 1–43</em>, 2012. <a class="volver" href="#cita-browne-mcts" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-kocsis-uct">L. Kocsis y C. Szepesvári. "Bandit Based Monte-Carlo Planning". <em>ECML 2006, LNCS 4212, Springer</em>, 2006. <a class="volver" href="#cita-kocsis-uct" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-cbr-intro">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: introducción</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-intro" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-aamodt-plaza">A. Aamodt y E. Plaza. "Case-Based Reasoning: Foundational Issues, Methodological Variations, and System Approaches". <em>AI Communications 7(1), 39–59</em>, 1994. <a class="volver" href="#cita-aamodt-plaza" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-cbr-jcolibri">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: jCOLIBRI</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-jcolibri" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-mikolov-word2vec">T. Mikolov, K. Chen, G. Corrado y J. Dean. "Efficient Estimation of Word Representations in Vector Space". <em>arXiv:1301.3781</em>, 2013. <a href="https://arxiv.org/abs/1301.3781">arxiv.org/abs/1301.3781</a> <a class="volver" href="#cita-mikolov-word2vec" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-bolukbasi-sesgo">T. Bolukbasi, K.-W. Chang, J. Zou, V. Saligrama y A. Kalai. "Man is to Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings". <em>NeurIPS 2016</em>, 2016. <a class="volver" href="#cita-bolukbasi-sesgo" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-kim-codenames">A. Kim, M. Ruzmaykin, A. Truong y A. Summerville. "Cooperation and Codenames: Understanding Natural Language Processing via Codenames". <em>Proceedings of AIIDE 2019</em>, 2019. <a class="volver" href="#cita-kim-codenames" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
 
     </main>
 
@@ -320,7 +363,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

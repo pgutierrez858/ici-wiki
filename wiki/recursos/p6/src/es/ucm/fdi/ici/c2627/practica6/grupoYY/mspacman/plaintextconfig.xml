@@ -1,0 +1,20 @@
+<TextFileConfiguration>
+	<FilePath>not used</FilePath>
+	<Delimiters>,</Delimiters>
+	<DescriptionClassName>es.ucm.fdi.ici.c2627.practica6.grupoYY.mspacman.MsPacManDescription</DescriptionClassName>
+	<DescriptionMappings>
+		<Map>score</Map>
+		<Map>time</Map>
+		<Map>nearestPPill</Map>
+		<Map>nearestGhost</Map>
+		<Map>edibleGhost</Map>
+	</DescriptionMappings>
+	<SolutionClassName>es.ucm.fdi.ici.c2627.practica6.grupoYY.mspacman.MsPacManSolution</SolutionClassName>
+	<SolutionMappings>
+		<Map>action</Map>
+	</SolutionMappings>
+	<ResultClassName>es.ucm.fdi.ici.c2627.practica6.grupoYY.mspacman.MsPacManResult</ResultClassName>
+	<ResultMappings>
+		<Map>score</Map>
+	</ResultMappings>
+</TextFileConfiguration>

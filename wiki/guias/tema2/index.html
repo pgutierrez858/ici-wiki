@@ -6,14 +6,14 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Temas 3 y 4 · Reglas y razonamiento borroso · ICI</title>
-<meta name="description" content="Temas 3 y 4 de ICI: sistemas de reglas con Jess y razonamiento borroso con jFuzzyLogic, de los hechos y las reglas al método de Mamdani, con ejemplos interactivos y el motor de Ms. Pac-Man como referencia.">
+<title>Tema 2 · IA para videojuegos · ICI</title>
+<meta name="description" content="Tema 2 de ICI: buscar caminos en un mapa, decidir con ellos y organizar la decisión en máquinas de estados y árboles de comportamiento, con el simulador de Ms. Pac-Man como referencia.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="../../assets/katex/katex.min.css">
 <link rel="stylesheet" href="../../assets/css/ici.css">
 <script src="../../assets/js/tema.js"></script>
 </head>
@@ -34,10 +34,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../../index.html">Inicio</a></li>
-        <li><a href="../../presentacion.html">Presentación</a></li>
         <li><a href="../../calendario.html">Calendario</a></li>
         <li><a href="../../practicas/index.html">Prácticas</a></li>
-        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,20 +49,23 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="../index.html">Guías</a>
+    <a href="../index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
-    <span>Temas 3 y 4</span>
+    <span>Tema 2</span>
   </nav>
 
   <header class="masthead">
     <h1>
-      Reglas y razonamiento borroso
-      <span class="thin">Escribir el conocimiento como reglas, primero de sí o no y después por grados.</span>
+      IA para videojuegos
+      <span class="thin">Buscar un camino, decidir con él y organizar la decisión.</span>
     </h1>
     <p class="standfirst">
-      Los apuntes de los temas&nbsp;3 y&nbsp;4, en diez páginas cortas. Las siete primeras son los sistemas de reglas, el material
-      de la Práctica&nbsp;3; las tres últimas, el razonamiento borroso de la Práctica&nbsp;4. Van en orden, y las dos
-      partes se apoyan en todo lo que ya sabéis de máquinas de estados y árboles de comportamiento.
+      Los apuntes del tema&nbsp;2 <!--cite recio-t2--><span class="cita">[<a href="#ref-recio-t2" id="cita-recio-t2">1</a>]</span><!--/cite-->, partidos en nueve páginas cortas para que cada una se pueda leer
+      de una sentada. Van en orden: cada página usa lo de las anteriores. Las siete primeras son el
+      material de la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>; las dos últimas
+      preparan la Práctica&nbsp;2. (Si venís de un enlace antiguo buscando los sistemas de reglas o la
+      lógica borrosa, ahora están en el <a href="../tema3/index.html">tema&nbsp;3</a> y el
+      <a href="../tema4/index.html">tema&nbsp;4</a>.)
     </p>
     <div class="byline">
       <span><strong>Pablo Gutiérrez Sánchez</strong></span>
@@ -74,113 +76,116 @@
 
   <dl class="facts">
     <div class="fact">
-      <dt>Temas</dt>
-      <dd>03 y 04<small>Reglas y lógica borrosa</small></dd>
+      <dt>Tema</dt>
+      <dd>02<small>IA para videojuegos</small></dd>
     </div>
     <div class="fact">
       <dt>Prácticas asociadas</dt>
-      <dd>Práctica 3<small>y la Práctica 4</small></dd>
+      <dd><a href="../../practicas/practica-1.html">Práctica 1</a><small>y la Práctica 2</small></dd>
     </div>
     <div class="fact">
       <dt>Antes de leer</dt>
-      <dd><a href="../tema1/maquinas-estados.html">Máquinas de estados</a><small>El <code>Input</code> y las acciones son los mismos</small></dd>
+      <dd><a href="../clase-game.html">La clase <code>Game</code></a><small>De ahí sale todo el estado</small></dd>
     </div>
   </dl>
 
   <div class="cols" id="contenido" tabindex="-1">
     <main>
 
-      <section id="reglas">
+      <section id="buscar">
         <div class="sec-head">
           <span class="num">01</span>
-          <h2 class="sec">Sistemas de reglas</h2>
+          <h2 class="sec">Buscar caminos</h2>
         </div>
         <p>
-          En vez de escribir en qué orden se comprueban las cosas, se escriben reglas sueltas y un motor decide cuáles se
-          aplican. Qué es eso, cómo funciona el motor por dentro, el lenguaje de Jess y cómo se usa en el simulador.
+          La primera mitad del tema va del problema general, tal y como se plantea en cualquier videojuego (representar el espacio, buscar en él y pagar por la búsqueda), y termina con lo que de todo eso ya viene resuelto en el simulador, que es bastante.
         </p>
         <ul class="links">
           <li>
-            <a href="que-es.html">
-              <span class="lt">01 · Qué es un sistema de reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · 6 secciones</span>
-              <span class="ld">De la cadena de <code>if</code> a las reglas, hechos, reglas y motor, el ciclo de reconocer, resolver y actuar, razonar por capas, y dónde se usan: de MYCIN a los diálogos de <em lang="en">Left 4 Dead</em>.</span>
+            <a href="representacion.html">
+              <span class="lt">01 · Representar el espacio<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 2 secciones</span>
+              <span class="ld">El problema de partida, y las tres formas de convertir un mapa en un grafo: puntos de ruta, rejillas y mallas de navegación. Y cómo es el grafo del laberinto.</span>
             </a>
           </li>
           <li>
-            <a href="encadenamiento.html">
-              <span class="lt">02 · Encadenar reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · con ejemplo interactivo</span>
-              <span class="ld">Hacia delante y hacia atrás, paso a paso sobre el mismo grafo de reglas, los palíndromos, y por qué en un juego se va hacia delante.</span>
+            <a href="busqueda.html">
+              <span class="lt">02 · Búsqueda en espacios de estados<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 2 secciones</span>
+              <span class="ld">El bucle común a todas las búsquedas, y las búsquedas ciegas: anchura, profundidad y coste uniforme, con ejemplos para seguir paso a paso.</span>
             </a>
           </li>
           <li>
-            <a href="conflictos.html">
-              <span class="lt">03 · La agenda y los conflictos<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · con ejemplo interactivo</span>
-              <span class="ld">Orden, prioridad, especificidad y novedad con un mismo fantasma, la refracción y el bucle de <code>modify</code>, y lo que hace el motor de la práctica con la prioridad.</span>
+            <a href="astar.html">
+              <span class="lt">03 · Heurísticas y A*<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 3 secciones</span>
+              <span class="ld">Admisible y consistente, las tres métricas del motor, las dos listas de A* y un ejemplo que junta todo.</span>
             </a>
           </li>
           <li>
-            <a href="rete.html">
-              <span class="lt">04 · Rete<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · con ejemplo interactivo</span>
-              <span class="ld">Por qué probarlo todo con todo no escala, la red de nodos alfa y beta por dentro, y lo que cuesta de verdad un turno de vuestro fantasma.</span>
-            </a>
-          </li>
-          <li>
-            <a href="clips.html">
-              <span class="lt">05 · CLIPS y Jess<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · con banco de pruebas</span>
-              <span class="ld">Hechos, plantillas, reglas, variables y restricciones, lo que Jess no entiende de CLIPS, un banco para escribir y ejecutar reglas, y cómo probarlas en Eclipse sin jugar.</span>
-            </a>
-          </li>
-          <li>
-            <a href="reglas-mspacman.html">
-              <span class="lt">06 · Reglas en Ms.&nbsp;Pac-Man<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · Práctica 3</span>
-              <span class="ld">El paquete <code>rules</code> del motor: un turno por dentro, <code>RulesInput</code>, el <code>.clp</code>, <code>RuleEngine</code> y <code>RulesAction</code>, histéresis con memoria, el observador y los errores típicos.</span>
-            </a>
-          </li>
-          <li>
-            <a href="comparar.html">
-              <span class="lt">07 · Reglas, máquinas y árboles<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · 4 secciones</span>
-              <span class="ld">El mismo fantasma en cuatro formatos, frente a frente, quién usa cada técnica en la industria, y el problema que queda para la lógica borrosa.</span>
+            <a href="astar-mspacman.html">
+              <span class="lt">04 · A* en Ms.&nbsp;Pac-Man<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 1 sección</span>
+              <span class="ld">Lo que el motor ya trae precalculado, la trampa de darse la vuelta y cómo pasar de una distancia a un movimiento.</span>
             </a>
           </li>
         </ul>
       </section>
 
-      <section id="borroso">
+      <section id="decidir">
         <div class="sec-head">
           <span class="num">02</span>
-          <h2 class="sec">Razonamiento borroso</h2>
+          <h2 class="sec">Decidir</h2>
         </div>
         <p>
-          Las mismas reglas, pero con palabras que se cumplen por grados: "si el fantasma está <em>cerca</em>". Qué es un
-          conjunto borroso, cómo razona un sistema con ellos y cómo se usa jFuzzyLogic en el simulador.
+          Con el camino ya resuelto por el motor, queda la pregunta que se evalúa en la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>: hacia dónde ir. Aquí van las estrategias, y esta parte sí que es cosa vuestra.
         </p>
         <ul class="links">
           <li>
-            <a href="borroso.html">
-              <span class="lt">08 · Conjuntos borrosos<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · con ejemplos interactivos</span>
-              <span class="ld">El problema de los umbrales, de Zadeh al metro de Sendai y a la IA de utilidad, funciones de pertenencia, variables lingüísticas y AND, OR y NOT por grados.</span>
+            <a href="estrategias.html">
+              <span class="lt">05 · Estrategias algorítmicas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 7 secciones</span>
+              <span class="ld">La regla voraz y por qué falla, razonar por cruces, ¿llego yo antes?, movimientos seguros, cuánto se tarda en alcanzar a un fantasma y tres formas de escribir la decisión.</span>
             </a>
           </li>
           <li>
-            <a href="inferencia-borrosa.html">
-              <span class="lt">09 · Inferencia borrosa<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · con banco de pruebas</span>
-              <span class="ld">Reglas borrosas, modus ponens generalizado, composición sup-min, Mamdani paso a paso con la propina, un banco de FCL que da lo mismo que jFuzzyLogic, y tres trampas de diseño.</span>
+            <a href="mapas-influencia.html">
+              <span class="lt">06 · Mapas de influencia<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · con implementación</span>
+              <span class="ld">Capas que se propagan por el laberinto, una función objetivo con pesos, y un controlador de Ms.&nbsp;Pac-Man escrito de principio a fin que sólo decide con el mapa.</span>
             </a>
           </li>
           <li>
-            <a href="borroso-mspacman.html">
-              <span class="lt">10 · Lógica borrosa en Ms.&nbsp;Pac-Man<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · Práctica 4</span>
-              <span class="ld">El FCL pieza a pieza, probarlo desde la consola, el paquete <code>fuzzy</code> del motor, cómo convertir salidas en una acción, la visibilidad parcial y los errores típicos.</span>
+            <a href="predecir-coordinar.html">
+              <span class="lt">07 · Predecir, coordinar y medir<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · 5 secciones</span>
+              <span class="ld">Adivinar a quien no controlas, repartirse el trabajo entre cuatro fantasmas, el reloj del modo comestible, el presupuesto de cada turno y cómo ver lo que piensa el controlador.</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="organizar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Organizar el comportamiento</h2>
+        </div>
+        <p>
+          Las mismas decisiones, escritas de otra forma: en vez de una función que lo decide todo cada turno, estados con transiciones o un árbol de tareas pequeñas, de forma que el conocimiento queda separado del mecanismo.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="maquinas-estados.html">
+              <span class="lt">08 · Máquinas de estados<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes · Práctica 2</span>
+              <span class="ld">Estados y transiciones, por qué los <code>if</code> anidados no escalan, máquinas jerárquicas y el paquete <code>fsm</code> del motor: <code>Input</code>, acciones, transiciones y estados compuestos.</span>
+            </a>
+          </li>
+          <li>
+            <a href="arboles-comportamiento.html">
+              <span class="lt">09 · Árboles de comportamiento<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Apuntes</span>
+              <span class="ld">Acciones, condiciones, secuencias, selectores y decoradores; cómo se recorre el árbol en cada turno, cómo se compara con una máquina de estados y con una jerárquica, con dos ejemplos escritos en los tres formatos, y una implementación mínima para el motor.</span>
             </a>
           </li>
         </ul>
@@ -188,34 +193,44 @@
 
       <section id="resumen">
         <div class="sec-head">
-          <span class="num">03</span>
+          <span class="num">04</span>
           <h2 class="sec">Lo que hay que llevarse</h2>
         </div>
         <ol>
-          <li>Un sistema de reglas tiene tres piezas: la <strong>memoria de trabajo</strong> (los hechos), la <strong>base de reglas</strong> y el <strong>motor</strong>, que repite reconocer, resolver y actuar hasta que la agenda se vacía.</li>
-          <li>Una regla dice entera su condición y no tiene <em>else</em>. Las reglas no se llaman entre sí: sólo se hablan escribiendo hechos, y eso permite razonar por capas.</li>
-          <li>Hacia delante se va de los hechos a las conclusiones; hacia atrás, de una pregunta a lo que la sostiene. Un personaje reacciona, así que en los juegos se va hacia delante.</li>
-          <li>Cuando se cumplen varias reglas hay que elegir, y la estrategia (orden, prioridad, especificidad, novedad) también es conocimiento. No os fiéis de un empate.</li>
-          <li>La <strong>refracción</strong> impide que una regla se dispare dos veces con los mismos hechos, pero un <code>modify</code> crea un hecho nuevo: una regla que no deja de cumplirse después de actuar no para nunca.</li>
-          <li>Rete no recalcula: cada hecho nuevo recorre una red que recuerda lo ya averiguado. En la práctica, un turno de un fantasma cuesta del orden de 12&nbsp;µs.</li>
-          <li>En el motor de Ms.&nbsp;Pac-Man se disparan todas las reglas, cada una aserta un <code>ACTION</code>, y Java se queda con el de <code>priority</code> más alta. La memoria se vacía en cada turno: lo que haya que recordar lo guarda Java y lo aserta como un hecho.</li>
-          <li>Jess 7.1 no es CLIPS en los detalles: no entiende <code>allowed-symbols</code> ni <code>range</code>, y no comprueba <code>type</code>.</li>
-          <li>Un <strong>conjunto borroso</strong> asigna a cada valor un grado de pertenencia entre 0 y 1. Una variable lingüística es una magnitud con unas pocas palabras que la describen, y esas palabras tienen que cubrir todo el rango y solaparse.</li>
-          <li>AND es el mínimo, OR el máximo y NOT es <!--tex 1 - \mu --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">1 - \mu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span><!--/tex-->. La lógica clásica es el caso en que todo vale 0 o 1.</li>
-          <li><strong>Mamdani</strong> en cuatro pasos: difuminar, evaluar las reglas, recortar y agregar sus consecuentes, y desdifuminar. Las reglas borrosas no compiten: se mezclan.</li>
-          <li>Un sistema borroso se depura mirando su <strong>curva de control</strong>. Las tres trampas son reglas que se contradicen, huecos sin reglas y un centro de gravedad que dice dónde pero no cuánto.</li>
-          <li>En jFuzzyLogic, AND y OR se leen de izquierda a derecha, <code>ACCU</code> vale <code>SUM</code> si no se escribe, y <code>MM</code> está roto: paréntesis, <code>ACCU</code> siempre y <code>COG</code>.</li>
-          <li>Reglas nítidas para decidir <strong>qué</strong> hacer cuando las situaciones son distintas; borrosas para decidir <strong>cuánto</strong> cuando cambian poco a poco.</li>
+          <li>El <em>pathfinding</em> son dos problemas: <strong>representar</strong> el espacio como grafo y <strong>buscar</strong> en ese grafo, y se resuelven por separado.</li>
+          <li>Waypoints, rejillas y mallas de navegación son tres formas de hacer lo primero, con tres compromisos distintos entre memoria, esfuerzo manual y calidad de las rutas.</li>
+          <li>Todo algoritmo de búsqueda es el mismo bucle sobre <strong>abiertos</strong> y <strong>cerrados</strong>. Lo que cambia es de qué estructura se saca el siguiente nodo.</li>
+          <li>Con costes unitarios, anchura ya es óptima, así que en el laberinto es la herramienta que toca.</li>
+          <li>Una heurística <strong>admisible</strong>, o sea que nunca sobreestime, hace a A* óptimo. En Ms.&nbsp;Pac-Man, la tabla precalculada sirve de heurística admisible para el A* de los fantasmas.</li>
+          <li>En el laberinto, <code>DM.PATH</code> siempre: las otras dos métricas atraviesan paredes.</li>
+          <li>El camino os lo da el motor, pero la decisión (el <strong>hacia dónde</strong>) no, y ahí es donde está la nota.</li>
+          <li>Decidid en los cruces, razonad por tramos, comparad distancias <strong>al mismo punto</strong> y mirad dos cruces por delante.</li>
+          <li>Esa decisión se puede escribir de tres formas (reglas con prioridad, función de evaluación con pesos, o mapa de costes sobre el grafo), y las tres dependen de lo mismo: que las funciones que las alimentan midan bien.</li>
+          <li>Predecir al otro sale gratis dentro de un pasillo, donde no puede elegir, pero a partir de dos cruces ya no vale nada. Interceptar es coincidir en el nodo <strong>y</strong> en el turno.</li>
+          <li>Cuatro agentes que ven el mismo estado ya están coordinados: sólo falta <strong>repartirse</strong> los objetivos y no recalcular el reparto en cada turno.</li>
+          <li>Un mapa de influencia saca el conocimiento del código que decide: unas pocas <strong>capas</strong> que se propagan por el laberinto, normalizadas y sumadas con pesos, y una decisión que sólo compara salidas.</li>
+          <li>Una <strong>máquina de estados</strong> separa qué hacer (el estado) de cuándo cambiar (las transiciones). En el motor, <code>Input</code> lee el juego una vez por turno, <code>Action</code> devuelve el movimiento y <code>FSM.run</code> prueba las transiciones en el orden en que se añadieron.</li>
+          <li>Cuando las transiciones se repiten entre estados, se agrupan en un <strong>estado compuesto</strong>: una máquina dentro de otra, que vuelve a su estado inicial al salir.</li>
+          <li>Un <strong>árbol de comportamiento</strong> se recorre entero desde la raíz en cada turno: la secuencia es un AND, el selector un OR, y el orden de los hijos es la prioridad. Reacciona siempre, a cambio de no recordar nada si no se le da una pizarra.</li>
         </ol>
         <div class="note mine">
           <span class="note-label">Y a continuación</span>
           <p>
-            Hasta aquí el conocimiento se escribe a mano y se aplica al estado presente. El tema siguiente cambia las dos
-            cosas: en los juegos por turnos se puede <em>simular</em> el futuro, y el conocimiento pasa a estar en la función
-            que evalúa cómo de buena es una posición.
+            Todo esto se aplica en la <a href="../../practicas/practica-1.html">Práctica&nbsp;1</a>, escribiendo
+            los dos controladores a mano. En la <a href="../../practicas/practica-2.html">Práctica&nbsp;2</a> el mismo comportamiento se reescribe como
+            máquina de estados, y la comparación entre las dos versiones es, diría, el hilo de todo el curso.
           </p>
         </div>
       </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-recio-t2">J. A. Recio-García. <em>Tema 02. Repaso de conceptos de IA para videojuegos</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-t2" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
 
     </main>
 
@@ -224,9 +239,11 @@
         <nav aria-labelledby="en-esta-pagina">
           <h2 id="en-esta-pagina">En esta página</h2>
           <ol>
-            <li><a href="#reglas">Sistemas de reglas</a></li>
-            <li><a href="#borroso">Razonamiento borroso</a></li>
+            <li><a href="#buscar">Buscar caminos</a></li>
+            <li><a href="#decidir">Decidir</a></li>
+            <li><a href="#organizar">Organizar el comportamiento</a></li>
             <li><a href="#resumen">Lo que hay que llevarse</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
       </div>
@@ -245,7 +262,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

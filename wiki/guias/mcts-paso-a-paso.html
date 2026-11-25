@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Práctica 5 paso a paso</span>
   </nav>
@@ -78,19 +78,19 @@
         <li><a href="#alfabeta">Minimax con alfa-beta</a>, en tres pasos.</li>
         <li><a href="#mcts">MCTS</a>, en seis pasos.</li>
         <li><a href="#experimentar">Experimentar</a> con los dos: profundidades, parámetros y una heurística.</li>
-        <li><a href="#retos">Retos</a> a vuestra elección, de los once que se proponen o vuestros.</li>
+        <li><a href="#retos">Retos</a> a vuestra elección, de los diez que se proponen o vuestros.</li>
       </ol>
       <p>
         Antes de empezar, leed en los apuntes <a href="tema5/juegos.html">juegos por turnos</a> y
         <a href="tema5/mcts.html">Monte Carlo Tree Search</a>: aquí no se vuelve a explicar la teoría.
       </p>
 
-      <div class="marcador" data-marcador="10">
+      <div class="marcador" id="marcador" data-marcador="10">
         <div class="marcador-cabeza">
           <span class="marcador-titulo">Vuestro marcador</span>
           <span class="marcador-total"><b data-total>0</b> / 10</span>
         </div>
-        <div class="marcador-barra" aria-hidden="true"><span data-barra></span></div>
+        <div class="marcador-fila" aria-hidden="true"><div class="marcador-barra"><span data-barra></span></div><svg class="marcador-pac" viewBox="0 0 26 26"><path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/><path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/></svg></div>
         <p class="marcador-nota" data-mensaje>Tachad lo que tengáis hecho. Se queda guardado en este navegador.</p>
         <ul class="check marcador-guia" data-guardar="p5-marcador-guia">
           <li data-puntos="2"><a href="#alfabeta">Alfa-beta</a>: A1 a A3 en <code>BIEN</code> · 2</li>
@@ -98,16 +98,16 @@
           <li data-puntos="1"><a href="#experimentar">Experimentos</a>: uno con cada algoritmo · 1</li>
         </ul>
         <ul class="check marcador-retos" data-guardar="p5-marcador-retos-2" data-barajar="p5-retos">
-            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto1">El rival también elige</a></li>
-            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto2">Vuestra heurística</a></li>
-            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto4">Simulaciones que capturan</a></li>
-            <li data-puntos="1.75" data-grupo="retos"><img src="../assets/img/misiones/cristal-azul.webp" alt="" width="22" height="22"> <a href="#reto5">Gestionar el tiempo</a></li>
-            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto6">Reaprovechar el árbol</a></li>
-            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto7">Profundización iterativa</a></li>
-            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto8">Tabla de transposiciones</a></li>
-            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto9">Búsqueda de quietud</a></li>
-            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto10">Minimax implícito</a></li>
-            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto11">Un híbrido</a></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto1">El rival también elige</a> <span class="pts">+2,5</span></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto2">Vuestra heurística</a> <span class="pts">+2,5</span></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto4">Simulaciones que capturan</a> <span class="pts">+2,5</span></li>
+            <li data-puntos="1.75" data-grupo="retos"><img src="../assets/img/misiones/cristal-azul.webp" alt="" width="22" height="22"> <a href="#reto5">Gestionar el tiempo</a> <span class="pts">+1,75</span></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto6">Reaprovechar el árbol</a> <span class="pts">+2,5</span></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto7">Profundización iterativa</a> <span class="pts">+2,5</span></li>
+            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto8">Tabla de transposiciones</a> <span class="pts">+5</span></li>
+            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto9">Búsqueda de quietud</a> <span class="pts">+5</span></li>
+            <li data-puntos="5" data-grupo="retos"><img src="../assets/img/misiones/cristal-dorado.webp" alt="" width="22" height="22"> <a href="#reto10">Minimax implícito</a> <span class="pts">+5</span></li>
+            <li data-puntos="2.5" data-grupo="retos"><img src="../assets/img/misiones/cristal-violeta.webp" alt="" width="22" height="22"> <a href="#reto11">Un híbrido</a> <span class="pts">+2,5</span></li>
         </ul>
       </div>
 
@@ -119,7 +119,7 @@
         <p>
           Esta práctica es en <strong>Python</strong>, y el entorno es el <strong>ajedrez</strong>. Las reglas (jugadas
           legales, mate, enroque, captura al paso) las pone la biblioteca
-          <a href="https://python-chess.readthedocs.io/">python-chess</a>; vosotros sólo decidís qué jugar.
+          <a href="https://python-chess.readthedocs.io/">python-chess</a> <!--cite python-chess--><span class="cita">[<a href="#ref-python-chess" id="cita-python-chess">1</a>]</span><!--/cite-->; vosotros sólo decidís qué jugar.
         </p>
         <ul class="links">
           <li>
@@ -334,11 +334,11 @@ t.san(jugadas[<span class="n">0</span>])                      <span class="c"># 
             <figure class="tableros">
               <div><div class="tablero" role="img" aria-label="Blancas: rey en g1 y dama en d1. Negras: rey en g8 y peones en d5 y e6."><i>8</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♚</b></span><span class="o"></span><i>7</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>6</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><i>5</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>4</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>3</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>2</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>1</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="w">♛</b></span><span class="o"></span><span class="c"></span><span class="o"><b class="w">♚</b></span><span class="c"></span><i></i><i>a</i><i>b</i><i>c</i><i>d</i><i>e</i><i>f</i><i>g</i><i>h</i></div><p>La posición: 9 − 2 = <strong>+7</strong></p></div>
               <div><div class="tablero" role="img" aria-label="La dama blanca ha ido de d1 a d5 y se ha comido el peón."><i>8</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♚</b></span><span class="o"></span><i>7</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>6</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><i>5</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c m"><b class="w">♛</b></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>4</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>3</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>2</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>1</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c m"></span><span class="o"></span><span class="c"></span><span class="o"><b class="w">♚</b></span><span class="c"></span><i></i><i>a</i><i>b</i><i>c</i><i>d</i><i>e</i><i>f</i><i>g</i><i>h</i></div><p>La dama come en d5: <strong>+8</strong>. Profundidad 1 se para aquí</p></div>
-              <div><div class="tablero" role="img" aria-label="El peón negro ha ido de e6 a d5 y se ha comido la dama. Solo quedan los reyes y ese peón."><i>8</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♚</b></span><span class="o"></span><i>7</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>6</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c m"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>5</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c m"><b class="n">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>4</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>3</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>2</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>1</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"><b class="w">♚</b></span><span class="c"></span><i></i><i>a</i><i>b</i><i>c</i><i>d</i><i>e</i><i>f</i><i>g</i><i>h</i></div><p>El peón de e6 come la dama: <strong>−1</strong>. Esto solo lo ve profundidad 2</p></div>
+              <div><div class="tablero" role="img" aria-label="El peón negro ha ido de e6 a d5 y se ha comido la dama. Sólo quedan los reyes y ese peón."><i>8</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♚</b></span><span class="o"></span><i>7</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>6</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c m"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>5</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c m"><b class="n">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>4</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>3</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>2</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>1</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"><b class="w">♚</b></span><span class="c"></span><i></i><i>a</i><i>b</i><i>c</i><i>d</i><i>e</i><i>f</i><i>g</i><i>h</i></div><p>El peón de e6 come la dama: <strong>−1</strong>. Esto sólo lo ve profundidad 2</p></div>
             </figure>
             <ul>
               <li>
-                <strong>Profundidad 1</strong>: solo se mira la jugada de las blancas. Tras comer quedan 9 − 1 = +8, y
+                <strong>Profundidad 1</strong>: sólo se mira la jugada de las blancas. Tras comer quedan 9 − 1 = +8, y
                 no se ve nada más, así que <code>minimax</code> devuelve +8.
               </li>
               <li>
@@ -839,7 +839,7 @@ h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span
             minimax mira su profundidad tarde lo que tarde.</li>
         </ul>
         <p>
-          Los apuntes tienen <a href="tema5/mejoras.html#mandos">nuestras medidas</a>, con otra versión del MCTS. Mirad si
+          En los apuntes tenéis <a href="tema5/mejoras.html#mandos">las medidas que hice yo</a>, con otra versión del MCTS. Mirad si
           con la vuestra pasa lo mismo.
         </p>
 
@@ -872,8 +872,8 @@ CENTRO = [chess.D4, chess.E4, chess.D5, chess.E5]
         <p>
           Se usa con <code>Minimax(evaluar=evaluar_centro)</code>. Para el MCTS, una <code>recompensa_centro</code> como
           la del paso M1 con <code>material(tablero, color) + 0.1 * centro(tablero, color)</code> dentro de la sigmoide, y
-          <code>MCTS(recompensa=recompensa_centro)</code>. Con esta heurística no medimos ninguna diferencia: es un ejemplo
-          de cómo se mete una, no de una buena.
+          <code>MCTS(recompensa=recompensa_centro)</code>. Con esta heurística no he medido ninguna diferencia, así que
+          tomadla como un ejemplo de cómo se mete una, no como una heurística buena.
         </p>
       </section>
 
@@ -916,12 +916,12 @@ RIVALES = {
 <article class="mision" id="reto1">
   <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
   <div>
-    <h4>El rival también elige <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h4>
+    <h3>El rival también elige <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h3>
 <p>En el MCTS de la guía, todos los nodos guardan las recompensas desde vuestro punto de vista, y la selección siempre baja por el hijo con más media. En los niveles en que movéis vosotros está bien. Pero en los niveles en que mueve el rival, eso es suponer que el rival elige lo mejor <em>para vosotros</em>:</p>
     <figure><svg class="grafica" viewBox="0 0 520 200" role="img" aria-label="Un árbol: tras e4 mueven las negras, con dos respuestas. La A regala la dama y tiene una media de 0,90 para las blancas; la B es normal y tiene 0,50. La selección de la guía baja por la A, porque 0,90 es más. Un rival de verdad elige la B: para él, la A vale 1 − 0,90 = 0,10 y la B, 0,50."><line class="arista " x1="260" y1="46" x2="130" y2="96"/><line class="arista " x1="260" y1="46" x2="390" y2="96"/><rect class="caja marca" x="170" y="10" width="180" height="36" rx="4"/><text class="t" x="260.0" y="32.5" text-anchor="middle">Tras e4, mueven las negras</text><rect class="caja mala" x="40" y="96" width="180" height="42" rx="4"/><text class="t" x="130.0" y="114.0" text-anchor="middle">Respuesta A: regala la dama</text><text class="t" x="130.0" y="129.0" text-anchor="middle">media 0,90</text><rect class="caja buena" x="300" y="96" width="180" height="42" rx="4"/><text class="t" x="390.0" y="114.0" text-anchor="middle">Respuesta B: normal</text><text class="t" x="390.0" y="129.0" text-anchor="middle">media 0,50</text><text class="nota mala" x="130" y="160" text-anchor="middle">La guía baja por aquí:</text><text class="nota mala" x="130" y="176" text-anchor="middle">0,90 es más que 0,50</text><text class="nota buena" x="390" y="160" text-anchor="middle">Un rival de verdad juega esta:</text><text class="nota buena" x="390" y="176" text-anchor="middle">para él, A vale 0,10 y B, 0,50</text></svg></figure>
     <p>Con la guía, el MCTS visita sobre todo la respuesta A y cree que e4 vale casi 0,90: juega esperando un regalo. Lo que hay que hacer: en los niveles del rival, que la selección use <code>1 - media</code> en vez de la media. Una media de 0,90 para vosotros es 0,10 para él. Los apuntes lo cuentan en <a href="tema5/mcts.html#punto-de-vista">quién gana en cada nodo</a>.</p>
     <p>¿Cómo sabéis quién elige en un nodo? <code>nodo.color</code> es quien hizo la jugada que lleva a él. Si <code>nodo.color == self.yo</code>, esa jugada fue vuestra, así que ahora elige el rival.</p>
-    <p class="entrega"><b>Para conseguirlo:</b> una clase <code>MCTSRival</code> que cambia la selección, enfrentada al MCTS de la guía (en <code>RIVALES</code>). Contra los rivales de referencia apenas se nota; contra el de la guía, a nosotros nos ganó el 66&nbsp;%.</p>
+    <p class="entrega"><b>Para conseguirlo:</b> una clase <code>MCTSRival</code> que cambia la selección, enfrentada al MCTS de la guía (en <code>RIVALES</code>). Contra los rivales de referencia apenas se nota; contra el de la guía, en las partidas que he lanzado yo le ganó el 66&nbsp;%.</p>
     <details class="pista">
       <summary>Pista</summary>
 <p>No hace falta tocar el árbol ni la retropropagación: sólo cómo se elige el hijo. Lo más corto es una clase hija que redefine <code>seleccionar</code>.</p>
@@ -938,7 +938,7 @@ RIVALES = {
 <article class="mision" id="reto2">
   <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
   <div>
-    <h4>Vuestra heurística <span class="valor">+2,5</span> <span class="chip free">Los dos</span></h4>
+    <h3>Vuestra heurística <span class="valor">+2,5</span> <span class="chip free">Los dos</span></h3>
 <p><code>evaluar</code> y <code>recompensa</code> sólo cuentan piezas. Dos posiciones con el mismo material les parecen iguales, aunque en una estéis a punto de ganar:</p>
     <figure class="tableros">
 <div><div class="tablero" role="img" aria-label="Blancas: rey en g1 y peones en b7, f2, g2 y h2. Negras: rey en g8 y peones en a6, f7, g7 y h7. El peón de b7 está a una casilla de coronar."><i>8</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♚</b></span><span class="o"></span><i>7</i><span class="o"></span><span class="c m"><b class="w">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♟</b></span><span class="o"><b class="n">♟</b></span><span class="c"><b class="n">♟</b></span><i>6</i><span class="c"><b class="n">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>5</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>4</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>3</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>2</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"><b class="w">♟</b></span><span class="c"><b class="w">♟</b></span><span class="o"><b class="w">♟</b></span><i>1</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"><b class="w">♚</b></span><span class="c"></span><i></i><i>a</i><i>b</i><i>c</i><i>d</i><i>e</i><i>f</i><i>g</i><i>h</i></div><p>Material: 4 − 4 = 0. Pero el peón de b7 corona en la jugada siguiente</p></div>
@@ -969,7 +969,7 @@ RIVALES = {
 <article class="mision" id="reto4">
   <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
   <div>
-    <h4>Simulaciones que capturan <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h4>
+    <h3>Simulaciones que capturan <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h3>
 <p>La simulación juega al azar. Mirad lo que pasa con una dama regalada:</p>
     <figure class="tableros">
 <div><div class="tablero" role="img" aria-label="Juegan blancas. La dama negra está en f3, y la pueden comer el peón de g2 o la dama de d1. La casilla f3 va resaltada."><i>8</i><span class="c"><b class="n">♜</b></span><span class="o"><b class="n">♞</b></span><span class="c"><b class="n">♝</b></span><span class="o"></span><span class="c"><b class="n">♚</b></span><span class="o"><b class="n">♝</b></span><span class="c"><b class="n">♞</b></span><span class="o"><b class="n">♜</b></span><i>7</i><span class="o"><b class="n">♟</b></span><span class="c"><b class="n">♟</b></span><span class="o"><b class="n">♟</b></span><span class="c"><b class="n">♟</b></span><span class="o"></span><span class="c"><b class="n">♟</b></span><span class="o"><b class="n">♟</b></span><span class="c"><b class="n">♟</b></span><i>6</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>5</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"><b class="n">♟</b></span><span class="c"></span><span class="o"></span><span class="c"></span><i>4</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="w">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><i>3</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c m"><b class="n">♛</b></span><span class="o"></span><span class="c"></span><i>2</i><span class="c"><b class="w">♟</b></span><span class="o"><b class="w">♟</b></span><span class="c"><b class="w">♟</b></span><span class="o"><b class="w">♟</b></span><span class="c"></span><span class="o"><b class="w">♟</b></span><span class="c"><b class="w">♟</b></span><span class="o"><b class="w">♟</b></span><i>1</i><span class="o"><b class="w">♜</b></span><span class="c"><b class="w">♞</b></span><span class="o"><b class="w">♝</b></span><span class="c"><b class="w">♛</b></span><span class="o"><b class="w">♚</b></span><span class="c"><b class="w">♝</b></span><span class="o"></span><span class="c"><b class="w">♜</b></span><i></i><i>a</i><i>b</i><i>c</i><i>d</i><i>e</i><i>f</i><i>g</i><i>h</i></div><p>La dama negra de f3 está regalada. Sólo 2 de las 23 jugadas la comen: al azar, el 9 %</p></div>
@@ -994,7 +994,7 @@ RIVALES = {
 <article class="mision" id="reto5">
   <img src="../assets/img/misiones/cristal-azul.webp" alt="Cristal azul" width="80" height="80" loading="lazy">
   <div>
-    <h4>Gestionar el tiempo <span class="valor">+1,75</span> <span class="chip free">Los dos</span></h4>
+    <h3>Gestionar el tiempo <span class="valor">+1,75</span> <span class="chip free">Los dos</span></h3>
 <p>Ahora vuestros jugadores piensan igual en todas las jugadas: el MCTS gasta siempre casi todo el tiempo, y alfa-beta mira siempre a la misma profundidad. Pero no todas las jugadas lo merecen. Haced que vuestro jugador decida cuánto pensar según la jugada, con alguna regla como estas:</p>
     <ul>
       <li><b>Una sola jugada legal</b> (por ejemplo, para salir de un jaque): devolvedla sin pensar.</li>
@@ -1002,7 +1002,7 @@ RIVALES = {
       <li><b>Alfa-beta con pocas piezas</b>: con 10 o menos en el tablero hay pocas jugadas y cada nivel cuesta poco. Subid un nivel de profundidad.</li>
     </ul>
     <figure><svg class="grafica" viewBox="0 0 520 120" role="img" aria-label="Dos barras. La jugada más visitada lleva 500 visitas. La segunda lleva 150, y aunque se llevara las 300 iteraciones que quedan llegaría a 450: no alcanza a la primera."><text class="nota " x="140" y="31" text-anchor="end">la más visitada</text><rect class="barra " x="150" y="15" width="300.0" height="22" rx="3"/><text class="nota dentro" x="442.0" y="31" text-anchor="end">500</text><text class="nota " x="140" y="71" text-anchor="end">la segunda</text><rect class="barra " x="150" y="55" width="90.0" height="22" rx="3"/><rect class="barra hueco" x="240.0" y="55" width="180.0" height="22" rx="3"/><text class="nota dentro" x="232.0" y="71" text-anchor="end">150</text><text class="nota " x="330.0" y="71" text-anchor="middle">+ 300 que quedan</text><line class="limite" x1="450.0" x2="450.0" y1="8" y2="88"/><text class="nota " x="260" y="108" text-anchor="middle">150 + 300 = 450, menos que 500: ya está decidido</text></svg></figure>
-    <p>Las dos primeras ahorran tiempo; la tercera lo gasta donde antes sobraba. Ojo: una jugada que tarda más de 1,5 veces su tiempo pierde la partida.</p>
+    <p>Las dos primeras ahorran tiempo; la tercera lo gasta donde antes sobraba. Ojo: una jugada que tarda más de 1,5 veces su tiempo pierde la partida. Y en el <a href="../practicas/practica-5.html#concurso">concurso</a> hay además un reloj de 60 s para toda la partida, así que lo que ahorréis en unas jugadas os queda para otras.</p>
     <p class="entrega"><b>Para conseguirlo:</b> una regla como mínimo, y dos pasadas de <code>comparar.py</code>, sin ella y con ella. Contad cuántos minutos tarda cada pasada (lo dice al acabar) y si cambian los puntos.</p>
     <details class="pista">
       <summary>Pista</summary>
@@ -1020,7 +1020,7 @@ RIVALES = {
 <article class="mision" id="reto6">
   <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
   <div>
-    <h4>Reaprovechar el árbol del MCTS <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h4>
+    <h3>Reaprovechar el árbol del MCTS <span class="valor">+2,5</span> <span class="chip free">MCTS</span></h3>
 <p>Cada vez que os toca, <code>elegir</code> crea una raíz nueva y empieza de cero. Pero el árbol de vuestra jugada anterior ya había mirado la posición en la que estáis ahora: está dos niveles más abajo, tras vuestra jugada y la respuesta del rival.</p>
     <figure><svg class="grafica" viewBox="0 0 520 250" role="img" aria-label="El árbol de la jugada anterior. Desde la raíz, vuestra jugada e4 y, debajo, la respuesta del rival e5, las dos resaltadas. Debajo de e5 hay un subárbol con 180 visitas que se convierte en la nueva raíz. Las otras ramas, d4, Nf3, c5 y e6, se tiran."><line class="arista tenue" x1="260" y1="44" x2="100" y2="88"/><line class="arista marca" x1="260" y1="44" x2="260" y2="88"/><line class="arista tenue" x1="260" y1="44" x2="420" y2="88"/><line class="arista tenue" x1="260" y1="120" x2="160" y2="160"/><line class="arista marca" x1="260" y1="120" x2="260" y2="160"/><line class="arista tenue" x1="260" y1="120" x2="360" y2="160"/><rect class="caja " x="160" y="12" width="200" height="32" rx="4"/><text class="t" x="260.0" y="32.5" text-anchor="middle">Raíz de la jugada anterior</text><rect class="caja tenue" x="60" y="88" width="80" height="32" rx="4"/><text class="t" x="100.0" y="108.5" text-anchor="middle">d4</text><rect class="caja marca" x="205" y="88" width="110" height="32" rx="4"/><text class="t" x="260.0" y="108.5" text-anchor="middle">e4 (la vuestra)</text><rect class="caja tenue" x="380" y="88" width="80" height="32" rx="4"/><text class="t" x="420.0" y="108.5" text-anchor="middle">Nf3</text><rect class="caja tenue" x="120" y="160" width="80" height="32" rx="4"/><text class="t" x="160.0" y="180.5" text-anchor="middle">c5</text><rect class="caja marca" x="205" y="160" width="110" height="32" rx="4"/><text class="t" x="260.0" y="180.5" text-anchor="middle">e5 (la del rival)</text><rect class="caja tenue" x="320" y="160" width="80" height="32" rx="4"/><text class="t" x="360.0" y="180.5" text-anchor="middle">e6</text><path class="subarbol" d="M260,192 L215,236 L305,236 Z"/><text class="nota buena" x="320" y="222" text-anchor="start">nueva raíz: ya trae 180 visitas</text><text class="nota " x="60" y="222" text-anchor="start">lo demás se tira</text></svg></figure>
     <p>Lo que hay que hacer: guardar el árbol en el objeto y, al empezar la jugada siguiente, bajar por vuestra jugada y por la del rival. Si ese nodo está, es la nueva raíz y ya trae sus visitas. Si el rival jugó algo que el árbol no había probado, de cero.</p>
@@ -1044,7 +1044,7 @@ RIVALES = {
 <article class="mision" id="reto7">
   <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
   <div>
-    <h4>Profundización iterativa <span class="valor">+2,5</span> <span class="chip free">Alfa-beta</span></h4>
+    <h3>Profundización iterativa <span class="valor">+2,5</span> <span class="chip free">Alfa-beta</span></h3>
 <p><code>Minimax(profundidad=3)</code> mira siempre 3 niveles, le sobre tiempo o no. Y lo que tarda cada nivel cambia mucho: cada uno cuesta unas diez veces el anterior.</p>
     <figure><svg class="grafica" viewBox="0 0 520 190" role="img" aria-label="Lo que tarda alfa-beta en el medio juego de comprobar.py: profundidad 1, 0,0004 s; 2, 0,009 s; 3, 0,06 s; 4, 0,56 s. Con 0,3 s por jugada cabe la 3 pero no la 4, que pasa también de 0,45 s, donde la jugada pierde por tiempo."><text class="nota " x="110" y="33" text-anchor="end">profundidad 1</text><rect class="barra " x="120" y="18" width="1.5" height="22" rx="3"/><text class="nota " x="127.5" y="33" text-anchor="start">0,0004 s</text><text class="nota " x="110" y="65" text-anchor="end">profundidad 2</text><rect class="barra " x="120" y="50" width="5.1" height="22" rx="3"/><text class="nota " x="131.1" y="65" text-anchor="start">0,009 s</text><text class="nota " x="110" y="97" text-anchor="end">profundidad 3</text><rect class="barra " x="120" y="82" width="34.0" height="22" rx="3"/><text class="nota " x="160.0" y="97" text-anchor="start">0,06 s</text><text class="nota " x="110" y="129" text-anchor="end">profundidad 4</text><rect class="barra " x="120" y="114" width="317.33333333333337" height="22" rx="3"/><text class="nota " x="443.33333333333337" y="129" text-anchor="start">0,56 s</text><line class="limite ok" x1="290.0" x2="290.0" y1="8" y2="146"/><text class="nota buena" x="290.0" y="164" text-anchor="middle">0,3 s: vuestro tiempo</text><line class="limite" x1="375.0" x2="375.0" y1="8" y2="146"/><text class="nota mala" x="375.0" y="182" text-anchor="middle">0,45 s: perdéis por tiempo</text></svg></figure>
     <p class="nota-pie">Medido en el medio juego de <code>comprobar.py</code>, con 37 jugadas legales. En vuestro ordenador serán otros números, y en un final con pocas piezas, mucho menores.</p>
@@ -1067,7 +1067,7 @@ RIVALES = {
 <article class="mision" id="reto8">
   <img src="../assets/img/misiones/cristal-dorado.webp" alt="Cristal dorado" width="80" height="80" loading="lazy">
   <div>
-    <h4>Tabla de transposiciones <span class="valor">+5</span> <span class="chip free">Alfa-beta</span></h4>
+    <h3>Tabla de transposiciones <span class="valor">+5</span> <span class="chip free">Alfa-beta</span></h3>
 <p>A una misma posición se llega por caminos distintos. Estas dos secuencias acaban en el mismo tablero:</p>
 <figure><svg class="grafica" viewBox="0 0 520 120" role="img" aria-label="Dos caminos desde la posición inicial. Arriba: Nf3, Nf6, Nc3. Abajo: Nc3, Nf6, Nf3. Los dos llegan a la misma posición."><line class="arista " x1="70" y1="60" x2="110" y2="26"/><line class="arista " x1="70" y1="60" x2="110" y2="94"/><line class="arista " x1="164" y1="26" x2="186" y2="26"/><line class="arista " x1="240" y1="26" x2="262" y2="26"/><line class="arista " x1="164" y1="94" x2="186" y2="94"/><line class="arista " x1="240" y1="94" x2="262" y2="94"/><line class="arista marca" x1="316" y1="26" x2="370" y2="60"/><line class="arista marca" x1="316" y1="94" x2="370" y2="60"/><rect class="caja " x="10" y="44" width="60" height="32" rx="4"/><text class="t" x="40.0" y="64.5" text-anchor="middle">inicio</text><rect class="caja " x="110" y="12" width="54" height="28" rx="4"/><text class="t" x="137.0" y="30.5" text-anchor="middle">Nf3</text><rect class="caja " x="186" y="12" width="54" height="28" rx="4"/><text class="t" x="213.0" y="30.5" text-anchor="middle">Nf6</text><rect class="caja " x="262" y="12" width="54" height="28" rx="4"/><text class="t" x="289.0" y="30.5" text-anchor="middle">Nc3</text><rect class="caja " x="110" y="80" width="54" height="28" rx="4"/><text class="t" x="137.0" y="98.5" text-anchor="middle">Nc3</text><rect class="caja " x="186" y="80" width="54" height="28" rx="4"/><text class="t" x="213.0" y="98.5" text-anchor="middle">Nf6</text><rect class="caja " x="262" y="80" width="54" height="28" rx="4"/><text class="t" x="289.0" y="98.5" text-anchor="middle">Nf3</text><rect class="caja buena" x="370" y="42" width="140" height="36" rx="4"/><text class="t" x="440.0" y="64.5" text-anchor="middle">la misma posición</text></svg></figure>
     <figure class="tableros">
@@ -1103,7 +1103,7 @@ print(time.perf_counter() - inicio, "segundos")</code></pre>    <details class="
 <article class="mision" id="reto9">
   <img src="../assets/img/misiones/cristal-dorado.webp" alt="Cristal dorado" width="80" height="80" loading="lazy">
   <div>
-    <h4>Búsqueda de quietud <span class="valor">+5</span> <span class="chip free">Alfa-beta</span></h4>
+    <h3>Búsqueda de quietud <span class="valor">+5</span> <span class="chip free">Alfa-beta</span></h3>
 <p>Alfa-beta mira hasta su profundidad y ahí llama a <code>evaluar</code>, pase lo que pase en el tablero. Si la última jugada que mira es una captura, <code>evaluar</code> cuenta la pieza comida, pero no ve que os la devuelven en la jugada siguiente. Con las blancas a profundidad 1:</p>
     <figure class="tableros">
 <div><div class="tablero" role="img" aria-label="Blancas: rey en g1 y dama en c1. Negras: rey en g8, caballo en c6 y peón en b7, que defiende al caballo."><i>8</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"><b class="n">♚</b></span><span class="o"></span><i>7</i><span class="o"></span><span class="c"><b class="n">♟</b></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>6</i><span class="c"></span><span class="o"></span><span class="c"><b class="n">♞</b></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>5</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>4</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>3</i><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><i>2</i><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"></span><i>1</i><span class="o"></span><span class="c"></span><span class="o"><b class="w">♛</b></span><span class="c"></span><span class="o"></span><span class="c"></span><span class="o"><b class="w">♚</b></span><span class="c"></span><i></i><i>a</i><i>b</i><i>c</i><i>d</i><i>e</i><i>f</i><i>g</i><i>h</i></div><p>La posición: 9 − 4 = <strong>+5</strong></p></div>
@@ -1139,34 +1139,34 @@ print(time.perf_counter() - inicio, "segundos")</code></pre>    <details class="
 <article class="mision" id="reto10">
   <img src="../assets/img/misiones/cristal-dorado.webp" alt="Cristal dorado" width="80" height="80" loading="lazy">
   <div>
-    <h4>Minimax implícito <span class="valor">+5</span> <span class="chip free">MCTS</span></h4>
-<p>En el MCTS, lo que vale un nodo es la media de sus simulaciones. La media tarda en reaccionar: si una sola respuesta del rival tumba vuestra jugada, se diluye entre todas las demás visitas. Minimax implícito guarda en cada nodo, además, un segundo valor calculado como en minimax: en un nodo nuevo, la <code>recompensa</code> de la posición; en los demás, el mejor de sus hijos para quien elige en ese nodo. La selección mezcla los dos con un peso que llamaremos α, entre 0 y 1:</p>
-<pre class="cuenta">valor = (1 − α) · media + α · minimax</pre>
+    <h3>Minimax implícito <span class="valor">+5</span> <span class="chip free">MCTS</span></h3>
+<p>En el MCTS, lo que vale un nodo es la media de sus simulaciones. La media tarda en reaccionar: si una sola respuesta del rival tumba vuestra jugada, se diluye entre todas las demás visitas. Minimax implícito <!--cite lanctot-implicito--><span class="cita">[<a href="#ref-lanctot-implicito" id="cita-lanctot-implicito">2</a>]</span><!--/cite--> guarda en cada nodo, además, un segundo valor calculado como en minimax: en un nodo nuevo, la <code>recompensa</code> de la posición; en los demás, el mejor de sus hijos para quien elige en ese nodo. La selección mezcla los dos con un peso que llamaremos λ, entre 0 y 1:</p>
+<pre class="cuenta">valor = (1 − λ) · media + λ · minimax</pre>
     <p>Un ejemplo:</p>
 <pre class="cuenta">media de e4 tras 100 visitas:            0,62
 minimax de e4 (la mejor respuesta rival):  0,20
-con α = 0,8:   0,2 · 0,62 + 0,8 · 0,20
+con λ = 0,8:   0,2 · 0,62 + 0,8 · 0,20
              = 0,124 + 0,16
              = 0,28</pre>
-    <p>La media dice que e4 está bien; minimax ha encontrado una respuesta que la tumba, y la mezcla le hace caso. Los apuntes lo explican con una demo en <a href="tema5/mejoras.html#minimax">minimax implícito</a>. Es lo que más subió contra AlfaBeta2 cuando preparamos la práctica.</p>
-    <p class="entrega"><b>Para conseguirlo:</b> el minimax implícito, con un α elegido midiendo (al menos tres valores), contra el MCTS de la guía y contra AlfaBeta2.</p>
+    <p>La media dice que e4 está bien; minimax ha encontrado una respuesta que la tumba, y la mezcla le hace caso. Los apuntes lo explican con una demo en <a href="tema5/mejoras.html#minimax">minimax implícito</a>. Es lo que más subió contra AlfaBeta2 cuando preparé la práctica.</p>
+    <p class="entrega"><b>Para conseguirlo:</b> el minimax implícito, con un λ elegido midiendo (al menos tres valores), contra el MCTS de la guía y contra AlfaBeta2.</p>
     <details class="pista">
       <summary>Pista</summary>
-<p>Necesita antes el reto <a href="#reto1">El rival también elige</a>, porque minimax tiene que saber quién elige en cada nivel. Empezad con α = 0,8.</p>
+<p>Necesita antes el reto <a href="#reto1">El rival también elige</a>, porque minimax tiene que saber quién elige en cada nivel. Empezad con λ = 0,8.</p>
 <pre class="pseudo"><b>al expandir</b> un hijo:
     hijo.minimax = <span class="fn">recompensa</span> de su posición
 <b>al retropropagar</b>, en cada nodo que ya tiene hijos:
     nodo.minimax = el mejor hijo.minimax para quien elige en nodo
 <b>al seleccionar</b>:
-    puntos(hijo) = (1 − α) · media + α · minimax + exploración</pre>
+    puntos(hijo) = (1 − λ) · media + λ · minimax + exploración</pre>
     </details>
   </div>
 </article>
 <article class="mision" id="reto11">
   <img src="../assets/img/misiones/cristal-violeta.webp" alt="Cristal violeta" width="80" height="80" loading="lazy">
   <div>
-    <h4>Un híbrido <span class="valor">+2,5</span> <span class="chip free">Los dos</span></h4>
-<p>Cada algoritmo falla en algo distinto. El MCTS ve lejos, pero sus simulaciones al azar no ven una pieza colgada (lo de "Simulaciones que capturan"). Alfa-beta no se deja ni una táctica corta, pero no ve más allá de su profundidad. La idea: un MCTS que, en vez de simular al azar, valora el nodo nuevo con un alfa-beta corto.</p>
+    <h3>Un híbrido <span class="valor">+2,5</span> <span class="chip free">Los dos</span></h3>
+<p>Cada algoritmo falla en algo distinto. El MCTS ve lejos, pero sus simulaciones al azar no ven una pieza colgada (lo de "Simulaciones que capturan"). Alfa-beta no se deja ni una táctica corta, pero no ve más allá de su profundidad. La idea es hacer un MCTS que, en vez de simular al azar, valora el nodo nuevo con un alfa-beta corto.</p>
     <figure><ol class="fases" aria-label="Las cuatro fases del MCTS; en el híbrido, la simulación al azar se cambia por un alfa-beta corto.">
   <li>Selección</li><li>Expansión</li>
   <li class="cambia"><s>Simulación al azar</s><b>Alfa-beta de profundidad 2</b></li>
@@ -1224,6 +1224,16 @@ con α = 0,8:   0,2 · 0,62 + 0,8 · 0,20
         </div>
       </section>
 
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-python-chess">N. Fiekas. <em>python-chess: a chess library for Python</em>. documentación, 2026. <a href="https://python-chess.readthedocs.io/">python-chess.readthedocs.io</a> <a class="volver" href="#cita-python-chess" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-lanctot-implicito">M. Lanctot, M. H. M. Winands, T. Pepels y N. R. Sturtevant. "Monte Carlo Tree Search with Heuristic Evaluations using Implicit Minimax Backups". <em>IEEE Conference on Computational Intelligence and Games (CIG 2014), 1–8</em>, 2014. <a class="volver" href="#cita-lanctot-implicito" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
       <nav class="pager" aria-label="Práctica 5">
         <a class="pager-prev" href="../practicas/practica-5.html"><span class="pager-l">El enunciado</span><span class="pager-t">Práctica 5</span></a>
         <a class="pager-next" href="tema5/index.html"><span class="pager-l">Los apuntes</span><span class="pager-t">Juegos por turnos</span></a>
@@ -1244,8 +1254,34 @@ con α = 0,8:   0,2 · 0,62 + 0,8 · 0,20
             <li><a href="#experimentar">Tercera parte: experimentad</a></li>
             <li><a href="#retos">Cuarta parte: los retos</a></li>
             <li><a href="#versiones">Las versiones</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
+        <section class="marcador marcador-rail" data-espejo="marcador" aria-labelledby="marcador-rail-t">
+          <div class="marcador-cabeza">
+            <h2 id="marcador-rail-t">Marcador</h2>
+            <span class="marcador-total"><b data-total>0</b> / 10</span>
+          </div>
+          <div class="marcador-fila" aria-hidden="true"><div class="marcador-barra"><span data-barra></span></div><svg class="marcador-pac" viewBox="0 0 26 26"><path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/><path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/></svg></div>
+          <ul class="marcador-bonus">
+            <li><a href="#alfabeta">Alfa-beta</a><span class="pts">2</span></li>
+            <li><a href="#mcts">MCTS</a><span class="pts">2</span></li>
+            <li><a href="#experimentar">Experimentos</a><span class="pts">1</span></li>
+          </ul>
+          <p class="marcador-bonus-t">Retos · los tres mejores</p>
+          <ul class="marcador-bonus" data-barajar="p5-retos">
+              <li><a href="#reto1">El rival también elige</a><span class="pts">+2,5</span></li>
+              <li><a href="#reto2">Vuestra heurística</a><span class="pts">+2,5</span></li>
+              <li><a href="#reto4">Simulaciones que capturan</a><span class="pts">+2,5</span></li>
+              <li><a href="#reto5">Gestionar el tiempo</a><span class="pts">+1,75</span></li>
+              <li><a href="#reto6">Reaprovechar el árbol</a><span class="pts">+2,5</span></li>
+              <li><a href="#reto7">Profundización iterativa</a><span class="pts">+2,5</span></li>
+              <li><a href="#reto8">Tabla de transposiciones</a><span class="pts">+5</span></li>
+              <li><a href="#reto9">Búsqueda de quietud</a><span class="pts">+5</span></li>
+              <li><a href="#reto10">Minimax implícito</a><span class="pts">+5</span></li>
+              <li><a href="#reto11">Un híbrido</a><span class="pts">+2,5</span></li>
+          </ul>
+        </section>
         <nav aria-labelledby="de-la-practica">
           <h2 id="de-la-practica">Práctica 5</h2>
           <ol>
@@ -1276,7 +1312,7 @@ con α = 0,8:   0,2 · 0,62 + 0,8 · 0,20
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

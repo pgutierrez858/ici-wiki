@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Probar y competir</span>
   </nav>
@@ -61,9 +61,9 @@
       <span class="thin">Cómo medir lo que hacen, cómo se juega el concurso y de dónde sale el punto extra.</span>
     </h1>
     <p class="standfirst">
-      Un controlador no se juzga viéndolo jugar una partida: se juzga con la media de unos cuantos cientos.
-      Aquí está cómo montar esas pruebas, cómo se ejecuta el concurso de todos contra todos con el que se
-      cierra cada práctica, con qué cuenta exacta sale el punto extra, y qué herramientas trae el motor para
+      Para juzgar un controlador no basta con verlo jugar una partida, hace falta la media de unos cuantos
+      cientos. Aquí veremos cómo montar esas pruebas, cómo se ejecuta el concurso de todos contra todos con el que se
+      cierra cada práctica, con qué cuenta exacta sale el punto extra y qué herramientas trae el motor para
       guardar métricas, depurar y ver lo que está pasando.
     </p>
     <div class="byline">
@@ -200,8 +200,8 @@
             <thead><tr><th scope="col">Método de <code>Stats</code></th><th scope="col">Qué es</th></tr></thead>
             <tbody>
               <tr><td><code>getAverage()</code></td><td>La media de todas las partidas. Es el número con el que se ordenan los rankings del concurso.</td></tr>
-              <tr><td><code>getStandardDeviation()</code></td><td>Cuánto se separan unas <strong>partidas</strong> de otras. Es lo irregular que es vuestro controlador, así que jugar más partidas <em>no</em> la baja: no mide el experimento, os mide a vosotros.</td></tr>
-              <tr><td><code>getStandardError()</code></td><td>Lo mismo pero un piso más arriba: cuánto se separarían unas <strong>medias</strong> de otras si repitierais el experimento entero. Sale de dividir la anterior por la raíz de las partidas jugadas, y es <strong>el número que decide si una mejora es real</strong>. Explicado justo debajo.</td></tr>
+              <tr><td><code>getStandardDeviation()</code></td><td>Cuánto se separan unas <strong>partidas</strong> de otras. Es lo irregular que es vuestro controlador, así que jugar más partidas <em>no</em> la baja (lo que mide es a vosotros, no al experimento).</td></tr>
+              <tr><td><code>getStandardError()</code></td><td>Lo mismo pero un piso más arriba: cuánto se separarían unas <strong>medias</strong> de otras si repitierais el experimento entero. Sale de dividir la anterior por la raíz de las partidas jugadas, y es <strong>el número que decide si una mejora es real</strong> (lo explico justo debajo).</td></tr>
               <tr><td><code>getN()</code></td><td>Partidas que han contado de verdad. Si salen menos de las que pedisteis, ha habido excepciones.</td></tr>
               <tr><td><code>getMin()</code> · <code>getMax()</code></td><td>La peor y la mejor de todas las partidas. La peor dice más: si es 0, hay partidas en las que Ms.&nbsp;Pac-Man muere sin comerse una sola píldora.</td></tr>
               <tr><td><code>getMsTaken()</code></td><td>Lo que ha tardado el experimento entero, en milisegundos. Dividido entre las partidas da lo que cuesta una, que es lo que hay que saber antes de planificar: no lo estiméis a ojo, porque depende muchísimo de lo que haga vuestro controlador y de cuánto sobreviva. Como referencia, el concurso de la Práctica&nbsp;0 jugó 44&#8239;100 partidas en menos de un minuto repartidas entre todos los núcleos, con controladores que se mueren pronto.</td></tr>
@@ -254,9 +254,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
             </div>
             <p>
               Conviene leer esa igualdad despacio, porque es la que contesta a la pregunta obvia: el error
-              típico <strong>es</strong> una desviación típica. No es una media, ni se comporta "como si"
-              fuera nada: es la desviación típica de otra cosa (de las medias en vez de las partidas), y por
-              eso se le aplican las mismas reglas que a cualquier desviación típica.
+              típico <strong>es</strong> una desviación típica, sólo que de otra cosa (de las medias en vez
+              de las partidas), y por eso se le aplican las mismas reglas que a cualquier desviación típica.
             </p>
             <p>
               Falta justificar el segundo igual, que es de donde sale la raíz. Llamemos <!--tex \sigma --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi></mrow><annotation encoding="application/x-tex">\sigma</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span></span></span></span><!--/tex--> a la
@@ -350,7 +349,7 @@ c5.3,-9.3,12,-14,20,-14
 H400000v40H845.2724
 s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span><!--/tex--> (cien pasos en direcciones aleatorias te
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span><!--/tex--> (cien pasos en direcciones aleatorias os
               dejan a diez del origen, no a cien), y al dividir la suma entre <!--tex n --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span><!--/tex--> queda <!--tex \sigma/\sqrt{n} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mi mathvariant="normal">/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">\sigma/\sqrt{n}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0503em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="mord">/</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
 c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
 c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
@@ -385,7 +384,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
               </p>
             </div>
             <p>
-              Ejemplo. Medís vuestra versión actual con 100 partidas y <code>Stats</code> os da una media de
+              Veamos un ejemplo. Medís vuestra versión actual con 100 partidas y <code>Stats</code> os da una media de
               <strong>3&#8239;850</strong> y una desviación típica de <strong>2&#8239;100</strong>:
             </p>
             <div class="formula">
@@ -424,12 +423,12 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
               mayoría y una cola larga hacia arriba cuando la píldora de poder sale bien.
             </p>
             <p>
-              Y ahí es donde encaja todo: la desviación típica <em>de esa campana</em> (la campana de las
-              medias, no la de las partidas) es exactamente el error típico. Por eso la regla del 68 y el 95,
-              que es una regla sobre desviaciones típicas, se lee directamente con él.
+              Y con esto ya encajan las piezas, porque la desviación típica <em>de esa campana</em> (la campana
+              de las medias, no la de las partidas) es exactamente el error típico, así que la regla del 68 y
+              el 95, que es una regla sobre desviaciones típicas, se lee directamente con él.
             </p>
             <div class="note tip">
-              <span class="note-label">Y no hace falta creérselo: se comprueba</span>
+              <span class="note-label">Y no hace falta creérselo, se puede comprobar</span>
               <p>
                 Si el error típico es la desviación típica de las medias, hay una forma directa de verlo:
                 conseguid unas cuantas medias y calculadles la desviación típica. Lanzad veinte veces
@@ -536,7 +535,7 @@ H400000v40H845.2724
 s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
 M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathit">ET</span></span></span></span></span><!--/tex--></td>
-                    <td><strong>Esto ya no es un paso de la cuenta: es una suposición</strong>, y la única de las cinco filas. Los dos errores típicos no tienen por qué ser iguales; si se parecen, se puede sacar factor común y queda un <!--tex \sqrt{2} \approx 1,41 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mn>2</mn></msqrt><mo>≈</mo><mn>1,41</mn></mrow><annotation encoding="application/x-tex">\sqrt{2} \approx 1{,}41</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">2</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+                    <td><strong>Ojo, que esta fila es una suposición y no un paso de la cuenta</strong> (la única de las cinco). Los dos errores típicos no tienen por qué ser iguales; si se parecen, se puede sacar factor común y queda un <!--tex \sqrt{2} \approx 1,41 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mn>2</mn></msqrt><mo>≈</mo><mn>1,41</mn></mrow><annotation encoding="application/x-tex">\sqrt{2} \approx 1{,}41</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">2</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
 c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
 c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
 c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
@@ -615,9 +614,9 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
               <!--tex \displaystyle \text{creedla sólo si}\quad \lvert \text{media nueva} - \text{media vieja} \rvert > 3 \times \text{error típico} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mrow><mtext>creedla s</mtext><mover accent="true"><mtext>o</mtext><mo>ˊ</mo></mover><mtext>lo si</mtext></mrow><mspace width="1em"/><mo stretchy="false">∣</mo><mtext>media nueva</mtext><mo>−</mo><mtext>media vieja</mtext><mo stretchy="false">∣</mo><mo>&gt;</mo><mn>3</mn><mo>×</mo><mrow><mtext>error t</mtext><mover accent="true"><mtext>ı</mtext><mo>ˊ</mo></mover><mtext>pico</mtext></mrow></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle \text{creedla sólo si}\quad \lvert \text{media nueva} - \text{media vieja} \rvert &gt; 3 \times \text{error típico}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">creedla s</span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">o</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">lo si</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">∣</span><span class="mord text"><span class="mord">media nueva</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">media vieja</span></span><span class="mclose">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">error t</span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord latin_fallback">ı</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">pico</span></span></span></span></span><!--/tex-->
             </div>
             <p>
-              En el ejemplo, <!--tex 3 \times 210 = 630 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>×</mo><mn>210</mn><mo>=</mo><mn>630</mn></mrow><annotation encoding="application/x-tex">3 \times 210 = 630</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">210</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">630</span></span></span></span><!--/tex-->, y vosotros habéis sacado 130. <strong>No habéis mejorado nada,
-              habéis cambiado de ruido</strong>: con esas dos medidas, la versión nueva y la vieja son
-              indistinguibles. Y si algún día os sale justo por encima del umbral, repetid las dos medidas
+              En el ejemplo, <!--tex 3 \times 210 = 630 --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>×</mo><mn>210</mn><mo>=</mo><mn>630</mn></mrow><annotation encoding="application/x-tex">3 \times 210 = 630</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">210</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">630</span></span></span></span><!--/tex-->, y vosotros habéis sacado 130, así que <strong>no habéis mejorado
+              nada</strong> (lo único que ha cambiado es el ruido): con esas dos medidas, la versión nueva y la
+              vieja son indistinguibles. Y si algún día os sale justo por encima del umbral, repetid las dos medidas
               antes de celebrarlo.
             </p>
             <div class="note tip">
@@ -627,10 +626,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
                 un umbral cambia cómo juega. Lo que se ve en los datos es que <strong>el error típico va de
                 la mano de la media</strong>: en los 21 controladores del concurso de la
                 <a href="../practicas/practica-0.html#entregado">Práctica&nbsp;0</a> los dos números
-                correlacionan un <strong>0,98</strong>. Quien puntúa más, varía más.
+                correlacionan un <strong>0,98</strong>, o sea que quien puntúa más también varía más.
               </p>
               <p>
-                Y eso salva el atajo donde hace falta. Dos versiones que puntúan parecido
+                Y eso hace que el atajo funcione justo donde hace falta. Dos versiones que puntúan parecido
                 tienen errores típicos parecidos: entre los catorce primeros de aquella tabla, dos vecinos
                 nunca se separan más de un 23&#8239;%. Y cuando los errores típicos sí se separan de verdad
                 es porque las medias también lo han hecho, y entonces no hace falta ninguna prueba para ver
@@ -747,8 +746,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
             <p>
               Conviene tener esta tabla a mano antes de ponerse a medir: dice, para cada número de
               partidas, cuál es la mejora más pequeña que podríais llegar a ver. Está calculada con una
-              desviación típica de 2&#8239;000 puntos, que es un orden de magnitud razonable; la vuestra os
-              la dice <code>getStandardDeviation()</code>:
+              desviación típica de 2&#8239;000 puntos, que diría que es un orden de magnitud razonable (la vuestra os
+              la dice <code>getStandardDeviation()</code>):
             </p>
             <div class="table-scroll">
               <table class="ancha">
@@ -782,7 +781,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
           <p>
             El <code>Executor</code> crea su <code>Random</code> sin semilla, así que
             <strong>dos ejecuciones del mismo experimento no dan el mismo número</strong> y dos controladores
-            distintos no juegan las mismas partidas. No es un fallo: es lo que obliga a mirar medias de
+            distintos no juegan las mismas partidas. No es un fallo, y de hecho es lo que obliga a mirar medias de
             muchas partidas en vez de casos. Si al comparar dos versiones os sale una diferencia pequeña,
             volved a lanzar las dos antes de creérosla.
           </p>
@@ -1092,8 +1091,8 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
             Comparad las dos tablas. Los <strong>segundos</strong> fantasmas se llevan el medio punto entero
             porque quedaron a quince puntos del primero: en la práctica empataron. La <strong>segunda</strong>
             Ms.&nbsp;Pac-Man se lleva 0,19 porque la primera le sacó casi el doble. La nota va por lo cerca
-            que quedasteis del mejor, y eso es deliberado:
-            quedar segundo a un palmo vale casi tanto como ganar, y quedar segundo a media tabla de
+            que quedasteis del mejor, y lo he hecho así a propósito, para que
+            quedar segundo a un palmo valga casi tanto como ganar, y quedar segundo a media tabla de
             distancia, no.
           </p>
         </div>
@@ -1120,7 +1119,7 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
                 <td>Mismo punto para los dos. No hay desempate.</td>
               </tr>
               <tr>
-                <td>Sólo hay dos participantes, o todos empatan</td>
+                <td>Sólo hay un participante, o todos empatan</td>
                 <td>Si <em>mejor</em> y <em>peor</em> coinciden, todo el mundo se lleva el medio punto.</td>
               </tr>
               <tr>
@@ -1245,7 +1244,7 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
     GameView.addLines (game, Color.CYAN,   miNodo, nodoDelFantasmaQueMePreocupa);
 }</code></pre></div>
         <p>
-          Lo importante no es pintar el camino bueno: es pintar <strong>lo que el controlador ha descartado</strong>. Un
+          Lo que más ayuda, más que pintar el camino bueno, es pintar <strong>lo que el controlador ha descartado</strong>. Un
           controlador que se queda encerrado sin motivo aparente os lo explica solo en cuanto veis de rojo los
           tres tramos que ha dado por cerrados.
         </p>
@@ -1262,7 +1261,7 @@ es.ucm.fdi.ici.c2627.practica1.grupoB.Ghosts</code></pre></div>
           <p>
             En una partida suelta da igual. En las decenas de miles de partidas de un concurso,
             <strong>se acaba la memoria y se cae la ejecución entera</strong>, la vuestra y la de todos los
-            demás. Pasó con las entregas de la Práctica&nbsp;0 la primera vez que se lanzó el concurso con 100
+            demás. Me pasó con las entregas de la Práctica&nbsp;0 la primera vez que lancé el concurso con 100
             partidas por emparejamiento. Por eso "apagad la depuración" está en la lista de comprobación de la
             entrega, y por eso el interruptor tiene que envolver <em>la llamada</em>, no ir por dentro.
           </p>
@@ -1469,7 +1468,7 @@ executor.replayGame(<span class="s">"partida-rara.txt"</span>, <span class="k">t
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

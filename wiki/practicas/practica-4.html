@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -57,11 +57,11 @@
 
   <header class="masthead">
     <h1>
-      Razonamiento borroso
+      Práctica 4 · Razonamiento borroso
       <span class="thin">Reglas que se activan a medias, y versiones que se miden contra los mismos rivales.</span>
     </h1>
     <p class="standfirst">
-      El objetivo de esta práctica es implementar los comportamientos de Ms.&nbsp;Pac-Man y de los fantasmas
+      En esta práctica vais a implementar los comportamientos de Ms.&nbsp;Pac-Man y de los fantasmas
       mediante <strong>lógica borrosa</strong>, con reglas escritas en FCL y evaluadas por jFuzzyLogic. Como en las
       dos prácticas anteriores, lo que más pesa es <strong>cómo llegáis</strong> al controlador final: saber qué
       reglas se activan y qué sale de ellas, y saber si cada versión es mejor que la anterior, con números.
@@ -87,8 +87,8 @@
       <dd>Completa<small>Como en las prácticas anteriores</small></dd>
     </div>
     <div class="fact">
-      <dt>Para empezar</dt>
-      <dd>Siete reglas<small>Un ejemplo guiado, con su proyecto</small></dd>
+      <dt>Guía paso a paso</dt>
+      <dd><a href="../guias/borroso-paso-a-paso.html">Siete reglas<span class="arrow" aria-hidden="true">&#8594;</span></a><small>Un ejemplo guiado, con su proyecto</small></dd>
     </div>
   </dl>
 
@@ -127,7 +127,7 @@
         <div class="note tip">
           <span class="note-label">Antes de empezar</span>
           <p>
-            Leed <a href="../guias/tema2/borroso-mspacman.html"><strong>Lógica borrosa en Ms.&nbsp;Pac-Man</strong></a>,
+            Leed <a href="../guias/tema4/borroso-mspacman.html"><strong>Lógica borrosa en Ms.&nbsp;Pac-Man</strong></a>,
             en los apuntes del tema 4: el formato FCL y el paquete <code>fuzzy</code> pieza a pieza. Y después haced
             entera la guía <a href="../guias/borroso-paso-a-paso.html"><strong>Ms.&nbsp;Pac-Man con siete reglas
             borrosas</strong></a>, con su proyecto descargado y abierto: es el punto de partida de la práctica.
@@ -405,8 +405,8 @@ Ruido (+27, umbral 114). Repetida: +120, umbral 115. No me lo creo.
 Traza: t=61 va a la ppill con el fantasma a 69. NOT lejos vale 0,44.
 Al concurso va v0. Siguiente: v2 con "peligro IS cerca".</code></pre>
         <p>
-          Están el porqué de cada regla, un empate que pilló un caso y cómo se arregló, una mejora pequeña confirmada
-          repitiendo, la traza explicando por qué una regla no sirve y una versión descartada. Eso es lo que se pide.
+          Ahí está el porqué de cada regla, un empate que pilló un caso y cómo se arregló, una mejora pequeña confirmada
+          repitiendo, la traza explicando por qué una regla no sirve y una versión descartada, que es más o menos lo que se pide.
         </p>
       </section>
 
@@ -528,7 +528,7 @@ Al concurso va v0. Siguiente: v2 con "peligro IS cerca".</code></pre>
         <div class="note mine rail-nota">
           <span class="note-label">El tema</span>
           <p style="margin:0">
-            <a href="../guias/tema2/borroso.html">Razonamiento borroso</a>: conjuntos, inferencia, desdifuminar y FCL,
+            <a href="../guias/tema4/borroso.html">Razonamiento borroso</a>: conjuntos, inferencia, desdifuminar y FCL,
             con bancos de pruebas en la página.
           </p>
         </div>
@@ -555,7 +555,7 @@ Al concurso va v0. Siguiente: v2 con "peligro IS cerca".</code></pre>
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 23 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Código Secreto como problema · Tema bonus · ICI</title>
+<meta name="description" content="Código Secreto como problema de IA: las reglas, el jefe de espías y el agente, qué cambia si los dos conocen la estrategia del otro, por qué no sirven tal cual las técnicas de los otros temas y dónde se usan estas ideas, de Scribblenauts a Contexto y la competición de bots.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema bonus</a>
+    <span aria-hidden="true">/</span>
+    <span>Código Secreto como problema</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema bonus · 01 · Juegos de lenguaje</p>
+    <h1>
+      Código Secreto como problema
+      <span class="thin">Un juego en el que las acciones son palabras.</span>
+    </h1>
+    <p class="standfirst">
+      Antes de programar nada, el juego: quién ve qué, qué se puede decir y por qué dar una buena pista es tan difícil (también para las personas). Y una suposición que nos va a acompañar todo el tema: que los dos agentes de cada equipo conocen la estrategia del otro.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="juego" data-corto="El juego">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">El juego</h2>
+        </div>
+        <p>
+          Código Secreto (Codenames en inglés) es un juego de mesa de Vlaada Chvátil de 2015, que en castellano edita Devir <!--cite chvatil-codenames--><span class="cita">[<a href="#ref-chvatil-codenames" id="cita-chvatil-codenames">1</a>]</span><!--/cite-->.
+          Hay dos equipos, el rojo y el azul, y en la mesa 25 cartas con una palabra cada una. En cada equipo hay un
+          <strong>jefe de espías</strong> y uno o más <strong>agentes</strong>. Los dos jefes de espías ven una tarjeta que
+          dice de quién es cada carta, y los agentes no:
+        </p>
+        <div class="cn-dos">
+          <figure class="cn-fig">
+            <figcaption>Lo que ven los agentes</figcaption>
+            <div class="cn-tablero" style="--cols:5"><div class="cn-carta"><span class="cn-w">ORO</span></div><div class="cn-carta"><span class="cn-w">PALACIO</span></div><div class="cn-carta"><span class="cn-w">ROSA</span></div><div class="cn-carta"><span class="cn-w">COPA</span></div><div class="cn-carta"><span class="cn-w">COHETE</span></div><div class="cn-carta"><span class="cn-w">DIAMANTE</span></div><div class="cn-carta"><span class="cn-w">MALETA</span></div><div class="cn-carta"><span class="cn-w">PERRO</span></div><div class="cn-carta"><span class="cn-w">MÉDICO</span></div><div class="cn-carta"><span class="cn-w">SAL</span></div><div class="cn-carta"><span class="cn-w">CABALLO</span></div><div class="cn-carta"><span class="cn-w">PELO</span></div><div class="cn-carta"><span class="cn-w">CEBOLLA</span></div><div class="cn-carta"><span class="cn-w">PIERNA</span></div><div class="cn-carta"><span class="cn-w">CORONA</span></div><div class="cn-carta"><span class="cn-w">ZORRO</span></div><div class="cn-carta"><span class="cn-w">DIENTE</span></div><div class="cn-carta"><span class="cn-w">PARQUE</span></div><div class="cn-carta"><span class="cn-w">QUESO</span></div><div class="cn-carta"><span class="cn-w">ÓPERA</span></div><div class="cn-carta"><span class="cn-w">ÁNGEL</span></div><div class="cn-carta"><span class="cn-w">TABLA</span></div><div class="cn-carta"><span class="cn-w">COMETA</span></div><div class="cn-carta"><span class="cn-w">CAJA</span></div><div class="cn-carta"><span class="cn-w">LÁMPARA</span></div></div>
+          </figure>
+          <figure class="cn-fig">
+            <figcaption>Lo que ven los jefes de espías</figcaption>
+            <div class="cn-tablero" style="--cols:5"><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">ORO</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">PALACIO</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">ROSA</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">COPA</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">COHETE</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">DIAMANTE</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">MALETA</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">PERRO</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">MÉDICO</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">SAL</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">CABALLO</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">PELO</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">CEBOLLA</span></div><div class="cn-carta cn-X clave"><span class="cn-tipo">asesino</span><span class="cn-w">PIERNA</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">CORONA</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">ZORRO</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">DIENTE</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">PARQUE</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">QUESO</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">ÓPERA</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">ÁNGEL</span></div><div class="cn-carta cn-N clave"><span class="cn-tipo">neutral</span><span class="cn-w">TABLA</span></div><div class="cn-carta cn-R clave"><span class="cn-tipo">rojo</span><span class="cn-w">COMETA</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">CAJA</span></div><div class="cn-carta cn-A clave"><span class="cn-tipo">azul</span><span class="cn-w">LÁMPARA</span></div></div>
+          </figure>
+        </div>
+        <p>
+          De las 25 cartas, 9 son del equipo que empieza (aquí el azul), 8 del otro, 7 son neutrales y una es el
+          <strong>asesino</strong>. Cada turno va así:
+        </p>
+        <ol>
+          <li>El jefe de espías dice una <strong>pista</strong>: una sola palabra y un número, por ejemplo "MANTEQUILLA&nbsp;3". La palabra no puede estar en el tablero ni empezar igual que una que esté (con QUESO en la mesa no vale "quesito"), y no se puede decir nada más ni hacer gestos.</li>
+          <li>Sus agentes tocan cartas de una en una. Si es de su equipo, pueden seguir; pueden probar hasta el número más una (la de más sirve para recuperar una pista anterior que se quedó a medias).</li>
+          <li>Si tocan una neutral, se acaba el turno. Si tocan una del rival, se acaba el turno y encima le han regalado una carta. Si tocan el asesino, pierden la partida en ese momento.</li>
+        </ol>
+        <p>
+          Gana el equipo que descubre antes todas sus cartas. En el tablero de arriba, el jefe azul puede decir
+          "MANTEQUILLA&nbsp;3" pensando en QUESO, CEBOLLA y SAL (es la pista que da la máquina en esta partida, que es la
+          semilla&nbsp;25 del <a href="simulador.html#semilla=25">simulador</a>). Fijaos en que una sola palabra va
+          para tres cartas a la vez, y en que no tiene nada que ver con las rojas ni con la PIERNA, que es el asesino.
+        </p>
+      </section>
+
+      <section id="roles" data-corto="Dos agentes">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Dos agentes, dos problemas</h2>
+        </div>
+        <p>
+          En cada equipo hay dos jugadores con problemas muy distintos, y para la máquina cada uno es un agente aparte:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col"></th><th scope="col">Jefe de espías (da pistas)</th><th scope="col">Agente (adivina)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Qué ve</th><td>El tablero y la tarjeta: sabe de quién es cada carta.</td><td>El tablero, lo ya descubierto y las pistas. No ve la tarjeta.</td></tr>
+              <tr><th scope="row">Entre qué elige</th><td>Cualquier palabra del idioma (decenas de miles) y un número.</td><td>Qué carta tocar de las que quedan (como mucho 25) y cuándo plantarse.</td></tr>
+              <tr><th scope="row">Qué tiene que adivinar</th><td>Cómo va a entender la pista su agente.</td><td>En qué estaba pensando su jefe de espías.</td></tr>
+              <tr><th scope="row">Lo que puede salir mal</th><td>Una pista que se parece más a una carta rival o al asesino que a las suyas.</td><td>Tocar de más: cada carta que no es suya acaba el turno, y el asesino la partida.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          El del agente es un problema de ordenar: con la pista, ordenar las cartas que quedan de más a menos parecidas y
+          decidir hasta dónde llegar. El del jefe de espías es un problema de buscar: hay muchísimas pistas posibles y cada una
+          hay que valorarla pensando en las 25 cartas a la vez. La gracia está en que los dos problemas van atados, porque una
+          pista vale lo que su agente sea capaz de sacar de ella.
+        </p>
+      </section>
+
+      <section id="convencion" data-corto="Conocer la estrategia">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Si los dos conocen la estrategia</h2>
+        </div>
+        <p>
+          Cuando jugáis con amigos, os vais conociendo: a la tercera partida ya sabéis que a vuestra compañera le gustan las
+          pistas de películas, o que vuestro jefe de espías nunca arriesga con el asesino cerca. En el tema vamos a suponer eso
+          mismo pero llevado al extremo: <strong>los dos agentes de un equipo conocen la estrategia del otro</strong>, porque
+          la habéis programado vosotros y es la misma para los dos lados.
+        </p>
+        <p>
+          Esto significa que el jefe de espías puede hacer algo que una persona sólo puede hacer a medias, que es
+          <strong>simular a su agente</strong> antes de hablar: "si digo COSTA, mi agente ordenará el tablero así, tocará estas
+          dos y parará". Si además los dos usan exactamente los mismos números para medir el parecido entre palabras, la
+          simulación es perfecta y el jefe de espías sabe de antemano qué va a pasar con cada pista.
+        </p>
+        <p>
+          Ahora bien, ¿eso es bueno? En la <a href="estrategias.html">página&nbsp;03</a> veremos que sí... y que no del todo.
+          Con una simulación perfecta funcionan pistas que ninguna persona entendería, porque lo único que importa es que la
+          cuenta salga, no que tenga sentido. En cuanto el que adivina no piensa exactamente igual (una persona, otro modelo,
+          o los mismos vectores con un poco de "ruido"), esas pistas se rompen, y hay que dejar margen.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Cuidado con los códigos</span>
+          <p>
+            Si los dos conocen la estrategia, se podría hacer trampa con un código: la pista "ARCO" significa "las cartas 3, 7
+            y 12" porque sí. Las reglas lo prohíben (la pista tiene que ir de lo que significan las palabras) y aquí también:
+            todas las estrategias del tema eligen la pista por su parecido con las cartas, y lo que comparten los dos agentes
+            es la forma de medir ese parecido.
+          </p>
+        </div>
+        <p>
+          Hay otros juegos cooperativos en los que pasa lo mismo, como Hanabi (cada jugador ve las cartas de los demás pero no
+          las suyas), que lleva años usándose para investigar agentes que cooperan <!--cite bard-hanabi--><span class="cita">[<a href="#ref-bard-hanabi" id="cita-bard-hanabi">2</a>]</span><!--/cite-->, o las convenciones de subasta del bridge,
+          que son justo eso: una estrategia que la pareja ha pactado antes de sentarse.
+        </p>
+      </section>
+
+      <section id="comparar" data-corto="Frente a lo anterior">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Frente a lo que ya sabéis</h2>
+        </div>
+        <p>
+          Merece la pena pararse un momento a ver por qué no basta con lo que hemos hecho en el curso, porque cada técnica
+          falla por un sitio distinto:
+        </p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Técnica</th><th scope="col">Cómo sería en Código Secreto</th><th scope="col">Dónde se atasca</th></tr></thead>
+            <tbody>
+              <tr><td>Máquinas de estados, árboles de comportamiento, reglas (temas 2 a 4)</td><td>Escribir a mano qué palabras van con cuáles: "si están PLAYA e ISLA, di COSTA".</td><td>Hay 239 palabras de tablero en nuestro simulador y miles de pistas posibles, así que las combinaciones no se acaban nunca.</td></tr>
+              <tr><td>Minimax y MCTS (tema 5)</td><td>Probar cada pista y simular qué pasa después.</td><td>Hay miles de jugadas por turno, y el "resultado" de una pista depende de la cabeza del compañero, para la que no hay reglas que simular. Lo que sí aprovechamos es la idea de simular, pero sólo un paso: lo que hará el agente.</td></tr>
+              <tr><td>Razonamiento basado en casos (tema 6)</td><td>Buscar por similitud.</td><td>Es la idea que vamos a usar, pero la similitud entre "costa" e "isla" no hay quien la escriba a mano como la de la distancia al fantasma. Aquí la similitud se aprende del texto.</td></tr>
+              <tr><td>Información oculta (tema 5)</td><td>El agente no ve la tarjeta.</td><td>Aquí al revés que en el póker: el que sabe más (el jefe de espías) quiere que su compañero lo descubra, y sólo puede hablar con una palabra.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          En otras palabras, el conocimiento que falta es el significado de las palabras, y eso no lo escribe nadie a mano:
+          sale de leer muchísimo texto. Es el único sitio del curso donde vamos a usar una técnica del otro lado de la IA (la
+          subsimbólica, aprendida de datos), y por eso está en un bloque aparte.
+        </p>
+      </section>
+
+      <section id="usos" data-corto="Dónde se usa">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2 class="sec">Dónde se usa</h2>
+        </div>
+        <p>
+          Típicamente, los juegos en los que el jugador escribe o dice palabras han ido de una lista hecha a mano a vectores
+          aprendidos, y de ahí a modelos de lenguaje. Algunos ejemplos:
+        </p>
+        <ul>
+          <li><strong>Scribblenauts</strong> (5th Cell, 2009). Escribes el nombre de un objeto y aparece en la pantalla para resolver el puzle. Detrás hay un diccionario hecho a mano de más de 20&nbsp;000 palabras, cada una con sus propiedades, o sea, justo lo contrario de los vectores de la página&nbsp;02 (allí las asociaciones salen solas de los textos y aquí alguien las escribió una a una).</li>
+          <li><strong>Semantle y Contexto</strong> (2022). Hay que adivinar una palabra secreta, y cada intento te dice lo cerca que estás con el parecido entre vectores de palabras. Contexto tiene versión en castellano, y es literalmente el coseno de la página siguiente convertido en juego.</li>
+          <li><strong>Infinite Craft</strong> (Neal Agarwal, 2024). Combinas elementos ("agua" + "fuego") y un modelo de lenguaje decide qué sale. Ningún diseñador ha escrito la tabla de combinaciones.</li>
+          <li><strong>Bots de Código Secreto</strong>. Desde 2019 hay una competición de bots de este juego (la Codenames AI Competition <!--cite codenames-competicion--><span class="cita">[<a href="#ref-codenames-competicion" id="cita-codenames-competicion">3</a>]</span><!--/cite-->), y el artículo que la presentó <!--cite kim-codenames--><span class="cita">[<a href="#ref-kim-codenames" id="cita-kim-codenames">4</a>]</span><!--/cite--> ya vio lo que vamos a ver aquí: los bots que comparten los mismos vectores se entienden muy bien entre ellos, y mezclados con otros mucho peor. Más tarde se ha usado también para medir modelos de lenguaje <!--cite stephenson-codenames--><span class="cita">[<a href="#ref-stephenson-codenames" id="cita-stephenson-codenames">5</a>]</span><!--/cite-->.</li>
+
+          <li><strong>Personajes con los que se habla</strong>. Varias empresas (Ubisoft, NVIDIA y otras) han enseñado prototipos de personajes que contestan con un modelo de lenguaje, con los problemas de coste y de control que veremos en la página&nbsp;04.</li>
+        </ul>
+        <p>
+          Y fuera de los juegos está por todas partes. Los buscadores que entienden que "portátil barato" y "ordenador
+          económico" son lo mismo, o los asistentes que consultan vuestros documentos antes de responder, recuperan los textos
+          por el coseno de sus vectores, que es justo lo que hará nuestro agente con las cartas.
+        </p>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-chvatil-codenames">V. Chvátil. <em>Codenames</em>. Czech Games Edition, 2015. <a class="volver" href="#cita-chvatil-codenames" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-bard-hanabi">N. Bard, J. N. Foerster, S. Chandar, N. Burch, M. Lanctot y otros. "The Hanabi Challenge: A New Frontier for AI Research". <em>Artificial Intelligence 280, 103216</em>, 2020. <a class="volver" href="#cita-bard-hanabi" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-codenames-competicion">A. Summerville, A. Kim, M. Ruzmaykin y A. Truong. <em>The Codenames AI Competition (código y bots base)</em>. FDG 2019, 2019. <a href="https://github.com/CodenamesAICompetition/Game">github.com/CodenamesAICompetition/Game</a> <a class="volver" href="#cita-codenames-competicion" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-kim-codenames">A. Kim, M. Ruzmaykin, A. Truong y A. Summerville. "Cooperation and Codenames: Understanding Natural Language Processing via Codenames". <em>Proceedings of AIIDE 2019</em>, 2019. <a class="volver" href="#cita-kim-codenames" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-stephenson-codenames">M. Stephenson, M. Sidji y B. Ronval. "Codenames as a Benchmark for Large Language Models". <em>IEEE Transactions on Games</em>, 2025. <a href="https://arxiv.org/abs/2412.11373">arxiv.org/abs/2412.11373</a> <a class="volver" href="#cita-stephenson-codenames" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema bonus">
+        <a class="pager-prev" href="index.html"><span class="pager-l">Anterior</span><span class="pager-t">Índice del tema</span></a>
+        <a class="pager-next" href="vectores.html"><span class="pager-l">Siguiente</span><span class="pager-t">Palabras como vectores</span></a>
+      </nav>
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#juego">El juego</a></li>
+            <li><a href="#roles">Dos agentes</a></li>
+            <li><a href="#convencion">Conocer la estrategia</a></li>
+            <li><a href="#comparar">Frente a lo anterior</a></li>
+            <li><a href="#usos">Dónde se usa</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema bonus</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html" aria-current="page"><span>01</span>Código Secreto como problema</a></li>
+            <li><a href="vectores.html"><span>02</span>Palabras como vectores</a></li>
+            <li><a href="estrategias.html"><span>03</span>Estrategias</a></li>
+            <li><a href="modelos-lenguaje.html"><span>04</span>Con un modelo de lenguaje</a></li>
+            <li><a href="simulador.html"><span>05</span>El simulador</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

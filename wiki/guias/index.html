@@ -6,10 +6,11 @@
 <!--ICI:HEAD-->
 <!-- página publicada -->
 <!--/ICI:HEAD-->
-<title>Guías · ICI</title>
-<meta name="description" content="Apuntes de cada tema, guías de entorno y documentos de referencia: instalación de Eclipse y el simulador, y la clase Game.">
+<title>Apuntes · ICI</title>
+<meta name="description" content="La guía de la práctica en curso, los apuntes de cada tema, las guías paso a paso de las prácticas anteriores y las del entorno: Eclipse, la clase Game, la competición y comparar versiones.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/css/ici.css">
@@ -32,10 +33,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -48,61 +48,106 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <span>Guías</span>
+    <span>Apuntes</span>
   </nav>
 
   <header class="masthead">
     <h1>
-      Guías
-      <span class="thin">Los apuntes de cada tema, el entorno y los documentos de referencia.</span>
+      Apuntes
+      <span class="thin">La teoría de cada tema, la práctica montada paso a paso y el entorno.</span>
     </h1>
     <p class="standfirst">
-      Los apuntes de cada tema y todo lo que no es enunciado: cómo montar el
-      entorno, dónde está cada cosa del motor y qué consultar cuando el código no compila. Se amplía
-      conforme el curso lo pide.
+      Aquí hay tres cosas: los <a href="#apuntes">apuntes</a>, que explican cada técnica con sus ejemplos;
+      las <a href="#en-curso">guías paso a paso</a>, que montan la práctica desde cero; y las del
+      <a href="#entorno">entorno</a>, para instalar, probar y depurar. Arriba tenéis siempre la guía de la
+      práctica que está en curso.
     </p>
   </header>
 
   <div class="cols solo" id="contenido" tabindex="-1">
     <main>
 
+      <section id="en-curso">
+        <div class="sec-head">
+          <h2 class="sec" data-en-curso>La práctica en curso</h2>
+        </div>
+        <div class="guia-p" id="guia-p5" data-start="2026-11-17" data-due="2026-11-29">
+          <h3>Práctica 5 · Alfa-beta y MCTS en ajedrez <span class="chip now" data-state>En curso</span></h3>
+          <p>
+            La guía de la <a href="../practicas/practica-5.html">Práctica&nbsp;5</a>, que esta vez es en Python y con
+            VS Code. El proyecto, con el entorno de ajedrez, los rivales de referencia y la plantilla, está en
+            <a href="../recursos/ICI-Practica5.zip" download><code>ICI-Practica5.zip</code></a>.
+          </p>
+          <ul class="links indice">
+            <li>
+              <a href="mcts-paso-a-paso.html">
+                <span class="lt">Práctica 5 paso a paso<span class="arrow" aria-hidden="true">&#8594;</span></span>
+                <span class="lm">Guía · VS Code y Python</span>
+                <span class="ld">
+                  Instalar Python y VS Code y abrir el proyecto; minimax con alfa-beta en tres pasos y MCTS en seis, cada
+                  uno con su comprobación; medirlos, experimentar con ellos y diez retos para mejorarlos.
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
       <section id="apuntes">
         <div class="sec-head">
-          <h2 class="sec">Apuntes</h2>
+          <h2 class="sec">Apuntes por tema</h2>
         </div>
         <p>
           El desarrollo de cada tema, con el pseudocódigo de todos los algoritmos y el código real del
-          simulador donde toca. Se publican junto con la práctica que los usa.
+          simulador donde toca. Al final de cada tema tenéis el enlace a su práctica.
         </p>
-        <ul class="links">
+        <ul class="links indice">
           <li>
-            <a href="tema1/index.html">
-              <span class="lt">2 · IA para videojuegos<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · 9 páginas · Prácticas 1 y 2</span>
+            <a href="tema2/index.html">
+              <span class="lt">Tema 2 · IA para videojuegos<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">9 páginas · Prácticas 1 y 2</span>
               <span class="ld">
                 Cómo se representa un mapa para poder buscar en él, búsquedas ciegas, heurísticas y A*; lo
                 que de todo eso viene ya resuelto en el motor de Ms.&nbsp;Pac-Man y las estrategias que sí
-                son tuyas, con los mapas de influencia; y cómo organizar el comportamiento en máquinas de
+                son vuestras, con los mapas de influencia; y cómo organizar el comportamiento en máquinas de
                 estados y árboles de comportamiento.
               </span>
             </a>
           </li>
           <li>
-            <a href="tema2/index.html">
-              <span class="lt">3 y 4 · Reglas y razonamiento borroso<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · 10 páginas · Prácticas 3 y 4</span>
+            <a href="apuntes-pathfinding-slides.html">
+              <span class="lt">Tema 2 · Pathfinding y estrategias, en diapositivas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">59 diapositivas</span>
               <span class="ld">
-                Sistemas de reglas: hechos, reglas y motor, encadenamiento, resolución de conflictos, Rete, el
-                lenguaje de Jess y el paquete <code>rules</code> del motor. Razonamiento borroso: conjuntos y variables
-                lingüísticas, el método de Mamdani y jFuzzyLogic en Ms.&nbsp;Pac-Man. Con bancos de pruebas para
-                ejecutar reglas y FCL en la propia página.
+                El mismo tema en el orden en el que se explica en clase, con los dibujos y el pseudocódigo
+                delante.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="tema3/index.html">
+              <span class="lt">Tema 3 · Sistemas de reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">7 páginas · Práctica 3</span>
+              <span class="ld">
+                Hechos, reglas y motor, encadenamiento hacia delante y hacia atrás, resolución de conflictos, Rete, el
+                lenguaje de Jess y el paquete <code>rules</code> del motor. Con un banco para escribir y disparar reglas en la propia página.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="tema4/index.html">
+              <span class="lt">Tema 4 · Razonamiento borroso<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">3 páginas · Práctica 4</span>
+              <span class="ld">
+                Conjuntos y variables lingüísticas, el método de Mamdani paso a paso y jFuzzyLogic en Ms.&nbsp;Pac-Man.
+                Con un banco para probar FCL en la propia página.
               </span>
             </a>
           </li>
           <li>
             <a href="tema5/index.html">
-              <span class="lt">5 · Juegos por turnos<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Apuntes · 5 páginas · Práctica 5</span>
+              <span class="lt">Tema 5 · Juegos por turnos<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">5 páginas · Práctica 5</span>
               <span class="ld">
                 El árbol de juego, minimax y alfa-beta en breve, y Monte Carlo Tree Search a fondo: el bandido y UCB1,
                 las cuatro fases, sus mejoras y dónde se usa. También azar e información oculta (determinización e
@@ -112,134 +157,139 @@
             </a>
           </li>
           <li>
-            <a href="apuntes-pathfinding-slides.html">
-              <span class="lt">2 · Pathfinding y estrategias, en diapositivas<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Presentación · 59 diapositivas</span>
+            <a href="tema6/index.html">
+              <span class="lt">Tema 6 · Razonamiento basado en casos<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">5 páginas · Práctica 6</span>
               <span class="ld">
-                El mismo tema en el orden en el que se explica en clase, con los dibujos y el pseudocódigo
-                delante.
+                Qué es un caso y el ciclo de las cuatro R, la similitud local y global con sus cuentas, los k vecinos,
+                reutilizar y adaptar, revisar cuando el resultado llega tarde, qué retener y qué olvidar, y la plantilla
+                de jCOLIBRI clase a clase. Con ejemplos para mover la consulta entre casos y ver crecer la base.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="bonus/index.html">
+              <span class="lt">Bonus · Agentes para juegos de lenguaje<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">5 páginas · con simulador</span>
+              <span class="ld">
+                Código Secreto como problema de IA, los vectores de palabras y el coseno, y estrategias para dar y adivinar
+                pistas, de las ingenuas a las de la competición de bots (margen, puntuación blanda y valor esperado). También
+                agentes con modelos de lenguaje, y un simulador para jugar contra la máquina o entre varias personas.
               </span>
             </a>
           </li>
         </ul>
       </section>
 
-      <section id="practica3">
+      <section id="anteriores">
         <div class="sec-head">
-          <h2 class="sec">Práctica 3 · Reglas</h2>
+          <h2 class="sec">Guías de las prácticas anteriores</h2>
+        </div>
+
+        <div class="guia-p" id="guia-p4" data-start="2026-11-02" data-due="2026-11-16">
+          <h3>Práctica 4 · Lógica borrosa <span class="chip done" data-state>Cerrada</span></h3>
+          <p>
+            Las guías de la <a href="../practicas/practica-4.html">Práctica&nbsp;4</a>. Todo su código, con los
+            rivales de referencia, está en el proyecto de la práctica,
+            <a href="../recursos/ICI-Practica4.zip" download><code>ICI-Practica4.zip</code></a>.
+          </p>
+          <ul class="links indice">
+            <li>
+              <a href="borroso-paso-a-paso.html">
+                <span class="lt">Ms.&nbsp;Pac-Man con siete reglas borrosas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+                <span class="lm">Guía · 7 secciones</span>
+                <span class="ld">
+                  Un controlador borroso montado de dos reglas a siete, con lo que cambió cada paso medido contra los
+                  rivales de referencia, un banco para probar el FCL en la página, y cómo seguir con Ms.&nbsp;Pac-Man y
+                  con los fantasmas.
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="depurar-borroso.html">
+                <span class="lt">Depurar reglas borrosas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+                <span class="lm">Guía · 7 secciones</span>
+                <span class="ld">
+                  Probar el FCL sin jugar con casos escritos a mano y su curva de control, una traza que dice qué
+                  reglas se activan en cada turno y cuáles no se activan nunca, y los errores típicos con jFuzzyLogic.
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="guia-p" id="guia-p3" data-start="2026-10-19" data-due="2026-11-01">
+          <h3>Práctica 3 · Reglas <span class="chip done" data-state>Cerrada</span></h3>
+          <p>
+            Las guías de la <a href="../practicas/practica-3.html">Práctica&nbsp;3</a>. Todo su código, con los
+            rivales de referencia, está en el proyecto de la práctica,
+            <a href="../recursos/ICI-Practica3.zip" download><code>ICI-Practica3.zip</code></a>.
+          </p>
+          <ul class="links indice">
+            <li>
+              <a href="reglas-paso-a-paso.html">
+                <span class="lt">Ms.&nbsp;Pac-Man con siete reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+                <span class="lm">Guía · 7 secciones</span>
+                <span class="ld">
+                  Un controlador de reglas montado de una regla a siete, con lo que cambió cada paso medido contra
+                  los rivales de referencia, un banco para probar las reglas en la página, y cómo seguir con Ms.&nbsp;Pac-Man y con
+                  los fantasmas.
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="depurar-reglas.html">
+                <span class="lt">Depurar reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+                <span class="lm">Guía · 7 secciones</span>
+                <span class="ld">
+                  Probar reglas sin jugar con casos escritos a mano, una traza que dice qué reglas se disparan en
+                  cada turno y cuáles no se disparan nunca, y los errores típicos de la práctica.
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="entorno">
+        <div class="sec-head">
+          <h2 class="sec">El entorno</h2>
         </div>
         <p>
-          Las tres guías de la <a href="../practicas/practica-3.html">Práctica&nbsp;3</a>. Todo su código, con los
-          rivales de referencia, está en el proyecto de la práctica,
-          <a href="../recursos/ICI-Practica3.zip" download><code>ICI-Practica3.zip</code></a>.
+          Lo que sirve para todas las prácticas de Ms.&nbsp;Pac-Man: instalarlo, saber qué le podéis preguntar al motor
+          y medir si una versión es mejor que otra.
         </p>
-        <ul class="links">
+        <ul class="links indice">
           <li>
-            <a href="reglas-paso-a-paso.html">
-              <span class="lt">Ms.&nbsp;Pac-Man con siete reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Guía · 7 secciones</span>
+            <a href="eclipse.html">
+              <span class="lt">Ms. Pac-Man en Eclipse<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · 7 pasos</span>
               <span class="ld">
-                Un controlador de reglas montado de una regla a siete, con lo que cambió cada paso medido contra
-                los rivales de referencia, un banco para probar las reglas en la página, y cómo seguir con Ms.&nbsp;Pac-Man y con
-                los fantasmas.
+                Instalar Eclipse desde eclipseide.org, importar el simulador, resolver las dependencias con
+                Maven y lanzar la primera partida. Incluye los diez errores típicos y cómo salir de ellos.
               </span>
             </a>
           </li>
           <li>
-            <a href="depurar-reglas.html">
-              <span class="lt">Depurar reglas<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Guía · 7 secciones</span>
+            <a href="clase-game.html">
+              <span class="lt">La clase <code>Game</code><span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Referencia</span>
               <span class="ld">
-                Probar reglas sin jugar con casos escritos a mano, una traza que dice qué reglas se disparan en
-                cada turno y cuáles no se disparan nunca, y los errores típicos de la práctica.
+                Posiciones, píldoras, distancias, caminos, intersecciones y tiempos de comestible. Es lo
+                único que vuestro controlador puede preguntar, así que conviene tenerlo a mano.
               </span>
             </a>
           </li>
           <li>
-            <a href="comparar-versiones.html">
-              <span class="lt">Comparar versiones<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Guía · 8 secciones</span>
+            <a href="clase-game-slides.html">
+              <span class="lt">La clase <code>Game</code>, en diapositivas<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">34 diapositivas</span>
               <span class="ld">
-                Un banco que juega cada versión contra los rivales de referencia, con la métrica que elijáis, y
-                dice si la diferencia es real, rival a rival y en media. Para Ms.&nbsp;Pac-Man y para fantasmas.
+                Lo mismo que la referencia, con dibujos: el laberinto como grafo, cómo se numeran los nodos,
+                qué pasa en cada turno, las reglas del juego y los métodos que más se usan.
               </span>
             </a>
           </li>
-        </ul>
-      </section>
-
-      <section id="practica5">
-        <div class="sec-head">
-          <h2 class="sec">Práctica 5 · Alfa-beta y MCTS en ajedrez</h2>
-        </div>
-        <p>
-          La guía de la <a href="../practicas/practica-5.html">Práctica&nbsp;5</a>, que esta vez es en Python y con
-          VS Code. El proyecto, con el entorno de ajedrez, los rivales de referencia y la plantilla, está en
-          <a href="../recursos/ICI-Practica5.zip" download><code>ICI-Practica5.zip</code></a>.
-        </p>
-        <ul class="links">
-          <li>
-            <a href="mcts-paso-a-paso.html">
-              <span class="lt">Práctica 5 paso a paso<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Guía · VS Code y Python</span>
-              <span class="ld">
-                Instalar Python y VS Code y abrir el proyecto; minimax con alfa-beta en tres pasos y MCTS en seis, cada
-                uno con su comprobación; medirlos, experimentar con ellos y diez retos para mejorarlos.
-              </span>
-            </a>
-          </li>
-        </ul>
-      </section>
-
-      <section id="practica4">
-        <div class="sec-head">
-          <h2 class="sec">Práctica 4 · Lógica borrosa</h2>
-        </div>
-        <p>
-          Las tres guías de la <a href="../practicas/practica-4.html">Práctica&nbsp;4</a>. Todo su código, con los
-          rivales de referencia, está en el proyecto de la práctica,
-          <a href="../recursos/ICI-Practica4.zip" download><code>ICI-Practica4.zip</code></a>.
-        </p>
-        <ul class="links">
-          <li>
-            <a href="borroso-paso-a-paso.html">
-              <span class="lt">Ms.&nbsp;Pac-Man con siete reglas borrosas<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Guía · 7 secciones</span>
-              <span class="ld">
-                Un controlador borroso montado de dos reglas a siete, con lo que cambió cada paso medido contra los
-                rivales de referencia, un banco para probar el FCL en la página, y cómo seguir con Ms.&nbsp;Pac-Man y
-                con los fantasmas.
-              </span>
-            </a>
-          </li>
-          <li>
-            <a href="depurar-borroso.html">
-              <span class="lt">Depurar reglas borrosas<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Guía · 7 secciones</span>
-              <span class="ld">
-                Probar el FCL sin jugar con casos escritos a mano y su curva de control, una traza que dice qué
-                reglas se activan en cada turno y cuáles no se activan nunca, y los errores típicos con jFuzzyLogic.
-              </span>
-            </a>
-          </li>
-          <li>
-            <a href="comparar-versiones.html">
-              <span class="lt">Comparar versiones<span class="arrow" aria-hidden="true">&#8594;</span></span>
-              <span class="lm">Guía · 8 secciones</span>
-              <span class="ld">
-                El mismo banco de la Práctica&nbsp;3, que en el proyecto de la Práctica&nbsp;4 ya compara versiones
-                de <code>.fcl</code>.
-              </span>
-            </a>
-          </li>
-        </ul>
-      </section>
-
-      <section id="pruebas">
-        <div class="sec-head">
-          <h2 class="sec">Pruebas y competición</h2>
-        </div>
-        <ul class="links">
           <li>
             <a href="competicion.html">
               <span class="lt">Probar los controladores y la competición<span class="arrow" aria-hidden="true">&#8594;</span></span>
@@ -251,55 +301,20 @@
               </span>
             </a>
           </li>
-        </ul>
-      </section>
-
-      <section id="entorno">
-        <div class="sec-head">
-          <h2 class="sec">Entorno de desarrollo</h2>
-        </div>
-        <ul class="links">
           <li>
-            <a href="eclipse.html">
-              <span class="lt">Ms. Pac-Man en Eclipse<span class="arrow" aria-hidden="true">→</span></span>
-              <span class="lm">Guía · 7 pasos</span>
+            <a href="comparar-versiones.html">
+              <span class="lt">Comparar versiones<span class="arrow" aria-hidden="true">&#8594;</span></span>
+              <span class="lm">Guía · 8 secciones</span>
               <span class="ld">
-                Instalar Eclipse desde eclipseide.org, importar el simulador, resolver las dependencias con
-                Maven y lanzar la primera partida. Incluye los diez errores típicos y cómo salir de ellos.
-              </span>
-            </a>
-          </li>
-        </ul>
-      </section>
-
-      <section id="motor">
-        <div class="sec-head">
-          <h2 class="sec">El motor</h2>
-        </div>
-        <ul class="links">
-          <li>
-            <a href="clase-game.html">
-              <span class="lt">La clase <code>Game</code><span class="arrow" aria-hidden="true">→</span></span>
-              <span class="lm">Referencia</span>
-              <span class="ld">
-                Posiciones, píldoras, distancias, caminos, intersecciones y tiempos de comestible. Es lo
-                único que tu controlador puede preguntar, así que conviene tenerlo a mano.
-              </span>
-            </a>
-          </li>
-          <li>
-            <a href="clase-game-slides.html">
-              <span class="lt">La clase <code>Game</code>, en diapositivas<span class="arrow" aria-hidden="true">→</span></span>
-              <span class="lm">Presentación · 34 diapositivas</span>
-              <span class="ld">
-                Lo mismo que la referencia, con dibujos: el laberinto como grafo, cómo se numeran los nodos,
-                qué pasa en cada turno, las reglas del juego y los métodos que más se usan.
+                Un banco que juega cada versión contra los rivales de referencia, con la métrica que elijáis, y
+                dice si la diferencia es real, rival a rival y en media. Compara reglas de Jess en la Práctica&nbsp;3 y
+                <code>.fcl</code> en la Práctica&nbsp;4, para Ms.&nbsp;Pac-Man y para fantasmas.
               </span>
             </a>
           </li>
           <li>
             <a href="https://gaia.fdi.ucm.es/research/mspacman/">
-              <span class="lt">GAIA · Ms. Pac-Man<span class="arrow" aria-hidden="true">→</span></span>
+              <span class="lt">GAIA · Ms. Pac-Man<span class="arrow" aria-hidden="true">&#8594;</span></span>
               <span class="lm">Externo</span>
               <span class="ld">
                 El grupo de investigación que mantiene el entorno, y la competición internacional que se
@@ -311,20 +326,10 @@
         <div class="note trap">
           <span class="note-label">Regla que no cambia</span>
           <p>
-            El código del simulador no se modifica nunca. Si algo del motor te estorba, la solución está en
-            tu controlador o en preguntar en clase, no en tocar <code>pacman.*</code>.
+            El código del simulador no se modifica nunca. Si algo del motor os estorba, buscad la solución en
+            vuestro controlador o preguntad en clase, pero no toquéis <code>pacman.*</code>.
           </p>
         </div>
-      </section>
-
-      <section id="proximas">
-        <div class="sec-head">
-          <h2 class="sec">En camino</h2>
-        </div>
-        <p>
-          Con cada bloque se publica aquí lo que haga falta: las herramientas de la Práctica&nbsp;6 cuando se
-          anuncie su entorno, y los apuntes de los temas que quedan.
-        </p>
       </section>
 
     </main>
@@ -342,7 +347,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

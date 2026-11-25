@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--ICI:HEAD-->
+<!-- página publicada -->
+<!--/ICI:HEAD-->
+<title>Reutilizar y adaptar · Tema 6 · ICI</title>
+<meta name="description" content="Qué hacer con los casos recuperados: copiar la solución del más parecido, votar entre varios, elegir por el resultado que obtuvo cada acción, explorar para no quedarse con lo primero que funcionó, adaptar la solución (movimientos absolutos o relativos) y qué hacer cuando no hay ningún caso parecido.">
+<meta name="author" content="Pablo Gutiérrez Sánchez">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../assets/css/ici.css">
+<script src="../../assets/js/tema.js"></script>
+</head>
+<body data-page="guias">
+
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!--ICI:NAV-->
+<header class="site">
+  <div class="site-inner">
+    <a class="mark" href="../../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Ms. Pac-Man">
+        <path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/>
+        <path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/>
+      </svg>
+      <span class="mark-name">ICI <small>Comportamientos inteligentes</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones de la asignatura">
+      <ul>
+        <li><a href="../../index.html">Inicio</a></li>
+        <li><a href="../../calendario.html">Calendario</a></li>
+        <li><a href="../../practicas/index.html">Prácticas</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
+      </ul>
+    </nav>
+    <button class="theme" type="button">Tema · <b>auto</b></button>
+  </div>
+</header>
+<!--/ICI:NAV-->
+
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Migas de pan">
+    <a href="../../index.html">Asignatura</a>
+    <span aria-hidden="true">/</span>
+    <a href="../index.html">Apuntes</a>
+    <span aria-hidden="true">/</span>
+    <a href="index.html">Tema 6</a>
+    <span aria-hidden="true">/</span>
+    <span>Reutilizar y adaptar</span>
+  </nav>
+
+  <header class="masthead">
+    <p class="tema-when">Tema 6 · 03 · Razonamiento basado en casos</p>
+    <h1>
+      Reutilizar y adaptar
+      <span class="thin">Ya tenemos los casos parecidos, y ahora hay que sacar de ellos una decisión para una situación que no es exactamente ninguna de ellas.</span>
+    </h1>
+    <p class="standfirst">
+      Copiar, votar o elegir por resultados, por qué hay que seguir probando cosas aunque algo ya funcione, cómo guardar la
+      solución para que sirva en cualquier sitio del laberinto, y qué hacer cuando la base no tiene nada que se parezca.
+    </p>
+  </header>
+
+  <div class="cols" id="contenido" tabindex="-1">
+    <main>
+      <section id="copiar" data-corto="Copiar">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2 class="sec">Lo más sencillo: copiar</h2>
+        </div>
+        <p>
+          Se recupera el caso más parecido y se hace lo mismo que se hizo entonces, que es lo que hace la plantilla de la
+          práctica:
+        </p>
+        <pre class="pseudo"><span class="var">caso</span> = el más parecido de la base
+<span class="var">acción</span> = la solución de <span class="var">caso</span>
+<b>si</b> la similitud es menor que 0,7 <b>o</b> el resultado de <span class="var">caso</span> fue menor que 100:
+    <span class="var">acción</span> = otro movimiento, al azar</pre>
+        <p>
+          La gracia está en las dos condiciones del <b>si</b>. La primera dice "no tengo nada parecido, así que lo que hice
+          entonces no me sirve", y la segunda "lo que hice entonces salió mal, así que pruebo otra cosa". Las dos acaban en
+          probar algo distinto, que se guardará como caso nuevo y se revisará, y así es como la base aprende cosas que no
+          sabía.
+        </p>
+      </section>
+
+      <section id="votar" data-corto="Votar por resultados">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2 class="sec">Votar, y votar mirando los resultados</h2>
+        </div>
+        <p>
+          En la <a href="similitud.html#vecinos">página anterior</a> vimos que es más fiable recuperar <var>k</var> casos y
+          votar. Pero en Ms. Pac-Man los casos traen algo que un clasificador normal no tiene, que es el
+          <strong>resultado</strong>: los vecinos no dicen sólo "aquí se hizo esto", dicen "aquí se hizo esto y salió así", y
+          con eso se puede votar mejor.
+        </p>
+        <p>A modo de ejemplo, Ms. Pac-Man llega a un cruce y sus cinco vecinos más parecidos son estos:</p>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Caso</th><th scope="col">Similitud</th><th scope="col">Solución</th><th scope="col">Resultado</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td>0,95</td><td>huir</td><td>+20</td></tr>
+              <tr><td>B</td><td>0,93</td><td>huir</td><td>−480 (la cazaron)</td></tr>
+              <tr><td>C</td><td>0,90</td><td>huir</td><td>+40</td></tr>
+              <tr><td>D</td><td>0,91</td><td>ir a la píldora</td><td>+260</td></tr>
+              <tr><td>E</td><td>0,85</td><td>ir a la píldora</td><td>+180</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Hay tres formas de decidir:</p>
+        <pre class="pseudo"><b>Un voto cada uno</b>
+huir            = 3 votos
+ir a la píldora = 2 votos
+→ huir
+
+<b>Votos pesados por la similitud</b>
+huir            = 0,95 + 0,93 + 0,90 = 2,78
+ir a la píldora = 0,91 + 0,85        = 1,76
+→ huir
+
+<b>Resultado medio de cada acción, pesado por la similitud</b>
+huir            = (0,95 · 20 + 0,93 · (−480) + 0,90 · 40) / 2,78
+                = (19 − 446,4 + 36) / 2,78
+                = −391,4 / 2,78
+                = −140,8
+ir a la píldora = (0,91 · 260 + 0,85 · 180) / 1,76
+                = (236,6 + 153) / 1,76
+                = 389,6 / 1,76
+                = 221,4
+→ ir a la píldora</pre>
+        <p>
+          Las dos primeras eligen huir porque es lo que más veces se hizo, y la tercera elige ir a la píldora porque es lo
+          que mejor salió. Si la base empezó llena de decisiones al azar (y con la plantilla empieza así), lo que más veces se
+          hizo no tiene por qué ser bueno.
+        </p>
+        <h3 class="label">Explorar o explotar, otra vez</h3>
+        <p>
+          Elegir siempre la acción con mejor resultado medio tiene una trampa que ya conocéis del
+          <a href="../tema5/mcts.html#bandido">bandido multibrazo</a> del tema&nbsp;5. Si en una zona sólo se ha probado
+          huir, y huir sale regular, se va a seguir huyendo siempre, porque nunca se prueba otra cosa. Así que de vez en
+          cuando hay que explorar, y hay varias formas de hacerlo:
+        </p>
+        <ul>
+          <li>Al azar con una probabilidad fija <var>ε</var> (épsilon, por ejemplo 0,1): con esa probabilidad, una acción al
+            azar, y el resto de las veces la mejor. Es lo más sencillo.</li>
+          <li>Por falta de pruebas: si una acción tiene pocos vecinos o ninguno, se prueba (que es la idea de UCB1, darle un
+            extra a lo poco probado).</li>
+          <li>Explorando en las partidas de entrenamiento y sólo explotando en las de evaluación.</li>
+        </ul>
+      </section>
+
+      <section id="adaptar" data-corto="Adaptar">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2 class="sec">Adaptar: lo que se guarda como solución</h2>
+        </div>
+        <p>
+          La situación de ahora nunca es igual que la del caso, y a veces la solución se puede copiar tal cual y a veces hay
+          que <strong>adaptarla</strong> a lo que ha cambiado. En Ms. Pac-Man hay un ejemplo muy claro de esto. La plantilla
+          guarda como solución un movimiento (<code>UP</code>, <code>DOWN</code>, <code>LEFT</code> o <code>RIGHT</code>), y
+          mirad qué pasa al copiarlo:
+        </p>
+        <figure class="wide">
+          <figcaption>El mismo cruce y las mismas distancias, pero el fantasma viene del otro lado</figcaption>
+          <svg class="explica" viewBox="0 0 640 230" role="img" aria-label="Tres dibujos de un cruce con Ms. Pac-Man en el centro. Primero, el caso guardado: el fantasma está a la izquierda y la solución fue ir a la derecha, que salió bien. Segundo, ahora: el fantasma está a la derecha, y copiar ir a la derecha lleva hacia él. Tercero, ahora con la solución guardada como alejarse del fantasma: Ms. Pac-Man va a la izquierda.">
+            <defs>
+              <marker id="cb-punta-ok" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10Z" fill="var(--ok)"/></marker>
+              <marker id="cb-punta-mal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10Z" fill="var(--bad)"/></marker>
+            </defs>
+            <g transform="translate(10,10)">
+              <rect x="10" y="10" width="68" height="68" rx="4" class="cb-muro"/><rect x="112" y="10" width="68" height="68" rx="4" class="cb-muro"/>
+              <rect x="10" y="112" width="68" height="68" rx="4" class="cb-muro"/><rect x="112" y="112" width="68" height="68" rx="4" class="cb-muro"/>
+              <path d="M95 95 106 89A12 12 0 1 0 106 101Z" class="cb-pac"/>
+              <path d="M22 103V91A9 9 0 0 1 40 91V103L37 100L34 103L31 100L28 103L25 100Z" class="cb-fantasma"/>
+              <path d="M112 95H168" class="cb-ruta"/>
+              <text x="95" y="202" class="mc-t mc-centro" font-weight="700">el caso guardado</text>
+              <text x="95" y="218" class="mc-t mc-centro">solución: RIGHT · +120</text>
+            </g>
+            <g transform="translate(225,10)">
+              <rect x="10" y="10" width="68" height="68" rx="4" class="cb-muro"/><rect x="112" y="10" width="68" height="68" rx="4" class="cb-muro"/>
+              <rect x="10" y="112" width="68" height="68" rx="4" class="cb-muro"/><rect x="112" y="112" width="68" height="68" rx="4" class="cb-muro"/>
+              <path d="M95 95 106 89A12 12 0 1 0 106 101Z" class="cb-pac"/>
+              <path d="M150 103V91A9 9 0 0 1 168 91V103L165 100L162 103L159 100L156 103L153 100Z" class="cb-fantasma"/>
+              <path d="M112 95H140" class="cb-ruta mala"/>
+              <text x="95" y="202" class="mc-t mc-centro" font-weight="700">ahora, copiando RIGHT</text>
+              <text x="95" y="218" class="mc-t mc-centro">va derecho al fantasma</text>
+            </g>
+            <g transform="translate(440,10)">
+              <rect x="10" y="10" width="68" height="68" rx="4" class="cb-muro"/><rect x="112" y="10" width="68" height="68" rx="4" class="cb-muro"/>
+              <rect x="10" y="112" width="68" height="68" rx="4" class="cb-muro"/><rect x="112" y="112" width="68" height="68" rx="4" class="cb-muro"/>
+              <path d="M95 95 84 89A12 12 0 1 1 84 101Z" class="cb-pac"/>
+              <path d="M150 103V91A9 9 0 0 1 168 91V103L165 100L162 103L159 100L156 103L153 100Z" class="cb-fantasma"/>
+              <path d="M78 95H22" class="cb-ruta"/>
+              <text x="95" y="202" class="mc-t mc-centro" font-weight="700">ahora, con "alejarse"</text>
+              <text x="95" y="218" class="mc-t mc-centro">va a la izquierda</text>
+            </g>
+          </svg>
+        </figure>
+        <p>
+          Las distancias son las mismas, así que para la similitud los dos cruces son iguales, pero <code>RIGHT</code> sólo
+          era buena idea porque el fantasma estaba a la izquierda. Esto se puede arreglar de dos formas.
+        </p>
+        <p>
+          La primera es describir mejor la situación, añadiendo por qué lado viene el fantasma (el movimiento que lleva hacia
+          él). Así los dos cruces ya no se parecen y el caso guardado no se recupera. Funciona, pero la base necesita un caso
+          por cada lado y tarda más en llenarse.
+        </p>
+        <p>
+          La segunda es guardar la solución en relativo: en lugar de <code>RIGHT</code>, guardar "alejarse del fantasma más
+          cercano", y al reutilizarla calcular qué movimiento es eso en el cruce de ahora
+          (<code>game.getNextMoveAwayFromTarget</code>). La misma solución sirve en cualquier sitio del laberinto, y la
+          adaptación sale sola.
+        </p>
+        <p>
+          Esto último os suena, porque son las acciones de las prácticas 3 y 4 (<code>HuirAction</code>,
+          <code>IrAPPillAction</code>, <code>ComerAction</code>, <code>PerseguirAction</code>). Si la solución de un caso es
+          el nombre de una de esas acciones, el CBR decide <em>qué</em> hacer y la acción, que ya teníais escrita, decide
+          <em>cómo</em>. Es el mismo reparto que con las reglas, sólo que aquí la acción la eligen los casos.
+        </p>
+        <div class="note trap">
+          <span class="note-label">Un movimiento copiado puede ser imposible</span>
+          <p>
+            Si guardáis movimientos, el que copiáis puede llevar contra una pared en el cruce de ahora. El motor no se
+            queja (si la dirección no existe, o si es dar media vuelta, Ms. Pac-Man sigue como iba), pero el caso se guarda
+            con el movimiento que se <em>pidió</em> y no con el que se hizo, y la base acaba llena de soluciones que nunca
+            pasaron. Comprobad que el movimiento está entre <code>game.getPossibleMoves(nodo, ultimoMovimiento)</code> y, si
+            no, elegid otro (el del siguiente vecino, por ejemplo).
+          </p>
+        </div>
+        <p>
+          Se suele distinguir entre dos formas de reutilizar. La <strong>transformacional</strong> parte de la solución del
+          caso más parecido y cambia lo que no encaja, a veces con trozos de las soluciones de otros vecinos, y la
+          <strong>constructiva</strong> monta una solución nueva juntando partes de varios casos (votar es constructiva, en
+          su forma más simple) <!--cite recio-cbr-recuperar | transp. 23--><span class="cita">[<a href="#ref-recio-cbr-recuperar" id="cita-recio-cbr-recuperar">1</a>, transp. 23]</span><!--/cite-->.
+        </p>
+        <p>
+          Fuera de los juegos, adaptar suele ser lo más difícil del CBR. CHEF, el sistema de recetas de la
+          <a href="que-es.html#usos">página 01</a>, cambiaba un ingrediente por otro parecido cuando la receta recuperada
+          llevaba algo que el usuario no quería, y luego comprobaba si el plato seguía funcionando <!--cite hammond-chef--><span class="cita">[<a href="#ref-hammond-chef" id="cita-hammond-chef">2</a>]</span><!--/cite-->. jCOLIBRI trae métodos de
+          adaptación sencillos (copiar un atributo de la consulta a la solución, o ajustar un número en proporción) <!--cite recio-cbr-jcolibri | transp. 30, 35--><span class="cita">[<a href="#ref-recio-cbr-jcolibri" id="cita-recio-cbr-jcolibri">3</a>, transp. 30, 35]</span><!--/cite-->, pero la
+
+          adaptación de verdad depende del dominio y la tenéis que escribir vosotros.
+        </p>
+      </section>
+
+      <section id="sin-caso" data-corto="Sin caso parecido">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2 class="sec">Cuando no hay nada parecido</h2>
+        </div>
+        <p>
+          Recuperar siempre devuelve algo, porque el caso más parecido de la base existe aunque no se parezca casi nada. Si la
+          similitud es baja, copiarlo es tan arbitrario como tirar una moneda (y peor, porque parece una decisión con
+          fundamento). Por eso se pone un <strong>umbral</strong>, y por debajo de él se considera que no hay caso y se decide
+          de otra forma.
+        </p>
+        <p>
+          Una opción es elegir al azar entre los movimientos posibles, que es lo que hace la plantilla. Sirve para explorar,
+          pero en una partida de verdad pierde vidas. La otra es decidir con un controlador que ya tenéis, el de reglas de la
+          Práctica&nbsp;3 o el borroso de la 4, que decide algo razonable, y el caso que sale de ahí se guarda igual que los
+          demás. Con el tiempo, la base aprende de ese controlador y, si ve que algo sale mejor, lo mejora.
+        </p>
+        <p>
+          En la plantilla, lo que se hace por debajo del umbral está en el método <code>planB</code> del motor, que de
+          momento juega al azar. Ahí es donde iría ese controlador. Eso sí, en el concurso el plan B va apagado y por debajo
+          del umbral se juega al azar, porque lo que se mide es lo que aprende la base (lo cuenta <a
+          href="../../practicas/practica-6.html#concurso">el enunciado</a>).
+        </p>
+        <p>
+          Esto último es un sistema <strong>híbrido</strong> (reglas para lo que se sabe escribir, casos para lo que se
+          aprende jugando), algo muy común fuera de las prácticas, y el umbral es el que decide cuánto manda cada parte.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Cómo elegir el umbral</span>
+          <p>
+            Imprimid la similitud del caso recuperado durante unas cuantas partidas y mirad cómo se reparte. Si casi todas
+            salen por encima de 0,9 (con rangos grandes pasa, como vimos en la <a href="similitud.html#global">página
+            anterior</a>), un umbral de 0,7 no hace nada.
+          </p>
+        </div>
+      </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-recio-cbr-recuperar">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: recuperación y adaptación</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-recuperar" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-hammond-chef">K. J. Hammond. "CHEF: A Model of Case-Based Planning". <em>Proceedings of AAAI-86, 267–271</em>, 1986. <a class="volver" href="#cita-hammond-chef" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-recio-cbr-jcolibri">J. A. Recio-García. <em>Tema 04. Razonamiento basado en casos: jCOLIBRI</em>. Transparencias de Ingeniería de Comportamientos Inteligentes, Facultad de Informática, UCM, 2025. <a class="volver" href="#cita-recio-cbr-jcolibri" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
+      <nav class="pager" aria-label="Páginas del tema 6">
+        <a class="pager-prev" href="similitud.html"><span class="pager-l">Anterior</span><span class="pager-t">Recuperar: la similitud</span></a>
+        <a class="pager-next" href="revisar-retener.html"><span class="pager-l">Siguiente</span><span class="pager-t">Revisar, retener y olvidar</span></a>
+      </nav>
+
+    </main>
+
+    <aside class="rail">
+      <div class="rail-inner">
+        <nav aria-labelledby="en-esta-pagina">
+          <h2 id="en-esta-pagina">En esta página</h2>
+          <ol>
+            <li><a href="#copiar">Copiar</a></li>
+            <li><a href="#votar">Votar por resultados</a></li>
+            <li><a href="#adaptar">Adaptar</a></li>
+            <li><a href="#sin-caso">Sin caso parecido</a></li>
+            <li><a href="#referencias">Referencias</a></li>
+          </ol>
+        </nav>
+        <nav aria-labelledby="del-tema">
+          <h2 id="del-tema">Tema 6</h2>
+          <ol>
+            <li><a href="index.html"><span>00</span>Índice del tema</a></li>
+            <li><a href="que-es.html"><span>01</span>Recordar en vez de razonar</a></li>
+            <li><a href="similitud.html"><span>02</span>Recuperar: la similitud</a></li>
+            <li><a href="reutilizar.html" aria-current="page"><span>03</span>Reutilizar y adaptar</a></li>
+            <li><a href="revisar-retener.html"><span>04</span>Revisar, retener y olvidar</a></li>
+            <li><a href="jcolibri.html"><span>05</span>CBR en Ms. Pac-Man</a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+
+  <!--ICI:FOOT-->
+  <footer class="page">
+    <p>
+      <strong>Ingeniería de Comportamientos Inteligentes</strong> · Curso 2026 – 2027 ·
+      Facultad de Informática, Universidad Complutense de Madrid.
+    </p>
+    <p>
+      Pablo Gutiérrez Sánchez · despacho 409 ·
+      <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> ·
+      <a href="../../index.html#profesor">tutorías</a>
+    </p>
+    <p class="fine">
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
+    </p>
+    <p class="credito">
+      Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
+      adaptación del motor de la competición <em>Ms. Pac-Man vs Ghosts</em> (Piers R. Williams,
+      University of Essex) realizada en el grupo GAIA de la UCM, y se distribuye bajo GNU GPL v3.
+    </p>
+  </footer>
+  <!--/ICI:FOOT-->
+</div>
+
+<script src="../../assets/js/ici.js" defer></script>
+</body>
+</html>

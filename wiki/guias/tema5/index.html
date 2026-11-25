@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../../index.html">Inicio</a></li>
-        <li><a href="../../presentacion.html">Presentación</a></li>
         <li><a href="../../calendario.html">Calendario</a></li>
         <li><a href="../../practicas/index.html">Prácticas</a></li>
-        <li><a href="../../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -50,7 +50,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="../index.html">Guías</a>
+    <a href="../index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Tema 5</span>
   </nav>
@@ -61,9 +61,9 @@
       <span class="thin">Simular el futuro en vez de describir el presente.</span>
     </h1>
     <p class="standfirst">
-      Los apuntes del tema&nbsp;5, en cinco páginas cortas. Hasta ahora la decisión la escribíais vosotros; aquí el programa
-      la busca, probando jugadas y mirando cómo acaban. El centro del tema es Monte Carlo Tree Search, el algoritmo de la
-      Práctica&nbsp;5, que se programa en Python sobre ajedrez.
+      Los apuntes del tema&nbsp;5, repartidos en cinco páginas cortas. Hasta ahora la decisión la escribíais vosotros, y aquí
+      es el programa el que la busca, probando jugadas y mirando cómo acaban. El centro del tema es Monte Carlo Tree Search,
+      el algoritmo de la Práctica&nbsp;5, que programaréis en Python sobre ajedrez.
     </p>
     <div class="byline">
       <span><strong>Pablo Gutiérrez Sánchez</strong></span>
@@ -95,8 +95,8 @@
           <h2 class="sec">Las páginas</h2>
         </div>
         <p>
-          Van en orden. Las dos primeras son lo que hay que saber para la práctica; la tercera, lo que os hará falta para
-          mejorarla; las dos últimas, para ir más allá.
+          Van en orden. Las dos primeras son lo que hay que saber para la práctica, la tercera es lo que os hará falta para
+          mejorarla y las dos últimas son para ir más allá (si os pica la curiosidad).
         </p>
         <ul class="links">
           <li>
@@ -143,21 +143,21 @@
           <h2 class="sec">Lo que hay que llevarse</h2>
         </div>
         <ol>
-          <li>En un juego por turnos con reglas conocidas se puede <strong>buscar</strong>: probar jugadas, imaginar las respuestas y elegir mirando cómo acaban. Nadie escribe la decisión; el programa la encuentra.</li>
-          <li>El árbol de juego crece como <!--tex b^d --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>b</mi><mi>d</mi></msup></mrow><annotation encoding="application/x-tex">b^d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span></span></span></span></span></span></span></span><!--/tex-->: unas <!--tex 10^{123} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>123</mn></msup></mrow><annotation encoding="application/x-tex">10^{123}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">123</span></span></span></span></span></span></span></span></span></span></span></span><!--/tex--> partidas en ajedrez. Ningún método lo recorre entero; todos deciden qué trozo mirar.</li>
+          <li>En un juego por turnos con reglas conocidas se puede <strong>buscar</strong>: probar jugadas, imaginar las respuestas y elegir mirando cómo acaban, y así es el propio programa el que encuentra la decisión.</li>
+          <li>El árbol de juego crece como <!--tex b^d --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>b</mi><mi>d</mi></msup></mrow><annotation encoding="application/x-tex">b^d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span></span></span></span></span></span></span></span><!--/tex-->: unas <!--tex 10^{123} --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>123</mn></msup></mrow><annotation encoding="application/x-tex">10^{123}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">123</span></span></span></span></span></span></span></span></span></span></span></span><!--/tex--> partidas en ajedrez. Ningún método lo recorre entero, así que todos tienen que decidir qué trozo mirar.</li>
           <li><strong>Minimax</strong> supone que el rival juega bien: MAX se queda con el máximo de sus hijos y MIN con el mínimo. <strong>Alfa-beta</strong> poda lo que ya no puede cambiar la decisión.</li>
-          <li>Minimax tiene que cortar, y detrás del corte sólo sabe lo que diga la <strong>función de evaluación</strong>. Si no se sabe escribir, como en go, no sirve.</li>
-          <li><strong>MCTS</strong> valora jugando: en cada iteración <strong>selecciona</strong> con UCB1, <strong>expande</strong> un nodo, <strong>simula</strong> una partida y <strong>retropropaga</strong> el resultado. Más tiempo es mejor juego.</li>
+          <li>Minimax tiene que cortar, y detrás del corte sólo sabe lo que diga la <strong>función de evaluación</strong>, y si no sabemos escribirla (como pasa en go), minimax no sirve.</li>
+          <li><strong>MCTS</strong> valora jugando: en cada iteración <strong>selecciona</strong> con UCB1, <strong>expande</strong> un nodo, <strong>simula</strong> una partida y <strong>retropropaga</strong> el resultado. Cuanto más tiempo le dejéis, mejor juega.</li>
           <li><strong>UCB1</strong> reparte los intentos entre explotar lo que va bien y explorar lo poco probado: media más <!--tex c --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span><!--/tex--> por la raíz de <!--tex \ln n --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ln</mi><mo>⁡</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\ln n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span><!--/tex--> entre <!--tex n_i --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">n_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><!--/tex-->.</li>
-          <li>Cada nodo cuenta las victorias <strong>del jugador que hizo la jugada que lleva a él</strong>. Sumar siempre las de un mismo color es el error típico. Al final se juega el hijo <strong>más visitado</strong>.</li>
-          <li>En ajedrez, con simulaciones al azar, MCTS no ve las trampas tácticas: una media esconde la única respuesta que lo cambia todo. Cortar y evaluar, simular con criterio, buscar mates y mezclar con minimax son las mejoras.</li>
-          <li>Con <strong>dados</strong>, nodos de azar con la media pesada. Con <strong>cartas escondidas</strong>, determinizar (inventarse lo que no se ve), con cuidado con la fusión de estrategias, que ISMCTS arregla.</li>
+          <li>Cada nodo cuenta las victorias <strong>del jugador que hizo la jugada que lleva a él</strong>. El error típico es sumar siempre las de un mismo color. Al final se juega el hijo <strong>más visitado</strong>.</li>
+          <li>En ajedrez, con simulaciones al azar, MCTS no ve las trampas tácticas: una media esconde la única respuesta que lo cambia todo. Las mejoras van por ahí: cortar y evaluar, simular con criterio, buscar mates y mezclar con minimax.</li>
+          <li>Con <strong>dados</strong>, nodos de azar que hacen la media pesada. Con <strong>cartas escondidas</strong>, determinizar (inventarse lo que no se ve), pero cuidado con la fusión de estrategias, que es lo que arregla ISMCTS.</li>
         </ol>
         <div class="note mine">
           <span class="note-label">Y en la práctica</span>
           <p>
-            La <a href="../mcts-paso-a-paso.html">guía paso a paso</a> lleva del tablero vacío a dos jugadores, un minimax con
-            alfa-beta y un MCTS, en Python y con Visual Studio Code. Después, experimentar con ellos y mejorarlos es cosa
+            La <a href="../mcts-paso-a-paso.html">guía paso a paso</a> de la <a href="../../practicas/practica-5.html">Práctica&nbsp;5</a> lleva del tablero vacío a dos jugadores, un minimax con
+            alfa-beta y un MCTS, en Python y con Visual Studio Code. Después, experimentar con ellos y mejorarlos ya es cosa
             vuestra.
           </p>
         </div>
@@ -203,7 +203,7 @@
       <a href="../../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

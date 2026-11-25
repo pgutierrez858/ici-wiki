@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -57,13 +57,13 @@
 
   <header class="masthead">
     <h1>
-      Controladores algorítmicos
+      Práctica 1 · Controladores algorítmicos
       <span class="thin">Escribir a mano los comportamientos de Ms. Pac-Man y de los fantasmas.</span>
     </h1>
     <p class="standfirst">
       El objetivo de esta práctica es implementar los comportamientos tanto de Ms.&nbsp;Pac-Man como de los
       fantasmas <strong>de forma algorítmica</strong>, en Java, sin ninguna representación explícita del
-      conocimiento: condicionales, bucles y estructuras de datos. Es la línea base contra la que se van a
+      conocimiento: condicionales, bucles y estructuras de datos. Es la línea base contra la que vamos a
       comparar todas las técnicas del resto del curso, así que conviene que sea buena.
     </p>
     <div class="byline">
@@ -124,31 +124,31 @@
         <p>
           Siendo una primera aproximación al diseño de los comportamientos, no se espera una implementación
           exhaustiva. Por eso se fija un <strong>máximo de 500 líneas de código por cada
-          comportamiento</strong>. Con ese límite la solución tiene que ser <em>elegida</em> en vez de
-          acumulada, que es exactamente la habilidad que se evalúa.
+          comportamiento</strong>. Con ese límite os toca <em>elegir</em> qué meter en vez de ir
+          acumulando cosas, y eso es en buena parte lo que se evalúa.
         </p>
         <div class="note trap">
           <span class="note-label">Nada de aprendizaje ni de persistencia</span>
           <p>
             En esta implementación <strong>no se permite ningún esquema de aprendizaje</strong> donde se
             guarden datos sobre las partidas o los oponentes en cualquier medio de persistencia: bases de
-            datos, ficheros, ni nada parecido. Todo lo que decide tu controlador tiene que salir del
-            <code>Game</code> que recibe en ese turno y de lo que tú hayas escrito a mano.
+            datos, ficheros, ni nada parecido. Todo lo que decide vuestro controlador tiene que salir del
+            <code>Game</code> que recibe en ese turno y de lo que hayáis escrito a mano.
           </p>
           <p>
             Guardar estado <em>dentro</em> de la partida sí vale (el último movimiento, un contador, un
-            objetivo que estás siguiendo): eso no es aprender, es recordar.
+            objetivo que estáis siguiendo), porque eso es recordar, no aprender.
           </p>
         </div>
         <div class="note tip">
           <span class="note-label">Antes de empezar</span>
           <p>
-            Lee los apuntes del tema:
-            <a href="../guias/tema1/index.html"><strong>Tema 2 · IA para videojuegos</strong></a>. Están
+            Leed los apuntes del tema:
+            <a href="../guias/tema2/index.html"><strong>Tema 2 · IA para videojuegos</strong></a>. Están
             escritos para esta práctica, y las páginas de
-            <a href="../guias/tema1/astar-mspacman.html">A* en Ms.&nbsp;Pac-Man</a> y de
-            <a href="../guias/tema1/estrategias.html">estrategias algorítmicas</a> son directamente el
-            material de trabajo. Ten a mano también la
+            <a href="../guias/tema2/astar-mspacman.html">A* en Ms.&nbsp;Pac-Man</a> y de
+            <a href="../guias/tema2/estrategias.html">estrategias algorítmicas</a> son directamente el
+            material de trabajo. Tened a mano también la
             <a href="../guias/clase-game.html">referencia de la clase <code>Game</code></a>.
           </p>
         </div>
@@ -161,8 +161,8 @@
         </div>
         <p>
           El simulador se configurará <strong>sin visibilidad parcial</strong> y con el
-          <strong>tiempo máximo de razonamiento por defecto (40&nbsp;ms)</strong>. Es decir: tu controlador
-          ve el estado completo de la partida, y tiene 40&nbsp;ms anunciados para contestar.
+          <strong>tiempo máximo de razonamiento por defecto (40&nbsp;ms)</strong>. Es decir, vuestro controlador
+          ve el estado completo de la partida y tiene 40&nbsp;ms anunciados para contestar.
         </p>
         <div class="codigo"><pre><code>Executor executor = <span class="k">new</span> Executor.Builder()
         .setTickLimit(<span class="n">4000</span>)
@@ -174,14 +174,14 @@
         .build();</code></pre></div>
         <p>
           La evaluación se hace con <code>runExperiment</code>, o sea varias partidas seguidas, y se usa la
-          <strong>puntuación media</strong>. Acostúmbrate desde el primer día a mirar la media de veinte
-          partidas y no el resultado de una: con controladores que tienen algo de azar, una partida suelta
+          <strong>puntuación media</strong>. Acostumbraos desde el primer día a mirar la media de veinte
+          partidas y no el resultado de una, porque con controladores que tienen algo de azar una partida suelta
           no dice nada.
         </p>
         <h3 class="label">El presupuesto de 40 ms, con precisión</h3>
         <p>
           <strong>Hay dos formas muy distintas de ejecutar una partida</strong>, y el reloj sólo existe en
-          una de ellas. Saber en cuál estás cambia lo que tiene sentido programar.
+          una de ellas. Según en cuál estéis, tiene sentido programar unas cosas u otras.
         </p>
         <div class="table-scroll">
           <table>
@@ -196,22 +196,22 @@
               <tr>
                 <td>Cuándo se usa</td>
                 <td><strong>En clase y en la corrección.</strong></td>
-                <td>En la competición, y si lo pides tú.</td>
+                <td>En la competición, y si lo pedís vosotros.</td>
               </tr>
               <tr>
-                <td>Cómo te llama</td>
-                <td>Llama a tu <code>getMove(game, timeDue)</code> y <strong>se queda esperando</strong> a que vuelvas.</td>
-                <td>Te despierta un hilo aparte, duerme 40&nbsp;ms y sigue con lo que haya.</td>
+                <td>Cómo os llama</td>
+                <td>Llama a vuestro <code>getMove(game, timeDue)</code> y <strong>se queda esperando</strong> a que termine.</td>
+                <td>Os despierta un hilo aparte, duerme 40&nbsp;ms y sigue con lo que haya.</td>
               </tr>
               <tr>
-                <td>Si tardas 200&nbsp;ms</td>
-                <td>No pasa nada: la partida tarda 200&nbsp;ms más en ese turno. <strong>Tu movimiento se usa entero.</strong></td>
-                <td>El juego avanza 5 turnos con el <strong>último movimiento que dejaste puesto</strong>.</td>
+                <td>Si tardáis 200&nbsp;ms</td>
+                <td>No pasa nada, la partida tarda 200&nbsp;ms más en ese turno. <strong>Vuestro movimiento se usa entero.</strong></td>
+                <td>El juego avanza 5 turnos con el <strong>último movimiento que dejasteis puesto</strong>.</td>
               </tr>
               <tr>
                 <td>Qué es <code>timeDue</code></td>
                 <td>Un plazo <em>anunciado</em>: <code>ahora + 40&nbsp;ms</code>. Nadie lo comprueba.</td>
-                <td>El instante real en que el motor va a mirar tu respuesta.</td>
+                <td>El instante real en que el motor va a mirar vuestra respuesta.</td>
               </tr>
             </tbody>
           </table>
@@ -219,25 +219,25 @@
         <div class="note trap">
           <span class="note-label">El detalle del modo con reloj que casi nadie espera</span>
           <p>
-            Mientras tu cálculo anterior sigue corriendo, el motor <strong>no lanza otro</strong>: tu
-            <code>getMove</code> <em>ni siquiera se llama</em> para esos turnos. Un cálculo de 200&nbsp;ms no
-            son cinco turnos decididos con información vieja, son cinco turnos en los que no te preguntan
-            nada. Lo puedes ver en <code>Controller.run()</code>, en la línea
+            Mientras vuestro cálculo anterior sigue corriendo, el motor <strong>no lanza otro</strong>, así que vuestro
+            <code>getMove</code> <em>ni siquiera se llama</em> en esos turnos. Con un cálculo de 200&nbsp;ms
+            no tenéis cinco turnos decididos con información vieja (que es lo que uno esperaría), tenéis cinco turnos en los que el motor no os pregunta
+            nada. Lo podéis ver en <code>Controller.run()</code>, en la línea
             <code>if (!threadStillRunning)</code>.
           </p>
         </div>
 
         <h3 class="label">¿Hay que devolver un movimiento en cada turno?</h3>
         <p>
-          <strong>No.</strong> Y merece la pena saber exactamente qué hace el motor cuando no le das nada
-          utilizable, porque es lo que permite repartir el trabajo. Está en
+          <strong>No.</strong> Y merece la pena saber qué hace exactamente el motor cuando no le dais nada
+          utilizable, porque es lo que os permite repartir el trabajo. Está en
           <code>Game.correctPacManDir</code>, y la regla es esta, por orden:
         </p>
         <ol>
           <li>Si el movimiento es <strong>legal</strong> en ese nodo y no es dar media vuelta, se usa.</li>
-          <li>Si no lo es (<code>null</code>, ilegal o un giro de 180°), <strong>se sigue en la dirección que llevabas</strong>.</li>
-          <li>Si tampoco se puede seguir recto, el motor elige por ti cualquier salida legal que no sea retroceder.</li>
-          <li>Y si no hay ninguna, <code>NEUTRAL</code>: te quedas quieto.</li>
+          <li>Si no lo es (<code>null</code>, ilegal o un giro de 180°), <strong>se sigue en la dirección que llevabais</strong>.</li>
+          <li>Si tampoco se puede seguir recto, el motor elige por vosotros cualquier salida legal que no sea retroceder.</li>
+          <li>Y si no hay ninguna, <code>NEUTRAL</code>, o sea, os quedáis quietos.</li>
         </ol>
         <p>
           Con los fantasmas pasa lo mismo por otro camino: el fantasma que no aparezca en el
@@ -248,20 +248,20 @@
         <div class="note trap">
           <span class="note-label">Dos consecuencias que hay que tener presentes</span>
           <p>
-            La primera: <strong>el giro de 180° se ignora en silencio</strong>. Si vas hacia la derecha y
-            devuelves <code>LEFT</code>, no te das la vuelta ni te quedas quieto: sigues hacia la derecha. La
+            La primera: <strong>el giro de 180° se ignora en silencio</strong>. Si vais hacia la derecha y
+            devolvéis <code>LEFT</code>, ni os dais la vuelta ni os quedáis quietos, seguís hacia la derecha. La
             única excepción del juego es el fantasma al que le cae encima una píldora de poder.
           </p>
           <p>
-            La segunda: en un cruce, <strong>"no decidir" no es neutral</strong>. Es "sigo recto", que es una
-            de las opciones, y muchas veces la mala.
+            La segunda: en un cruce, <strong>"no decidir" no es neutral</strong>, porque equivale a "sigo recto", que es una
+            de las opciones (y muchas veces la mala).
           </p>
         </div>
 
-        <h3 class="label">Sí, puedes gastar 200 ms en un cruce</h3>
+        <h3 class="label">Sí, podéis gastar 200 ms en un cruce</h3>
         <p>
           El trabajo no está repartido por igual entre los 4000 turnos:
-          en un pasillo no hay nada que decidir y en un cruce hay que decidirlo todo. Así que concentra el
+          en un pasillo no hay nada que decidir y en un cruce hay que decidirlo todo, así que concentrad el
           presupuesto donde sirve:
         </p>
         <figure>
@@ -273,8 +273,8 @@
 <b>end function</b></pre>
         </figure>
         <p>
-          En el modo con el que se corrige eso es legal y no cuesta nada más que reloj. Lo único que se paga
-          es el tiempo de la corrección, y conviene no olvidarlo: en una partida Ms.&nbsp;Pac-Man pisa un cruce
+          En el modo con el que se corrige eso es legal y sólo cuesta reloj, o sea, tiempo de corrección
+          (que tampoco conviene olvidar): en una partida Ms.&nbsp;Pac-Man pisa un cruce
           más o menos uno de cada veinte turnos, y un controlador que gaste 200&nbsp;ms en cada decisión
           alarga así una partida de 4000 turnos:
         </p>
@@ -294,13 +294,13 @@
           Y la corrección son muchas partidas. Con 20&nbsp;ms por cruce ni se nota.
         </p>
         <div class="note tip">
-          <span class="note-label">Y si además quieres que aguante el modo con reloj</span>
+          <span class="note-label">Y si además queréis que aguante el modo con reloj</span>
           <p>
-            La clase <code>Controller</code> te deja el campo <code>lastMove</code> como
+            La clase <code>Controller</code> os deja el campo <code>lastMove</code> como
             <code>protected</code>, y el comentario del propio motor dice para qué:
             <em lang="en">"You can set this directly in your getMove() method to save an immediate
-            response"</em>. Es el patrón <em lang="en">anytime</em> del que habla el tema 5: apunta enseguida
-            un movimiento decente, sigue calculando, y ve mejorándolo.
+            response"</em>. Es el patrón <em lang="en">anytime</em> del que habla el tema 5: apuntáis enseguida
+            un movimiento decente, seguís calculando y lo vais mejorando.
           </p>
 <pre><code><span class="c">@Override</span>
 <span class="k">public</span> MOVE getMove(Game game, <span class="k">long</span> timeDue) {
@@ -313,8 +313,8 @@
     <span class="k">return</span> lastMove;
 }</code></pre>
           <p>
-            Para esta práctica no hace falta, porque la corrección espera. Pero es la forma correcta de
-            escribirlo si alguna vez el reloj es de verdad, y no cuesta nada dejarlo así desde el principio.
+            Para esta práctica no hace falta, porque la corrección espera, pero es la forma buena de
+            escribirlo si alguna vez el reloj va en serio, y no cuesta nada dejarlo así desde el principio.
           </p>
         </div>
       </section>
@@ -347,13 +347,13 @@
               </tr>
               <tr>
                 <td>Repertorio de técnicas</td>
-                <td>Lo que viene en la sección siguiente. Un controlador que sólo encadena condicionales sobre distancias aprueba; no pasa de ahí.</td>
+                <td>Lo que viene en la sección siguiente. Un controlador que sólo encadena condicionales sobre distancias aprueba, pero no pasa de ahí.</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p>
-          Los dos comportamientos cuentan. Un grupo con una Ms.&nbsp;Pac-Man excelente y unos fantasmas que
+          Los dos comportamientos cuentan, así que un grupo con una Ms.&nbsp;Pac-Man excelente y unos fantasmas que
           se limitan a perseguir en línea recta ha hecho media práctica.
         </p>
         <div class="note tip">
@@ -375,14 +375,14 @@
           <h2 class="sec">Qué se espera: el repertorio</h2>
         </div>
         <p>
-          No se trata de encadenar
-          condicionales sobre <code>getShortestPathDistance</code> hasta que la cosa más o menos funcione.
-          Lo que distingue una práctica notable de una de sobresaliente es <strong>qué preguntas se hace el
-          controlador antes de decidir</strong>, y son estas.
+          Encadenar
+          condicionales sobre <code>getShortestPathDistance</code> hasta que la cosa más o menos funcione da para poco.
+          Lo que separa una práctica de notable de una de sobresaliente es, diría, <strong>qué preguntas se hace el
+          controlador antes de decidir</strong>, y van aquí abajo.
         </p>
         <p>
           No hace falta implementarlas todas, y desde luego no caben todas en 500 líneas. Elegid tres o
-          cuatro, hacedlas bien, y que se note en la partida.
+          cuatro, hacedlas bien y que se note en la partida.
         </p>
 
         <h3 class="label">Para Ms. Pac-Man</h3>
@@ -400,11 +400,11 @@
               </tr>
               <tr>
                 <td><strong>"¿Llego yo antes?"</strong></td>
-                <td>Comparar tu distancia a un cruce con la de cada fantasma <em>a ese mismo cruce</em>, con un margen. Es la diferencia entre huir y ponerse a salvo.</td>
+                <td>Comparar vuestra distancia a un cruce con la de cada fantasma <em>a ese mismo cruce</em>, con un margen. Con esto pasáis de huir sin más a poneros a salvo.</td>
               </tr>
               <tr>
                 <td><strong>Mirar dos cruces por delante</strong></td>
-                <td>Un tramo seguro que desemboca en un cruce sin salidas seguras es una trampa. Con profundidad 2 se detecta; con más, la predicción ya no vale nada.</td>
+                <td>Un tramo seguro que desemboca en un cruce sin salidas seguras es una trampa. Con profundidad 2 se detecta, y con más la predicción ya no vale gran cosa.</td>
               </tr>
               <tr>
                 <td><strong>Búsqueda propia restringida</strong></td>
@@ -412,15 +412,15 @@
               </tr>
               <tr>
                 <td><strong>Prioridades explícitas</strong></td>
-                <td>Un orden de decisión escrito y defendible: primero comer fantasma comestible si compensa, luego píldora de poder si hay presión, luego píldora normal, y al final sobrevivir.</td>
+                <td>Un orden de decisión escrito y que podáis defender: primero comer fantasma comestible si compensa, luego píldora de poder si hay presión, luego píldora normal, y al final sobrevivir.</td>
               </tr>
               <tr>
                 <td><strong>Umbrales que se mueven</strong></td>
-                <td>Un umbral fijo es una decisión tomada a ciegas. Que la distancia a la que merece la pena perseguir crezca con la cadena de fantasmas ya comidos, por ejemplo, es conocimiento del dominio metido en un número.</td>
+                <td>Un umbral fijo es una decisión tomada a ciegas. Si la distancia a la que merece la pena perseguir crece con la cadena de fantasmas ya comidos, por ejemplo, estáis metiendo conocimiento del dominio en un número.</td>
               </tr>
               <tr>
                 <td><strong>La píldora de poder como recurso</strong></td>
-                <td>Comérsela al pasar es desperdiciarla. Guardarla, y gastarla cuando hay varios fantasmas encima y cerca, multiplica la puntuación: los cuatro fantasmas con una sola píldora valen tanto como 300 píldoras normales.</td>
+                <td>Comérsela al pasar es desperdiciarla. Si la guardáis y la gastáis cuando hay varios fantasmas encima y cerca, la puntuación se multiplica: los cuatro fantasmas con una sola píldora valen tanto como 300 píldoras normales.</td>
               </tr>
               <tr>
                 <td><strong>El final del nivel</strong></td>
@@ -441,7 +441,7 @@
             <tbody>
               <tr>
                 <td><strong>Papeles distintos</strong></td>
-                <td>Un <code>switch</code> sobre <code>GHOST</code> y cuatro comportamientos: uno persigue, otro intercepta, otro cubre el túnel, otro vigila la píldora de poder. Cuatro clones del mismo perseguidor son un solo fantasma con cuatro cuerpos.</td>
+                <td>Un <code>switch</code> sobre <code>GHOST</code> y cuatro comportamientos: uno persigue, otro intercepta, otro cubre el túnel, otro vigila la píldora de poder. Cuatro clones del mismo perseguidor son, en la práctica, un solo fantasma con cuatro cuerpos.</td>
               </tr>
               <tr>
                 <td><strong>Dispersión al empezar</strong></td>
@@ -449,27 +449,27 @@
               </tr>
               <tr>
                 <td><strong>Interceptar, no seguir</strong></td>
-                <td>Perseguir por el camino más corto es ir siempre por detrás. Predecir el próximo cruce de Ms.&nbsp;Pac-Man y dirigirse <em>ahí</em> es lo que la acorrala.</td>
+                <td>Perseguir por el camino más corto es ir siempre por detrás. Para acorralarla hay que predecir el próximo cruce de Ms.&nbsp;Pac-Man y dirigirse <em>ahí</em>.</td>
               </tr>
               <tr>
                 <td><strong>Anticipar la píldora de poder</strong></td>
-                <td>Mirar si en el tramo que Ms.&nbsp;Pac-Man lleva hay una píldora de poder activa, y dispersarse <strong>antes</strong> de que se la coma, no después.</td>
+                <td>Mirar si en el tramo que Ms.&nbsp;Pac-Man lleva hay una píldora de poder activa, y dispersarse <strong>antes</strong> de que se la coma (después ya es tarde).</td>
               </tr>
               <tr>
                 <td><strong>Huir con criterio</strong></td>
-                <td><code>getNextMoveAwayFromTarget</code> mira un paso y un perseguidor, y como casi todas las huidas empatan, elige por el orden del <code>enum MOVE</code>: los cuatro fantasmas resuelven el empate igual y huyen en fila. Mejor: calcular por qué pasillo viene Ms.&nbsp;Pac-Man, descartar esa salida, y elegir entre las demás.</td>
+                <td><code>getNextMoveAwayFromTarget</code> mira un paso y un perseguidor, y como casi todas las huidas empatan, elige por el orden del <code>enum MOVE</code>: los cuatro fantasmas resuelven el empate igual y huyen en fila. Es mejor calcular por qué pasillo viene Ms.&nbsp;Pac-Man, descartar esa salida y elegir entre las demás.</td>
               </tr>
               <tr>
                 <td><strong>Dejar de huir a tiempo</strong></td>
-                <td>Si vas hacia Ms.&nbsp;Pac-Man mientras aún eres comestible, os acercáis 1 + ½ = 3/2 nodos por turno (tú vas a media velocidad), así que te alcanza en 2<em>d</em>/3 turnos. Si el tiempo de comestible que queda es menor que 2/3 de la distancia a la que está, ya no te puede comer: vuelve a perseguir y gana posición mientras los demás siguen huyendo.</td>
+                <td>Si un fantasma va hacia Ms.&nbsp;Pac-Man mientras aún es comestible, se acercan 1 + ½ = 3/2 nodos por turno (el fantasma va a media velocidad), así que ella lo alcanza en 2<em>d</em>/3 turnos. Si el tiempo de comestible que le queda es menor que 2/3 de la distancia a la que está, ya no se lo puede comer, así que puede volver a perseguir y ganar posición mientras los demás siguen huyendo.</td>
               </tr>
               <tr>
                 <td><strong>No perseguir todos lo mismo</strong></td>
-                <td>Repartirse cuadrantes, o que sólo dos persigan mientras los otros dos cortan las salidas, es coordinación de verdad aunque no haya mensajes: los cuatro ven el mismo estado y pueden repartirse el mapa por convenio.</td>
+                <td>Repartirse cuadrantes, o que sólo dos persigan mientras los otros dos cortan las salidas, ya es coordinarse aunque no haya mensajes, porque los cuatro ven el mismo estado y pueden repartirse el mapa por convenio.</td>
               </tr>
               <tr>
                 <td><strong>Respetar el ciclo</strong></td>
-                <td>Sólo se decide para los fantasmas con <code>doesGhostRequireAction</code>; a los demás no se les pone entrada en el mapa. Y para medir distancias, siempre la versión con <code>lastMoveMade</code>: no pueden darse la vuelta.</td>
+                <td>Sólo se decide para los fantasmas con <code>doesGhostRequireAction</code>; a los demás no se les pone entrada en el mapa. Y para medir distancias, siempre la versión con <code>lastMoveMade</code>, porque no pueden darse la vuelta.</td>
               </tr>
             </tbody>
           </table>
@@ -477,8 +477,8 @@
 
         <h3 class="label">Una forma de organizarlo</h3>
         <p>
-          El esqueleto de una Ms.&nbsp;Pac-Man con este repertorio cabe en muy pocas líneas, porque la
-          complicación está en las funciones auxiliares, no en la decisión:
+          El esqueleto de una Ms.&nbsp;Pac-Man con este repertorio cabe en muy pocas líneas, porque lo complicado
+          está en las funciones auxiliares y la decisión en sí es corta:
         </p>
         <figure>
           <figcaption>Pseudocódigo · <code>MsPacMan</code>, prioridades sobre movimientos seguros</figcaption>
@@ -507,9 +507,9 @@
         </figure>
         <p>
           La condición para ir a comer usa una cota: un fantasma comestible se mueve a media velocidad, así
-          que si está a <em>d</em> pasos lo alcanzas en <strong>2<em>d</em> turnos como mucho</strong>. La
-          cuenta está en los apuntes, en
-          <a href="../guias/tema1/estrategias.html#alcanzar-comestible">¿Me da tiempo a comérmelo?</a>.
+          que si está a <em>d</em> pasos lo alcanzáis en <strong>2<em>d</em> turnos como mucho</strong>. La
+          cuenta la tenéis en los apuntes, en
+          <a href="../guias/tema2/estrategias.html#alcanzar-comestible">¿Me da tiempo a comérmelo?</a>.
         </p>
         <p>
           Y el de los fantasmas, con papeles y con el orden de prioridades al revés:
@@ -573,9 +573,9 @@
           <p>
             El camino <strong>no incluye el nodo de origen</strong>: <code>camino[0]</code> ya es el
             vecino al que hay que moverse. Y devuelve un <code>int[]</code> vacío si el origen es la
-            cárcel o si ya estás en el destino. Acceder a <code>camino[0]</code> sin comprobarlo es la
-            excepción que te tumba la partida en la corrección, y pasa poco: justo lo suficiente para que
-            no la veas probando.
+            cárcel o si ya estáis en el destino. Si accedéis a <code>camino[0]</code> sin comprobarlo, esa
+            excepción os tumba la partida en la corrección, y pasa poco (lo justo para que
+            no la veáis probando).
           </p>
         </div>
         <div class="note mine">
@@ -583,9 +583,9 @@
           <p>
             Todos los números que aparecen en este enunciado (cuándo está "cerca" un fantasma, cuántos
             hacen falta para ir a por la píldora, cuánta holgura se deja al comparar distancias) son
-            decisiones de diseño que hay que <strong>afinar jugando</strong>. Sácalos a una clase de
-            constantes con nombres y un comentario cada uno. Se nota en la nota de calidad de código, y
-            sobre todo se nota en lo rápido que podéis probar variantes.
+            decisiones de diseño que hay que <strong>afinar jugando</strong>. Sacadlos a una clase de
+            constantes con nombres y un comentario cada uno. Se nota en la nota de calidad de código y,
+            sobre todo, en lo rápido que podéis probar variantes.
           </p>
 <pre><code><span class="k">public class</span> Constantes {
     <span class="c">// distancia a la que se considera que un fantasma está cerca</span>
@@ -611,7 +611,7 @@
           los fantasmas de todos los grupos, y al revés. El curso pasado fueron <strong>trece controladores
           de cada tipo</strong> y <strong>300 partidas por emparejamiento</strong>, y la puntuación de
           rendimiento sale de esas medias. Merece la pena mirar cómo quedó, porque el reparto dice bastante
-          sobre dónde está el trabajo.
+          de dónde está el trabajo.
         </p>
         <div class="table-scroll">
           <table>
@@ -630,20 +630,20 @@
           <p>
             Entre la mejor Ms.&nbsp;Pac-Man y la peor hay un factor de <strong>casi cuatro</strong>; entre los
             mejores fantasmas y los peores, de <strong>menos de dos</strong>. Unos fantasmas decentes salen
-            con poco esfuerzo (perseguir ya funciona) y una Ms.&nbsp;Pac-Man decente no. Ahí es donde se
-            separan las notas, y es donde conviene gastar las tardes.
+            con poco esfuerzo (perseguir ya funciona), pero una Ms.&nbsp;Pac-Man decente no, así que ahí es donde se
+            separan las notas y donde conviene gastar las tardes.
           </p>
           <p>
-            La otra lectura: la que ganó no inventó nada que no esté en la sección anterior. Decidía sólo en
+            Por otro lado, la que ganó no inventó nada que no esté en la sección anterior: decidía sólo en
             los cruces, razonaba por tramos, comparaba distancias al mismo punto, miraba dos cruces por
-            delante y tenía sus umbrales en un archivo aparte. Eso, hecho bien, dobló al resto.
+            delante y tenía sus umbrales en un archivo aparte. Con eso bien hecho dobló al resto.
           </p>
         </div>
 
         <h3 class="label">Ideas que aparecieron en las Ms. Pac-Man</h3>
         <p>
-          Ninguna es obligatoria y varias se estorban entre sí. Están aquí para que veáis el abanico de
-          formas distintas de contestar a la misma pregunta.
+          Ninguna es obligatoria y varias se estorban entre sí. Las pongo para que veáis cuántas formas
+          distintas hubo de contestar a la misma pregunta.
         </p>
         <div class="table-scroll">
           <table>
@@ -651,7 +651,7 @@
             <tbody>
               <tr>
                 <td><strong>Prioridades sobre lo seguro</strong></td>
-                <td>Calcular primero qué salidas son seguras a dos cruces vista, y sólo dentro de ese conjunto aplicar el orden comer&nbsp;→ píldora de poder&nbsp;→ píldora&nbsp;→ sobrevivir. Es el esqueleto de la sección anterior, y es el que ganó.</td>
+                <td>Calcular primero qué salidas son seguras a dos cruces vista, y sólo dentro de ese conjunto aplicar el orden comer&nbsp;→ píldora de poder&nbsp;→ píldora&nbsp;→ sobrevivir. Es el esqueleto de la sección anterior, y fue el que ganó.</td>
               </tr>
               <tr>
                 <td><strong>Función de evaluación con pesos</strong></td>
@@ -663,31 +663,31 @@
               </tr>
               <tr>
                 <td><strong>Mapa de costes sobre el laberinto</strong></td>
-                <td>Repartir un coste por nodo (caro alrededor de un perseguidor, barato alrededor de la comida y de los fantasmas comestibles, y la píldora de poder cara o barata según haga falta) y dejar que una búsqueda de coste mínimo decida sola. La decisión deja de ser un <code>if</code> y pasa a ser el mapa.</td>
+                <td>Repartir un coste por nodo (caro alrededor de un perseguidor, barato alrededor de la comida y de los fantasmas comestibles, y la píldora de poder cara o barata según haga falta) y dejar que una búsqueda de coste mínimo decida sola. Así la decisión ya no está en un <code>if</code>, está en el mapa.</td>
               </tr>
               <tr>
-                <td><strong>Juzgar el camino, no el destino</strong></td>
-                <td>Descartar una píldora si <em>algún nodo</em> del camino hasta ella pasa a menos de cierta distancia de un fantasma. Filtrar objetivos por el trayecto entero, no por dónde acaban.</td>
+                <td><strong>Juzgar el camino además del destino</strong></td>
+                <td>Descartar una píldora si <em>algún nodo</em> del camino hasta ella pasa a menos de cierta distancia de un fantasma. O sea, filtrar objetivos mirando el trayecto entero y no sólo dónde acaban.</td>
               </tr>
               <tr>
                 <td><strong>La píldora de poder como zona prohibida</strong></td>
-                <td>Mientras no haya al menos tres fantasmas fuera y cerca, mantenerse <strong>lejos</strong> de la píldora para no gastarla de pasada. Dos grupos lo implementaron así, en negativo, y es la forma más simple de que la píldora deje de desperdiciarse.</td>
+                <td>Mientras no haya al menos tres fantasmas fuera y cerca, mantenerse <strong>lejos</strong> de la píldora para no gastarla de pasada. Dos grupos lo implementaron así, en negativo, y diría que es la forma más simple de dejar de desperdiciar la píldora.</td>
               </tr>
               <tr>
                 <td><strong>Contar píldoras por tramo</strong></td>
-                <td>Al recorrer el pasillo hasta el siguiente cruce, ir sumando cuántas píldoras hay. Entre dos salidas igual de seguras, la que más come. La píldora más cercana casi nunca es el mejor pasillo.</td>
+                <td>Al recorrer el pasillo hasta el siguiente cruce, ir sumando cuántas píldoras hay. Entre dos salidas igual de seguras, la que más come, porque la píldora más cercana casi nunca está en el mejor pasillo.</td>
               </tr>
               <tr>
-                <td><strong>Distancia media, no distancia mínima</strong></td>
-                <td>Al huir, elegir la salida que maximiza la distancia <em>media</em> a todas las amenazas cercanas en vez de la distancia al fantasma más próximo. Alejarse del más cercano es exactamente cómo se cae en la pinza de los otros dos.</td>
+                <td><strong>Distancia media en vez de distancia mínima</strong></td>
+                <td>Al huir, elegir la salida que maximiza la distancia <em>media</em> a todas las amenazas cercanas en vez de la distancia al fantasma más próximo. Si sólo os alejáis del más cercano, es muy fácil acabar en la pinza de los otros dos.</td>
               </tr>
               <tr>
                 <td><strong>¿Me da tiempo a comérmelo?</strong></td>
-                <td>Perseguir un fantasma comestible sólo si el tiempo comestible que le queda da para alcanzarlo, contando que huyendo se acerca la mitad de rápido. Perseguir a uno que deja de ser comestible por el camino es la forma más tonta de morir.</td>
+                <td>Perseguir un fantasma comestible sólo si el tiempo comestible que le queda da para alcanzarlo, contando que huyendo se acerca la mitad de rápido. Perseguir a uno que deja de ser comestible por el camino es, probablemente, la forma más tonta de morir.</td>
               </tr>
               <tr>
                 <td><strong>La píldora invierte la carrera</strong></td>
-                <td>Un tramo al que un fantasma llega antes que tú deja de ser malo si hay una píldora de poder en ese tramo y a <em>ella</em> llegas tú antes. La excepción vale la pena escribirla: convierte huidas en emboscadas.</td>
+                <td>Un tramo al que un fantasma llega antes que vosotros deja de ser malo si hay una píldora de poder en ese tramo y a <em>ella</em> llegáis vosotros antes. Merece la pena escribir esta excepción, porque una huida se convierte en una emboscada.</td>
               </tr>
               <tr>
                 <td><strong>El final, con otro criterio</strong></td>
@@ -704,15 +704,15 @@
             <tbody>
               <tr>
                 <td><strong>Una clase por fantasma</strong></td>
-                <td>En vez de un <code>switch</code> gigante, una interfaz con un único método y cuatro clases que la implementan. El controlador sólo decide <em>quién</em> contesta. Se lee mucho mejor, y es literalmente el paso previo a la Práctica&nbsp;2.</td>
+                <td>En vez de un <code>switch</code> gigante, una interfaz con un único método y cuatro clases que la implementan. El controlador sólo decide <em>quién</em> contesta. Se lee mucho mejor, y es tal cual el paso previo a la Práctica&nbsp;2.</td>
               </tr>
               <tr>
-                <td><strong>Papeles como puestos, no como identidades</strong></td>
-                <td>El papel de "cazador" no es de Blinky: es del fantasma que ahora mismo esté más cerca. Reasignarlos cada turno, con un cupo máximo por papel, hace que la formación se mantenga aunque los fantasmas se mezclen.</td>
+                <td><strong>Papeles como puestos que van rotando</strong></td>
+                <td>El papel de "cazador" no es siempre de Blinky, lo tiene el fantasma que ahora mismo esté más cerca. Reasignarlos cada turno, con un cupo máximo por papel, hace que la formación se mantenga aunque los fantasmas se mezclen.</td>
               </tr>
               <tr>
                 <td><strong>Repartirse los cruces</strong></td>
-                <td>Calcular los cruces por los que Ms.&nbsp;Pac-Man puede pasar en los próximos dos niveles de profundidad y asignar a cada fantasma uno <strong>distinto</strong>, el más cercano que quede libre. Sin mensajes, y sin que dos vayan al mismo sitio.</td>
+                <td>Calcular los cruces por los que Ms.&nbsp;Pac-Man puede pasar en los próximos dos niveles de profundidad y asignar a cada fantasma uno <strong>distinto</strong>, el más cercano que quede libre. Así no hacen falta mensajes y no van dos al mismo sitio.</td>
               </tr>
               <tr>
                 <td><strong>Cercar a distintas profundidades</strong></td>
@@ -720,19 +720,19 @@
               </tr>
               <tr>
                 <td><strong>Memoria en los cruces</strong></td>
-                <td>Un mapa que guarda, por cada cruce, la última dirección que tomó un fantasma allí; el siguiente que pase tiene que elegir otra, y el mapa se borra cada pocos turnos. Dispersión emergente, sin coordinar a nadie.</td>
+                <td>Un mapa que guarda, por cada cruce, la última dirección que tomó un fantasma allí; el siguiente que pase tiene que elegir otra, y el mapa se borra cada pocos turnos. Se dispersan solos, sin que nadie los coordine.</td>
               </tr>
               <tr>
                 <td><strong>Interceptar coincidiendo en el tiempo</strong></td>
-                <td>Expandir a la vez dos búsquedas en anchura, la de Ms.&nbsp;Pac-Man y la del fantasma, anotando <em>en qué turno</em> llega cada uno a cada nodo, y buscar un nodo al que los dos lleguen en el mismo instante y de frente. Es interceptar de verdad, no seguir por detrás.</td>
+                <td>Expandir a la vez dos búsquedas en anchura, la de Ms.&nbsp;Pac-Man y la del fantasma, anotando <em>en qué turno</em> llega cada uno a cada nodo, y buscar un nodo al que los dos lleguen en el mismo instante y de frente. Esto ya es interceptar de verdad, en vez de ir por detrás.</td>
               </tr>
               <tr>
-                <td><strong>Dispersarse antes, no después</strong></td>
-                <td>Todos los grupos que puntuaron bien miraban la píldora de poder: si Ms.&nbsp;Pac-Man está a menos de X de una píldora activa, huir <em>ya</em>. Huir cuando ya eres comestible es tarde.</td>
+                <td><strong>Dispersarse antes de tiempo</strong></td>
+                <td>Todos los grupos que puntuaron bien miraban la píldora de poder: si Ms.&nbsp;Pac-Man está a menos de X de una píldora activa, huir <em>ya</em>, porque cuando el fantasma ya es comestible es tarde.</td>
               </tr>
               <tr>
                 <td><strong>Taponar la píldora</strong></td>
-                <td>La variante agresiva de lo anterior: si el fantasma llega a la píldora antes que Ms.&nbsp;Pac-Man, no huye: se planta encima y le cierra el acceso.</td>
+                <td>La variante agresiva de lo anterior: si el fantasma llega a la píldora antes que Ms.&nbsp;Pac-Man, en vez de huir se planta encima y le cierra el acceso.</td>
               </tr>
               <tr>
                 <td><strong>Dejar de huir a tiempo</strong></td>
@@ -744,11 +744,11 @@
               </tr>
               <tr>
                 <td><strong>Custodiar la comida</strong></td>
-                <td>Un fantasma que se dirige siempre a la píldora más cercana a Ms.&nbsp;Pac-Man no la persigue: la espera donde va a tener que ir. Contra una Ms.&nbsp;Pac-Man voraz es demoledor.</td>
+                <td>Un fantasma que se dirige siempre a la píldora más cercana a Ms.&nbsp;Pac-Man no la persigue, la espera donde va a tener que ir. Contra una Ms.&nbsp;Pac-Man glotona funciona muy bien.</td>
               </tr>
               <tr>
                 <td><strong>Un poco de ruido, medido</strong></td>
-                <td>Un 5&#8239;% de movimientos aleatorios rompe los bucles y hace que el rival no pueda memorizar el patrón. Más de eso ya es jugar mal: varios grupos se pasaron y se les nota en la tabla.</td>
+                <td>Un 5&#8239;% de movimientos aleatorios rompe los bucles y hace que el rival no pueda memorizar el patrón. Más de eso ya es jugar mal (varios grupos se pasaron y se les nota en la tabla).</td>
               </tr>
               <tr>
                 <td><strong>Sacrificar a uno</strong></td>
@@ -761,7 +761,7 @@
         <h3 class="label">Y los fallos que se repitieron</h3>
         <p>
           Estos salieron en varias entregas a la vez, y todos cuestan puntos en la corrección o en la
-          competición. Van aquí para que no vuelvan a salir.
+          competición. Los pongo aquí para que no os pasen a vosotros.
         </p>
         <div class="table-scroll">
           <table>
@@ -769,7 +769,7 @@
             <tbody>
               <tr>
                 <td><strong>Restar índices de nodo</strong></td>
-                <td>Los nodos están numerados por filas: dos índices consecutivos pueden tener una pared en medio. Una resta de índices no es una distancia, aunque a veces lo parezca. La distancia es <code>getShortestPathDistance</code>, siempre.</td>
+                <td>Los nodos están numerados por filas: dos índices consecutivos pueden tener una pared en medio. Restar índices no da una distancia, aunque a veces lo parezca. Para la distancia, <code>getShortestPathDistance</code>, siempre.</td>
               </tr>
               <tr>
                 <td><strong>Medir sin el último movimiento</strong></td>
@@ -777,11 +777,11 @@
               </tr>
               <tr>
                 <td><strong>Dejar la depuración encendida</strong></td>
-                <td>Buena parte de la clase entregó con llamadas a <code>GameView</code> fuera del <code>if (DEBUG)</code>, o con el interruptor a <code>true</code>. Y no es un detalle de estilo: lo que se pinta se acumula en dos listas <code>static</code> que sólo se vacían al repintar la ventana, y en la corrección no hay ventana. En decenas de miles de partidas <strong>se acaba la memoria y se cae la ejecución entera</strong>, la vuestra y la de todos los demás.</td>
+                <td>Buena parte de la clase entregó con llamadas a <code>GameView</code> fuera del <code>if (DEBUG)</code>, o con el interruptor a <code>true</code>. Esto va más allá del estilo, porque lo que se pinta se acumula en dos listas <code>static</code> que sólo se vacían al repintar la ventana, y en la corrección no hay ventana. En decenas de miles de partidas <strong>se acaba la memoria y se cae la ejecución entera</strong>, la vuestra y la de todos los demás.</td>
               </tr>
               <tr>
                 <td><strong>Acceder a <code>camino[0]</code> sin comprobar la longitud</strong></td>
-                <td>Pasa poco, y cuando pasa tumba la partida entera. Justo lo suficientemente raro como para no verlo probando.</td>
+                <td>Pasa poco, y cuando pasa tumba la partida entera. Es lo bastante raro como para no verlo probando.</td>
               </tr>
               <tr>
                 <td><strong>Gastar la píldora de poder al pasar</strong></td>
@@ -797,10 +797,10 @@
         <div class="note tip">
           <span class="note-label">Cómo usar todo esto</span>
           <p>
-            No es una lista de la compra. Las entregas que mejor puntuaron tenían <strong>tres o cuatro</strong>
-            de estas ideas bien hechas, no doce a medias; y las que peor puntuaron solían tener muchas
-            condiciones sueltas sin una estructura que las ordenara. Elegid las que os parezcan defendibles,
-            metedlas de una en una, y medid después de cada una.
+            No hace falta meterlo todo. Las entregas que mejor puntuaron tenían <strong>tres o cuatro</strong>
+            de estas ideas bien hechas (y no doce a medias), y las que peor puntuaron solían tener muchas
+            condiciones sueltas sin una estructura que las ordenara. Elegid las que podáis defender,
+            metedlas de una en una y medid después de cada una.
           </p>
         </div>
       </section>
@@ -836,7 +836,7 @@
         <div class="step">
           <span class="step-num">3</span>
           <div class="step-body">
-            <h3 class="label">Mirar, no suponer</h3>
+            <h3 class="label">Mirar la partida antes de suponer nada</h3>
             <p>
               Cuando algo vaya mal, poned el <code>DEBUG</code> a <code>true</code> y ved la partida
               despacio, con <code>runGame(pacman, ghosts, 60)</code>. Los errores de la función "¿llego yo
@@ -850,8 +850,8 @@
             <h3 class="label">Enfrentar los vuestros entre sí</h3>
             <p>
               Poned vuestra <code>MsPacMan</code> contra vuestros <code>Ghosts</code>. Es el mejor banco de
-              pruebas que vais a tener, porque los dos conocen las mismas debilidades, y cada arreglo de un
-              lado destapa un agujero del otro.
+              pruebas que vais a tener, porque los dos conocen las mismas debilidades y cada arreglo de un
+              lado destapa un agujero en el otro.
             </p>
           </div>
         </div>
@@ -898,7 +898,7 @@
           <p>
             El archivo debe comprimirse <strong>desde la raíz del código fuente</strong>, es decir
             comprimiendo la carpeta <code>es</code>. Al abrir el zip, lo primero que debe verse es
-            <code>es/</code>, no <code>src/</code> ni la carpeta del proyecto.
+            <code>es/</code> (y no <code>src/</code> ni la carpeta del proyecto).
           </p>
         </div>
         <div class="note trap">
@@ -909,7 +909,7 @@
           </p>
         </div>
         <p>
-          Todas las prácticas serán comprobadas para la detección de plagios.
+          Todas las prácticas se pasan por un detector de plagios.
         </p>
 
         <h3 class="label">Antes de subir el zip</h3>
@@ -952,7 +952,7 @@
         <div class="note mine rail-nota">
           <span class="note-label">El tema</span>
           <p style="margin:0">
-            <a href="../guias/tema1/index.html">IA para videojuegos</a>, partido en páginas, y el
+            <a href="../guias/tema2/index.html">IA para videojuegos</a>, partido en páginas, y el
             mismo contenido en <a href="../guias/apuntes-pathfinding-slides.html">diapositivas</a>.
           </p>
         </div>
@@ -986,7 +986,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

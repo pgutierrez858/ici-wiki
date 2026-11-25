@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/css/ici.css">
@@ -33,10 +34,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html">Prácticas</a></li>
-        <li><a href="../guias/index.html" aria-current="page">Guías</a></li>
+        <li><a href="../guias/index.html" aria-current="page">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -49,7 +49,7 @@
   <nav class="crumbs" aria-label="Migas de pan">
     <a href="../index.html">Asignatura</a>
     <span aria-hidden="true">/</span>
-    <a href="index.html">Guías</a>
+    <a href="index.html">Apuntes</a>
     <span aria-hidden="true">/</span>
     <span>Ms. Pac-Man en Eclipse</span>
   </nav>
@@ -132,8 +132,8 @@
           </p>
           <p>
             "Eclipse IDE for Enterprise Java and Web Developers" también funciona, pero descarga bastante
-            más de lo necesario. Cualquier versión de los últimos dos años vale; si te dan a elegir, coge
-            la más reciente.
+            más de lo necesario. En principio cualquier versión de los últimos dos años vale, y si te dan
+            a elegir, coge la más reciente.
           </p>
 
           <div class="note trap">
@@ -306,8 +306,8 @@
             compila y funciona igual, y puedes ignorarlos mientras trabajemos con este motor.
           </p>
           <p>
-            Solo si tu JDK se niega a compilar con ese nivel, cosa que puede pasar con las versiones más
-            nuevas, haz clic derecho en el proyecto,
+            Sólo si tu JDK se niega a compilar con ese nivel (cosa que puede pasar con las versiones más
+            nuevas), haz clic derecho en el proyecto,
             <span class="path">Properties &gt; Java Compiler</span>, desmarca
             <strong>"Use compliance from execution environment"</strong> y pon
             <strong>21</strong> en <em>Compiler compliance level</em>.
@@ -386,8 +386,8 @@
           </p>
 <pre><code>es.ucm.fdi.ici.c2627.practica0.grupoIndividual</code></pre>
           <p>
-            La entrega se corrige de forma automática y el nombre del paquete forma parte del contrato.
-            Míralo con calma en el enunciado de cada práctica.
+            La entrega se corrige de forma automática, así que el paquete tiene que llamarse exactamente
+            así. Míralo con calma en el enunciado de cada práctica.
           </p>
         </div>
       </section>
@@ -437,7 +437,7 @@
           </ul>
           <p>
             Con controladores aleatorios esa puntuación será baja y errática, de unos pocos cientos de
-            puntos. Es lo correcto: nadie está jugando todavía.
+            puntos, y es lo normal, porque todavía no está jugando nadie.
           </p>
           <div class="note tip">
             <span class="note-label">Dos ajustes que usarás mucho</span>
@@ -488,7 +488,7 @@
               </tr>
               <tr>
                 <td>Ms.&nbsp;Pac-Man se queda quieta o va a tirones</td>
-                <td>Tu <code>getMove</code> devuelve <code>null</code>, o tarda más de los 40&nbsp;ms del <em>tick</em>. Devuelve siempre un <code>MOVE</code> válido, y <code>MOVE.NEUTRAL</code> si no hay nada mejor, evitando cálculos largos.</td>
+                <td>Tu <code>getMove</code> devuelve <code>null</code>, o tarda más de los 40&nbsp;ms del <em>tick</em>. Devuelve siempre un <code>MOVE</code> válido (<code>MOVE.NEUTRAL</code> si no hay nada mejor) y evita los cálculos largos.</td>
               </tr>
               <tr>
                 <td>La ventana es enorme o minúscula</td>
@@ -506,7 +506,7 @@
           <p>
             Escríbeme a <a href="mailto:pabgut02@ucm.es">pabgut02@ucm.es</a> con tres cosas: tu sistema
             operativo, la salida de <code>java -version</code> y el texto completo del error, copiado y
-            pegado. Con eso se resuelve en un correo; con "no me funciona Eclipse", en cinco.
+            pegado. Con eso normalmente se resuelve en un correo, y con un "no me funciona Eclipse"... en cinco.
           </p>
         </div>
       </section>
@@ -599,7 +599,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

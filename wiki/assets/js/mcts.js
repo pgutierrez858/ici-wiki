@@ -597,50 +597,84 @@
 
   /* ============================ 4 · determinizar ============================ */
 
+  // Dos mesas a la vez: a la izquierda, el mundo que se inventa la búsqueda (con la carta del
+  // rival boca arriba); a la derecha, la partida de verdad (boca abajo hasta que decís un palo).
+  // Abajo, lo que vale A según la búsqueda, lo que da A en la mesa y lo que da B.
   function creaDeterminizar(nodo) {
     var d = prepara(nodo);
-    var modo = 'pimc', mundos = [];
-    var tabla = el('div', 'table-scroll'); d.stage.appendChild(tabla);
-    var pie = el('pre', 'demo-traza'); d.stage.appendChild(pie);
+    var palo = function () { return Math.random() < 0.5 ? '♥' : '♠'; };
+    // manos y puntos cuentan sólo las partidas en que se jugó A; las de B no dicen nada de A
+    var mano, manos = 0, puntos = 0;
+
+    function reparte() { mano = { inventado: palo(), real: palo(), dicho: null }; }
+    function reinicia() { manos = 0; puntos = 0; reparte(); }
+    function dice(p) { mano.dicho = p; if (p === 'B') return; manos++; if (p === mano.real) puntos += 10; }
+
+    var svg = sv('svg', { viewBox: '0 0 640 300', class: 'demo-svg mc-svg det-svg', role: 'img', 'aria-label': 'A la izquierda, el mundo que se inventa la búsqueda, con la carta del rival boca arriba. A la derecha, la mesa de verdad, con la carta boca abajo hasta que decís un palo. Abajo, tres barras: lo que vale A según la búsqueda, lo que da A en la mesa y lo que da plantarse.' });
+    d.stage.appendChild(svg);
+
+    function carta(x, p, boca) {
+      var g = sv('g', {});
+      g.appendChild(sv('rect', { x: x, y: 52, width: 64, height: 90, rx: 7, class: boca ? 'det-carta' : 'det-dorso' }));
+      if (boca) g.appendChild(sv('text', { x: x + 32, y: 112, class: 'det-palo ' + (p === '♥' ? 'det-rojo' : 'det-negro') }, p));
+      else g.appendChild(sv('text', { x: x + 32, y: 109, class: 'det-q' }, '?'));
+      return g;
+    }
+    function texto(x, y, t, cls) { svg.appendChild(sv('text', { x: x, y: y, class: 'mc-t mc-centro' + (cls ? ' ' + cls : '') }, t)); }
+    function fila(y, etiq, v, cls) {
+      texto(12, y + 12, etiq, 'det-izq');
+      svg.appendChild(sv('rect', { x: 230, y: y, width: 300, height: 16, rx: 2, class: 'det-fondo' }));
+      if (v != null) svg.appendChild(sv('rect', { x: 230, y: y, width: v * 30, height: 16, rx: 2, class: cls }));
+      texto(230 + (v == null ? 0 : v * 30) + 8, y + 12, v == null ? '—' : fmt(v, 1), 'det-izq det-num');
+    }
 
     function pinta() {
-      var cols = modo === 'pimc'
-        ? [['A · el as, y adivinar', function (m) { return 10; }], ['B · plantarse', function () { return 6; }]]
-        : [['A, y decir ♥', function (m) { return m === '♥' ? 10 : 0; }], ['A, y decir ♠', function (m) { return m === '♠' ? 10 : 0; }], ['B · plantarse', function () { return 6; }]];
-      var html = '<table class="mc-det"><thead><tr><th scope="col">Mundo</th><th scope="col">El rival tiene</th>' +
-        cols.map(function (c) { return '<th scope="col">' + c[0] + '</th>'; }).join('') + '</tr></thead><tbody>';
-      var vista = mundos.slice(-6), desde = mundos.length - vista.length;
-      if (desde > 0) html += '<tr><td colspan="' + (cols.length + 2) + '" class="mc-tenue">… ' + desde + ' mundos más arriba</td></tr>';
-      vista.forEach(function (m, i) {
-        var vals = cols.map(function (c) { return c[1](m); }), mx = Math.max.apply(null, vals);
-        html += '<tr><td>' + (desde + i + 1) + '</td><td class="mc-palo">' + m + '</td>' +
-          vals.map(function (v) { return '<td' + (v === mx ? ' class="mejor"' : '') + '>' + v + '</td>'; }).join('') + '</tr>';
-      });
-      var medias = cols.map(function (c) { return mundos.length ? mundos.reduce(function (a, m) { return a + c[1](m); }, 0) / mundos.length : NaN; });
-      var mm = Math.max.apply(null, medias.filter(function (x) { return !isNaN(x); }).concat([-1]));
-      html += '<tr class="mc-medias"><th scope="row" colspan="2">Media</th>' + medias.map(function (v) { return '<td' + (v === mm ? ' class="mejor"' : '') + '>' + (isNaN(v) ? '—' : fmt(v, 1)) + '</td>'; }).join('') + '</tr>';
-      html += '</tbody></table>';
-      tabla.innerHTML = html;
-      if (!mundos.length) { pie.textContent = 'Todavía no hay mundos. Pulsad "Un mundo más".'; d.read.textContent = ''; return; }
-      var k = medias.lastIndexOf(mm), elegida = cols[k][0];   // en un empate, B (la última columna)
-      pie.textContent = modo === 'pimc'
-        ? 'Determinizar elige: ' + elegida + '.\nEn cada mundo se ve la carta del rival, así que "adivinar" siempre acierta y A vale 10.\nPero de verdad no la veis: A vale 10 la mitad de las veces y 0 la otra mitad, 5 de media. B, con sus 6, era mejor.'
-        : 'Un solo árbol para lo que sabéis: elige ' + elegida + '.\nEl palo que diréis tiene que ser el mismo en todos los mundos, porque no podéis distinguirlos.\n' +
-          (k === cols.length - 1
-            ? 'Así A vale lo que vale de verdad, unos 5, y B gana con 6.'
-            : 'Con tan pocos mundos, el palo que más ha salido parece mejor de lo que es. Añadid mundos: su media baja hacia 5 y B, con 6, acaba ganando.');
-      d.read.textContent = mundos.length + ' mundo' + (mundos.length > 1 ? 's' : '') + ': ' + mundos.filter(function (m) { return m === '♥'; }).length + ' con corazones y ' + mundos.filter(function (m) { return m === '♠'; }).length + ' con picas.';
-    }
-    function mas(k) { return function () { for (var i = 0; i < k; i++) mundos.push(Math.random() < 0.5 ? '♥' : '♠'); pinta(); }; }
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      var visto = mano.dicho !== null, acierta = mano.dicho === mano.real;
+      texto(150, 20, 'Un mundo inventado', 'det-titulo');
+      texto(150, 38, 'lo que hace la búsqueda', 'mc-tenue');
+      texto(490, 20, 'La mesa de verdad', 'det-titulo');
+      texto(490, 38, 'lo que os pasa a vosotros', 'mc-tenue');
+      svg.appendChild(sv('line', { x1: 320, x2: 320, y1: 8, y2: 190, class: 'det-sep' }));
 
+      svg.appendChild(carta(118, mano.inventado, true));
+      texto(150, 164, 'la ve: tiene ' + mano.inventado + ', así que dice ' + mano.inventado);
+      texto(150, 183, 'acierta siempre: A = 10', 'det-ok');
+
+      svg.appendChild(carta(458, mano.real, visto));
+      if (!visto) texto(490, 164, 'no la veis: ¿adivináis o cobráis?');
+      else if (mano.dicho === 'B') { texto(490, 164, 'cobráis sin mirar (tenía ' + mano.real + ')'); texto(490, 183, 'B = 6', 'det-num'); }
+      else { texto(490, 164, 'decís ' + mano.dicho + ' y tenía ' + mano.real); texto(490, 183, acierta ? 'acertáis: A = 10' : 'falláis: A = 0', acierta ? 'det-ok' : 'det-mal'); }
+
+      svg.appendChild(sv('line', { x1: 8, x2: 632, y1: 204, y2: 204, class: 'det-sep' }));
+      fila(218, 'A, según la búsqueda', 10, 'det-cree');
+      fila(244, 'A, en la mesa' + (manos ? ' (' + manos + ' ' + (manos > 1 ? 'veces' : 'vez') + ')' : ''), manos ? puntos / manos : null, 'det-mesa');
+      fila(270, 'B, cobrar', 6, 'det-b');
+
+      bDice.forEach(function (b) { b.disabled = visto; });
+      bOtra.disabled = !visto;
+      d.read.textContent = !manos
+        ? 'La búsqueda compara A (10, porque en su mundo siempre acierta) con B (6) y elige A. Jugad A unas cuantas veces para ver cuánto da en la mesa.'
+        : 'La búsqueda sigue creyendo que A vale 10 y elige A. En la mesa, A os ha dado ' + puntos + ' puntos en ' + manos +
+          ' partida' + (manos > 1 ? 's' : '') + ', ' + fmt(puntos / manos, 1) + ' de media; cobrar os habría dado 6 cada vez.' +
+          (manos >= 20 ? (puntos / manos < 6 ? ' B era la buena.' : ' Seguid: con más partidas, A baja hacia 5.') : '');
+    }
+
+    var bDice = [boton('A: decir ♥', function () { dice('♥'); pinta(); }, 'demo-play'), boton('A: decir ♠', function () { dice('♠'); pinta(); }, 'demo-play'),
+                 boton('B: cobrar 6', function () { dice('B'); pinta(); })];
+    var bOtra = boton('Otra partida', function () { reparte(); pinta(); });
     var b1 = barra('demo-bar-play');
-    b1.appendChild(boton('Un mundo más', mas(1), 'demo-play'));
-    b1.appendChild(boton('×10', mas(10)));
-    b1.appendChild(boton('Reiniciar', function () { mundos = []; pinta(); }));
+    bDice.forEach(function (b) { b1.appendChild(b); });
+    b1.appendChild(bOtra);
     d.controls.appendChild(b1);
     var b2 = barra();
-    b2.appendChild(opciones('Cómo se cuenta', [['Determinizar', 'pimc'], ['Lo que sé (ISMCTS)', 'is']], modo, function (v) { modo = v; pinta(); }));
+    b2.appendChild(boton('Jugar A 20 veces, diciendo un palo al azar', function () {
+      for (var i = 0; i < 20; i++) { reparte(); dice(palo()); }
+      pinta();
+    }));
+    b2.appendChild(boton('Reiniciar', function () { reinicia(); pinta(); }));
     d.controls.appendChild(b2);
+    reinicia();
     pinta();
   }
 

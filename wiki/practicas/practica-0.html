@@ -11,6 +11,7 @@
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -57,14 +57,14 @@
 
   <header class="masthead">
     <h1>
-      Introducción a Ms. Pac-Man
+      Práctica 0 · Introducción a Ms. Pac-Man
       <span class="thin">Conocer el simulador de la primera mitad del curso y aprender a jugar.</span>
     </h1>
     <p class="standfirst">
-      El objetivo de esta práctica es conocer el entorno de simulación que utilizaremos durante la primera
-      mitad del curso y escribir los primeros comportamientos, todavía muy simples, para Ms.&nbsp;Pac-Man y
-      para los fantasmas. Consta de tres ejercicios que se realizan de forma individual: los dos primeros son para
-      trastear y no se entregan; el tercero sí.
+      En esta práctica vamos a conocer el simulador que usaremos durante la primera mitad del curso, y a
+      escribir los primeros comportamientos (todavía muy simples) para Ms.&nbsp;Pac-Man y para los
+      fantasmas. Son tres ejercicios, individuales: los dos primeros son para trastear y no se entregan,
+      el tercero sí.
     </p>
     <div class="byline">
       <span><strong>Pablo Gutiérrez Sánchez</strong></span>
@@ -131,10 +131,10 @@
           <h2 class="sec">Ms. Pac-Man</h2>
         </div>
         <p>
-          Ms.&nbsp;Pac-Man es un arcade de principios de los ochenta. La señora Pac-Man tiene que conseguir
+          Ms.&nbsp;Pac-Man es un arcade de principios de los ochenta <!--cite mspacman-arcade--><span class="cita">[<a href="#ref-mspacman-arcade" id="cita-mspacman-arcade">1</a>]</span><!--/cite-->. La señora Pac-Man tiene que conseguir
           el máximo número de puntos huyendo de cuatro fantasmas, y las reglas son sencillas: comerse todas
-          las píldoras de la pantalla, las normales y las de poder, momento en el que se pasa al siguiente
-          nivel. Mientras tanto, los cuatro fantasmas recorren el laberinto intentando capturarla.
+          las píldoras de la pantalla, las normales y las de poder, y cuando no queda ninguna se pasa al
+          siguiente nivel. Mientras tanto, los cuatro fantasmas recorren el laberinto intentando capturarla.
         </p>
         <figure class="lab-uno">
           <figcaption>El primer laberinto, tal como empieza el nivel</figcaption>
@@ -142,7 +142,7 @@
                alt="El primer laberinto del simulador: pasillos rosas sobre fondo negro, 220 píldoras como puntos blancos, cuatro píldoras de poder más grandes en las esquinas, la caja de la cárcel en el centro y Ms. Pac-Man abajo.">
         </figure>
         <p>
-          Esa imagen sale del propio simulador. Las 220 píldoras pequeñas son los puntos que hay que
+          Esa imagen es una captura del propio simulador. Las 220 píldoras pequeñas son los puntos que hay que
           comerse para acabar el nivel; las cuatro grandes de las esquinas son las de poder, y la caja del
           centro es la cárcel de los fantasmas.
         </p>
@@ -190,8 +190,8 @@
         </div>
         <h3 class="label">El laberinto por dentro</h3>
         <p>
-          Tres cosas del mapa condicionan cualquier estrategia que escribas, y se ven mejor marcadas encima
-          del laberinto:
+          Hay tres cosas del mapa que condicionan cualquier estrategia que escribas, y se ven mejor
+          marcadas encima del laberinto:
         </p>
         <figure class="lab-uno">
           <figcaption>Cruces en amarillo, túneles en azul, cárcel en rosa y su puerta en verde</figcaption>
@@ -283,7 +283,7 @@
 
         <h3 class="label">Cuándo te comen y cuándo comes tú</h3>
         <p>
-          El contacto no es caer en la misma casilla. Cuando todos han terminado de moverse, el motor mide
+          Para tocarse no hace falta caer en la misma casilla: cuando todos han terminado de moverse, el motor mide
           la distancia por los pasillos entre Ms.&nbsp;Pac-Man y cada fantasma: si es de <strong>2 nodos o
           menos</strong>, se han tocado.
         </p>
@@ -324,8 +324,8 @@
           <span class="note-label">En un mismo turno puedes comer y morir</span>
           <p>
             El motor recorre los cuatro fantasmas. Si uno comestible está a tiro te lo apunta, y si además
-            hay otro normal igual de cerca, pierdes la vida de todas formas. Estar rodeado con la píldora de
-            poder a medias no es seguro.
+            hay otro normal igual de cerca, pierdes la vida de todas formas, así que cuidado con dejarte
+            rodear con la píldora de poder a medias.
           </p>
         </div>
 
@@ -368,8 +368,8 @@
           <span class="note-label">En las prácticas la partida se corta antes</span>
           <p>
             El <code>Executor</code> se configura con un límite de turnos, y en clase y en la corrección son
-            4000: unos dos minutos y medio de juego. Casi nunca vas a ver el cuarto laberinto, así que
-            optimiza para los primeros niveles.
+            4000 (unos dos minutos y medio de juego). Casi nunca vas a ver el cuarto laberinto, así que
+            compensa optimizar para los primeros niveles.
           </p>
         </div>
       </section>
@@ -382,7 +382,7 @@
         <p>
           En la primera mitad del curso utilizaremos una adaptación del simulador creado para la competición
           <em>Ms. Pac-Man vs Ghosts</em>, que se celebra anualmente en la
-          <em>Conference on Computational Intelligence and Games</em>. Debes usar el que viene en
+          <em>Conference on Computational Intelligence and Games</em> <!--cite williams-mspacman gaia-mspacman--><span class="cita">[<a href="#ref-williams-mspacman" id="cita-williams-mspacman">2</a>, <a href="#ref-gaia-mspacman" id="cita-gaia-mspacman">3</a>]</span><!--/cite-->. Debes usar el que viene en
           <code>ICI-MsPacManEngine.zip</code>, importado como explica la
           <a href="../guias/eclipse.html">guía de instalación</a>: es el que se usa para corregir.
         </p>
@@ -538,8 +538,8 @@
           <h2 class="sec">La clase <code>Executor</code></h2>
         </div>
         <p>
-          Es la clase encargada de ejecutar la simulación. Contiene métodos para lanzar el juego de
-          distintas formas:
+          Es la clase que ejecuta la simulación, y tiene métodos para lanzar el juego de distintas
+          formas:
         </p>
         <div class="table-scroll">
           <table>
@@ -557,8 +557,8 @@
         <p>
           Según el método, obtendrás la puntuación de una partida o una serie de estadísticas. Las
           estadísticas se guardan en objetos <code>Stats</code>, que ofrecen media, máximo, mínimo y
-          demás. <strong>Para la evaluación de las prácticas se realizarán varias simulaciones y se
-          utilizará la puntuación media obtenida</strong>, así que acostúmbrate a mirar la media y no una
+          demás. <strong>Para evaluar las prácticas lanzo varias simulaciones y me quedo con la
+          puntuación media</strong>, así que acostúmbrate a mirar la media y no una
           partida suelta.
         </p>
 
@@ -653,7 +653,7 @@
             un cálculo de 200&nbsp;ms son cinco turnos decididos por inercia.
           </p>
           <p>
-            El presupuesto importa igual, porque la evaluación son muchas partidas de 4000 turnos cada una.
+            Aun así, conviene no pasarse del presupuesto, porque la evaluación son muchas partidas de 4000 turnos cada una.
             Y devuelve siempre un <code>MOVE</code>, aunque sea <code>MOVE.NEUTRAL</code>: un
             <code>null</code> el motor lo descarta y sigue recto.
           </p>
@@ -671,7 +671,7 @@
           <h2 class="sec">Visualización</h2>
         </div>
         <p>
-          El simulador ofrece métodos para pintar información sobre el laberinto, y son la mejor
+          El simulador tiene métodos para pintar información sobre el laberinto, y diría que son la mejor
           herramienta de depuración que tienes: <code>GameView.addLines()</code> dibuja una línea entre dos
           puntos y <code>GameView.addPoints()</code> dibuja los puntos de un camino dado. Ambos son
           estáticos, se llaman desde dentro de <code>getMove</code> y, si la ventana no está abierta, no
@@ -716,7 +716,7 @@
         <p>
           <code>Game</code> contiene toda la información sobre el estado del juego, quizás demasiada y mal
           documentada, además de distintas funciones auxiliares. Por eso hay en esta wiki una
-          <a href="../guias/clase-game.html">referencia dedicada solo a esta clase</a>:
+          <a href="../guias/clase-game.html">referencia dedicada sólo a esta clase</a>:
           <strong>léela antes del ejercicio 2</strong>.
         </p>
         <p>
@@ -773,13 +773,15 @@
             Las dos miran sólo los movimientos legales, y se diferencian en cómo miden lo que le queda a
             cada vecino hasta el objetivo. Los <code>getApproximate…</code>, que son los que pide el
             enunciado, leen la tabla de distancias del laberinto, que no sabe por dónde has llegado. Los
-            <code>getNextMove…</code> usan la distancia que <strong>respeta la regla de no volver
-            atrás</strong>, que es la que de verdad vas a recorrer, y cuestan algo más.
+            <code>getNextMove…</code> intentan <strong>respetar la regla de no volver atrás</strong>, pero
+            para todos los vecinos usan el último movimiento con el que llegaste al nodo de partida, que
+            sólo es el bueno para el vecino de frente, y cuestan algo más.
           </p>
           <p>
-            Casi siempre coinciden. Se separan cuando el camino más corto desde el vecino pasaría por el
-            nodo del que vienes, que es justo el que el juego no te va a dejar tomar. El nombre engaña un
-            poco: hoy ninguna de las dos calcula nada aproximado, viene de versiones viejas del motor.
+            Casi siempre coinciden. Se separan sobre todo al girar, y ahí el <code>getNextMove…</code> mide
+            mal (en <a href="#entregado">lo que pasó en la entrega</a> está contado con más detalle). El nombre
+            engaña un poco: el <code>getApproximate…</code> no es "peor" que el otro, viene de versiones
+            viejas del motor.
           </p>
         </div>
       </section>
@@ -792,14 +794,14 @@
         <p>Como norma general, <strong>todas</strong> las entregas del curso siguen el mismo esquema:</p>
         <ul>
           <li>
-            Se utilizará el paquete
-            <code>es.ucm.fdi.ici.c2627.practicaX.grupoYY</code>, que contendrá todo el código de los
+            Todo va en el paquete
+            <code>es.ucm.fdi.ici.c2627.practicaX.grupoYY</code>, con el código de todos los
             controladores, tanto de Ms.&nbsp;Pac-Man como de los fantasmas.
           </li>
           <li>
-            Por defecto, el controlador de Ms.&nbsp;Pac-Man se denominará <code>MsPacMan</code> y el de los
-            fantasmas <code>Ghosts</code>. En caso de entregar varios controladores, se indicará el nombre
-            de cada uno.
+            Por defecto, el controlador de Ms.&nbsp;Pac-Man se llama <code>MsPacMan</code> y el de los
+            fantasmas <code>Ghosts</code>. Si entregáis varios controladores, indicad el nombre de cada
+            uno.
           </li>
         </ul>
         <p>
@@ -891,8 +893,8 @@
             <p>
               Juega varias partidas con el teclado y fíjate en qué
               decisiones tomas tú: cuándo das la vuelta, a qué distancia dejas de huir, qué haces cuando dos
-              fantasmas vienen por pasillos distintos. Esas son exactamente las reglas que tendrás que
-              escribir en código durante el resto del curso.
+              fantasmas vienen por pasillos distintos. Esas decisiones son, más o menos, las reglas que
+              tendrás que escribir en código durante el resto del curso.
             </p>
           </div>
         </div>
@@ -906,8 +908,8 @@
         </div>
         <div class="ex">
           <p>
-            Lee la <a href="../guias/clase-game.html">referencia de la clase <code>Game</code></a> e
-            investiga a fondo la funcionalidad que ofrece. Después, escribe dos controladores:
+            Lee la <a href="../guias/clase-game.html">referencia de la clase <code>Game</code></a> y
+            cotillea con calma todo lo que ofrece. Después, escribe dos controladores:
           </p>
           <h3 class="label"><code>GhostsAggressive</code></h3>
           <p>
@@ -928,7 +930,7 @@
               Pon <code>MsPacManRunAway</code> contra <code>GhostsAggressive</code> y mira qué pasa. Huir del
               más cercano, sin más, no la salva: el fantasma más próximo no siempre es el más peligroso, y
               en cuanto dos cierran el mismo bucle por los dos lados la regla no tiene nada que decir.
-              Entender por qué falla este comportamiento es el punto de partida del ejercicio 3.
+              Entender por qué falla es el punto de partida del ejercicio 3.
             </p>
           </div>
         </div>
@@ -948,13 +950,13 @@
 
           <h3><code>MsPacMan</code></h3>
           <p>
-            El comportamiento de Ms.&nbsp;Pac-Man consiste en <strong>evitar fantasmas que están
-            demasiado cerca</strong> o <strong>perseguirles si son comestibles</strong>. En otro caso,
-            moverse a la <em>pill</em> o <em>power pill</em> más cercana.
+            Ms.&nbsp;Pac-Man tiene que <strong>evitar a los fantasmas que estén demasiado
+            cerca</strong> o <strong>perseguirlos si son comestibles</strong>, y si no, moverse a la
+            <em>pill</em> o <em>power pill</em> más cercana.
           </p>
           <p>
-            Para el primer caso, o sea fantasma demasiado cerca o fantasma comestible, deberás
-            <strong>visualizar una línea</strong> indicando el fantasma del que Ms.&nbsp;Pac-Man huye o
+            En el primer caso (fantasma demasiado cerca o fantasma comestible) tienes que
+            <strong>pintar una línea</strong> que señale el fantasma del que Ms.&nbsp;Pac-Man huye o al que
             intenta comer.
           </p>
           <figure>
@@ -980,11 +982,11 @@
 
           <h3><code>Ghosts</code></h3>
           <p>
-            El comportamiento de los fantasmas también es bastante sencillo. Huirán de Ms.&nbsp;Pac-Man si
-            esta puede comerles o si está cerca de una <em>power pill</em>. En caso contrario se moverán
-            hacia ella o aleatoriamente, con probabilidad <strong>90&nbsp;%</strong> y
-            <strong>10&nbsp;%</strong> respectivamente. Fija también un límite para estimar que
-            Ms.&nbsp;Pac-Man está cerca de una <em>power pill</em> (p.&nbsp;ej. 15).
+            Los fantasmas tampoco tienen mucho misterio. Huyen de Ms.&nbsp;Pac-Man si ella puede
+            comérselos o si está cerca de una <em>power pill</em>, y si no, van hacia ella o se mueven al
+            azar, con probabilidad <strong>90&nbsp;%</strong> y <strong>10&nbsp;%</strong> respectivamente.
+            Fija también un límite para decidir cuándo Ms.&nbsp;Pac-Man está cerca de una
+            <em>power pill</em> (p.&nbsp;ej. 15).
           </p>
           <figure>
             <figcaption>Pseudocódigo · <code>Ghosts</code>, para cada fantasma</figcaption>
@@ -1016,14 +1018,14 @@
           <h2 class="sec">Cómo se entrega</h2>
         </div>
         <p>
-          Debes entregar a través del Campus Virtual el código que implementa los dos comportamientos del
-          ejercicio 3, en un archivo zip denominado <code>practica0.zip</code>.
+          Por el Campus Virtual se sube el código de los dos comportamientos del ejercicio 3, en un zip
+          llamado <code>practica0.zip</code>.
         </p>
         <div class="note trap">
           <span class="note-label">Importante: la raíz del zip</span>
           <p>
-            El archivo debe realizarse <strong>en la raíz del código fuente</strong>. Es decir,
-            comprimiendo la carpeta <code>es</code>, que es la que hace de raíz del paquete. Al abrir el
+            El zip se hace <strong>en la raíz del código fuente</strong>, o sea, comprimiendo la carpeta
+            <code>es</code>, que es la que hace de raíz del paquete. Al abrir el
             zip, lo primero que debe verse es <code>es/</code>, no <code>src/</code> ni la carpeta del
             proyecto.
           </p>
@@ -1031,18 +1033,18 @@
         <div class="note trap">
           <span class="note-label">No se modifica el simulador</span>
           <p>
-            Obviamente no se permite modificar el código del simulador. Por lo tanto, la entrega
-            <strong>no debe contener el código del simulador</strong> (paquete <code>pacman.*</code>).
+            El código del simulador no se puede modificar, así que la entrega <strong>no lleva el código
+            del simulador</strong> (paquete <code>pacman.*</code>).
           </p>
         </div>
         <p>
-          Todas las prácticas serán comprobadas para la detección de plagios.
+          Todas las prácticas pasan por un detector de plagios.
         </p>
         <h3 class="label">Antes de subir el zip</h3>
         <ul>
           <li>El paquete es <code>es.ucm.fdi.ici.c2627.practica0.grupoIndividual</code>.</li>
           <li>Las clases se llaman exactamente <code>MsPacMan</code> y <code>Ghosts</code>.</li>
-          <li>Ambas compilan en un proyecto limpio que solo referencia a <code>MsPacManEngine</code>.</li>
+          <li>Ambas compilan en un proyecto limpio que sólo referencia a <code>MsPacManEngine</code>.</li>
           <li>Al abrir el zip aparece <code>es/</code> en la raíz.</li>
           <li>No hay ni un archivo del paquete <code>pacman.*</code> dentro.</li>
         </ul>
@@ -1056,8 +1058,8 @@
         <p>
           Se entregaron <strong>21 controladores de cada tipo</strong>, y todos hacen lo que pide el
           ejercicio 3: huyen, persiguen y comen. El diseño venía dado en el pseudocódigo, así que los fallos
-          que se repiten son de <strong>API</strong>: llamar al método parecido en vez de al correcto. Están aquí porque todos vuelven en la <a href="practica-1.html">Práctica&nbsp;1</a>, donde
-          ya cuestan puntos, y porque casi todos son invisibles mirando una partida.
+          que se repiten son de <strong>API</strong>: llamar al método parecido en vez de al correcto. Los pongo aquí porque todos vuelven en la <a href="practica-1.html">Práctica&nbsp;1</a>, donde
+          ya cuestan puntos, y porque casi ninguno se nota mirando una partida.
         </p>
         <h3 class="label">Los fallos que se repiten</h3>
         <div class="table-scroll">
@@ -1113,7 +1115,7 @@
               </tr>
               <tr>
                 <td><strong>Un <code>return</code> que falta</strong></td>
-                <td>Se calcula el movimiento para perseguir al fantasma comestible… y se tira, porque la llamada está suelta en un <code>else</code> sin <code>return</code>. El control sigue de largo y se va a por la píldora. Compila, se ejecuta y no hace lo que dice el código.</td>
+                <td>Se calcula el movimiento para perseguir al fantasma comestible… y se tira, porque la llamada está suelta en un <code>else</code> sin <code>return</code>. El control sigue de largo y se va a por la píldora. Compila y se ejecuta, pero no hace lo que dice el código.</td>
               </tr>
               <tr>
                 <td><strong>Pedir el nodo de un fantasma antes de comprobar que existe</strong></td>
@@ -1133,7 +1135,7 @@
             entregas llamadas igual, los resultados de unas pisan los de otras y la tabla sale vacía.
           </p>
           <p>
-            Para jugar el concurso de esta práctica hubo que renombrarlas una a una. Poned un nombre
+            Para jugar el concurso de esta práctica tuve que renombrarlas una a una. Poned un nombre
             reconocible y distinto en los dos controladores, y en la Práctica&nbsp;1 con la letra del grupo
             dentro. Está contado, con el resto de las reglas del concurso, en
             <a href="../guias/competicion.html"><strong>Probar los controladores y la
@@ -1143,7 +1145,7 @@
 
         <h3 class="label">El concurso</h3>
         <p>
-          Con las 21 entregas se jugó el concurso de todos contra todos, a 100 partidas por
+          Con las 21 entregas lancé el concurso de todos contra todos, a 100 partidas por
           emparejamiento y con la configuración de la
           <a href="practica-1.html#reglas-simulacion">Práctica&nbsp;1</a>:
         </p>
@@ -1172,8 +1174,8 @@
           entero, el peor se queda a cero, y los de en medio en proporción.
         </p>
         <p>
-          La última columna es el puesto que ocupaba cada uno <strong>en una tirada previa de sólo 10
-          partidas</strong> por emparejamiento. Esa columna es la parte interesante de la tabla.
+          La última columna (diría que lo más interesante de la tabla) es el puesto que ocupaba cada uno
+          <strong>en una tirada previa de sólo 10 partidas</strong> por emparejamiento.
         </p>
         <figure>
           <figcaption>Ranking de Ms. Pac-Man · la media de sus 2&#8239;100 partidas</figcaption>
@@ -1280,8 +1282,8 @@
             VMM del 11.º al 3.º.
           </p>
           <p>
-            No es que la segunda medida corrigiera a la primera: es que <strong>en el medio de la tabla no
-            había nada que medir</strong>. Del 6.º al 13.º hay <strong>ocho controladores metidos en 110
+            Ojo, que la segunda tirada tampoco corrige a la primera: <strong>en el medio de la tabla no
+            había nada que medir</strong>, ni con 10 partidas ni con 100. Del 6.º al 13.º hay <strong>ocho controladores metidos en 110
             puntos</strong>, y con 100 partidas la diferencia mínima creíble entre dos de ellos es de 148.
             O sea que esos ocho siguen empatados y su orden volverá a cambiar la próxima
             vez que se lance. Con 10 partidas el umbral pasaba de 460 puntos, y el empate iba
@@ -1356,15 +1358,15 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
             El resultado es un método que evalúa bien seguir recto y mal girar.
           </p>
           <p>
-            La moraleja no es "usad el aproximado y ya": es que <strong>los dos son aproximaciones</strong>,
-            y que en cuanto la decisión importe conviene calcular la distancia vosotros, con
+            De aquí no saquéis "usad el aproximado y ya": <strong>los dos son aproximaciones</strong>,
+            y en cuanto la decisión importe conviene calcular la distancia vosotros, con
             <code>getShortestPathDistance(vecino, objetivo, movimientoConElQueLlegoAlVecino)</code>, que es
             la comparación que de verdad queríais hacer.
           </p>
         </div>
 
         <div class="note trap">
-          <span class="note-label">3 · El umbral de 20 era un punto de partida, no una respuesta</span>
+          <span class="note-label">3 · El umbral de 20 era sólo un punto de partida</span>
           <p>
             El enunciado propone <code>limit = 20</code> y dice "pruébalo y ajústalo". Casi todo el mundo lo
             dejó en 20. De los que lo tocaron: el que lo subió a 40 es <strong>primero</strong> y los dos que
@@ -1399,13 +1401,24 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
           </p>
           <p>
             Trece de las veintiuna Ms.&nbsp;Pac-Man pintan algo en cada turno, así que en 44&#8239;100
-            partidas eso son cientos de millones de objetos. Es la razón de verdad por la que la depuración
-            visual tiene que ir detrás de un interruptor que se apague al entregar: no es que quede feo, es
-            que <strong>tumba la corrección de todo el mundo</strong>.
+            partidas eso son cientos de millones de objetos. Por eso la depuración visual tiene que ir detrás
+            de un interruptor que se apague al entregar: si se queda encendida, <strong>tumba la corrección
+            de todo el mundo</strong>.
           </p>
         </div>
 
       </section>
+
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-mspacman-arcade">General Computer Corporation. <em>Ms. Pac-Man</em>. videojuego arcade, Midway, 1982. <a class="volver" href="#cita-mspacman-arcade" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-williams-mspacman">P. R. Williams, D. Perez-Liebana y S. M. Lucas. "Ms. Pac-Man Versus Ghost Team CIG 2016 Competition". <em>IEEE Conference on Computational Intelligence and Games (CIG)</em>, 2016. <a class="volver" href="#cita-williams-mspacman" aria-label="Volver a la cita">↩</a></li>
+          <li id="ref-gaia-mspacman">Grupo GAIA, UCM. <em>Ms. Pac-Man vs Ghosts (versión de la asignatura)</em>. 2026. <a href="https://gaia.fdi.ucm.es/research/mspacman/">gaia.fdi.ucm.es/research/mspacman</a> <a class="volver" href="#cita-gaia-mspacman" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
 
     </main>
 
@@ -1427,6 +1440,7 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
             <li><a href="#ej3"><em>Ejercicio 3</em>Los controladores de la entrega</a></li>
             <li><a href="#entrega">Cómo se entrega</a></li>
             <li><a href="#entregado">Lo que salió en la entrega</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <div class="note mine rail-nota">
@@ -1452,7 +1466,7 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

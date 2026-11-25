@@ -7,10 +7,11 @@
 <!-- página publicada -->
 <!--/ICI:HEAD-->
 <title>Práctica 5 · Juegos por turnos · ICI</title>
-<meta name="description" content="Enunciado de la Práctica 5: dos jugadores de ajedrez en Python, minimax con poda alfa-beta y Monte Carlo Tree Search, montados con una guía paso a paso; después, experimentos con sus parámetros y heurísticas, y retos a elegir que dan puntos como misiones.">
+<meta name="description" content="Enunciado de la Práctica 5: dos jugadores de ajedrez en Python, minimax con poda alfa-beta y Monte Carlo Tree Search, montados con una guía paso a paso; después, experimentos con sus parámetros y heurísticas, retos a elegir que dan puntos como misiones y un concurso entre grupos con límite de tiempo por jugada y por partida.">
 <meta name="author" content="Pablo Gutiérrez Sánchez">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
@@ -34,10 +35,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -57,14 +57,14 @@
 
   <header class="masthead">
     <h1>
-      Juegos por turnos
+      Práctica 5 · Juegos por turnos
       <span class="thin">Dos jugadores de ajedrez que deciden simulando el futuro, y lo que probáis vosotros con ellos.</span>
     </h1>
     <p class="standfirst">
-      El objetivo de esta práctica es poner en práctica lo que hemos visto del tema&nbsp;5: programar en Python dos
+      La idea de esta práctica es aplicar lo que hemos visto en el tema&nbsp;5: programar en Python dos
       jugadores de ajedrez, uno con <strong>minimax y poda alfa-beta</strong> y otro con <strong>Monte Carlo Tree
-      Search</strong>, siguiendo una guía paso a paso. Después, tocarlos: profundidades, parámetros, heurísticas, y al
-      menos una mejora, de las que se proponen o vuestra. Lo que importa es que probéis cosas y entendáis por qué salen
+      Search</strong>, siguiendo una guía paso a paso. Después toca trastear con ellos (profundidades, parámetros,
+      heurísticas) y probar al menos una mejora, de las que se proponen o vuestra. Lo que importa es que probéis cosas y entendáis por qué salen
       como salen, sin que os suponga mucha carga.
     </p>
     <div class="byline">
@@ -88,8 +88,8 @@
       <dd>Python<small>Con python-chess, en VS Code</small></dd>
     </div>
     <div class="fact">
-      <dt>Para empezar</dt>
-      <dd>Nueve pasos<small>Alfa-beta en tres y MCTS en seis, con su comprobación</small></dd>
+      <dt>Guía paso a paso</dt>
+      <dd><a href="../guias/mcts-paso-a-paso.html">Nueve pasos<span class="arrow" aria-hidden="true">&#8594;</span></a><small>Alfa-beta en tres y MCTS en seis, con su comprobación</small></dd>
     </div>
   </dl>
 
@@ -105,7 +105,7 @@
           Esta vez el entorno cambia: dejamos Ms.&nbsp;Pac-Man y pasamos al <strong>ajedrez</strong>, un juego por
           turnos, con dos jugadores, sin azar y en el que se ve todo el tablero. Es el terreno de los algoritmos que
           <strong>simulan el futuro</strong> en vez de razonar sólo sobre el presente, como hacían las reglas o la lógica
-          borrosa. Las reglas del ajedrez las pone la biblioteca python-chess; vosotros escribís quién decide.
+          borrosa. Las reglas del ajedrez las pone la biblioteca python-chess <!--cite python-chess--><span class="cita">[<a href="#ref-python-chess" id="cita-python-chess">1</a>]</span><!--/cite-->; vosotros escribís quién decide.
         </p>
         <figure>
           <figcaption>La ventana de la práctica: vuestro MCTS (blancas) contra vuestro alfa-beta</figcaption>
@@ -162,7 +162,7 @@
           <h2 class="sec">Cómo se evalúa</h2>
         </div>
         <p>
-          Por partes, sumando puntos. La guía da 5 y los retos, otros 5:
+          Por partes, sumando puntos. La guía da 5, los retos otros 5, y el concurso, un punto extra:
         </p>
         <div class="table-scroll">
           <table class="ancha">
@@ -172,6 +172,7 @@
               <tr><td><strong>2 · MCTS</strong></td><td>Los pasos M1 a M6 en <code>BIEN</code>.</td><td>2</td></tr>
               <tr><td><strong>3 · Experimentos</strong></td><td>Al menos uno con cada algoritmo, apuntado en las notas.</td><td>1</td></tr>
               <tr><td><strong>4 · Retos</strong></td><td>Cada reto es una misión con su cristal: dorado (difícil), 5 puntos; violeta (fácil), 2,5; azul (muy sencillo), 1,75. Cuentan como mucho tres, y entre todos no pasan de 5. El color de cada uno está en la <a href="../guias/mcts-paso-a-paso.html#retos">guía</a>.</td><td>hasta 5</td></tr>
+              <tr><td><strong>Concurso</strong></td><td>Según lo cerca que quede vuestro jugador del primero en el <a href="#concurso">concurso</a>. La nota no pasa de 10.</td><td>+1 como mucho</td></tr>
             </tbody>
           </table>
         </div>
@@ -196,15 +197,104 @@
               <tr><td><strong>Nada de fuera</strong></td><td>Ni motores externos (Stockfish o cualquier otro, tampoco con <code>chess.engine</code>), ni libros de aperturas, ni tablas de finales descargadas, ni red. El conocimiento de ajedrez que tenga vuestro jugador lo escribís vosotros.</td></tr>
               <tr><td><strong>Ni hilos, ni procesos, ni ficheros</strong></td><td>El jugador piensa en el hilo en el que se le llama, y no lee ni escribe ficheros.</td></tr>
               <tr><td><strong>Sin estado global</strong></td><td>Todo lo que haya que recordar entre jugadas (un árbol reutilizado, por ejemplo) va en atributos del objeto, no en variables del módulo. <code>comparar.py</code> juega muchas partidas seguidas en el mismo proceso.</td></tr>
-              <tr><td><strong>El tiempo</strong></td><td><code>elegir</code> recibe el tiempo por jugada como argumento: usadlo en vez de escribir el número.</td></tr>
+              <tr><td><strong>El tiempo</strong></td><td><code>elegir</code> recibe el tiempo de esa jugada como argumento: usadlo en vez de escribir el número. En el <a href="#concurso">concurso</a>, con el reloj de partida, ese tiempo puede bajar al final.</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <section id="como-trabajar">
+      <section id="concurso">
         <div class="sec-head">
           <span class="num">04</span>
+          <h2 class="sec">Concurso</h2>
+        </div>
+        <p>
+          Esta vez también hay concurso. Cuando acabe el plazo juego una liguilla de todos contra todos con el jugador
+          que entreguéis (el que crea <code>jugador()</code>): cada pareja de grupos juega cuatro aperturas de
+          <code>comparar.py</code>, cada una con blancas y con negras, así que son ocho partidas por pareja. Victoria
+          1 punto, tablas ½, y gana el grupo que más puntos sume.
+        </p>
+        <h3 class="label">Los límites</h3>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">Límite</th><th scope="col">Cuánto</th><th scope="col">Si os pasáis</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Por jugada</strong></td><td>1 s: el <code>tiempo</code> que recibe <code>elegir</code>.</td><td>Una jugada que tarda más de 1,5 veces su tiempo pierde la partida.</td></tr>
+              <tr><td><strong>Por partida</strong></td><td>60 s de reloj para cada jugador, sumando lo que tardan todas sus jugadas. Cuando os queda menos de 1 s, <code>tiempo</code> es lo que os queda.</td><td>No perdéis, pero desde ahí cada jugada recibe 0,05 s hasta el final, que da para muy poco.</td></tr>
+              <tr><td><strong>Largo de la partida</strong></td><td>200 medias jugadas desde la apertura (100 de cada uno).</td><td>Gana quien tenga 3 o más puntos de material de ventaja; si no, tablas.</td></tr>
+              <tr><td><strong>Jugada ilegal</strong></td><td>Ninguna.</td><td>Pierde la partida.</td></tr>
+              <tr><td><strong>Excepciones</strong></td><td>Ninguna.</td><td>Fuera del concurso, aunque sea en una sola partida: el concurso se juega en paralelo y no repito partidas.</td></tr>
+              <tr><td><strong>Entrega tarde</strong></td><td>Hasta 12 horas.</td><td>Desde 12 horas de retraso, fuera del concurso.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Lo nuevo es el reloj de partida. Esto significa que no os da para pensar 1 s en todas las jugadas: si la
+          partida llega al final, son 100 jugadas vuestras con 60 s para todas, así que de media
+        </p>
+<!--TEX \frac{60 \text{ s}}{100 \text{ jugadas}} = 0{,}6 \text{ s por jugada} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><mn>60</mn><mtext> s</mtext></mrow><mrow><mn>100</mn><mtext> jugadas</mtext></mrow></mfrac><mo>=</mo><mn>0,6</mn><mtext> s por jugada</mtext></mrow><annotation encoding="application/x-tex">\frac{60 \text{ s}}{100 \text{ jugadas}} = 0{,}6 \text{ s por jugada}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.2019em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">100</span><span class="mord text"><span class="mord"> jugadas</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">60</span><span class="mord text"><span class="mord"> s</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">6</span><span class="mord text"><span class="mord"> s por jugada</span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          El MCTS de la guía gasta el 90&nbsp;% del tiempo que recibe, 0,9 s por jugada, y se queda sin reloj en
+        </p>
+<!--TEX \frac{60 \text{ s}}{0{,}9 \text{ s por jugada}} \approx 66 \text{ jugadas} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><mn>60</mn><mtext> s</mtext></mrow><mrow><mn>0,9</mn><mtext> s por jugada</mtext></mrow></mfrac><mo>≈</mo><mn>66</mn><mtext> jugadas</mtext></mrow><annotation encoding="application/x-tex">\frac{60 \text{ s}}{0{,}9 \text{ s por jugada}} \approx 66 \text{ jugadas}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.2019em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">9</span><span class="mord text"><span class="mord"> s por jugada</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">60</span><span class="mord text"><span class="mord"> s</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">66</span><span class="mord text"><span class="mord"> jugadas</span></span></span></span></span></span></div><!--/TEX-->
+        <figure>
+          <figcaption>Los mismos 60 s, gastados de dos formas: cada barra es lo que se piensa en cada jugada, y su área, el reloj entero</figcaption>
+          <svg class="grafica" viewBox="0 0 540 200" role="img" aria-label="Dos barras a lo largo de las 100 jugadas de una partida, con la altura proporcional a los segundos por jugada. Arriba, un jugador que gasta 0,9 s en cada jugada: la barra es alta hasta la jugada 66, donde se agota el reloj, y desde ahí es una línea casi plana de 0,05 s por jugada. Abajo, un jugador que reparte 0,6 s en cada una de las 100 jugadas: una barra más baja que llega hasta el final.">
+            <text class="nota" x="364" y="14" text-anchor="middle">jugada 66: reloj agotado</text>
+            <text class="nota" x="90" y="52" text-anchor="end">0,9 s siempre</text>
+            <rect class="barra" x="100" y="25" width="264" height="45" rx="2"/>
+            <text class="nota dentro" x="232" y="52" text-anchor="middle">0,9 × 66 ≈ 60 s</text>
+            <rect class="barra" x="364" y="67.5" width="136" height="2.5"/>
+            <text class="nota tenue" x="432" y="58" text-anchor="middle">0,05 s cada una</text>
+            <line class="limite" x1="364" x2="364" y1="20" y2="80"/>
+            <text class="nota" x="90" y="135" text-anchor="end">0,6 s siempre</text>
+            <rect class="barra" x="100" y="115" width="400" height="30" rx="2"/>
+            <text class="nota dentro" x="300" y="135" text-anchor="middle">0,6 × 100 = 60 s</text>
+            <line class="rejilla" x1="100" x2="500" y1="158" y2="158"/>
+            <text class="eje" x="100" y="176" text-anchor="middle">jugada 1</text>
+            <text class="eje" x="300" y="176" text-anchor="middle">50</text>
+            <text class="eje" x="500" y="176" text-anchor="middle">100</text>
+          </svg>
+        </figure>
+        <p>
+          De ahí al final juega casi a ciegas, y es justo cuando hay que rematar la partida. Esto es así para que
+          repartir el tiempo cuente (de eso va el reto <a href="../guias/mcts-paso-a-paso.html#reto5">Gestionar el
+          tiempo</a>): ahorrar en las jugadas fáciles para gastarlo en las que lo merecen.
+        </p>
+        <div class="note tip">
+          <span class="note-label">Llevar la cuenta</span>
+          <p>
+            Cada partida empieza con un <code>jugador()</code> nuevo, así que podéis guardar en atributos del objeto
+            cuánto lleváis gastado (con <code>time.perf_counter()</code> al entrar y al salir de <code>elegir</code>)
+            y cuántas jugadas lleváis. Con eso sabéis cuánto reloj os queda y cuántas jugadas os pueden faltar como mucho.
+          </p>
+        </div>
+        <h3 class="label">Probadlo antes</h3>
+        <p>
+          Volved a descargar <a href="../recursos/ICI-Practica5.zip" download><code>ICI-Practica5.zip</code></a> y
+          copiad su carpeta <code>ajedrez/</code> encima de la vuestra (no tiene nada vuestro): es la que trae el
+          reloj. Después, en vuestro <code>comparar.py</code>, poned <code>TIEMPO = 1</code> y
+          <code>MAX_MEDIAS = 200</code>, y añadid <code>reloj=60</code> a la llamada a <code>jugar</code> de
+          <code>una_partida</code>. Con eso las partidas se juegan como en el concurso. Tardan bastante más (cada
+          una puede llegar a los dos minutos), así que con dos o tres aperturas basta.
+        </p>
+        <h3 class="label">El punto extra</h3>
+        <p>
+          Como en las otras prácticas, un punto sobre la nota, según lo cerca que quedéis del primero. Si llamamos
+          <em>mía</em> al porcentaje de puntos de vuestro grupo, y <em>mejor</em> y <em>peor</em> a los del primero y el
+          último:
+        </p>
+<!--TEX 1 \times \frac{\text{mía} - \text{peor}}{\text{mejor} - \text{peor}} --><div class="tex-bloque"><span class="katex-display fleqn"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mn>1</mn><mo>×</mo><mfrac><mrow><mrow><mtext>m</mtext><mover accent="true"><mtext>ı</mtext><mo>ˊ</mo></mover><mtext>a</mtext></mrow><mo>−</mo><mtext>peor</mtext></mrow><mrow><mtext>mejor</mtext><mo>−</mo><mtext>peor</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">1 \times \frac{\text{mía} - \text{peor}}{\text{mejor} - \text{peor}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2519em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">mejor</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord text"><span class="mord">peor</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">m</span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord latin_fallback">ı</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">a</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord text"><span class="mord">peor</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div><!--/TEX-->
+        <p>
+          El primero se lleva el punto entero, el último 0 y los de en medio, en proporción. La nota de la práctica no
+          pasa de 10. Los casos raros (empates, quién no entra en la escala) son los de la
+          <a href="../guias/competicion.html#punto-extra">guía de la competición</a>.
+        </p>
+      </section>
+
+      <section id="como-trabajar">
+        <div class="sec-head">
+          <span class="num">05</span>
           <h2 class="sec">Cómo trabajar</h2>
         </div>
         <div class="step">
@@ -250,7 +340,7 @@
             <h3 class="label">Vuestra versión</h3>
             <p>
               La que mejor os haya ido, sea de MCTS, de alfa-beta o una mezcla: <code>jugador()</code> en
-              <code>grupoYY/__init__.py</code> la crea.
+              <code>grupoYY/__init__.py</code> la crea, y es la que juega el <a href="#concurso">concurso</a>.
             </p>
           </div>
         </div>
@@ -258,7 +348,7 @@
 
       <section id="significativa">
         <div class="sec-head">
-          <span class="num">05</span>
+          <span class="num">06</span>
           <h2 class="sec">¿La mejora es real?</h2>
         </div>
         <p>
@@ -277,19 +367,19 @@ p &amp;= 66\,\%, \qquad m = 24 \\[6pt]
 \end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:4.8em;vertical-align:-2.15em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">p</span></span></span><span style="top:-2.71em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">entre</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord">66</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">24</span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">y</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord">66</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">24</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.65em;"><span style="top:-4.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">66</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">%</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">24</span></span></span><span style="top:-2.71em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">42</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">%</span></span></span><span style="top:-1.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">90</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">%</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.15em;"><span></span></span></span></span></span></span></span></span></span></span></span></div><!--/TEX-->
         <p>
           El 50&nbsp;% queda dentro del intervalo, así que no está demostrado que el reto mejore el MCTS: va en la
-          dirección que se esperaba, y nada más. Para saberlo, más partidas, añadiendo aperturas a
-          <code>APERTURAS</code>. Una versión que pase del 0 al 30&nbsp;% contra AlfaBeta2, en cambio, sí ha demostrado
+          dirección que se esperaba, y nada más. Para saberlo hacen falta más partidas (podéis añadir aperturas a
+          <code>APERTURAS</code>). Una versión que pase del 0 al 30&nbsp;% contra AlfaBeta2, en cambio, sí ha demostrado
           algo. Y "no se nota" también vale como resultado.
         </p>
       </section>
 
       <section id="entrega">
         <div class="sec-head">
-          <span class="num">06</span>
+          <span class="num">07</span>
           <h2 class="sec">Reglas de entrega</h2>
         </div>
         <p>
-          Esta práctica se desarrolla en <strong>grupos de 3 o 4 estudiantes</strong>, y se entrega en una tarea del
+          Esta práctica se hace en <strong>grupos de 3 o 4 estudiantes</strong> y se entrega en una tarea del
           Campus Virtual antes del <strong>domingo 29 de noviembre a las 23:59</strong>:
         </p>
         <div class="table-scroll">
@@ -327,6 +417,15 @@ p &amp;= 66\,\%, \qquad m = 24 \\[6pt]
         </ul>
       </section>
 
+      <!--ICI:REFS-->
+      <section id="referencias" class="referencias" data-corto="Referencias">
+        <h2 class="sec">Referencias</h2>
+        <ol>
+          <li id="ref-python-chess">N. Fiekas. <em>python-chess: a chess library for Python</em>. documentación, 2026. <a href="https://python-chess.readthedocs.io/">python-chess.readthedocs.io</a> <a class="volver" href="#cita-python-chess" aria-label="Volver a la cita">↩</a></li>
+        </ol>
+      </section>
+      <!--/ICI:REFS-->
+
     </main>
 
     <aside class="rail">
@@ -337,9 +436,11 @@ p &amp;= 66\,\%, \qquad m = 24 \\[6pt]
             <li><a href="#que-se-pide">Qué se pide</a></li>
             <li><a href="#evaluacion">Cómo se evalúa</a></li>
             <li><a href="#reglas">Reglas del jugador</a></li>
+            <li><a href="#concurso">Concurso</a></li>
             <li><a href="#como-trabajar">Cómo trabajar</a></li>
             <li><a href="#significativa">¿La mejora es real?</a></li>
             <li><a href="#entrega">Reglas de entrega</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ol>
         </nav>
         <nav aria-labelledby="de-la-practica">
@@ -378,7 +479,7 @@ p &amp;= 66\,\%, \qquad m = 24 \\[6pt]
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una

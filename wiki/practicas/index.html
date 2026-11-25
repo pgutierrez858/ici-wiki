@@ -10,6 +10,7 @@
 <meta name="description" content="Los bloques de prácticas del curso, qué pide cada uno y las reglas de entrega comunes a todas las entregas de la asignatura.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="../assets/css/ici.css">
@@ -32,10 +33,9 @@
     <nav class="site-nav" aria-label="Secciones de la asignatura">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="../presentacion.html">Presentación</a></li>
         <li><a href="../calendario.html">Calendario</a></li>
         <li><a href="../practicas/index.html" aria-current="page">Prácticas</a></li>
-        <li><a href="../guias/index.html">Guías</a></li>
+        <li><a href="../guias/index.html">Apuntes</a></li>
       </ul>
     </nav>
     <button class="theme" type="button">Tema · <b>auto</b></button>
@@ -57,28 +57,48 @@
       <span class="thin">Siete prácticas y un bloque extra al final, y de aquí sale toda la nota.</span>
     </h1>
     <p class="standfirst">
-      Cada bloque introduce una forma de representar conocimiento y te pide aplicarla a un entorno de
-      juego. El enunciado de cada práctica se publica al empezar su bloque; las reglas de entrega, en
-      cambio, son las mismas todo el curso y están al final de esta página.
+      Cada bloque introduce una forma de representar conocimiento y os pide aplicarla a un entorno de
+      juego. El enunciado de cada práctica se publica al empezar su bloque, mientras que las reglas de
+      entrega son las mismas todo el curso (están al final de esta página).
     </p>
   </header>
 
+  <!--ICI:AHORA-->
+  <section class="ahora" aria-labelledby="ahora-t">
+    <h2 class="ahora-t" id="ahora-t">Ahora</h2>
+    <ol class="ahora-pills">
+      <li class="ap" data-ap="done" data-b="p0" data-start="2026-09-07" data-due="2026-09-20" data-name="Práctica 0" data-enun="practica-0.html" data-tema="Tutorial" data-guia="../guias/eclipse.html" data-guia-txt="Guía de instalación"><a href="practica-0.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P0</span><span class="sr-only">Práctica 0 · Tutorial, cerrada</span></a></li>
+      <li class="ap" data-ap="done" data-b="p1" data-start="2026-09-21" data-due="2026-10-04" data-name="Práctica 1" data-enun="practica-1.html" data-tema="Algorítmica" data-guia="../guias/competicion.html" data-guia-txt="Guía de la competición" data-apuntes="../guias/tema2/index.html"><a href="practica-1.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P1</span><span class="sr-only">Práctica 1 · Algorítmica, cerrada</span></a></li>
+      <li class="ap" data-ap="done" data-b="p2" data-start="2026-10-05" data-due="2026-10-18" data-name="Práctica 2" data-enun="practica-2.html" data-hito="2026-10-11" data-hito-txt="diseño" data-tema="Máquinas de estados" data-apuntes="../guias/tema2/maquinas-estados.html"><a href="practica-2.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P2</span><span class="sr-only">Práctica 2 · Máquinas de estados, cerrada</span></a></li>
+      <li class="ap" data-ap="done" data-b="p3" data-start="2026-10-19" data-due="2026-11-01" data-name="Práctica 3" data-enun="practica-3.html" data-tema="Sistemas de reglas" data-guia="../guias/reglas-paso-a-paso.html" data-guia-txt="Guía paso a paso" data-apuntes="../guias/tema3/index.html"><a href="practica-3.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P3</span><span class="sr-only">Práctica 3 · Sistemas de reglas, cerrada</span></a></li>
+      <li class="ap" data-ap="done" data-b="p4" data-start="2026-11-02" data-due="2026-11-16" data-name="Práctica 4" data-enun="practica-4.html" data-tema="Razonamiento borroso" data-guia="../guias/borroso-paso-a-paso.html" data-guia-txt="Guía paso a paso" data-apuntes="../guias/tema4/index.html"><a href="practica-4.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P4</span><span class="sr-only">Práctica 4 · Razonamiento borroso, cerrada</span></a></li>
+      <li class="ap" data-ap="now" data-objetivo data-b="p5" data-start="2026-11-17" data-due="2026-11-29" data-name="Práctica 5" data-enun="practica-5.html" data-tema="Juegos por turnos" data-guia="../guias/mcts-paso-a-paso.html" data-guia-txt="Guía paso a paso" data-apuntes="../guias/tema5/index.html"><a href="practica-5.html" aria-current="step"><span class="ap-dot" aria-hidden="true"><svg class="ap-pac" viewBox="0 0 26 26" aria-hidden="true" focusable="false"><path class="pac pac-a" d="M13 13 24.26 6.5A13 13 0 1 0 24.26 19.5Z"/><path class="pac pac-b" d="M13 13 25.74 10.41A13 13 0 1 0 25.74 15.59Z"/></svg><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P5</span><span class="sr-only">Práctica 5 · Juegos por turnos, en curso</span></a></li>
+      <li class="ap" data-ap="soon" data-b="cb" data-start="2026-11-30" data-due="2026-12-13" data-name="Práctica 6" data-enun="practica-6.html" data-hito="2026-12-06" data-hito-txt="diseño" data-tema="Razonamiento basado en casos" data-guia="../guias/tema6/jcolibri.html" data-guia-txt="Guía de la plantilla" data-apuntes="../guias/tema6/index.html"><a href="practica-6.html"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">P6</span><span class="sr-only">Práctica 6 · Razonamiento basado en casos, abre el 30 nov</span></a></li>
+      <li class="ap" data-ap="soon" data-b="bn" data-start="2026-12-14" data-due="2026-12-20" data-name="Bonus" data-due-txt="Por anunciar" data-tema="Juegos de lenguaje" data-apuntes="../guias/bonus/index.html"><span class="ap-a"><span class="ap-dot" aria-hidden="true"><span class="ap-pill"></span></span><span class="ap-num" aria-hidden="true">B</span><span class="sr-only">Bonus · Juegos de lenguaje, por abrir</span></span></li>
+    </ol>
+    <div class="ahora-now">
+      <p class="ahora-txt"><b data-ahora-name>Práctica 5 · Juegos por turnos</b> <span data-ahora-when>Entrega el dom 29 noviembre</span> <span data-ahora-rel>quedan 4 días</span></p>
+      <ul class="ahora-links">
+        <li><a data-ahora-enun href="practica-5.html">Enunciado <span aria-hidden="true">→</span></a></li>
+        <li><a data-ahora-guia href="../guias/mcts-paso-a-paso.html">Guía paso a paso <span aria-hidden="true">→</span></a></li>
+        <li><a data-ahora-apuntes href="../guias/tema5/index.html">Apuntes <span aria-hidden="true">→</span></a></li>
+      </ul>
+    </div>
+  </section>
+  <!--/ICI:AHORA-->
+
   <dl class="facts">
-    <div class="fact">
-      <dt>Próxima entrega</dt>
-      <dd><span data-next-due>dom 20 septiembre</span><small><span data-next-due-rel>Quedan 12 días</span> · <span data-next-name>Práctica 0</span></small></dd>
+    <div class="fact fact-wide">
+      <dt>Paquete</dt>
+      <dd><pre class="fact-pre"><code>es.ucm.fdi.ici.c2627.<wbr>practicaN.<wbr>grupoYY</code></pre><small>Con el número de la práctica en <code>N</code> y la letra del grupo en <code>YY</code></small></dd>
     </div>
     <div class="fact">
       <dt>Formato</dt>
-      <dd><code>practicaN.zip</code><small>Por el Campus Virtual</small></dd>
+      <dd><code>practicaN-grupoYY.zip</code><small>Por el Campus Virtual</small></dd>
     </div>
     <div class="fact">
-      <dt>Paquete</dt>
-      <dd><code>…ici.c2627</code><small>Curso 2026&#8239;–&#8239;2027</small></dd>
-    </div>
-    <div class="fact">
-      <dt>Entorno actual</dt>
-      <dd>Ms. Pac-Man<small>Hasta la Práctica 4</small></dd>
+      <dt>Entornos</dt>
+      <dd>Ms. Pac-Man<small>Todas menos la P5, que va en ajedrez</small></dd>
     </div>
   </dl>
 
@@ -91,10 +111,10 @@
         </div>
         <!--ICI:BLOCKS-->
         <ol class="blocks">
-          <li class="blk" data-b="p0" data-start="2026-09-07" data-due="2026-09-20" data-name="Práctica 0">
+          <li class="blk" data-b="p0" data-start="2026-09-07" data-due="2026-09-20" data-name="Práctica 0" data-enun="practica-0.html">
             <span class="blk-num" aria-hidden="true">00</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practica-0.html">Práctica 0 · Tutorial</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practica-0.html">Práctica 0 · Tutorial</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">El simulador, el ciclo de una partida y los primeros comportamientos, todavía a mano.</p>
             </div>
             <div class="blk-meta">
@@ -104,13 +124,13 @@
             </div>
             <ul class="blk-links">
               <li><a href="practica-0.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 1 · Ingeniería del conocimiento</span></li>
+              <li><a href="../guias/eclipse.html">Guía de instalación <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p1" data-start="2026-09-21" data-due="2026-10-04" data-name="Práctica 1">
+          <li class="blk" data-b="p1" data-start="2026-09-21" data-due="2026-10-04" data-name="Práctica 1" data-enun="practica-1.html">
             <span class="blk-num" aria-hidden="true">01</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practica-1.html">Práctica 1 · Algorítmica</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practica-1.html">Práctica 1 · Algorítmica</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">Movimiento y búsqueda de caminos en el laberinto: la solución directa, y por qué no escala.</p>
             </div>
             <div class="blk-meta">
@@ -120,14 +140,15 @@
             </div>
             <ul class="blk-links">
               <li><a href="practica-1.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="../guias/tema1/index.html">Apuntes · Tema 2 <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 2 · Búsqueda y movimiento</span></li>
+              <li><a href="../guias/competicion.html">Guía de la competición <span aria-hidden="true">→</span></a></li>
+              <li><a href="../guias/tema2/index.html">Apuntes · Tema 2 · IA para videojuegos <span aria-hidden="true">→</span></a></li>
+              <li><a href="practica-1-resultados.html">Resultados <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p2" data-start="2026-10-05" data-due="2026-10-18" data-name="Práctica 2" data-hito="2026-10-11" data-hito-txt="diseño">
+          <li class="blk" data-b="p2" data-start="2026-10-05" data-due="2026-10-18" data-name="Práctica 2" data-enun="practica-2.html" data-hito="2026-10-11" data-hito-txt="diseño">
             <span class="blk-num" aria-hidden="true">02</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practica-2.html">Práctica 2 · Máquinas de estados</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practica-2.html">Práctica 2 · Máquinas de estados</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">Comportamientos como estados y transiciones: diseño, jerarquía y depuración de una FSM.</p>
             </div>
             <div class="blk-meta">
@@ -138,14 +159,14 @@
             </div>
             <ul class="blk-links">
               <li><a href="practica-2.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="../guias/tema1/maquinas-estados.html">Apuntes · Máquinas de estados <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 2 · Máquinas de estados</span></li>
+              <li><a href="../guias/tema2/maquinas-estados.html">Apuntes · Tema 2 · Máquinas de estados <span aria-hidden="true">→</span></a></li>
+              <li><a href="practica-2-resultados.html">Resultados <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p3" data-start="2026-10-19" data-due="2026-11-01" data-name="Práctica 3">
+          <li class="blk" data-b="p3" data-start="2026-10-19" data-due="2026-11-01" data-name="Práctica 3" data-enun="practica-3.html">
             <span class="blk-num" aria-hidden="true">03</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practica-3.html">Práctica 3 · Sistemas de reglas</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practica-3.html">Práctica 3 · Sistemas de reglas</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">Conocimiento declarativo con Jess: hechos, reglas, motor de inferencia y encadenamiento.</p>
             </div>
             <div class="blk-meta">
@@ -155,14 +176,15 @@
             </div>
             <ul class="blk-links">
               <li><a href="practica-3.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="../guias/tema2/index.html">Apuntes · Sistemas de reglas <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 3 · Sistemas de reglas</span></li>
+              <li><a href="../guias/reglas-paso-a-paso.html">Guía paso a paso <span aria-hidden="true">→</span></a></li>
+              <li><a href="../guias/tema3/index.html">Apuntes · Tema 3 · Sistemas de reglas <span aria-hidden="true">→</span></a></li>
+              <li><a href="practica-3-resultados.html">Resultados <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p4" data-start="2026-11-02" data-due="2026-11-16" data-name="Práctica 4">
+          <li class="blk" data-b="p4" data-start="2026-11-02" data-due="2026-11-16" data-name="Práctica 4" data-enun="practica-4.html">
             <span class="blk-num" aria-hidden="true">04</span>
             <div class="blk-main">
-              <h3 class="blk-title"><a href="practica-4.html">Práctica 4 · Razonamiento borroso</a> <span class="chip done" data-state>Entregada</span></h3>
+              <h3 class="blk-title"><a href="practica-4.html">Práctica 4 · Razonamiento borroso</a> <span class="chip done" data-state>Cerrada</span></h3>
               <p class="blk-desc">Decisiones con magnitudes imprecisas: conjuntos borrosos, reglas lingüísticas e inferencia.</p>
             </div>
             <div class="blk-meta">
@@ -172,11 +194,12 @@
             </div>
             <ul class="blk-links">
               <li><a href="practica-4.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="../guias/tema2/borroso.html">Apuntes · Razonamiento borroso <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 4 · Razonamiento borroso</span></li>
+              <li><a href="../guias/borroso-paso-a-paso.html">Guía paso a paso <span aria-hidden="true">→</span></a></li>
+              <li><a href="../guias/tema4/index.html">Apuntes · Tema 4 · Razonamiento borroso <span aria-hidden="true">→</span></a></li>
+              <li><a href="practica-4-resultados.html">Resultados <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="p5" data-start="2026-11-17" data-due="2026-11-29" data-name="Práctica 5">
+          <li class="blk" data-b="p5" data-start="2026-11-17" data-due="2026-11-29" data-name="Práctica 5" data-enun="practica-5.html">
             <span class="blk-num" aria-hidden="true">05</span>
             <div class="blk-main">
               <h3 class="blk-title"><a href="practica-5.html">Práctica 5 · Juegos por turnos</a> <span class="chip now" data-state>En curso</span></h3>
@@ -189,24 +212,26 @@
             </div>
             <ul class="blk-links">
               <li><a href="practica-5.html">Enunciado <span aria-hidden="true">→</span></a></li>
-              <li><a href="../guias/tema5/index.html">Apuntes · Juegos por turnos <span aria-hidden="true">→</span></a></li>
-              <li><span class="off">Tema 5 · Juegos por turnos</span></li>
+              <li><a href="../guias/mcts-paso-a-paso.html">Guía paso a paso <span aria-hidden="true">→</span></a></li>
+              <li><a href="../guias/tema5/index.html">Apuntes · Tema 5 · Juegos por turnos <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
-          <li class="blk" data-b="cb" data-start="2026-11-30" data-due="2026-12-13" data-name="Práctica 6" data-due-txt="Por anunciar">
+          <li class="blk" data-b="cb" data-start="2026-11-30" data-due="2026-12-13" data-name="Práctica 6" data-enun="practica-6.html" data-hito="2026-12-06" data-hito-txt="diseño">
             <span class="blk-num" aria-hidden="true">06</span>
             <div class="blk-main">
-              <h3 class="blk-title">Práctica 6 · Razonamiento basado en casos <span class="chip soon" data-state>Por abrir</span></h3>
+              <h3 class="blk-title"><a href="practica-6.html">Práctica 6 · Razonamiento basado en casos</a> <span class="chip soon" data-state>Abre el 30 nov</span></h3>
               <p class="blk-desc">En vez de escribir reglas, guardar partidas: recuperar el caso más parecido, adaptar su solución y aprender del resultado.</p>
             </div>
             <div class="blk-meta">
-              <span>Entrega <b>Por anunciar</b></span>
-              <span class="env">Entorno: Por anunciar</span>
+              <span>Diseño <b>dom 6 diciembre</b></span>
+              <span>Entrega <b>dom 13 diciembre</b></span>
+              <span class="env">Entorno: Ms. Pac-Man</span>
               <span>Grupos</span>
             </div>
             <ul class="blk-links">
-              <li><span class="off">Enunciado por publicar</span></li>
-              <li><span class="off">Tema 6 · Razonamiento basado en casos</span></li>
+              <li><a href="practica-6.html">Enunciado <span aria-hidden="true">→</span></a></li>
+              <li><a href="../guias/tema6/jcolibri.html">Guía de la plantilla <span aria-hidden="true">→</span></a></li>
+              <li><a href="../guias/tema6/index.html">Apuntes · Tema 6 · Razonamiento basado en casos <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
           <li class="blk" data-b="bn" data-start="2026-12-14" data-due="2026-12-20" data-name="Bonus" data-due-txt="Por anunciar">
@@ -222,14 +247,15 @@
             </div>
             <ul class="blk-links">
               <li><span class="off">Enunciado por publicar</span></li>
-              <li><span class="off">Bonus · Juegos de lenguaje</span></li>
+              <li><a href="../guias/bonus/index.html">Apuntes · Bonus · Juegos de lenguaje <span aria-hidden="true">→</span></a></li>
             </ul>
           </li>
         </ol>
         <!--/ICI:BLOCKS-->
         <p class="apunte sep">
-          Las fechas completas están en el <a href="../calendario.html">calendario</a>. Un bloque "por
-          abrir" todavía no tiene enunciado publicado; cada uno se publica al empezar su tramo.
+          Las fechas completas están en el <a href="../calendario.html">calendario</a>. Un bloque "cerrado" ya
+          pasó su entrega, "abre el" dice cuándo empieza uno cuyo enunciado ya podéis leer, y "por abrir" es
+          que todavía no tiene el enunciado publicado (cada uno sale al empezar su tramo).
         </p>
       </section>
 
@@ -246,10 +272,10 @@
         <p>
           Todo el código de una entrega vive en el paquete
           <code>es.ucm.fdi.ici.c2627.practicaX.grupoYY</code>, donde <code>X</code> es el número de la
-          práctica e <code>YY</code> el número de grupo asignado en clase. En las prácticas individuales,
+          práctica e <code>YY</code> la letra de vuestro grupo. En las prácticas individuales,
           el último tramo es <code>grupoIndividual</code>.
         </p>
-        <pre><code>es/ucm/fdi/ici/c2627/practica2/grupo07/
+        <pre><code>es/ucm/fdi/ici/c2627/practica2/grupoA/
   <span class="c">├─</span> MsPacMan.java   <span class="c">// controlador de Ms. Pac-Man</span>
   <span class="c">├─</span> Ghosts.java     <span class="c">// controlador de los cuatro fantasmas</span>
   <span class="c">└─</span> …               <span class="c">// las clases auxiliares que necesites</span></code></pre>
@@ -257,8 +283,8 @@
         <h3>Los controladores</h3>
         <p>
           Salvo que el enunciado diga otra cosa, cada entrega incluye los dos bandos: la clase
-          <code>MsPacMan</code> y la clase <code>Ghosts</code>. Si entregas varios controladores
-          alternativos, indica en la memoria cuál es el que debe evaluarse.
+          <code>MsPacMan</code> y la clase <code>Ghosts</code>. Si entregáis varios controladores
+          alternativos, indicad en la memoria cuál es el que debe evaluarse.
         </p>
 
         <h3>El zip</h3>
@@ -271,7 +297,7 @@
           </p>
         </div>
         <ul class="check">
-          <li>El nombre del archivo es <code>practicaN.zip</code>, con el número de la práctica.</li>
+          <li>El nombre del archivo es <code>practicaN-grupoYY.zip</code>, con el número de la práctica y la letra del grupo (la P0, individual, es <code>practica0.zip</code>).</li>
           <li>El paquete es <code>es.ucm.fdi.ici.c2627.practicaN.grupoYY</code>.</li>
           <li>Al abrir el zip aparece <code>es/</code> en la raíz.</li>
           <li>No hay ni un archivo del simulador dentro (paquete <code>pacman.*</code>).</li>
@@ -312,7 +338,7 @@
         </p>
         <p>
           La defensa es en clase, sobre el código que habéis entregado, y puede pedírsele a cualquier
-          miembro del grupo. Conviene que todos sepáis explicar todo: es la mejor señal de que el trabajo
+          miembro del grupo. Conviene que todos sepáis explicar todo, que al final es la mejor señal de que el trabajo
           se ha repartido de verdad.
         </p>
         <p>
@@ -331,8 +357,8 @@
           <code>ICI-PracticaN.zip</code> por práctica, con el proyecto de Eclipse ya referenciando al
           simulador y con el paquete creado. Importad primero el simulador. Desde la
           <a href="practica-3.html">Práctica&nbsp;3</a>, el zip de cada práctica trae también el simulador y
-          se importan los dos proyectos de una vez. Del entorno de la segunda mitad del curso se dará lo suyo
-          cuando se anuncie.
+          se importan los dos proyectos de una vez. La <a href="practica-5.html">Práctica&nbsp;5</a> es la
+          excepción: va en Python con VS Code, y cómo prepararlo está en su guía.
         </p>
         <ul class="links">
           <li>
@@ -346,7 +372,7 @@
             <a href="../guias/clase-game.html">
               <span class="lt">La clase <code>Game</code><span class="arrow" aria-hidden="true">→</span></span>
               <span class="lm">Referencia</span>
-              <span class="ld">Todo lo que tu controlador puede preguntarle al estado de la partida.</span>
+              <span class="ld">Todo lo que vuestro controlador puede preguntarle al estado de la partida.</span>
             </a>
           </li>
           <li>
@@ -392,7 +418,7 @@
       <a href="../index.html#profesor">tutorías</a>
     </p>
     <p class="fine">
-      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 18 de noviembre de 2026.
+      Los comunicados oficiales y las entregas van por el Campus Virtual: esta wiki es el material de consulta. Última actualización: 25 de noviembre de 2026.
     </p>
     <p class="credito">
       Los enunciados están adaptados del material original de Juan A. Recio-García. El simulador es una
