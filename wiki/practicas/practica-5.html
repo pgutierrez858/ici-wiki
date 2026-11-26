@@ -349,12 +349,124 @@
       <section id="significativa">
         <div class="sec-head">
           <span class="num">06</span>
-          <h2 class="sec">¿La mejora es real?</h2>
+          <h2 class="sec">Comparar versiones</h2>
         </div>
         <p>
-          <code>comparar.py</code> da, para cada versión y cada rival, el porcentaje de puntos y un margen de dos
-          errores típicos. Llamamos <!--tex p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span><!--/tex--> al porcentaje y <!--tex m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> al margen: el resultado de verdad está, casi seguro, entre
-          <!--tex p - m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>−</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">p - m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> y <!--tex p + m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>+</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">p + m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex-->. Con el reto&nbsp;1 de la guía enfrentado al MCTS base, en 16 partidas:
+          <code>comparar.py</code> juega cada versión de <code>VERSIONES</code> contra cada rival de
+          <code>RIVALES</code>, desde las aperturas de <code>APERTURAS</code> y con los dos colores, y al acabar saca
+          una tabla. No tiene opciones que pasarle: lo que se cambia está arriba del fichero, en MAYÚSCULAS. Se puede
+          lanzar de dos formas:
+        </p>
+        <ul>
+          <li>Desde VS Code: en <strong>Ejecutar y depurar</strong> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> /
+            <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>) elegid <strong>Comparar versiones</strong> en el desplegable
+            y pulsad <kbd>F5</kbd>.</li>
+          <li>Desde una terminal, dentro de la carpeta <code>ICI-Practica5</code> y con el entorno activado (si
+            trabajáis con Jupyter, es la única forma):</li>
+        </ul>
+<pre><code>source .venv/bin/activate        <span class="c"># Mac y Linux</span>
+.venv\Scripts\activate           <span class="c"># Windows</span>
+python comparar.py</code></pre>
+        <div class="table-scroll">
+          <table class="ancha">
+            <thead><tr><th scope="col">En el fichero</th><th scope="col">Qué es</th></tr></thead>
+            <tbody>
+              <tr><td><code>VERSIONES</code></td><td>Las vuestras, cada una con un nombre corto y un <code>lambda</code> que la crea. Son las filas de la tabla.</td></tr>
+              <tr><td><code>RIVALES</code></td><td>Contra quién juega cada versión. Son las columnas. Vienen Aleatorio, Voraz y AlfaBeta2, pero vale cualquier jugador, también uno vuestro.</td></tr>
+              <tr><td><code>APERTURAS</code></td><td>Desde dónde empieza cada partida. Cada apertura son dos partidas por pareja, una con cada color, así que con las ocho que vienen salen 16.</td></tr>
+              <tr><td><code>TIEMPO</code></td><td>Segundos por jugada. Con 0,3, que es lo que viene, una partida tarda como mucho medio minuto; con 1 se parece más al concurso, pero tarda el triple.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="label">Enfrentar dos versiones, paso a paso</h3>
+        <p>
+          A modo de ejemplo, la misión <a href="../guias/mcts-paso-a-paso.html#retos">El rival también elige</a>: una
+          versión nueva del MCTS, <code>MCTSRival</code>, contra el MCTS de la guía.
+        </p>
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="label">La versión nueva</h3>
+            <p>
+              Una clase hija debajo de la original, en el mismo fichero (<code>grupoYY/mcts.py</code>), que cambia sólo
+              lo que pide la misión. La anterior no se toca, que hace falta para compararlas.
+            </p>
+<pre><code><span class="k">class</span> MCTSRival(MCTS):
+    <span class="k">def</span> seleccionar(self, nodo):
+        ...                               <span class="c"># vuestra versión</span></code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="label">Importadla</h3>
+            <p>Arriba de <code>comparar.py</code>, junto a la que ya estaba (con vuestra letra en vez de YY):</p>
+<pre><code><span class="k">from</span> grupoYY.mcts <span class="k">import</span> MCTS, MCTSRival</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="label">Una a cada lado</h3>
+            <p>
+              La nueva en <code>VERSIONES</code> y la anterior en <code>RIVALES</code>. Los rivales de referencia, de
+              momento, comentados con <code>#</code>, para que vaya más rápido: con un solo rival son 16 partidas.
+            </p>
+<pre><code>VERSIONES = {
+    <span class="s">"mcts-rival"</span>: <span class="k">lambda</span>: MCTSRival(),
+}
+RIVALES = {
+    <span class="c"># "Aleatorio": lambda: Aleatorio(),</span>
+    <span class="c"># "Voraz": lambda: Voraz(),</span>
+    <span class="c"># "AlfaBeta2": lambda: AlfaBeta(2),</span>
+    <span class="s">"MCTS guía"</span>: <span class="k">lambda</span>: MCTS(),
+}</code></pre>
+            <p>
+              Para dos alfa-beta es igual: <code>"ab3": lambda: Minimax(profundidad=3)</code> en
+              <code>VERSIONES</code> y <code>"ab2": lambda: Minimax(profundidad=2)</code> en <code>RIVALES</code>.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="label">Lanzadlo</h3>
+            <p>
+              Desde VS Code o con <code>python comparar.py</code>. Al empezar dice cuántas partidas son y lo que puede
+              tardar, va contándolas y, al acabar, sale esto:
+            </p>
+<pre><code>                         MCTS guía         TOTAL
+mcts-rival        66% ±24 (10-1-5)       66% ±24</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="label">Leed la casilla</h3>
+            <p>
+              La fila es la versión y la columna, el rival: <code>MCTSRival</code> ha sacado el 66&nbsp;% de los puntos
+              contra el MCTS de la guía, con 10 ganadas, 1 tablas y 5 perdidas. Un 50&nbsp;% sería que juegan igual.
+              Falta saber si ese 66&nbsp;% es de verdad o ha sido suerte, y para eso está el ±24 (justo abajo).
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">6</span>
+          <div class="step-body">
+            <h3 class="label">Y contra los de siempre</h3>
+            <p>
+              Quitad los <code>#</code> de los rivales de referencia y poned la anterior también en
+              <code>VERSIONES</code> (<code>"mcts": lambda: MCTS()</code>). Salen las dos filas una debajo de la otra,
+              y se ve si la nueva ha empeorado contra Voraz o AlfaBeta2 sin daros cuenta.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="label">¿Es suerte?</h3>
+        <p>
+          Cada casilla lleva el porcentaje de puntos y un margen de dos errores típicos. Llamamos <!--tex p --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span><!--/tex--> al porcentaje y <!--tex m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> al margen: el resultado de verdad está, casi seguro, entre
+          <!--tex p - m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>−</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">p - m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex--> y <!--tex p + m --><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>+</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">p + m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span><!--/tex-->. En la casilla de <code>MCTSRival</code> contra el MCTS de la guía, en 16 partidas:
         </p>
 <!--TEX \begin{aligned}
 p &= 66\,\%, \qquad m = 24 \\[6pt]
@@ -438,7 +550,7 @@ p &amp;= 66\,\%, \qquad m = 24 \\[6pt]
             <li><a href="#reglas">Reglas del jugador</a></li>
             <li><a href="#concurso">Concurso</a></li>
             <li><a href="#como-trabajar">Cómo trabajar</a></li>
-            <li><a href="#significativa">¿La mejora es real?</a></li>
+            <li><a href="#significativa">Comparar versiones</a></li>
             <li><a href="#entrega">Reglas de entrega</a></li>
             <li><a href="#referencias">Referencias</a></li>
           </ol>
